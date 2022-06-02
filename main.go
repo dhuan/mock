@@ -5,84 +5,83 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	"github.com/dhuan/mock/internal/mock"
+	"github.com/dhuan/mock/internal/mockfs"
+	"github.com/dhuan/mock/internal/types"
+	"github.com/dhuan/mock/internal/utils"
 )
 
 type MockConfig struct {
-	Endpoints []EndpointConfig `json:"endpoints"`
+	Endpoints []types.EndpointConfig `json:"endpoints"`
 }
 
-type State struct {
-	RequestRecordDirectoryPath string
-}
-
-type EndpointConfig struct {
-	Route   string `json:"route"`
-	Method  string `json:"method"`
-	Content string `json:"content"`
-}
-
-type RequestRecord struct {
-	Headers http.Header `json:"headers"`
+type MockApiResponse struct {
+	Pass             bool                    `json:"pass"`
+	ValidationErrors *[]mock.ValidationError `json:"validation_errors"`
 }
 
 func main() {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	config := &MockConfig{
-		Endpoints: []EndpointConfig{
-			EndpointConfig{"/foobar", "POST", "./foobar.txt"},
+		Endpoints: []types.EndpointConfig{
+			types.EndpointConfig{
+				Route:   "/foobar",
+				Method:  "POST",
+				Content: "./foobar.txt",
+			},
 		},
 	}
 
-	tempDir, err := mktempDir()
-	fmt.Println(fmt.Sprintf("!!!!!!!!!!!!!! %s", tempDir))
+	prepareConfig(config)
+
+	tempDir, err := utils.MktempDir()
+	fmt.Println(fmt.Sprintf("Temporary folder created for Request Records: %s", tempDir))
 	if err != nil {
 		panic(err)
 	}
-	state := &State{tempDir}
+	state := &types.State{RequestRecordDirectoryPath: tempDir}
+	mockFs := mockfs.MockFs{State: state}
 
 	for _, endpointConfig := range config.Endpoints {
+		route := fmt.Sprintf("/%s", endpointConfig.Route)
+
 		if strings.ToLower(endpointConfig.Method) == "get" {
-			router.Get(endpointConfig.Route, newEndpointHandler(state, &endpointConfig))
+			router.Get(route, newEndpointHandler(state, &endpointConfig, mockFs))
 		}
 
 		if strings.ToLower(endpointConfig.Method) == "post" {
-			router.Post(endpointConfig.Route, newEndpointHandler(state, &endpointConfig))
+			router.Post(route, newEndpointHandler(state, &endpointConfig, mockFs))
 		}
 
 		if strings.ToLower(endpointConfig.Method) == "patch" {
-			router.Patch(endpointConfig.Route, newEndpointHandler(state, &endpointConfig))
+			router.Patch(route, newEndpointHandler(state, &endpointConfig, mockFs))
 		}
 
 		if strings.ToLower(endpointConfig.Method) == "put" {
-			router.Put(endpointConfig.Route, newEndpointHandler(state, &endpointConfig))
+			router.Put(route, newEndpointHandler(state, &endpointConfig, mockFs))
 		}
 	}
+
+	router.Post("/__mock__", mockApiHandler(mockFs, state, config))
 
 	http.ListenAndServe(":3000", router)
 }
 
-func newEndpointHandler(state *State, endpointConfig *EndpointConfig) http.HandlerFunc {
+func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fileContent, err := os.ReadFile(endpointConfig.Content)
 		if err != nil {
 			panic(err)
 		}
 
-		requestRecord := buildRequestRecord(r)
-		requestRecordJson, err := buildRequestRecordJson(requestRecord)
+		err = mockFs.StoreRequestRecord(r, endpointConfig)
 		if err != nil {
-			panic(err)
-		}
-		requestRecordFileName := fmt.Sprintf("%s_%s", nowStr(), buildEndpointId(endpointConfig))
-		requestRecordFilePath := fmt.Sprintf("%s/%s", state.RequestRecordDirectoryPath, requestRecordFileName)
-		if err = writeNewFile(requestRecordFilePath, requestRecordJson); err != nil {
 			panic(err)
 		}
 
@@ -90,40 +89,38 @@ func newEndpointHandler(state *State, endpointConfig *EndpointConfig) http.Handl
 	}
 }
 
-func buildEndpointId(endpointConfig *EndpointConfig) string {
-	return strings.ReplaceAll(endpointConfig.Route, "/", "__")
-}
+func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		assertConfig, err := mock.ParseAssertRequest(r)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(400)
 
-func mktempDir() (string, error) {
-	result, err := exec.Command("mktemp", "-d").Output()
-	if err != nil {
-		return "", err
-	}
+			return
+		}
 
-	return strings.TrimSuffix(string(result), "\n"), nil
-}
+		pass, validationErrors, err := mock.Validate(mockFs, assertConfig)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(500)
 
-func nowStr() string {
-	now := time.Now()
+			return
+		}
 
-	return fmt.Sprint(now.Unix())
-}
+		response := MockApiResponse{pass, validationErrors}
+		responseJson, err := json.Marshal(response)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(400)
+		}
 
-func writeNewFile(filePath string, fileContent []byte) error {
-	err := os.WriteFile(filePath, fileContent, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func buildRequestRecord(r *http.Request) *RequestRecord {
-	return &RequestRecord{
-		Headers: r.Header,
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(responseJson)
 	}
 }
 
-func buildRequestRecordJson(requestRecord *RequestRecord) ([]byte, error) {
-	return json.Marshal(requestRecord)
+func prepareConfig(mockConfig *MockConfig) {
+	for i, endpoint := range mockConfig.Endpoints {
+		mockConfig.Endpoints[i].Route = utils.ReplaceRegex(endpoint.Route, []string{`^\/`}, "")
+	}
 }
