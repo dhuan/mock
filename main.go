@@ -14,6 +14,7 @@ import (
 	"github.com/dhuan/mock/internal/mockfs"
 	"github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
+	"github.com/nsf/jsondiff"
 )
 
 type MockConfig struct {
@@ -99,7 +100,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 			return
 		}
 
-		pass, validationErrors, err := mock.Validate(mockFs, assertConfig)
+		pass, validationErrors, err := mock.Validate(mockFs, jsonValidate, assertConfig)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(500)
@@ -123,4 +124,21 @@ func prepareConfig(mockConfig *MockConfig) {
 	for i, endpoint := range mockConfig.Endpoints {
 		mockConfig.Endpoints[i].Route = utils.ReplaceRegex(endpoint.Route, []string{`^\/`}, "")
 	}
+}
+
+func jsonValidate(jsonA map[string]interface{}, jsonB map[string]interface{}) bool {
+	a, err := json.Marshal(jsonA)
+	if err != nil {
+		return false
+	}
+
+	b, err := json.Marshal(jsonB)
+	if err != nil {
+		return false
+	}
+
+	options := jsondiff.DefaultJSONOptions()
+	result, _ := jsondiff.Compare(a, b, &options)
+
+	return result == jsondiff.FullMatch
 }

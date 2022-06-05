@@ -3,6 +3,7 @@ package mockfs
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,7 +19,11 @@ type MockFs struct {
 }
 
 func (this MockFs) StoreRequestRecord(r *http.Request, endpointConfig *types.EndpointConfig) error {
-	requestRecord := buildRequestRecord(r)
+	requestRecord, err := buildRequestRecord(r)
+	if err != nil {
+		return err
+	}
+
 	requestRecordJson, err := buildRequestRecordJson(requestRecord)
 	if err != nil {
 		return err
@@ -82,14 +87,35 @@ func routeNameToRequestRecordFileRouteName(route string) string {
 	return strings.ReplaceAll(route, "/", "__")
 }
 
-func buildRequestRecord(r *http.Request) *types.RequestRecord {
+func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
 	route := utils.ReplaceRegex(r.RequestURI, []string{`^\/`}, "")
 	headers := buildHeadersForRequestRecord(&r.Header)
-
-	return &types.RequestRecord{
+	requestRecord := &types.RequestRecord{
 		Route:   route,
 		Headers: *headers,
 	}
+	hasJsonBody := hasHeaderWithValue(headers, "content-type", "application/json") || requestHasBody(r)
+
+	requestBody := make([]byte, 0)
+	requestRecord.Body = &requestBody
+	if hasJsonBody {
+		requestBody, err := extractBodyFromRequest(r)
+		if err != nil {
+			return requestRecord, err
+		}
+		requestRecord.Body = &requestBody
+	}
+
+	return requestRecord, nil
+}
+
+func requestHasBody(req *http.Request) bool {
+	bodyContent, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return false
+	}
+
+	return string(bodyContent) != ""
 }
 
 func buildHeadersForRequestRecord(headers *http.Header) *http.Header {
@@ -119,4 +145,20 @@ func writeNewFile(filePath string, fileContent []byte) error {
 	}
 
 	return nil
+}
+
+func hasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSearch string) bool {
+	for headerKey, headerValues := range *headers {
+		for _, headerValue := range headerValues {
+			if headerKey == headerKeyToSearch && headerValue == headerValueToSearch {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func extractBodyFromRequest(req *http.Request) ([]byte, error) {
+	return ioutil.ReadAll(req.Body)
 }

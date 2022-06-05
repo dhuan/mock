@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"net/http"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -37,4 +38,16 @@ func MktempDir() (string, error) {
 	}
 
 	return strings.TrimSuffix(string(result), "\n"), nil
+}
+
+func HasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSearch string) bool {
+	for headerKey, headerValues := range *headers {
+		for _, headerValue := range headerValues {
+			if headerKey == headerKeyToSearch && headerValue == headerValueToSearch {
+				return true
+			}
+		}
+	}
+
+	return false
 }
