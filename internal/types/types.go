@@ -6,6 +6,7 @@ import (
 
 type State struct {
 	RequestRecordDirectoryPath string
+	ConfigFolderPath           string
 }
 
 type EndpointConfig struct {
