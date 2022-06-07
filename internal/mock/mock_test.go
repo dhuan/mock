@@ -19,7 +19,7 @@ func reset() {
 	mock_request_records = make([]*types.RequestRecord, 0)
 }
 
-func addToMockedRequestRecords(route string, headers [][]string, body []byte) {
+func addToMockedRequestRecords(route string, method string, headers [][]string, body []byte) {
 	httpHeaders := make(http.Header)
 
 	for _, headerValues := range headers {
@@ -31,6 +31,7 @@ func addToMockedRequestRecords(route string, headers [][]string, body []byte) {
 		mock_request_records,
 		&types.RequestRecord{
 			Route:   route,
+			Method:  method,
 			Headers: httpHeaders,
 			Body:    &body,
 		},
@@ -75,6 +76,7 @@ func TestValidate_HeaderNotIncluded(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(
 		"foobar",
+		"get",
 		[][]string{[]string{"some_header_key", "some_header_value"}},
 		[]byte(``),
 	)
@@ -106,6 +108,7 @@ func TestValidate_HeaderMismatch(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(
 		"foobar",
+		"get",
 		[][]string{[]string{"foo", "not_bar"}},
 		[]byte(``),
 	)
@@ -139,6 +142,7 @@ func TestValidate_BodyJson_ValueMatches(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(
 		"foobar",
+		"post",
 		[][]string{
 			[]string{"content-type", "application/json"},
 		},
@@ -173,6 +177,7 @@ func TestValidate_BodyJson_RequestWithBodyButNoBodyAssertion(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(
 		"foobar",
+		"post",
 		[][]string{
 			[]string{"content-type", "application/json"},
 		},
@@ -196,6 +201,7 @@ func TestValidate_BodyJson_RequestWithoutBodyButWithBodyAssertion(t *testing.T) 
 	reset()
 	addToMockedRequestRecords(
 		"foobar",
+		"post",
 		[][]string{
 			[]string{"content-type", "application/json"},
 		},
@@ -219,6 +225,60 @@ func TestValidate_BodyJson_RequestWithoutBodyButWithBodyAssertion(t *testing.T) 
 				Metadata: map[string]string{},
 			},
 		},
+		validationErrors,
+	)
+}
+
+func TestValidate_MethodMismatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"post",
+		[][]string{},
+		[]byte(""),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route:  "foobar",
+		Method: "put",
+	}
+
+	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{
+			mock.ValidationError{
+				Code: mock.Validation_error_code_method_mismatch,
+				Metadata: map[string]string{
+					"method_requested": "post",
+					"method_expected":  "put",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func TestValidate_MethodMatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"post",
+		[][]string{},
+		[]byte(""),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route:  "foobar",
+		Method: "post",
+	}
+
+	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{},
 		validationErrors,
 	)
 }

@@ -17,6 +17,7 @@ type EndpointConfig struct {
 
 type RequestRecord struct {
 	Route   string      `json:"route"`
+	Method  string      `json:"method"`
 	Headers http.Header `json:"headers"`
 	Body    *[]byte     `json:"body"`
 }

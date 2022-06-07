@@ -15,12 +15,14 @@ var (
 	Validation_error_code_header_not_included         = "header_not_included"
 	Validation_error_code_body_mismatch               = "body_mismatch"
 	Validation_error_code_request_has_no_body_content = "request_has_no_body_content"
+	Validation_error_code_method_mismatch             = "method_mismatch"
 )
 
 type AssertHeader map[string][]string
 
 type AssertConfig struct {
 	Route    string                 `json:"route"`
+	Method   string                 `json:"method"`
 	Headers  AssertHeader           `json:"headers"`
 	BodyJson map[string]interface{} `json:"body_json"`
 }
@@ -77,6 +79,19 @@ func Validate(
 		if len(*bodyJsonAssertionValidationErrors) > 0 {
 			validationErrors = append(validationErrors, *bodyJsonAssertionValidationErrors...)
 		}
+	}
+
+	if assertConfig.Method != "" && assertConfig.Method != requestRecord.Method {
+		validationErrors = append(
+			validationErrors,
+			ValidationError{
+				Validation_error_code_method_mismatch,
+				map[string]string{
+					"method_requested": requestRecord.Method,
+					"method_expected":  assertConfig.Method,
+				},
+			},
+		)
 	}
 
 	return len(validationErrors) == 0, &validationErrors, nil
