@@ -24,7 +24,6 @@ type MockConfig struct {
 }
 
 type MockApiResponse struct {
-	Pass             bool                    `json:"pass"`
 	ValidationErrors *[]mock.ValidationError `json:"validation_errors"`
 }
 
@@ -137,7 +136,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 			return
 		}
 
-		pass, validationErrors, err := mock.Validate(mockFs, jsonValidate, assertConfig)
+		validationErrors, err := mock.Validate(mockFs, jsonValidate, assertConfig)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(500)
@@ -145,12 +144,22 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 			return
 		}
 
-		response := MockApiResponse{pass, validationErrors}
+		response := MockApiResponse{validationErrors}
 		responseJson, err := json.Marshal(response)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(400)
+			w.Header().Add("Content-Type", "application/json")
+			w.Write(responseJson)
+
+			return
 		}
+
+		statusCode := 200
+		if len(*validationErrors) > 0 {
+			statusCode = 400
+		}
+		w.WriteHeader(statusCode)
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(responseJson)

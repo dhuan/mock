@@ -46,17 +46,17 @@ func Validate(
 	mockFs types.MockFs,
 	jsonValidate JsonValidate,
 	assertConfig *AssertConfig,
-) (bool, *[]ValidationError, error) {
+) (*[]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
 	requestRecords, err := getRequestRecordMatchingRoute(mockFs, assertConfig.Route)
 	if err != nil {
-		return false, &validationErrors, err
+		return &validationErrors, err
 	}
 	if len(requestRecords) == 0 {
 		validationErrors = append(validationErrors, ValidationError{Validation_error_code_no_call, map[string]string{}})
 
-		return false, &validationErrors, nil
+		return &validationErrors, nil
 	}
 
 	requestRecord := requestRecords[0]
@@ -73,7 +73,7 @@ func Validate(
 	if hasBodyJsonAssertion {
 		bodyJsonAssertionValidationErrors, err := handleBodyJsonAssertion(requestRecord, jsonValidate, assertConfig)
 		if err != nil {
-			return false, &validationErrors, err
+			return &validationErrors, err
 		}
 
 		if len(*bodyJsonAssertionValidationErrors) > 0 {
@@ -94,7 +94,7 @@ func Validate(
 		)
 	}
 
-	return len(validationErrors) == 0, &validationErrors, nil
+	return &validationErrors, nil
 }
 
 func handleBodyJsonAssertion(

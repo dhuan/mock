@@ -58,7 +58,7 @@ func TestValidate_NoCalls(t *testing.T) {
 		},
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -88,7 +88,7 @@ func TestValidate_HeaderNotIncluded(t *testing.T) {
 		},
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -120,7 +120,7 @@ func TestValidate_HeaderMismatch(t *testing.T) {
 		},
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -156,7 +156,7 @@ func TestValidate_BodyJson_ValueMatches(t *testing.T) {
 		},
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -188,7 +188,7 @@ func TestValidate_BodyJson_RequestWithBodyButNoBodyAssertion(t *testing.T) {
 		Route: "foobar",
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -215,7 +215,7 @@ func TestValidate_BodyJson_RequestWithoutBodyButWithBodyAssertion(t *testing.T) 
 		},
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -243,7 +243,7 @@ func TestValidate_MethodMismatch(t *testing.T) {
 		Method: "put",
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -274,7 +274,7 @@ func TestValidate_MethodMatch(t *testing.T) {
 		Method: "post",
 	}
 
-	_, validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
