@@ -106,6 +106,8 @@ func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
 		requestRecord.Body = &requestBody
 	}
 
+	requestRecord.Method = strings.ToLower(r.Method)
+
 	return requestRecord, nil
 }
 
