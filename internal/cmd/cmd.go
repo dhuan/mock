@@ -30,6 +30,7 @@ func Execute() {
 	rootCmd.AddCommand(serveCmd)
 
 	serveCmd.PersistentFlags().StringVarP(&flagConfig, "config", "c", "", "configuration file")
+	serveCmd.MarkPersistentFlagRequired("config")
 	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "3000", "port to listen on")
 
 	if err := rootCmd.Execute(); err != nil {
