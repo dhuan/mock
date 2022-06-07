@@ -26,8 +26,8 @@ type AssertConfig struct {
 }
 
 type ValidationError struct {
-	Code     string   `json:"code"`
-	Metadata []string `json:"metadata"`
+	Code     string            `json:"code"`
+	Metadata map[string]string `json:"metadata"`
 }
 
 type JsonValidate func(jsonA map[string]interface{}, jsonB map[string]interface{}) bool
@@ -52,7 +52,7 @@ func Validate(
 		return false, &validationErrors, err
 	}
 	if len(requestRecords) == 0 {
-		validationErrors = append(validationErrors, ValidationError{Validation_error_code_no_call, []string{}})
+		validationErrors = append(validationErrors, ValidationError{Validation_error_code_no_call, map[string]string{}})
 
 		return false, &validationErrors, nil
 	}
@@ -90,7 +90,10 @@ func handleBodyJsonAssertion(
 	validationErrors := make([]ValidationError, 0)
 
 	if string(*requestRecord.Body) == "" {
-		validationErrors = append(validationErrors, ValidationError{Code: Validation_error_code_request_has_no_body_content, Metadata: []string{}})
+		validationErrors = append(
+			validationErrors,
+			ValidationError{Code: Validation_error_code_request_has_no_body_content, Metadata: map[string]string{}},
+		)
 
 		return &validationErrors, nil
 	}
@@ -102,9 +105,22 @@ func handleBodyJsonAssertion(
 	}
 
 	bodyValidationResult := jsonValidate(jsonA, assertConfig.BodyJson)
+	bodyRequest, err := json.Marshal(jsonA)
+	if err != nil {
+		return &validationErrors, err
+	}
+	bodyAssert, err := json.Marshal(assertConfig.BodyJson)
+	if err != nil {
+		return &validationErrors, err
+	}
 
 	if !bodyValidationResult {
-		validationErrors = append(validationErrors, ValidationError{Validation_error_code_body_mismatch, []string{}})
+		validationErrors = append(
+			validationErrors,
+			ValidationError{Validation_error_code_body_mismatch, map[string]string{
+				"body_requested": string(bodyRequest),
+				"body_expected":  string(bodyAssert),
+			}})
 	}
 
 	return &validationErrors, nil
@@ -118,8 +134,8 @@ func validateHeadersMatch(requestRecord *types.RequestRecord, assertConfig *Asse
 		if !ok {
 			validationErrors = append(validationErrors, ValidationError{
 				Code: Validation_error_code_header_not_included,
-				Metadata: []string{
-					headerKey,
+				Metadata: map[string]string{
+					"missing_header_key": headerKey,
 				},
 			})
 
@@ -129,10 +145,10 @@ func validateHeadersMatch(requestRecord *types.RequestRecord, assertConfig *Asse
 		if !utils.ListsEqual[string](header, headerB) {
 			validationErrors = append(validationErrors, ValidationError{
 				Code: Validation_error_code_header_value_mismatch,
-				Metadata: []string{
-					headerKey,
-					strings.Join(header, ","),
-					strings.Join(headerB, ","),
+				Metadata: map[string]string{
+					"header_key":             headerKey,
+					"header_value_expected":  strings.Join(header, ","),
+					"header_value_requested": strings.Join(headerB, ","),
 				},
 			})
 		}

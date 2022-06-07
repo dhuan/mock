@@ -62,7 +62,10 @@ func TestValidate_NoCalls(t *testing.T) {
 	assert.Equal(
 		t,
 		&[]mock.ValidationError{
-			mock.ValidationError{Code: mock.Validation_error_code_no_call, Metadata: []string{}},
+			mock.ValidationError{
+				Code:     mock.Validation_error_code_no_call,
+				Metadata: map[string]string{},
+			},
 		},
 		validationErrors,
 	)
@@ -88,7 +91,12 @@ func TestValidate_HeaderNotIncluded(t *testing.T) {
 	assert.Equal(
 		t,
 		&[]mock.ValidationError{
-			mock.ValidationError{Code: mock.Validation_error_code_header_not_included, Metadata: []string{"foo"}},
+			mock.ValidationError{
+				Code: mock.Validation_error_code_header_not_included,
+				Metadata: map[string]string{
+					"missing_header_key": "foo",
+				},
+			},
 		},
 		validationErrors,
 	)
@@ -114,7 +122,14 @@ func TestValidate_HeaderMismatch(t *testing.T) {
 	assert.Equal(
 		t,
 		&[]mock.ValidationError{
-			mock.ValidationError{Code: mock.Validation_error_code_header_value_mismatch, Metadata: []string{"foo", "bar", "not_bar"}},
+			mock.ValidationError{
+				Code: mock.Validation_error_code_header_value_mismatch,
+				Metadata: map[string]string{
+					"header_key":             "foo",
+					"header_value_requested": "not_bar",
+					"header_value_expected":  "bar",
+				},
+			},
 		},
 		validationErrors,
 	)
@@ -142,7 +157,13 @@ func TestValidate_BodyJson_ValueMatches(t *testing.T) {
 	assert.Equal(
 		t,
 		&[]mock.ValidationError{
-			mock.ValidationError{Code: mock.Validation_error_code_body_mismatch, Metadata: []string{}},
+			mock.ValidationError{
+				Code: mock.Validation_error_code_body_mismatch,
+				Metadata: map[string]string{
+					"body_requested": `{"foo":"not_bar"}`,
+					"body_expected":  `{"foo":"bar"}`,
+				},
+			},
 		},
 		validationErrors,
 	)
@@ -193,7 +214,10 @@ func TestValidate_BodyJson_RequestWithoutBodyButWithBodyAssertion(t *testing.T) 
 	assert.Equal(
 		t,
 		&[]mock.ValidationError{
-			mock.ValidationError{Code: mock.Validation_error_code_request_has_no_body_content, Metadata: []string{}},
+			mock.ValidationError{
+				Code:     mock.Validation_error_code_request_has_no_body_content,
+				Metadata: map[string]string{},
+			},
 		},
 		validationErrors,
 	)
