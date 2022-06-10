@@ -2,6 +2,9 @@ package types
 
 import (
 	"net/http"
+	"strings"
+
+	"github.com/dhuan/mock/internal/utils"
 )
 
 type State struct {
@@ -10,9 +13,9 @@ type State struct {
 }
 
 type EndpointConfig struct {
-	Route   string `json:"route"`
-	Method  string `json:"method"`
-	Content string `json:"content"`
+	Route   string                `json:"route"`
+	Method  string                `json:"method"`
+	Content EndpointConfigContent `json:"content"`
 }
 
 type RequestRecord struct {
@@ -25,4 +28,24 @@ type RequestRecord struct {
 type MockFs interface {
 	StoreRequestRecord(r *http.Request, endpointConfig *EndpointConfig) error
 	GetRecordsMatchingRoute(route string) ([]*RequestRecord, error)
+}
+
+type EndpointConfigContent []byte
+
+func (this *EndpointConfigContent) UnmarshalJSON(data []byte) (err error) {
+	if utils.BeginsWith(string(data), `"file:`) {
+		*this = []byte(utils.Unquote(string(data)))
+
+		return nil
+	}
+
+	if strings.Index(string(data), "{") == 0 {
+		*this = data
+
+		return nil
+	}
+
+	*this = data
+
+	return nil
 }

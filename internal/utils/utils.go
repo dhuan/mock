@@ -21,6 +21,10 @@ func ReplaceRegex(subject string, find []string, replaceWith string) string {
 	)
 }
 
+func Unquote(subject string) string {
+	return ReplaceRegex(subject, []string{`^"`, `"$`}, "")
+}
+
 func ListsEqual[T comparable](listA []T, listB []T) bool {
 	for i, _ := range listA {
 		if listA[i] != listB[i] {
@@ -50,4 +54,8 @@ func HasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSe
 	}
 
 	return false
+}
+
+func BeginsWith(subject, find string) bool {
+	return strings.Index(subject, find) == 0
 }

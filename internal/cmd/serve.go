@@ -19,6 +19,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type endpoint_content_type int
+
+const (
+	endpoint_content_type_file endpoint_content_type = iota
+	endpoint_content_type_json
+	endpoint_content_type_unknown
+)
+
 var serveCmd = &cobra.Command{
 	Use: "serve",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -43,7 +51,8 @@ var serveCmd = &cobra.Command{
 		}
 		mockFs := mockfs.MockFs{State: state}
 
-		for _, endpointConfig := range config.Endpoints {
+		for i, _ := range config.Endpoints {
+			endpointConfig := config.Endpoints[i]
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
 			if strings.ToLower(endpointConfig.Method) == "get" {
@@ -73,10 +82,14 @@ var serveCmd = &cobra.Command{
 
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		responseFile := fmt.Sprintf("%s/%s", state.ConfigFolderPath, endpointConfig.Content)
-		fileContent, err := os.ReadFile(responseFile)
+		responseContent, endpointContentType, err := resolveEndpointResponse(state, endpointConfig)
 		if err != nil {
 			panic(err)
+		}
+		if endpointContentType == endpoint_content_type_unknown {
+			fmt.Println(fmt.Sprintf("Failed to resolve endpoint content type for route %s", endpointConfig.Route))
+
+			return
 		}
 
 		err = mockFs.StoreRequestRecord(r, endpointConfig)
@@ -84,7 +97,7 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 			panic(err)
 		}
 
-		w.Write(fileContent)
+		w.Write(responseContent)
 	}
 }
 
@@ -164,4 +177,55 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 	}
 
 	return &mockConfig, nil
+}
+
+func resolveEndpointConfigContentType(endpointConfig *types.EndpointConfig) endpoint_content_type {
+	if utils.BeginsWith(string(endpointConfig.Content), "file:") {
+		return endpoint_content_type_file
+	}
+
+	if utils.BeginsWith(string(endpointConfig.Content), "{") {
+		return endpoint_content_type_json
+	}
+
+	return endpoint_content_type_unknown
+}
+
+func resolveEndpointResponse(state *types.State, endpointConfig *types.EndpointConfig) ([]byte, endpoint_content_type, error) {
+	endpointConfigContentType := resolveEndpointConfigContentType(endpointConfig)
+
+	if endpointConfigContentType == endpoint_content_type_unknown {
+		return []byte(""), endpointConfigContentType, nil
+	}
+
+	if endpointConfigContentType == endpoint_content_type_file {
+		responseFile := fmt.Sprintf(
+			"%s/%s",
+			state.ConfigFolderPath,
+			strings.Replace(string(endpointConfig.Content), "file:", "", -1),
+		)
+		fileContent, err := os.ReadFile(responseFile)
+		if err != nil {
+			return []byte(""), endpointConfigContentType, err
+		}
+
+		return fileContent, endpointConfigContentType, nil
+	}
+
+	if endpointConfigContentType == endpoint_content_type_json {
+		var jsonParsed interface{}
+		err := json.Unmarshal(endpointConfig.Content, &jsonParsed)
+		if err != nil {
+			return []byte(""), endpointConfigContentType, err
+		}
+
+		jsonEncoded, err := json.Marshal(jsonParsed)
+		if err != nil {
+			return []byte(""), endpointConfigContentType, err
+		}
+
+		return jsonEncoded, endpointConfigContentType, nil
+	}
+
+	return []byte(""), endpoint_content_type_unknown, nil
 }
