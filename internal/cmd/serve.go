@@ -72,7 +72,7 @@ var serveCmd = &cobra.Command{
 			}
 		}
 
-		router.Post("/__mock__", mockApiHandler(mockFs, state, config))
+		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
 
 		fmt.Println(fmt.Sprintf("Mock server is listening on port %s.", flagPort))
 
