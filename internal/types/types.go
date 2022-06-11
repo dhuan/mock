@@ -13,9 +13,9 @@ type State struct {
 }
 
 type EndpointConfig struct {
-	Route   string                `json:"route"`
-	Method  string                `json:"method"`
-	Content EndpointConfigContent `json:"content"`
+	Route   string                 `json:"route"`
+	Method  string                 `json:"method"`
+	Content EndpointConfigResponse `json:"response"`
 }
 
 type RequestRecord struct {
@@ -30,9 +30,9 @@ type MockFs interface {
 	GetRecordsMatchingRoute(route string) ([]*RequestRecord, error)
 }
 
-type EndpointConfigContent []byte
+type EndpointConfigResponse []byte
 
-func (this *EndpointConfigContent) UnmarshalJSON(data []byte) (err error) {
+func (this *EndpointConfigResponse) UnmarshalJSON(data []byte) (err error) {
 	if utils.BeginsWith(string(data), `"file:`) {
 		*this = []byte(utils.Unquote(string(data)))
 
