@@ -91,6 +91,9 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 
 			return
 		}
+		if endpointContentType == endpoint_content_type_json {
+			w.Header().Add("Content-Type", "application/json")
+		}
 
 		err = mockFs.StoreRequestRecord(r, endpointConfig)
 		if err != nil {
