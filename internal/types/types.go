@@ -16,6 +16,7 @@ type EndpointConfig struct {
 	Route   string                 `json:"route"`
 	Method  string                 `json:"method"`
 	Content EndpointConfigResponse `json:"response"`
+	Headers map[string]string      `json:"response_headers"`
 }
 
 type RequestRecord struct {
