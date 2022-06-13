@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -73,7 +74,7 @@ var serveCmd = &cobra.Command{
 
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		responseContent, endpointContentType, err := mock.ResolveEndpointResponse(state, endpointConfig)
+		responseContent, endpointContentType, err := mock.ResolveEndpointResponse(os.ReadFile, state, endpointConfig)
 		if err != nil {
 			panic(err)
 		}
