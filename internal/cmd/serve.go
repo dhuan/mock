@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,14 +16,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/nsf/jsondiff"
 	"github.com/spf13/cobra"
-)
-
-type endpoint_content_type int
-
-const (
-	endpoint_content_type_file endpoint_content_type = iota
-	endpoint_content_type_json
-	endpoint_content_type_unknown
 )
 
 var serveCmd = &cobra.Command{
@@ -82,16 +73,16 @@ var serveCmd = &cobra.Command{
 
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		responseContent, endpointContentType, err := resolveEndpointResponse(state, endpointConfig)
+		responseContent, endpointContentType, err := mock.ResolveEndpointResponse(state, endpointConfig)
 		if err != nil {
 			panic(err)
 		}
-		if endpointContentType == endpoint_content_type_unknown {
+		if endpointContentType == types.Endpoint_content_type_unknown {
 			fmt.Println(fmt.Sprintf("Failed to resolve endpoint content type for route %s", endpointConfig.Route))
 
 			return
 		}
-		if endpointContentType == endpoint_content_type_json {
+		if endpointContentType == types.Endpoint_content_type_json {
 			w.Header().Add("Content-Type", "application/json")
 		}
 
@@ -182,57 +173,6 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 	}
 
 	return &mockConfig, nil
-}
-
-func resolveEndpointConfigContentType(endpointConfig *types.EndpointConfig) endpoint_content_type {
-	if utils.BeginsWith(string(endpointConfig.Content), "file:") {
-		return endpoint_content_type_file
-	}
-
-	if utils.BeginsWith(string(endpointConfig.Content), "{") {
-		return endpoint_content_type_json
-	}
-
-	return endpoint_content_type_unknown
-}
-
-func resolveEndpointResponse(state *types.State, endpointConfig *types.EndpointConfig) ([]byte, endpoint_content_type, error) {
-	endpointConfigContentType := resolveEndpointConfigContentType(endpointConfig)
-
-	if endpointConfigContentType == endpoint_content_type_unknown {
-		return []byte(""), endpointConfigContentType, nil
-	}
-
-	if endpointConfigContentType == endpoint_content_type_file {
-		responseFile := fmt.Sprintf(
-			"%s/%s",
-			state.ConfigFolderPath,
-			strings.Replace(string(endpointConfig.Content), "file:", "", -1),
-		)
-		fileContent, err := os.ReadFile(responseFile)
-		if err != nil {
-			return []byte(""), endpointConfigContentType, err
-		}
-
-		return fileContent, endpointConfigContentType, nil
-	}
-
-	if endpointConfigContentType == endpoint_content_type_json {
-		var jsonParsed interface{}
-		err := json.Unmarshal(endpointConfig.Content, &jsonParsed)
-		if err != nil {
-			return []byte(""), endpointConfigContentType, err
-		}
-
-		jsonEncoded, err := json.Marshal(jsonParsed)
-		if err != nil {
-			return []byte(""), endpointConfigContentType, err
-		}
-
-		return jsonEncoded, endpointConfigContentType, nil
-	}
-
-	return []byte(""), endpoint_content_type_unknown, nil
 }
 
 func addHeaders(w http.ResponseWriter, endpointConfig *types.EndpointConfig) {
