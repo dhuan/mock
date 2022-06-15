@@ -64,7 +64,7 @@ Given the configuration above, the `foo/bar` endpoint's response is defined in t
 
 You may want to define different responses for the same endpoint, based on certain conditions. The `response_if` parameter enables you to achieve that.
 
-```json
+```diff
  {
    "endpoints": [
      {
