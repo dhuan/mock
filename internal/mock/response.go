@@ -81,6 +81,10 @@ func resolveEndpointResponseInternal(readFile ReadFileFunc, state *types.State, 
 		return []byte(""), endpointConfigContentType, nil
 	}
 
+	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
+		return []byte(utils.Unquote(string(response))), endpointConfigContentType, nil
+	}
+
 	if endpointConfigContentType == types.Endpoint_content_type_file {
 		responseFile := fmt.Sprintf(
 			"%s/%s",
@@ -122,5 +126,5 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 		return types.Endpoint_content_type_json
 	}
 
-	return types.Endpoint_content_type_unknown
+	return types.Endpoint_content_type_plaintext
 }

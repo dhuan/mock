@@ -25,7 +25,7 @@ func (this *osMock) ReadFile(name string) ([]byte, error) {
 	return args.Get(0).([]byte), nil
 }
 
-func Test_ResolveEndpointResponse_GettingResponse(t *testing.T) {
+func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 	osMockInstance := osMock{}
 	state := types.State{
 		RequestRecordDirectoryPath: "/path/to/somewhere",
@@ -49,6 +49,34 @@ func Test_ResolveEndpointResponse_GettingResponse(t *testing.T) {
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_json,
+		endpointContentType,
+	)
+}
+
+func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
+	osMockInstance := osMock{}
+	state := types.State{
+		RequestRecordDirectoryPath: "/path/to/somewhere",
+		ConfigFolderPath:           "/path/to/somewhere",
+	}
+	endpointConfig := types.EndpointConfig{
+		Route:   "foo/bar",
+		Method:  "post",
+		Content: []byte(`Hello world!`),
+		Headers: map[string]string{},
+	}
+
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		`Hello world!`,
+		string(response),
+	)
+
+	assert.Equal(
+		t,
+		types.Endpoint_content_type_plaintext,
 		endpointContentType,
 	)
 }

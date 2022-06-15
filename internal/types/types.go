@@ -67,5 +67,6 @@ type Endpoint_content_type int
 const (
 	Endpoint_content_type_file Endpoint_content_type = iota
 	Endpoint_content_type_json
+	Endpoint_content_type_plaintext
 	Endpoint_content_type_unknown
 )
