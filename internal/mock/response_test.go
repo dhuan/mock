@@ -6,15 +6,23 @@ import (
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/types"
 	"github.com/stretchr/testify/assert"
+	testifymock "github.com/stretchr/testify/mock"
 )
 
 var readFileMockReturn = []byte("")
 
-func readFileMock(name string) ([]byte, error) {
-	return readFileMockReturn, nil
+type osMock struct {
+	testifymock.Mock
+}
+
+func (this *osMock) ReadFile(name string) ([]byte, error) {
+	args := this.Called(name)
+
+	return args.Get(0).([]byte), nil
 }
 
 func Test_ResolveEndpointResponse_GettingResponse(t *testing.T) {
+	osMockInstance := osMock{}
 	state := types.State{
 		RequestRecordDirectoryPath: "/path/to/somewhere",
 		ConfigFolderPath:           "/path/to/somewhere",
@@ -26,7 +34,7 @@ func Test_ResolveEndpointResponse_GettingResponse(t *testing.T) {
 		Headers: map[string]string{},
 	}
 
-	response, endpointContentType, _ := mock.ResolveEndpointResponse(readFileMock, &state, &endpointConfig)
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
@@ -42,7 +50,7 @@ func Test_ResolveEndpointResponse_GettingResponse(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
-	readFileMockReturn = []byte("Hello world!")
+	osMockInstance := osMock{}
 	state := types.State{
 		RequestRecordDirectoryPath: "/path/to/somewhere",
 		ConfigFolderPath:           "/path/to/somewhere",
@@ -54,7 +62,9 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 		Headers: map[string]string{},
 	}
 
-	response, endpointContentType, _ := mock.ResolveEndpointResponse(readFileMock, &state, &endpointConfig)
+	osMockInstance.On("ReadFile", "/path/to/somewhere/./response_foobar").Return([]byte("Hello world!"), nil)
+
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
