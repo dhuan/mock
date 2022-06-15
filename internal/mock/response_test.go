@@ -1,6 +1,8 @@
 package mock_test
 
 import (
+	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/dhuan/mock/internal/mock"
@@ -10,6 +12,8 @@ import (
 )
 
 var readFileMockReturn = []byte("")
+
+var requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}}
 
 type osMock struct {
 	testifymock.Mock
@@ -34,7 +38,7 @@ func Test_ResolveEndpointResponse_GettingResponse(t *testing.T) {
 		Headers: map[string]string{},
 	}
 
-	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, &state, &endpointConfig)
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
@@ -64,7 +68,7 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 
 	osMockInstance.On("ReadFile", "/path/to/somewhere/./response_foobar").Return([]byte("Hello world!"), nil)
 
-	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, &state, &endpointConfig)
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
@@ -75,6 +79,54 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_file,
+		endpointContentType,
+	)
+}
+
+func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
+	osMockInstance := osMock{}
+	state := types.State{
+		RequestRecordDirectoryPath: "/path/to/somewhere",
+		ConfigFolderPath:           "/path/to/somewhere",
+	}
+	endpointConfig := types.EndpointConfig{
+		Route:   "foo/bar",
+		Method:  "post",
+		Headers: map[string]string{},
+		Content: []byte(`file:./response_foobar`),
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response: []byte(`{"result": "response_one"}`),
+				QuerystringMatches: []types.QuerystringMatches{
+					types.QuerystringMatches{
+						Key:   "foo",
+						Value: "bar",
+					},
+				},
+			},
+			types.ResponseIf{
+				Response: []byte(`{"result": "response_two"}`),
+				QuerystringMatches: []types.QuerystringMatches{
+					types.QuerystringMatches{
+						Key:   "hello",
+						Value: "world",
+					},
+				},
+			},
+		},
+	}
+
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		`{"result":"response_two"}`,
+		string(response),
+	)
+
+	assert.Equal(
+		t,
+		types.Endpoint_content_type_json,
 		endpointContentType,
 	)
 }

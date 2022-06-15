@@ -3,6 +3,7 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/dhuan/mock/internal/types"
@@ -13,10 +14,68 @@ type ReadFileFunc = func(name string) ([]byte, error)
 
 func ResolveEndpointResponse(
 	readFile ReadFileFunc,
+	request *http.Request,
 	state *types.State,
 	endpointConfig *types.EndpointConfig,
 ) ([]byte, types.Endpoint_content_type, error) {
-	endpointConfigContentType := resolveEndpointConfigContentType(endpointConfig)
+	hasResponseIf := len(endpointConfig.ResponseIf) > 0
+	matchingResponseIf := &types.ResponseIf{}
+
+	if hasResponseIf {
+		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(request, endpointConfig)
+		matchingResponseIf = matchingResponseIfB
+		hasResponseIf = foundMatchingResponseIf
+	}
+
+	if hasResponseIf {
+		return resolveEndpointResponseInternal(readFile, state, matchingResponseIf.Response)
+	}
+
+	return resolveEndpointResponseInternal(readFile, state, endpointConfig.Content)
+}
+
+func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
+	matchingResponseIfs := make([]int, 0)
+
+	for responseIfKey, _ := range endpointConfig.ResponseIf {
+		querystringConditions := endpointConfig.ResponseIf[responseIfKey].QuerystringMatches
+
+		if len(querystringConditions) == 0 {
+			continue
+		}
+
+		querystringMatch := querystringConditionsMatches(request, querystringConditions)
+
+		if querystringMatch {
+			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
+		}
+	}
+
+	if len(matchingResponseIfs) == 0 {
+		return &types.ResponseIf{}, false
+	}
+
+	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
+}
+
+func querystringConditionsMatches(request *http.Request, querystringConditions []types.QuerystringMatches) bool {
+	querystring := request.URL.Query()
+
+	for i, _ := range querystringConditions {
+		if !querystring.Has(querystringConditions[i].Key) {
+			return false
+		}
+
+		if querystring.Get(querystringConditions[i].Key) != querystringConditions[i].Value {
+			return false
+		}
+	}
+
+	return true
+}
+
+func resolveEndpointResponseInternal(readFile ReadFileFunc, state *types.State, response types.EndpointConfigResponse) ([]byte, types.Endpoint_content_type, error) {
+	endpointConfigContentType := resolveEndpointConfigContentType(response)
 
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {
 		return []byte(""), endpointConfigContentType, nil
@@ -26,7 +85,7 @@ func ResolveEndpointResponse(
 		responseFile := fmt.Sprintf(
 			"%s/%s",
 			state.ConfigFolderPath,
-			strings.Replace(string(endpointConfig.Content), "file:", "", -1),
+			strings.Replace(string(response), "file:", "", -1),
 		)
 		fileContent, err := readFile(responseFile)
 		if err != nil {
@@ -38,7 +97,7 @@ func ResolveEndpointResponse(
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
-		err := json.Unmarshal(endpointConfig.Content, &jsonParsed)
+		err := json.Unmarshal(response, &jsonParsed)
 		if err != nil {
 			return []byte(""), endpointConfigContentType, err
 		}
@@ -54,12 +113,12 @@ func ResolveEndpointResponse(
 	return []byte(""), types.Endpoint_content_type_unknown, nil
 }
 
-func resolveEndpointConfigContentType(endpointConfig *types.EndpointConfig) types.Endpoint_content_type {
-	if utils.BeginsWith(string(endpointConfig.Content), "file:") {
+func resolveEndpointConfigContentType(response types.EndpointConfigResponse) types.Endpoint_content_type {
+	if utils.BeginsWith(string(response), "file:") {
 		return types.Endpoint_content_type_file
 	}
 
-	if utils.BeginsWith(string(endpointConfig.Content), "{") {
+	if utils.BeginsWith(string(response), "{") {
 		return types.Endpoint_content_type_json
 	}
 

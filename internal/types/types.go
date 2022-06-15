@@ -12,11 +12,22 @@ type State struct {
 	ConfigFolderPath           string
 }
 
+type ResponseIf struct {
+	Response           EndpointConfigResponse `json:"response"`
+	QuerystringMatches []QuerystringMatches   `json:"querystring_matches"`
+}
+
+type QuerystringMatches struct {
+	Key   string
+	Value string
+}
+
 type EndpointConfig struct {
-	Route   string                 `json:"route"`
-	Method  string                 `json:"method"`
-	Content EndpointConfigResponse `json:"response"`
-	Headers map[string]string      `json:"response_headers"`
+	Route      string                 `json:"route"`
+	Method     string                 `json:"method"`
+	Content    EndpointConfigResponse `json:"response"`
+	Headers    map[string]string      `json:"response_headers"`
+	ResponseIf []ResponseIf           `json:"response_if"`
 }
 
 type RequestRecord struct {
