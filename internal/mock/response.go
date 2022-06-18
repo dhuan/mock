@@ -38,16 +38,18 @@ func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConf
 	matchingResponseIfs := make([]int, 0)
 
 	for responseIfKey, _ := range endpointConfig.ResponseIf {
-		querystringConditions := endpointConfig.ResponseIf[responseIfKey].QuerystringMatches
+		querystringConditionMatch := querystringConditionsMatches(request, endpointConfig.ResponseIf[responseIfKey].QuerystringMatches)
+		if len(endpointConfig.ResponseIf[responseIfKey].QuerystringMatches) > 0 && querystringConditionMatch {
+			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
 
-		if len(querystringConditions) == 0 {
 			continue
 		}
 
-		querystringMatch := querystringConditionsMatches(request, querystringConditions)
-
-		if querystringMatch {
+		querystringConditionMatchExact := querystringConditionsMatchesExact(request, endpointConfig.ResponseIf[responseIfKey].QuerystringMatchesExact)
+		if len(endpointConfig.ResponseIf[responseIfKey].QuerystringMatchesExact) > 0 && querystringConditionMatchExact {
 			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
+
+			continue
 		}
 	}
 
@@ -72,6 +74,26 @@ func querystringConditionsMatches(request *http.Request, querystringConditions [
 	}
 
 	return true
+}
+
+func querystringConditionsMatchesExact(request *http.Request, querystringConditions []types.QuerystringMatches) bool {
+	matches := 0
+	querystring := request.URL.Query()
+	requestQuerystringCount := len(querystring)
+
+	for i, _ := range querystringConditions {
+		if !querystring.Has(querystringConditions[i].Key) {
+			return false
+		}
+
+		if querystring.Get(querystringConditions[i].Key) != querystringConditions[i].Value {
+			return false
+		}
+
+		matches = matches + 1
+	}
+
+	return matches == requestQuerystringCount
 }
 
 func resolveEndpointResponseInternal(readFile ReadFileFunc, state *types.State, response types.EndpointConfigResponse) ([]byte, types.Endpoint_content_type, error) {

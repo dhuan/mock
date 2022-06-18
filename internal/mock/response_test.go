@@ -207,3 +207,56 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		endpointContentType,
 	)
 }
+
+func Test_ResolveEndpointResponse_WithExactQueryStringCondition_Matching(t *testing.T) {
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
+	osMockInstance := osMock{}
+	state := types.State{
+		RequestRecordDirectoryPath: "/path/to/somewhere",
+		ConfigFolderPath:           "/path/to/somewhere",
+	}
+	endpointConfig := types.EndpointConfig{
+		Route:   "foo/bar",
+		Method:  "post",
+		Headers: map[string]string{},
+		Content: []byte(`Fallback response!`),
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response: []byte(`response_one`),
+				QuerystringMatchesExact: []types.QuerystringMatches{
+					types.QuerystringMatches{
+						Key:   "hello",
+						Value: "world",
+					},
+				},
+			},
+			types.ResponseIf{
+				Response: []byte(`response_two`),
+				QuerystringMatchesExact: []types.QuerystringMatches{
+					types.QuerystringMatches{
+						Key:   "hello",
+						Value: "world",
+					},
+					types.QuerystringMatches{
+						Key:   "foo",
+						Value: "bar",
+					},
+				},
+			},
+		},
+	}
+
+	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		`response_two`,
+		string(response),
+	)
+
+	assert.Equal(
+		t,
+		types.Endpoint_content_type_plaintext,
+		endpointContentType,
+	)
+}

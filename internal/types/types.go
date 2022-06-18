@@ -13,8 +13,9 @@ type State struct {
 }
 
 type ResponseIf struct {
-	Response           EndpointConfigResponse `json:"response"`
-	QuerystringMatches []QuerystringMatches   `json:"querystring_matches"`
+	Response                EndpointConfigResponse `json:"response"`
+	QuerystringMatches      []QuerystringMatches   `json:"querystring_matches"`
+	QuerystringMatchesExact []QuerystringMatches   `json:"querystring_matches_exact"`
 }
 
 type QuerystringMatches struct {
