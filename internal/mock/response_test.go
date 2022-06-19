@@ -32,10 +32,10 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		ConfigFolderPath:           "/path/to/somewhere",
 	}
 	endpointConfig := types.EndpointConfig{
-		Route:   "foo/bar",
-		Method:  "post",
-		Content: []byte(`{"foo":"bar"}`),
-		Headers: map[string]string{},
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`{"foo":"bar"}`),
+		Headers:  map[string]string{},
 	}
 
 	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
@@ -60,10 +60,10 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		ConfigFolderPath:           "/path/to/somewhere",
 	}
 	endpointConfig := types.EndpointConfig{
-		Route:   "foo/bar",
-		Method:  "post",
-		Content: []byte(`Hello world!`),
-		Headers: map[string]string{},
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`Hello world!`),
+		Headers:  map[string]string{},
 	}
 
 	response, endpointContentType, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
@@ -88,10 +88,10 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 		ConfigFolderPath:           "/path/to/somewhere",
 	}
 	endpointConfig := types.EndpointConfig{
-		Route:   "foo/bar",
-		Method:  "post",
-		Content: []byte(`file:./response_foobar`),
-		Headers: map[string]string{},
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`file:./response_foobar`),
+		Headers:  map[string]string{},
 	}
 
 	osMockInstance.On("ReadFile", "/path/to/somewhere/./response_foobar").Return([]byte("Hello world!"), nil)
@@ -118,10 +118,10 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		ConfigFolderPath:           "/path/to/somewhere",
 	}
 	endpointConfig := types.EndpointConfig{
-		Route:   "foo/bar",
-		Method:  "post",
-		Headers: map[string]string{},
-		Content: []byte(`file:./response_foobar`),
+		Route:    "foo/bar",
+		Method:   "post",
+		Headers:  map[string]string{},
+		Response: []byte(`file:./response_foobar`),
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_one"}`),
@@ -161,10 +161,10 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		ConfigFolderPath:           "/path/to/somewhere",
 	}
 	endpointConfig := types.EndpointConfig{
-		Route:   "foo/bar",
-		Method:  "post",
-		Headers: map[string]string{},
-		Content: []byte(`Fallback response!`),
+		Route:    "foo/bar",
+		Method:   "post",
+		Headers:  map[string]string{},
+		Response: []byte(`Fallback response!`),
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_one"}`),
@@ -204,10 +204,10 @@ func Test_ResolveEndpointResponse_WithExactQueryStringCondition_Matching(t *test
 		ConfigFolderPath:           "/path/to/somewhere",
 	}
 	endpointConfig := types.EndpointConfig{
-		Route:   "foo/bar",
-		Method:  "post",
-		Headers: map[string]string{},
-		Content: []byte(`Fallback response!`),
+		Route:    "foo/bar",
+		Method:   "post",
+		Headers:  map[string]string{},
+		Response: []byte(`Fallback response!`),
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`response_one`),

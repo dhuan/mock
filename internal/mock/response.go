@@ -31,7 +31,7 @@ func ResolveEndpointResponse(
 		return resolveEndpointResponseInternal(readFile, state, matchingResponseIf.Response)
 	}
 
-	return resolveEndpointResponseInternal(readFile, state, endpointConfig.Content)
+	return resolveEndpointResponseInternal(readFile, state, endpointConfig.Response)
 }
 
 func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
