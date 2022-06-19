@@ -125,20 +125,14 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_one"}`),
-				QuerystringMatches: []types.QuerystringMatches{
-					types.QuerystringMatches{
-						Key:   "foo",
-						Value: "bar",
-					},
+				QuerystringMatches: []types.Kv{
+					types.Kv{Key: "foo", Value: "bar"},
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_two"}`),
-				QuerystringMatches: []types.QuerystringMatches{
-					types.QuerystringMatches{
-						Key:   "hello",
-						Value: "world",
-					},
+				QuerystringMatches: []types.Kv{
+					types.Kv{Key: "hello", Value: "world"},
 				},
 			},
 		},
@@ -174,20 +168,14 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_one"}`),
-				QuerystringMatches: []types.QuerystringMatches{
-					types.QuerystringMatches{
-						Key:   "foo",
-						Value: "bar",
-					},
+				QuerystringMatches: []types.Kv{
+					types.Kv{Key: "foo", Value: "bar"},
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_two"}`),
-				QuerystringMatches: []types.QuerystringMatches{
-					types.QuerystringMatches{
-						Key:   "hello",
-						Value: "world",
-					},
+				QuerystringMatches: []types.Kv{
+					types.Kv{Key: "hello", Value: "world"},
 				},
 			},
 		},
@@ -223,24 +211,15 @@ func Test_ResolveEndpointResponse_WithExactQueryStringCondition_Matching(t *test
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`response_one`),
-				QuerystringMatchesExact: []types.QuerystringMatches{
-					types.QuerystringMatches{
-						Key:   "hello",
-						Value: "world",
-					},
+				QuerystringMatchesExact: []types.Kv{
+					types.Kv{Key: "hello", Value: "world"},
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`response_two`),
-				QuerystringMatchesExact: []types.QuerystringMatches{
-					types.QuerystringMatches{
-						Key:   "hello",
-						Value: "world",
-					},
-					types.QuerystringMatches{
-						Key:   "foo",
-						Value: "bar",
-					},
+				QuerystringMatchesExact: []types.Kv{
+					types.Kv{Key: "hello", Value: "world"},
+					types.Kv{Key: "foo", Value: "bar"},
 				},
 			},
 		},

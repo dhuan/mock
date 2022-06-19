@@ -60,7 +60,7 @@ func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConf
 	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
 }
 
-func querystringConditionsMatches(request *http.Request, querystringConditions []types.QuerystringMatches) bool {
+func querystringConditionsMatches(request *http.Request, querystringConditions []types.Kv) bool {
 	querystring := request.URL.Query()
 
 	for i, _ := range querystringConditions {
@@ -76,7 +76,7 @@ func querystringConditionsMatches(request *http.Request, querystringConditions [
 	return true
 }
 
-func querystringConditionsMatchesExact(request *http.Request, querystringConditions []types.QuerystringMatches) bool {
+func querystringConditionsMatchesExact(request *http.Request, querystringConditions []types.Kv) bool {
 	matches := 0
 	querystring := request.URL.Query()
 	requestQuerystringCount := len(querystring)
