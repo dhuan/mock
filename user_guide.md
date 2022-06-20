@@ -41,6 +41,25 @@ The optional `response_headers` endpoint parameter will add headers to a endpoin
 }
 ```
 
+## Response Status Code
+
+By default, all responses' status code will be `200`. You can change it using the `response_status_code` option:
+
+```diff
+ {
+   "endpoints": [
+     {
+       "route": "foo/bar",
+       "method": "POST",
+       "response": {
+         "foo": "bar"
+       },
++      "response_status_code": 201 
+     }
+   ]
+}
+```
+
 
 ## File-based response content
 

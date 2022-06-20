@@ -17,7 +17,7 @@ func ResolveEndpointResponse(
 	request *http.Request,
 	state *types.State,
 	endpointConfig *types.EndpointConfig,
-) ([]byte, types.Endpoint_content_type, error) {
+) ([]byte, types.Endpoint_content_type, int, error) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
 
@@ -28,10 +28,28 @@ func ResolveEndpointResponse(
 	}
 
 	if hasResponseIf {
-		return resolveEndpointResponseInternal(readFile, state, matchingResponseIf.Response)
+		return resolveEndpointResponseInternal(
+			readFile,
+			state,
+			matchingResponseIf.Response,
+			resolveResponseStatusCode(matchingResponseIf.ResponseStatusCode),
+		)
 	}
 
-	return resolveEndpointResponseInternal(readFile, state, endpointConfig.Response)
+	return resolveEndpointResponseInternal(
+		readFile,
+		state,
+		endpointConfig.Response,
+		resolveResponseStatusCode(endpointConfig.ResponseStatusCode),
+	)
+}
+
+func resolveResponseStatusCode(statusCode int) int {
+	if statusCode < 1 {
+		return 200
+	}
+
+	return statusCode
 }
 
 func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
@@ -96,15 +114,20 @@ func querystringConditionsMatchesExact(request *http.Request, querystringConditi
 	return matches == requestQuerystringCount
 }
 
-func resolveEndpointResponseInternal(readFile ReadFileFunc, state *types.State, response types.EndpointConfigResponse) ([]byte, types.Endpoint_content_type, error) {
+func resolveEndpointResponseInternal(
+	readFile ReadFileFunc,
+	state *types.State,
+	response types.EndpointConfigResponse,
+	responseStatusCode int,
+) ([]byte, types.Endpoint_content_type, int, error) {
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
 
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {
-		return []byte(""), endpointConfigContentType, nil
+		return []byte(""), endpointConfigContentType, responseStatusCode, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
-		return []byte(utils.Unquote(string(response))), endpointConfigContentType, nil
+		return []byte(utils.Unquote(string(response))), endpointConfigContentType, responseStatusCode, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
@@ -115,28 +138,28 @@ func resolveEndpointResponseInternal(readFile ReadFileFunc, state *types.State, 
 		)
 		fileContent, err := readFile(responseFile)
 		if err != nil {
-			return []byte(""), endpointConfigContentType, err
+			return []byte(""), endpointConfigContentType, responseStatusCode, err
 		}
 
-		return fileContent, endpointConfigContentType, nil
+		return fileContent, endpointConfigContentType, responseStatusCode, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
 		err := json.Unmarshal(response, &jsonParsed)
 		if err != nil {
-			return []byte(""), endpointConfigContentType, err
+			return []byte(""), endpointConfigContentType, responseStatusCode, err
 		}
 
 		jsonEncoded, err := json.Marshal(jsonParsed)
 		if err != nil {
-			return []byte(""), endpointConfigContentType, err
+			return []byte(""), endpointConfigContentType, responseStatusCode, err
 		}
 
-		return jsonEncoded, endpointConfigContentType, nil
+		return jsonEncoded, endpointConfigContentType, responseStatusCode, nil
 	}
 
-	return []byte(""), types.Endpoint_content_type_unknown, nil
+	return []byte(""), types.Endpoint_content_type_unknown, responseStatusCode, nil
 }
 
 func resolveEndpointConfigContentType(response types.EndpointConfigResponse) types.Endpoint_content_type {

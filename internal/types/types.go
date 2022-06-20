@@ -14,6 +14,7 @@ type State struct {
 
 type ResponseIf struct {
 	Response                EndpointConfigResponse `json:"response"`
+	ResponseStatusCode      int                    `json:"response_status_code"`
 	QuerystringMatches      []Kv                   `json:"querystring_matches"`
 	QuerystringMatchesExact []Kv                   `json:"querystring_matches_exact"`
 }
@@ -24,11 +25,12 @@ type Kv struct {
 }
 
 type EndpointConfig struct {
-	Route      string                 `json:"route"`
-	Method     string                 `json:"method"`
-	Response   EndpointConfigResponse `json:"response"`
-	Headers    map[string]string      `json:"response_headers"`
-	ResponseIf []ResponseIf           `json:"response_if"`
+	Route              string                 `json:"route"`
+	Method             string                 `json:"method"`
+	Response           EndpointConfigResponse `json:"response"`
+	ResponseStatusCode int                    `json:"response_status_code"`
+	ResponseIf         []ResponseIf           `json:"response_if"`
+	Headers            map[string]string      `json:"response_headers"`
 }
 
 type RequestRecord struct {
