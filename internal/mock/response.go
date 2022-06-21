@@ -56,18 +56,11 @@ func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConf
 	matchingResponseIfs := make([]int, 0)
 
 	for responseIfKey, _ := range endpointConfig.ResponseIf {
-		querystringConditionMatch := querystringConditionsMatches(request, endpointConfig.ResponseIf[responseIfKey].QuerystringMatches)
-		if len(endpointConfig.ResponseIf[responseIfKey].QuerystringMatches) > 0 && querystringConditionMatch {
+		responseIf := endpointConfig.ResponseIf[responseIfKey]
+		matches := resolveSingleResponseIf(request, responseIf.Condition)
+
+		if matches {
 			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
-
-			continue
-		}
-
-		querystringConditionMatchExact := querystringConditionsMatchesExact(request, endpointConfig.ResponseIf[responseIfKey].QuerystringMatchesExact)
-		if len(endpointConfig.ResponseIf[responseIfKey].QuerystringMatchesExact) > 0 && querystringConditionMatchExact {
-			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
-
-			continue
 		}
 	}
 
@@ -78,40 +71,47 @@ func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConf
 	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
 }
 
-func querystringConditionsMatches(request *http.Request, querystringConditions []types.Kv) bool {
-	querystring := request.URL.Query()
+func resolveSingleResponseIf(request *http.Request, condition *types.Condition) bool {
+	conditionFunction := resolveConditionFunction(condition)
+	result := conditionFunction(request, condition.Key, condition.Value)
+	hasAnd := condition.And != nil
+	hasOr := condition.Or != nil
 
-	for i, _ := range querystringConditions {
-		if !querystring.Has(querystringConditions[i].Key) {
-			return false
-		}
-
-		if querystring.Get(querystringConditions[i].Key) != querystringConditions[i].Value {
-			return false
-		}
+	if result && !hasAnd {
+		return true
 	}
 
-	return true
+	if result && hasAnd {
+		return resolveSingleResponseIf(request, condition.And)
+	}
+
+	if !result && hasOr {
+		return resolveSingleResponseIf(request, condition.Or)
+	}
+
+	if !result && !hasOr {
+		return false
+	}
+
+	return false
 }
 
-func querystringConditionsMatchesExact(request *http.Request, querystringConditions []types.Kv) bool {
-	matches := 0
-	querystring := request.URL.Query()
-	requestQuerystringCount := len(querystring)
-
-	for i, _ := range querystringConditions {
-		if !querystring.Has(querystringConditions[i].Key) {
-			return false
-		}
-
-		if querystring.Get(querystringConditions[i].Key) != querystringConditions[i].Value {
-			return false
-		}
-
-		matches = matches + 1
+func resolveConditionFunction(condition *types.Condition) func(request *http.Request, key, value string) bool {
+	if condition.Type == types.ConditionType_QuerystringMatch {
+		return conditionQuerystringMatch
 	}
 
-	return matches == requestQuerystringCount
+	panic("Failed to resolve condition func!")
+}
+
+func conditionQuerystringMatch(request *http.Request, key, value string) bool {
+	query := request.URL.Query()
+
+	if !query.Has(key) {
+		return false
+	}
+
+	return value == query.Get(key)
 }
 
 func resolveEndpointResponseInternal(
