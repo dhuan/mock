@@ -113,7 +113,7 @@ In the configuration sample above, we have a single endpoint, `foo/bar`. There a
 
 ### Condition Chaining
 
-In the previous example we defined a Response with a very simple querystring-based condition. You may want define more complex conditions. Such is possible with condition chaining, with the `and` and `or` combination options. We'll now extend the previous condition example: the same response would be returned if `foo=bar` was present in the Request's Querystring - now, it'll be necessary that `hello=world` is also present in the request, together with `foo=bar`:
+In the previous example we defined a Response with a very simple querystring-based condition. Next we'll look at how to define more complex conditions,  with condition chaining, which is possible with the `and` and `or` combination options. We'll extend the previous condition example: besides the `foo=bar` querystring value, it will also be necessary that the `hello=world` querystring is present in the request.
 
 ```diff
  {
@@ -143,3 +143,9 @@ In the previous example we defined a Response with a very simple querystring-bas
    ]
 }
 ```
+
+Now, the `Hello world!` Response will only be returned if the request has the following querystring values: `foo=bar&hello=world`.
+
+Besides the `and` option, you can also use `or`.
+
+There's no limit to how deep you can nest a chain of conditions.
