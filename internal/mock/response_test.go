@@ -163,15 +163,19 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 			types.ResponseIf{
 				Response:           []byte(`{"result": "response_one"}`),
 				ResponseStatusCode: 202,
-				QuerystringMatches: []types.Kv{
-					types.Kv{Key: "foo", Value: "bar"},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "foo",
+					Value: "bar",
 				},
 			},
 			types.ResponseIf{
 				Response:           []byte(`{"result": "response_two"}`),
 				ResponseStatusCode: 203,
-				QuerystringMatches: []types.Kv{
-					types.Kv{Key: "hello", Value: "world"},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "hello",
+					Value: "world",
 				},
 			},
 		},
@@ -209,14 +213,18 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_one"}`),
-				QuerystringMatches: []types.Kv{
-					types.Kv{Key: "foo", Value: "bar"},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "foo",
+					Value: "bar",
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_two"}`),
-				QuerystringMatches: []types.Kv{
-					types.Kv{Key: "hello", Value: "world"},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "hello",
+					Value: "world",
 				},
 			},
 		},
@@ -237,7 +245,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 	)
 }
 
-func Test_ResolveEndpointResponse_WithExactQueryStringCondition_Matching(t *testing.T) {
+func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
 	osMockInstance := osMock{}
 	state := types.State{
@@ -251,16 +259,29 @@ func Test_ResolveEndpointResponse_WithExactQueryStringCondition_Matching(t *test
 		Response: []byte(`Fallback response!`),
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
-				Response: []byte(`response_one`),
-				QuerystringMatchesExact: []types.Kv{
-					types.Kv{Key: "hello", Value: "world"},
+				Response: []byte(`response_two`),
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "hello",
+					Value: "world",
+					And: &types.Condition{
+						Type:  types.ConditionType_QuerystringMatch,
+						Key:   "foo",
+						Value: "BAR",
+					},
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`response_two`),
-				QuerystringMatchesExact: []types.Kv{
-					types.Kv{Key: "hello", Value: "world"},
-					types.Kv{Key: "foo", Value: "bar"},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "hello",
+					Value: "world",
+					And: &types.Condition{
+						Type:  types.ConditionType_QuerystringMatch,
+						Key:   "foo",
+						Value: "bar",
+					},
 				},
 			},
 		},

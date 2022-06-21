@@ -7,21 +7,30 @@ import (
 	"github.com/dhuan/mock/internal/utils"
 )
 
+type ConditionType int
+
+const (
+	ConditionType_None ConditionType = iota
+	ConditionType_QuerystringMatch
+)
+
 type State struct {
 	RequestRecordDirectoryPath string
 	ConfigFolderPath           string
 }
 
-type ResponseIf struct {
-	Response                EndpointConfigResponse `json:"response"`
-	ResponseStatusCode      int                    `json:"response_status_code"`
-	QuerystringMatches      []Kv                   `json:"querystring_matches"`
-	QuerystringMatchesExact []Kv                   `json:"querystring_matches_exact"`
+type Condition struct {
+	Type  ConditionType `json:"type"`
+	Key   string        `json:"key"`
+	Value string        `json:"value"`
+	And   *Condition    `json:"and"`
+	Or    *Condition    `json:"or"`
 }
 
-type Kv struct {
-	Key   string
-	Value string
+type ResponseIf struct {
+	Response           EndpointConfigResponse `json:"response"`
+	ResponseStatusCode int                    `json:"response_status_code"`
+	Condition          *Condition             `json:"condition"`
 }
 
 type EndpointConfig struct {

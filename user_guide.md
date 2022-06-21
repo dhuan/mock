@@ -93,22 +93,14 @@ You may want to define different responses for the same endpoint, based on certa
 +      "response_if": [
 +        {
 +          "response": "Hello world!",
-+          "querystring_matches": [
++          "conditions": [
 +            {
++              "type": "querystring_matches",
 +              "key": "foo",
 +              "value": "bar"
 +            }
 +          ]
-+        },
-+        {
-+          "response": "Hello galaxy!",
-+          "querystring_matches": [
-+            {
-+              "key": "foo",
-+              "value": "not_bar"
-+            }
-+          ]
-         }
++        }
        ]
      }
    ]
@@ -118,3 +110,42 @@ You may want to define different responses for the same endpoint, based on certa
 In the configuration sample above, we have a single endpoint, `foo/bar`. There are two possible responses for this endpoint - if you call it with the `?foo=bar` querystring, the request response will be `Hello world!`. If however you use the `?foo=not_bar` querystring, the response will be `Hello galaxy!`.
 
 > Note that, in the example above, even though we've added conditional responses, we still have a `response` like before - in the case where a request does not match any of the Response Conditions, the default `Default response!` response will be returned.
+
+### Condition Chaining
+
+In the previous example we defined a Response with a very simple querystring-based condition. Next we'll look at how to define more complex conditions,  with condition chaining, which is possible with the `and` and `or` combination options. We'll extend the previous condition example: besides the `foo=bar` querystring value, it will also be necessary that the `hello=world` querystring is present in the request.
+
+```diff
+ {
+   "endpoints": [
+     {
+       "route": "foo/bar",
+       "method": "GET",
+       "response": "Default response!",
+       "response_if": [
+         {
+           "response": "Hello world!",
+           "conditions": [
+             {
+               "type": "querystring_matches",
+               "key": "foo",
+               "value": "bar",
++              "and": {
++                "type": "querystring_matches",
++                "key": "hello",
++                "value": "world"
++              }
+             }
+           ]
+         }
+       ]
+     }
+   ]
+}
+```
+
+Now, the `Hello world!` Response will only be returned if the request has the following querystring values: `foo=bar&hello=world`.
+
+Besides the `and` option, you can also use `or`.
+
+There's no limit to how deep you can nest a chain of conditions.
