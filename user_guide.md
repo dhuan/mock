@@ -1,5 +1,17 @@
 # mock's User Guide
 
+## Table of Contents
+
+- [The basics](#the_basics)
+- [Response with headers](#response_with_headers)
+- [Response Status Code](#response_status_code)
+- [File-based response content](#file-based_response_content)
+- [Conditional Response](#conditional_response)
+  - [Condition Chaining](#condition_chaining)
+
+## The basics
+
+
 The simplest endpoint configuration we can define looks like this: 
 
 ```json
