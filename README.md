@@ -9,6 +9,8 @@
   - If a header value was passed correctly;
   - And other useful things...
 
+The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](user_guide.md)
+
 ## Getting started
 
 ```sh
