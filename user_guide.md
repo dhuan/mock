@@ -1,5 +1,19 @@
 # mock's User Guide
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [mock's User Guide](#mocks-user-guide)
+  - [Response with headers](#response-with-headers)
+  - [Response Status Code](#response-status-code)
+  - [File-based response content](#file-based-response-content)
+  - [Conditional Response](#conditional-response)
+    - [Condition Chaining](#condition-chaining)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 The simplest endpoint configuration we can define looks like this: 
 
 ```json
