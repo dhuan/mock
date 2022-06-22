@@ -1,6 +1,8 @@
 package types
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -13,6 +15,18 @@ const (
 	ConditionType_None ConditionType = iota
 	ConditionType_QuerystringMatch
 )
+
+func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
+	conditionTypeText := utils.Unquote(string(data))
+
+	if conditionTypeText == "querystring_match" {
+		*this = ConditionType_QuerystringMatch
+
+		return nil
+	}
+
+	return errors.New(fmt.Sprintf("Failed to parse Condition Type: %s", conditionTypeText))
+}
 
 type State struct {
 	RequestRecordDirectoryPath string

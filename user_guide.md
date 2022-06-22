@@ -95,7 +95,7 @@ You may want to define different responses for the same endpoint, based on certa
 +          "response": "Hello world!",
 +          "conditions": [
 +            {
-+              "type": "querystring_matches",
++              "type": "querystring_match",
 +              "key": "foo",
 +              "value": "bar"
 +            }
@@ -127,11 +127,11 @@ In the previous example we defined a Response with a very simple querystring-bas
            "response": "Hello world!",
            "conditions": [
              {
-               "type": "querystring_matches",
+               "type": "querystring_match",
                "key": "foo",
                "value": "bar",
 +              "and": {
-+                "type": "querystring_matches",
++                "type": "querystring_match",
 +                "key": "hello",
 +                "value": "world"
 +              }
