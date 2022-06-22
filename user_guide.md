@@ -2,12 +2,12 @@
 
 ## Table of Contents
 
-- [The basics](#the_basics)
-- [Response with headers](#response_with_headers)
-- [Response Status Code](#response_status_code)
-- [File-based response content](#file-based_response_content)
-- [Conditional Response](#conditional_response)
-  - [Condition Chaining](#condition_chaining)
+- [The basics](#thebasics)
+- [Response with headers](#responsewithheaders)
+- [Response Status Code](#responsestatuscode)
+- [File-based response content](#file-basedresponse_content)
+- [Conditional Response](#conditionalresponse)
+  - [Condition Chaining](#conditionchaining)
 
 ## The basics
 
