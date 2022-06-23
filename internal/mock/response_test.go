@@ -274,3 +274,43 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		endpointContentType,
 	)
 }
+
+func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}}
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Headers:  map[string]string{},
+		Response: []byte(`Fallback response!`),
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response: []byte(`or chaining!`),
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "foo",
+					Value: "bar",
+					Or: &types.Condition{
+						Type:  types.ConditionType_QuerystringMatch,
+						Key:   "hello",
+						Value: "world",
+					},
+				},
+			},
+		},
+	}
+
+	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		`or chaining!`,
+		string(response),
+	)
+
+	assert.Equal(
+		t,
+		types.Endpoint_content_type_plaintext,
+		endpointContentType,
+	)
+}
