@@ -15,6 +15,11 @@ var readFileMockReturn = []byte("")
 
 var requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}}
 
+var state types.State = types.State{
+	RequestRecordDirectoryPath: "/path/to/somewhere",
+	ConfigFolderPath:           "/path/to/somewhere",
+}
+
 type osMock struct {
 	testifymock.Mock
 }
@@ -27,10 +32,6 @@ func (this *osMock) ReadFile(name string) ([]byte, error) {
 
 func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -55,10 +56,6 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 
 func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -83,10 +80,6 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 
 func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -113,10 +106,6 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 
 func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -131,10 +120,6 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 
 func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:              "foo/bar",
 		Method:             "post",
@@ -150,10 +135,6 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -201,10 +182,6 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=WORLD"}}
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -248,10 +225,6 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
 	osMockInstance := osMock{}
-	state := types.State{
-		RequestRecordDirectoryPath: "/path/to/somewhere",
-		ConfigFolderPath:           "/path/to/somewhere",
-	}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
