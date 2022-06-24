@@ -16,6 +16,7 @@ const (
 	AssertType_None AssertType = iota
 	AssertType_HeaderMatch
 	AssertType_MethodMatch
+	AssertType_JsonBodyMatch
 )
 
 var (
@@ -39,6 +40,7 @@ type AssertConfig struct {
 
 type Assert struct {
 	Type      AssertType
+	Data      map[string]interface{}
 	KeyValues []Kv
 	Value     string
 	And       *Assert
@@ -83,14 +85,14 @@ func Validate(
 
 	requestRecord := requestRecords[0]
 
-	return validate(requestRecord, assertConfig.Assert)
+	return validate(requestRecord, assertConfig.Assert, jsonValidate)
 }
 
-func validate(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {
+func validate(requestRecord *types.RequestRecord, assert *Assert, jsonValidate JsonValidate) (*[]ValidationError, error) {
 	hasAnd := assert.And != nil
 	hasOr := assert.Or != nil
 	validationErrors := make([]ValidationError, 0)
-	assertFunc := resolveAssertTypeFunc(assert.Type)
+	assertFunc := resolveAssertTypeFunc(assert.Type, jsonValidate)
 	validationErrorsCurrent, err := assertFunc(requestRecord, assert)
 	success := len(*validationErrorsCurrent) == 0
 	if err != nil {
@@ -106,7 +108,7 @@ func validate(requestRecord *types.RequestRecord, assert *Assert) (*[]Validation
 	}
 
 	if success && hasAnd {
-		furtherValidationErrors, err := validate(requestRecord, assert.And)
+		furtherValidationErrors, err := validate(requestRecord, assert.And, jsonValidate)
 		if err != nil {
 			return &validationErrors, err
 		}
@@ -115,7 +117,7 @@ func validate(requestRecord *types.RequestRecord, assert *Assert) (*[]Validation
 	}
 
 	if !success && hasOr {
-		furtherValidationErrors, err := validate(requestRecord, assert.Or)
+		furtherValidationErrors, err := validate(requestRecord, assert.Or, jsonValidate)
 		if err != nil {
 			return &validationErrors, err
 		}
@@ -130,13 +132,20 @@ func validate(requestRecord *types.RequestRecord, assert *Assert) (*[]Validation
 	return &validationErrors, nil
 }
 
-func resolveAssertTypeFunc(assertType AssertType) func(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {
+func resolveAssertTypeFunc(
+	assertType AssertType,
+	jsonValidate JsonValidate,
+) func(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {
 	if assertType == AssertType_HeaderMatch {
 		return assertHeaderMatch
 	}
 
 	if assertType == AssertType_MethodMatch {
 		return assertMethodMatch
+	}
+
+	if assertType == AssertType_JsonBodyMatch {
+		return assertJsonBodyMatch(jsonValidate)
 	}
 
 	panic(fmt.Sprintf("Failed to resolve assert type: %d", assertType))
@@ -188,6 +197,35 @@ func assertMethodMatch(requestRecord *types.RequestRecord, assert *Assert) (*[]V
 	}
 
 	return &validationErrors, nil
+}
+
+func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {
+	return func(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {
+		validationErrors := make([]ValidationError, 0)
+
+		var jsonResult map[string]interface{}
+		err := json.Unmarshal(*requestRecord.Body, &jsonResult)
+		if err != nil {
+			return &validationErrors, err
+		}
+
+		jsonValidationResult := jsonValidate(jsonResult, assert.Data)
+		if !jsonValidationResult {
+			assertJson, err := json.Marshal(assert.Data)
+			if err != nil {
+				panic(err)
+			}
+			validationErrors = append(
+				validationErrors,
+				ValidationError{Code: Validation_error_code_body_mismatch, Metadata: map[string]string{
+					"body_requested": string(*requestRecord.Body),
+					"body_expected":  string(assertJson),
+				}},
+			)
+		}
+
+		return &validationErrors, nil
+	}
 }
 
 func handleBodyJsonAssertion(

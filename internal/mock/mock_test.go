@@ -7,16 +7,26 @@ import (
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/types"
 	"github.com/stretchr/testify/assert"
+	testifymock "github.com/stretchr/testify/mock"
 )
 
 var mock_request_records []*types.RequestRecord
 
-func mockJsonValidate(jsonA map[string]interface{}, jsonB map[string]interface{}) bool {
-	return false
+type mockJsonValidate struct {
+	testifymock.Mock
+}
+
+var mockJsonValidateInstance = mockJsonValidate{}
+
+func (this *mockJsonValidate) JsonValidate(jsonA map[string]interface{}, jsonB map[string]interface{}) bool {
+	args := this.Called(jsonA, jsonB)
+
+	return args.Get(0).(bool)
 }
 
 func reset() {
 	mock_request_records = make([]*types.RequestRecord, 0)
+	mockJsonValidateInstance = mockJsonValidate{}
 }
 
 func addToMockedRequestRecords(route string, method string, headers [][]string, body []byte) {
@@ -61,7 +71,7 @@ func Test_Validate_NoCalls(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -97,7 +107,7 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -139,7 +149,7 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -187,7 +197,7 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -230,11 +240,88 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
 
 	assert.Equal(
 		t,
 		&[]mock.ValidationError{},
+		validationErrors,
+	)
+}
+
+func Test_Validate_JsonBodyAssertion_Match(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"get",
+		[][]string{},
+		[]byte(`{"foo":"bar", "some_key": "some_value"}`),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route: "foobar",
+		Assert: &mock.Assert{
+			Type: mock.AssertType_JsonBodyMatch,
+			Data: map[string]interface{}{
+				"foo":      "bar",
+				"some_key": "some_value",
+			},
+		},
+	}
+
+	mockJsonValidateInstance.On(
+		"JsonValidate",
+		map[string]interface{}{"foo": "bar", "some_key": "some_value"},
+		map[string]interface{}{"foo": "bar", "some_key": "some_value"},
+	).Return(true)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{},
+		validationErrors,
+	)
+}
+
+func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"get",
+		[][]string{},
+		[]byte(`{"foo":"bar","some_key":"some_value"}`),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route: "foobar",
+		Assert: &mock.Assert{
+			Type: mock.AssertType_JsonBodyMatch,
+			Data: map[string]interface{}{
+				"foo":         "bar",
+				"some_key":    "some_value",
+				"another_key": "another_value",
+			},
+		},
+	}
+
+	mockJsonValidateInstance.On(
+		"JsonValidate",
+		map[string]interface{}{"foo": "bar", "some_key": "some_value"},
+		map[string]interface{}{"foo": "bar", "some_key": "some_value", "another_key": "another_value"},
+	).Return(false)
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{
+			mock.ValidationError{
+				Code: mock.Validation_error_code_body_mismatch,
+				Metadata: map[string]string{
+					"body_requested": `{"foo":"bar","some_key":"some_value"}`,
+					"body_expected":  `{"another_key":"another_value","foo":"bar","some_key":"some_value"}`,
+				},
+			},
+		},
 		validationErrors,
 	)
 }
