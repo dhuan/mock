@@ -240,10 +240,16 @@ func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.Re
 			if err != nil {
 				panic(err)
 			}
+
+			requestRecordReformatted, err := reformatJson(requestRecord.Body)
+			if err != nil {
+				panic(err)
+			}
+
 			validationErrors = append(
 				validationErrors,
 				ValidationError{Code: Validation_error_code_body_mismatch, Metadata: map[string]string{
-					"body_requested": string(*requestRecord.Body),
+					"body_requested": string(requestRecordReformatted),
 					"body_expected":  string(assertJson),
 				}},
 			)
@@ -251,6 +257,21 @@ func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.Re
 
 		return &validationErrors, nil
 	}
+}
+
+func reformatJson(jsonEncoded *[]byte) ([]byte, error) {
+	var result map[string]interface{}
+	err := json.Unmarshal(*jsonEncoded, &result)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	newJsonEncoded, err := json.Marshal(result)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return newJsonEncoded, nil
 }
 
 func handleBodyJsonAssertion(
