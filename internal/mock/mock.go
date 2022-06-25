@@ -64,12 +64,12 @@ type AssertConfig struct {
 }
 
 type Assert struct {
-	Type      AssertType
-	Data      map[string]interface{}
-	KeyValues []Kv
-	Value     string
-	And       *Assert
-	Or        *Assert
+	Type      AssertType             `json:"type"`
+	Data      map[string]interface{} `json:"data"`
+	KeyValues []Kv                   `json:"key_values"`
+	Value     string                 `json:"value"`
+	And       *Assert                `json:"and"`
+	Or        *Assert                `json:"or"`
 }
 
 type Kv struct {
