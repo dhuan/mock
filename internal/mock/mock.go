@@ -2,6 +2,7 @@ package mock
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -18,6 +19,30 @@ const (
 	AssertType_MethodMatch
 	AssertType_JsonBodyMatch
 )
+
+func (this *AssertType) UnmarshalJSON(data []byte) error {
+	assertTypeText := utils.Unquote(string(data))
+
+	if assertTypeText == "header_match" {
+		*this = AssertType_HeaderMatch
+
+		return nil
+	}
+
+	if assertTypeText == "method_match" {
+		*this = AssertType_MethodMatch
+
+		return nil
+	}
+
+	if assertTypeText == "json_body_match" {
+		*this = AssertType_JsonBodyMatch
+
+		return nil
+	}
+
+	return errors.New(fmt.Sprintf("Failed to parse Assert Type: %s", assertTypeText))
+}
 
 var (
 	Validation_error_code_header_value_mismatch       = "header_value_mismatch"
