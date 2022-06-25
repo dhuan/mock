@@ -70,9 +70,7 @@ EOF
 
 In the command above we're trying to assert the following:
 
-```
-The `foo/bar` endpoint was called, with the JSON Payload `{"some_key":"some_value"}`, **and** with the `put` method.
-```
+> The `foo/bar` endpoint was called, with the JSON Payload `{"some_key":"some_value"}`, **and** with the `put` method.
 
 Obviously, there's a problem with that assertion - the request we made previously was a `post` request, not `put`, therefore we get a response indicating so:
 
