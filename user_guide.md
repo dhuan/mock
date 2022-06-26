@@ -13,6 +13,7 @@
 - [Test Assertions](#test-assertions)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
+    - [`json_body_match`](#json_body_match)
     - [`method_match`](#method_match)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
