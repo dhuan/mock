@@ -53,16 +53,26 @@ And then let's make assertions - Let's verify whether the `foo/bar` endpoint was
 ```sh
 curl -v http://localhost:4000/__mock__/assert -d @- <<EOF
 {
-    "route": "foo/bar",
-    "body_json": {
+  "route": "foo/bar",
+  "assert": {
+    "type": "json_body_match",
+    "data": {
       "some_key": "some_value"
     },
-    "method": "put"
+    "and": {
+      "type": "method_match",
+      "value": "put"
+    }
+  }
 }
 EOF
 ```
 
-In the command above we're asserting that the `foo/bar` endpoint was called with the given payload, with the `put` method. Obviously, there's a problem with that assertion - the request we made previously was a `post` request, not `put`, therefore we get a response indicating so:
+In the command above we're trying to assert the following:
+
+> The `foo/bar` endpoint was called, with the JSON Payload `{"some_key":"some_value"}`, **and** with the `put` method.
+
+Obviously, there's a problem with that assertion - the request we made previously was a `post` request, not `put`, therefore we get a response indicating so:
 
 ```sh
 {
