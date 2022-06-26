@@ -276,7 +276,22 @@ As shown in the example, chaining options are nested within a parent assertion. 
 
 ### Assertion Options Reference
 
+#### `json_body_match`
+
+The body payload que Request was called with.
+
+```json
+{
+  "type": "json_body_match",
+  "data": {
+    "foo": "bar"
+  }
+}
+```
+
 #### `method_match`
+
+The HTTP Method (Get, Post etc) the Request was called with.
 
 ```json
 {
