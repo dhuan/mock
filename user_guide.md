@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [mock's User Guide](#mocks-user-guide)
+- [Creating APIs with mock](#creating-apis-with-mock)
   - [Response with headers](#response-with-headers)
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
@@ -13,6 +13,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Creating APIs with mock
 
 The simplest endpoint configuration we can define looks like this: 
 
@@ -34,7 +35,7 @@ A `POST` HTTP Request to `/foo/bar` will respond you with `{"foo":"bar"}`, as ca
 
 In the next sections we'll look at other ways how you can setup endpoints.
 
-## Response with headers
+### Response with headers
 
 The optional `response_headers` endpoint parameter will add headers to a endpoint's response:
 
@@ -55,7 +56,7 @@ The optional `response_headers` endpoint parameter will add headers to a endpoin
 }
 ```
 
-## Response Status Code
+### Response Status Code
 
 By default, all responses' status code will be `200`. You can change it using the `response_status_code` option:
 
@@ -75,7 +76,7 @@ By default, all responses' status code will be `200`. You can change it using th
 ```
 
 
-## File-based response content
+### File-based response content
 
 In the earlier example, `response` is a JSON object containing the response JSON that you'll be responded with. However, as you setup complex APIs, your configuration file starts getting large and not easily readable. In the following example, we're setting the response content by referencing a file, thus leaving the configuration file more readable:
 
@@ -93,7 +94,7 @@ In the earlier example, `response` is a JSON object containing the response JSON
 
 Given the configuration above, the `foo/bar` endpoint's response is defined in the `response_foobar.json` file.
 
-## Conditional Response
+### Conditional Response
 
 You may want to define different responses for the same endpoint, based on certain conditions. The `response_if` parameter enables you to achieve that.
 
@@ -125,7 +126,7 @@ In the configuration sample above, we have a single endpoint, `foo/bar`. There a
 
 > Note that, in the example above, even though we've added conditional responses, we still have a `response` like before - in the case where a request does not match any of the Response Conditions, the default `Default response!` response will be returned.
 
-### Condition Chaining
+#### Condition Chaining
 
 In the previous example we defined a Response with a very simple querystring-based condition. Next we'll look at how to define more complex conditions,  with condition chaining, which is possible with the `and` and `or` combination options. We'll extend the previous condition example: besides the `foo=bar` querystring value, it will also be necessary that the `hello=world` querystring is present in the request.
 
