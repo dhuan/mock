@@ -4,15 +4,21 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [mock's User Guide](#mocks-user-guide)
+- [Creating APIs](#creating-apis)
   - [Response with headers](#response-with-headers)
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
+- [Test Assertions](#test-assertions)
+  - [Assertion Chaining](#assertion-chaining)
+  - [Assertion Options Reference](#assertion-options-reference)
+    - [`json_body_match`](#json_body_match)
+    - [`method_match`](#method_match)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Creating APIs
 
 The simplest endpoint configuration we can define looks like this: 
 
@@ -34,7 +40,7 @@ A `POST` HTTP Request to `/foo/bar` will respond you with `{"foo":"bar"}`, as ca
 
 In the next sections we'll look at other ways how you can setup endpoints.
 
-## Response with headers
+### Response with headers
 
 The optional `response_headers` endpoint parameter will add headers to a endpoint's response:
 
@@ -55,7 +61,7 @@ The optional `response_headers` endpoint parameter will add headers to a endpoin
 }
 ```
 
-## Response Status Code
+### Response Status Code
 
 By default, all responses' status code will be `200`. You can change it using the `response_status_code` option:
 
@@ -75,7 +81,7 @@ By default, all responses' status code will be `200`. You can change it using th
 ```
 
 
-## File-based response content
+### File-based response content
 
 In the earlier example, `response` is a JSON object containing the response JSON that you'll be responded with. However, as you setup complex APIs, your configuration file starts getting large and not easily readable. In the following example, we're setting the response content by referencing a file, thus leaving the configuration file more readable:
 
@@ -93,7 +99,7 @@ In the earlier example, `response` is a JSON object containing the response JSON
 
 Given the configuration above, the `foo/bar` endpoint's response is defined in the `response_foobar.json` file.
 
-## Conditional Response
+### Conditional Response
 
 You may want to define different responses for the same endpoint, based on certain conditions. The `response_if` parameter enables you to achieve that.
 
@@ -125,7 +131,7 @@ In the configuration sample above, we have a single endpoint, `foo/bar`. There a
 
 > Note that, in the example above, even though we've added conditional responses, we still have a `response` like before - in the case where a request does not match any of the Response Conditions, the default `Default response!` response will be returned.
 
-### Condition Chaining
+#### Condition Chaining
 
 In the previous example we defined a Response with a very simple querystring-based condition. Next we'll look at how to define more complex conditions,  with condition chaining, which is possible with the `and` and `or` combination options. We'll extend the previous condition example: besides the `foo=bar` querystring value, it will also be necessary that the `hello=world` querystring is present in the request.
 
@@ -163,3 +169,134 @@ Now, the `Hello world!` Response will only be returned if the request has the fo
 Besides the `and` option, you can also use `or`.
 
 There's no limit to how deep you can nest a chain of conditions.
+
+## Test Assertions
+
+Besides enabling you to set-up APIs, mock provides you with methods to make assertions on how your endpoints were called.
+
+Test Assertions are done by calling the `POST localhost:3000/__mock__/assert` endpoint.
+
+In case you're new to the concept of automated tests and assertions - let's see what a very simple assertion looks like:
+
+```json
+{
+  "route": "hello/world",
+  "assert": {
+    "type": "method_match",
+    "value": "put"
+  }
+}
+```
+
+Or if we could say it in plain english: the endpoint `hello/world` was requested with the `put` method.
+
+In case there was never a call to that particular endpoint, you would then get a response from mock indicating that no request has been made:
+
+```json
+{
+  "validation_errors": [
+    {
+      "code": "no_call",
+      "metadata": {}
+    }
+  ]
+}
+```
+
+However in case a request had been made to that endpoint, with the, say, `POST` method, you would then get a different validation error, because you attempted to assert that it was called with the `PUT` method instead:
+
+```json
+{
+  "validation_errors": [
+    {
+      "code": "method_mismatch",
+      "metadata": {
+        "method_expected": "put",
+        "method_requested": "post"
+      }
+    }
+  ]
+}
+```
+
+> mock tells you whether the assertion passed or not by including "Validation Errors" into the `validation_errors` response field. Another indicative is the Response Status - `200` is success, `400` means your assertion failed.
+
+With that we've seen a very simple assertion. There are other things that can be asserted in a HTTP Request, such as the header values passed, the body payload etc. [For a reference of all available assertion options, skip to this section.](#assertion-options-reference)
+
+### Assertion Chaining
+
+Assertions can be combined with chaining options `and` and `or`. In the following assertion payload, we're extending the assertion we tried previously, asserting that our endpoint was called with the `{"foo":"bar"}` JSON payload.
+
+```json
+{
+  "route": "hello/world",
+  "assert": {
+    "type": "method_match",
+    "value": "post",
+    "and": {
+      "type": "json_body_match",
+      "data": {
+        "foo": "bar"
+      }
+    }
+  }
+}
+```
+
+In plain-english: assert that `hello/world` was requested with the `POST` method, **and** the `{"foo":"bar"}` JSON payload.
+
+`or` can also be used for chaining assertions.
+
+As shown in the example, chaining options are nested within a parent assertion. There's no limit to how many assertion chains you can make:
+
+```json
+{
+  "route": "hello/world",
+  "assert": {
+    "type": "...",
+    "value": "...",
+    "and": {
+      "type": "...",
+      "value": "...",
+      "and": {
+        "type": "...",
+        "value": "...",
+        "or": {
+          "type": "...",
+          "value": "...",
+          "and": {
+            "type": "...",
+            "value": "..."
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Assertion Options Reference
+
+#### `json_body_match`
+
+The body payload que Request was called with.
+
+```json
+{
+  "type": "json_body_match",
+  "data": {
+    "foo": "bar"
+  }
+}
+```
+
+#### `method_match`
+
+The HTTP Method (Get, Post etc) the Request was called with.
+
+```json
+{
+  "type": "method_match",
+  "value": "post"
+}
+```
