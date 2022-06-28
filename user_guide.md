@@ -10,6 +10,7 @@
   - [File-based response content](#file-based-response-content)
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
+    - [Headers in Conditional Responses](#headers-in-conditional-responses)
 - [Test Assertions](#test-assertions)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
@@ -165,6 +166,76 @@ Now, the `Hello world!` Response will only be returned if the request has the fo
 Besides the `and` option, you can also use `or`.
 
 There's no limit to how deep you can nest a chain of conditions.
+
+#### Headers in Conditional Responses
+
+Conditional Response Objects *can* have Headers set as well. Use the `response_headers` option:
+
+```diff
+ {
+   "endpoints": [
+     {
+       "route": "foo/bar",
+       "method": "GET",
+       "response": "Default response!",
+       "response_headers": {
+         "Header-Foo": "Foobar!"
+       },
+       "response_if": [
+         {
+           "response": "Hello world!",
++          "response_headers": {
++            "Some-Header-Key": "Some header value"
++          },
+           "condition": {
+             /* ... */
+           }
+         }
+       ]
+     }
+   ]
+ }
+```
+
+If you don't set a `response_header` to a Conditional Response, the response will not have any headers, even if a `response_headers` field exists in the main Response.
+
+If you'd like Conditional Responses to inherit the Headers from the main Response, use the `response_headers_base`:
+
+```diff
+ {
+   "endpoints": [
+     {
+       "route": "foo/bar",
+       "method": "GET",
+       "response": "Default response!",
+       "response_headers": {
+         "Header-Foo": "Foobar!"
+       },
++      "response_headers_base": {
++        "Some-base-header": "Some value for the base header"
++      },
+       "response_if": [
+         {
+           "response": "Hello world!",
+           "response_headers": {
+             "Some-Header-Key": "Some header value"
+           },
+           "condition": {
+             /* ... */
+           }
+         }
+       ]
+     }
+   ]
+ }
+```
+
+With the example configuration above, a Request resolving to the Conditional Response would result in having the following headers:
+
+```
+Some-base-header: Some value for the base header
+Some-Header-Key: Some header value
+```
 
 ## Test Assertions
 
