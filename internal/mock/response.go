@@ -41,6 +41,8 @@ func ResolveEndpointResponse(
 			matchingResponseIf.Response,
 			resolveResponseStatusCode(matchingResponseIf.ResponseStatusCode),
 			endpointConfig,
+			matchingResponseIf,
+			hasResponseIf,
 		)
 	}
 
@@ -50,6 +52,8 @@ func ResolveEndpointResponse(
 		endpointConfig.Response,
 		resolveResponseStatusCode(endpointConfig.ResponseStatusCode),
 		endpointConfig,
+		matchingResponseIf,
+		hasResponseIf,
 	)
 }
 
@@ -129,11 +133,19 @@ func resolveEndpointResponseInternal(
 	response types.EndpointConfigResponse,
 	responseStatusCode int,
 	endpointConfig *types.EndpointConfig,
+	responseIf *types.ResponseIf,
+	hasResponseIf bool,
 ) (*Response, error) {
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
 	headers := make(map[string]string)
 	utils.JoinMap[string, string](headers, endpointConfig.Headers)
 	utils.JoinMap[string, string](headers, endpointConfig.HeadersBase)
+
+	if hasResponseIf {
+		headers = make(map[string]string)
+		utils.JoinMap[string, string](headers, endpointConfig.HeadersBase)
+		utils.JoinMap[string, string](headers, responseIf.Headers)
+	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {
 		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, nil

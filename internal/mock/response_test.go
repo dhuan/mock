@@ -362,3 +362,83 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 		response.Headers,
 	)
 }
+
+func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match(t *testing.T) {
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=bar"}}
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`{"foo":"bar"}`),
+		HeadersBase: map[string]string{
+			"Some-base-header-key": "Some base header value",
+		},
+		Headers: map[string]string{
+			"Some-header-key": "Some header value",
+		},
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response: []byte(`or chaining!`),
+				Headers: map[string]string{
+					"Another-header-key": "Another header value",
+				},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "foo",
+					Value: "bar",
+				},
+			},
+		},
+	}
+
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		map[string]string{
+			"Some-base-header-key": "Some base header value",
+			"Another-header-key":   "Another header value",
+		},
+		response.Headers,
+	)
+}
+
+func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_ConditionNotMatching(t *testing.T) {
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=not_bar"}}
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`{"foo":"bar"}`),
+		HeadersBase: map[string]string{
+			"Some-base-header-key": "Some base header value",
+		},
+		Headers: map[string]string{
+			"Some-header-key": "Some header value",
+		},
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response: []byte(`or chaining!`),
+				Headers: map[string]string{
+					"Another-header-key": "Another header value",
+				},
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "foo",
+					Value: "bar",
+				},
+			},
+		},
+	}
+
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		map[string]string{
+			"Some-base-header-key": "Some base header value",
+			"Some-header-key":      "Some header value",
+		},
+		response.Headers,
+	)
+}

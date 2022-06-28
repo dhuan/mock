@@ -45,6 +45,7 @@ type ResponseIf struct {
 	Response           EndpointConfigResponse `json:"response"`
 	ResponseStatusCode int                    `json:"response_status_code"`
 	Condition          *Condition             `json:"condition"`
+	Headers            map[string]string      `json:"response_headers"`
 }
 
 type EndpointConfig struct {
