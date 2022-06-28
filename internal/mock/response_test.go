@@ -314,3 +314,51 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		response.EndpointContentType,
 	)
 }
+
+func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`{"foo":"bar"}`),
+		Headers: map[string]string{
+			"Some-header-key": "Some header value",
+		},
+	}
+
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		map[string]string{
+			"Some-header-key": "Some header value",
+		},
+		response.Headers,
+	)
+}
+
+func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`{"foo":"bar"}`),
+		HeadersBase: map[string]string{
+			"Some-base-header-key": "Some base header value",
+		},
+		Headers: map[string]string{
+			"Some-header-key": "Some header value",
+		},
+	}
+
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		map[string]string{
+			"Some-base-header-key": "Some base header value",
+			"Some-header-key":      "Some header value",
+		},
+		response.Headers,
+	)
+}

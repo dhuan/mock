@@ -59,3 +59,9 @@ func HasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSe
 func BeginsWith(subject, find string) bool {
 	return strings.Index(subject, find) == 0
 }
+
+func JoinMap[K comparable, V comparable](mapDst map[K]V, mapSrc map[K]V) {
+	for i, v := range mapSrc {
+		mapDst[i] = v
+	}
+}

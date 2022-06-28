@@ -16,6 +16,7 @@ type Response struct {
 	Body                []byte
 	EndpointContentType types.Endpoint_content_type
 	StatusCode          int
+	Headers             map[string]string
 }
 
 func ResolveEndpointResponse(
@@ -39,6 +40,7 @@ func ResolveEndpointResponse(
 			state,
 			matchingResponseIf.Response,
 			resolveResponseStatusCode(matchingResponseIf.ResponseStatusCode),
+			endpointConfig,
 		)
 	}
 
@@ -47,6 +49,7 @@ func ResolveEndpointResponse(
 		state,
 		endpointConfig.Response,
 		resolveResponseStatusCode(endpointConfig.ResponseStatusCode),
+		endpointConfig,
 	)
 }
 
@@ -125,15 +128,19 @@ func resolveEndpointResponseInternal(
 	state *types.State,
 	response types.EndpointConfigResponse,
 	responseStatusCode int,
+	endpointConfig *types.EndpointConfig,
 ) (*Response, error) {
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
+	headers := make(map[string]string)
+	utils.JoinMap[string, string](headers, endpointConfig.Headers)
+	utils.JoinMap[string, string](headers, endpointConfig.HeadersBase)
 
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {
-		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode}, nil
+		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
-		return &Response{[]byte(utils.Unquote(string(response))), endpointConfigContentType, responseStatusCode}, nil
+		return &Response{[]byte(utils.Unquote(string(response))), endpointConfigContentType, responseStatusCode, headers}, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
@@ -144,28 +151,28 @@ func resolveEndpointResponseInternal(
 		)
 		fileContent, err := readFile(responseFile)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode}, err
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err
 		}
 
-		return &Response{fileContent, endpointConfigContentType, responseStatusCode}, nil
+		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
 		err := json.Unmarshal(response, &jsonParsed)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode}, err
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err
 		}
 
 		jsonEncoded, err := json.Marshal(jsonParsed)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode}, err
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err
 		}
 
-		return &Response{jsonEncoded, endpointConfigContentType, responseStatusCode}, nil
+		return &Response{jsonEncoded, endpointConfigContentType, responseStatusCode, headers}, nil
 	}
 
-	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode}, nil
+	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, nil
 }
 
 func resolveEndpointConfigContentType(response types.EndpointConfigResponse) types.Endpoint_content_type {

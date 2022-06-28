@@ -87,7 +87,7 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 			w.Header().Add("Content-Type", "application/json")
 		}
 
-		addHeaders(w, endpointConfig)
+		addHeaders(w, response)
 
 		err = mockFs.StoreRequestRecord(r, endpointConfig)
 		if err != nil {
@@ -177,8 +177,8 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 	return &mockConfig, nil
 }
 
-func addHeaders(w http.ResponseWriter, endpointConfig *types.EndpointConfig) {
-	for headerKey, _ := range endpointConfig.Headers {
-		w.Header().Add(headerKey, endpointConfig.Headers[headerKey])
+func addHeaders(w http.ResponseWriter, response *mock.Response) {
+	for headerKey, _ := range response.Headers {
+		w.Header().Add(headerKey, response.Headers[headerKey])
 	}
 }

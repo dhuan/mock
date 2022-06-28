@@ -54,6 +54,7 @@ type EndpointConfig struct {
 	ResponseStatusCode int                    `json:"response_status_code"`
 	ResponseIf         []ResponseIf           `json:"response_if"`
 	Headers            map[string]string      `json:"response_headers"`
+	HeadersBase        map[string]string      `json:"response_headers_base"`
 }
 
 type RequestRecord struct {
