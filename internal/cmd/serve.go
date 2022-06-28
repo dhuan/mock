@@ -74,16 +74,16 @@ var serveCmd = &cobra.Command{
 
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		responseContent, endpointContentType, responseStatusCode, err := mock.ResolveEndpointResponse(os.ReadFile, r, state, endpointConfig)
+		response, err := mock.ResolveEndpointResponse(os.ReadFile, r, state, endpointConfig)
 		if err != nil {
 			panic(err)
 		}
-		if endpointContentType == types.Endpoint_content_type_unknown {
+		if response.EndpointContentType == types.Endpoint_content_type_unknown {
 			fmt.Println(fmt.Sprintf("Failed to resolve endpoint content type for route %s", endpointConfig.Route))
 
 			return
 		}
-		if endpointContentType == types.Endpoint_content_type_json {
+		if response.EndpointContentType == types.Endpoint_content_type_json {
 			w.Header().Add("Content-Type", "application/json")
 		}
 
@@ -94,8 +94,8 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 			panic(err)
 		}
 
-		w.WriteHeader(responseStatusCode)
-		w.Write(responseContent)
+		w.WriteHeader(response.StatusCode)
+		w.Write(response.Body)
 	}
 }
 

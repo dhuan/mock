@@ -39,18 +39,18 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		Headers:  map[string]string{},
 	}
 
-	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
 		`{"foo":"bar"}`,
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_json,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
 
@@ -63,18 +63,18 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		Headers:  map[string]string{},
 	}
 
-	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
 		`Hello world!`,
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_plaintext,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
 
@@ -89,18 +89,18 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 
 	osMockInstance.On("ReadFile", "/path/to/somewhere/./response_foobar").Return([]byte("Hello world!"), nil)
 
-	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
 		"Hello world!",
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_file,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
 
@@ -113,9 +113,9 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 		Headers:  map[string]string{},
 	}
 
-	_, _, responseStatusCode, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
-	assert.Equal(t, 200, responseStatusCode)
+	assert.Equal(t, 200, response.StatusCode)
 }
 
 func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
@@ -128,9 +128,9 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 		Headers:            map[string]string{},
 	}
 
-	_, _, responseStatusCode, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
-	assert.Equal(t, 201, responseStatusCode)
+	assert.Equal(t, 201, response.StatusCode)
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
@@ -162,20 +162,20 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		},
 	}
 
-	response, endpointContentType, responseStatusCode, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
-	assert.Equal(t, 203, responseStatusCode)
+	assert.Equal(t, 203, response.StatusCode)
 
 	assert.Equal(
 		t,
 		`{"result":"response_two"}`,
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_json,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
 
@@ -207,18 +207,18 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		},
 	}
 
-	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
 		`Fallback response!`,
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_plaintext,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
 
@@ -260,18 +260,18 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		},
 	}
 
-	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
 		`response_two`,
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_plaintext,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
 
@@ -300,17 +300,17 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		},
 	}
 
-	response, endpointContentType, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
 
 	assert.Equal(
 		t,
 		`or chaining!`,
-		string(response),
+		string(response.Body),
 	)
 
 	assert.Equal(
 		t,
 		types.Endpoint_content_type_plaintext,
-		endpointContentType,
+		response.EndpointContentType,
 	)
 }
