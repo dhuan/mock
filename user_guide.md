@@ -113,18 +113,16 @@ You may want to define different responses for the same endpoint, based on certa
 +      "response_if": [
 +        {
 +          "response": "Hello world!",
-+          "conditions": [
-+            {
-+              "type": "querystring_match",
-+              "key": "foo",
-+              "value": "bar"
-+            }
-+          ]
++          "condition": {
++            "type": "querystring_match",
++            "key": "foo",
++            "value": "bar"
++          }
 +        }
-       ]
++      ]
      }
    ]
-}
+ }
 ```
 
 In the configuration sample above, we have a single endpoint, `foo/bar`. There are two possible responses for this endpoint - if you call it with the `?foo=bar` querystring, the request response will be `Hello world!`. If however you use the `?foo=not_bar` querystring, the response will be `Hello galaxy!`.
@@ -145,23 +143,21 @@ In the previous example we defined a Response with a very simple querystring-bas
        "response_if": [
          {
            "response": "Hello world!",
-           "conditions": [
-             {
-               "type": "querystring_match",
-               "key": "foo",
-               "value": "bar",
-+              "and": {
-+                "type": "querystring_match",
-+                "key": "hello",
-+                "value": "world"
-+              }
-             }
-           ]
+           "condition": {
+             "type": "querystring_match",
+             "key": "foo",
+             "value": "bar",
++            "and": {
++              "type": "querystring_match",
++              "key": "hello",
++              "value": "world"
++            }
+           }
          }
        ]
      }
    ]
-}
+ }
 ```
 
 Now, the `Hello world!` Response will only be returned if the request has the following querystring values: `foo=bar&hello=world`.
