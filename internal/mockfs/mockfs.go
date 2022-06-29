@@ -131,7 +131,7 @@ func buildHeadersForRequestRecord(headers *http.Header) *http.Header {
 }
 
 func buildRequestRecordJson(requestRecord *types.RequestRecord) ([]byte, error) {
-	return json.Marshal(requestRecord)
+	return json.MarshalIndent(requestRecord, "", "  ")
 }
 
 func nowStr() string {
