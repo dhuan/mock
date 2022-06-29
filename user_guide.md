@@ -11,6 +11,8 @@
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
+    - [Condition Options Reference](#condition-options-reference)
+      - [`querystring_match`](#querystring_match)
 - [Test Assertions](#test-assertions)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
@@ -235,6 +237,24 @@ With the example configuration above, a Request resolving to the Conditional Res
 ```
 Some-base-header: Some value for the base header
 Some-Header-Key: Some header value
+```
+
+#### Condition Options Reference
+
+In the earlier examples, we've seen that we can set Responses to be returned if a certain querystring matched, with the `querystring_match` Condition Option. There are, however, other Condition Options at your disposal for customizing your API.
+
+You'll find all the available Condition Options in this section.
+
+##### `querystring_match`
+
+Matches against a Querystring in the Request. For example, a Request having the `?foo=bar` Querystring will be matched in the following condition:
+
+```json
+{
+  "type": "querystring_match",
+  "key": "foo",
+  "value": "bar"
+}
 ```
 
 ## Test Assertions
