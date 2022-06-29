@@ -34,11 +34,12 @@ type State struct {
 }
 
 type Condition struct {
-	Type  ConditionType `json:"type"`
-	Key   string        `json:"key"`
-	Value string        `json:"value"`
-	And   *Condition    `json:"and"`
-	Or    *Condition    `json:"or"`
+	Type      ConditionType          `json:"type"`
+	Key       string                 `json:"key"`
+	Value     string                 `json:"value"`
+	KeyValues map[string]interface{} `json:"key_values"`
+	And       *Condition             `json:"and"`
+	Or        *Condition             `json:"or"`
 }
 
 type ResponseIf struct {

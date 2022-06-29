@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/dhuan/mock/internal/types"
@@ -86,7 +87,7 @@ func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConf
 
 func resolveSingleResponseIf(request *http.Request, condition *types.Condition) bool {
 	conditionFunction := resolveConditionFunction(condition)
-	result := conditionFunction(request, condition.Key, condition.Value)
+	result := conditionFunction(request, condition)
 	hasAnd := condition.And != nil
 	hasOr := condition.Or != nil
 
@@ -109,7 +110,7 @@ func resolveSingleResponseIf(request *http.Request, condition *types.Condition) 
 	return false
 }
 
-func resolveConditionFunction(condition *types.Condition) func(request *http.Request, key, value string) bool {
+func resolveConditionFunction(condition *types.Condition) func(request *http.Request, condition *types.Condition) bool {
 	if condition.Type == types.ConditionType_QuerystringMatch {
 		return conditionQuerystringMatch
 	}
@@ -117,14 +118,40 @@ func resolveConditionFunction(condition *types.Condition) func(request *http.Req
 	panic("Failed to resolve condition func!")
 }
 
-func conditionQuerystringMatch(request *http.Request, key, value string) bool {
+func conditionQuerystringMatch(request *http.Request, condition *types.Condition) bool {
 	query := request.URL.Query()
+	isSingle := condition.Key != "" && condition.Value != ""
+	isMultiple := len(condition.KeyValues) > 0
 
-	if !query.Has(key) {
-		return false
+	if isSingle {
+		if !query.Has(condition.Key) {
+			return false
+		}
+
+		return condition.Value == query.Get(condition.Key)
 	}
 
-	return value == query.Get(key)
+	if isMultiple {
+		return conditionQuerystringMatchWithMany(request, condition, query)
+	}
+
+	panic("Failed to resolve query string match!")
+}
+
+func conditionQuerystringMatchWithMany(request *http.Request, condition *types.Condition, query url.Values) bool {
+	for i, _ := range condition.KeyValues {
+		value := fmt.Sprint(condition.KeyValues[i])
+
+		if !query.Has(i) {
+			return false
+		}
+
+		if value != query.Get(i) {
+			return false
+		}
+	}
+
+	return true
 }
 
 func resolveEndpointResponseInternal(

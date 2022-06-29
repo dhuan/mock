@@ -257,6 +257,18 @@ Matches against a Querystring in the Request. For example, a Request having the 
 }
 ```
 
+It's also possible to have multiple key/value pairs in the same condition. You will use the `key_values` field instead:
+
+```json
+{
+  "type": "querystring_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
+}
+```
+
 ## Test Assertions
 
 Besides enabling you to set-up APIs, mock provides you with methods to make assertions on how your endpoints were called.

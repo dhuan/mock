@@ -222,6 +222,57 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 	)
 }
 
+func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t *testing.T) {
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Headers:  map[string]string{},
+		Response: []byte(`default_response`),
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response:           []byte(`response_one`),
+				ResponseStatusCode: 202,
+				Condition: &types.Condition{
+					Type: types.ConditionType_QuerystringMatch,
+					KeyValues: map[string]interface{}{
+						"foo":   "not_bar",
+						"hello": "world",
+					},
+				},
+			},
+			types.ResponseIf{
+				Response:           []byte(`response_two`),
+				ResponseStatusCode: 203,
+				Condition: &types.Condition{
+					Type: types.ConditionType_QuerystringMatch,
+					KeyValues: map[string]interface{}{
+						"foo":   "bar",
+						"hello": "world",
+					},
+				},
+			},
+		},
+	}
+
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(t, 203, response.StatusCode)
+
+	assert.Equal(
+		t,
+		`response_two`,
+		string(response.Body),
+	)
+
+	assert.Equal(
+		t,
+		types.Endpoint_content_type_plaintext,
+		response.EndpointContentType,
+	)
+}
+
 func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
 	osMockInstance := osMock{}
