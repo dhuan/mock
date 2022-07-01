@@ -16,6 +16,7 @@
 - [Test Assertions](#test-assertions)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
+    - [`header_match`](#header_match)
     - [`json_body_match`](#json_body_match)
     - [`method_match`](#method_match)
 
@@ -375,6 +376,19 @@ As shown in the example, chaining options are nested within a parent assertion. 
 ```
 
 ### Assertion Options Reference
+
+#### `header_match`
+
+Matches against the Request's header.
+
+```json
+{
+  "type": "header_match",
+  "key_values": {
+    "Some-header-key": "Some header value"
+  }
+}
+```
 
 #### `json_body_match`
 
