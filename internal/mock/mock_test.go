@@ -65,8 +65,8 @@ func Test_Validate_NoCalls(t *testing.T) {
 		Route: "foobar",
 		Assert: &mock.Assert{
 			Type: mock.AssertType_HeaderMatch,
-			KeyValues: []mock.Kv{
-				mock.Kv{Key: "foo", Value: "bar"},
+			KeyValues: map[string]interface{}{
+				"foo": "bar",
 			},
 		},
 	}
@@ -98,11 +98,8 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 		Route: "foobar",
 		Assert: &mock.Assert{
 			Type: mock.AssertType_HeaderMatch,
-			KeyValues: []mock.Kv{
-				mock.Kv{
-					Key:   "foo",
-					Value: "bar",
-				},
+			KeyValues: map[string]interface{}{
+				"foo": "bar",
 			},
 		},
 	}
@@ -136,15 +133,9 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 		Route: "foobar",
 		Assert: &mock.Assert{
 			Type: mock.AssertType_HeaderMatch,
-			KeyValues: []mock.Kv{
-				mock.Kv{
-					Key:   "foo",
-					Value: "bar",
-				},
-				mock.Kv{
-					Key:   "foo2",
-					Value: "bar2",
-				},
+			KeyValues: map[string]interface{}{
+				"foo":  "bar",
+				"foo2": "bar2",
 			},
 		},
 	}
@@ -184,11 +175,8 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 		Route: "foobar",
 		Assert: &mock.Assert{
 			Type: mock.AssertType_HeaderMatch,
-			KeyValues: []mock.Kv{
-				mock.Kv{
-					Key:   "some_header_key",
-					Value: "some_header_value",
-				},
+			KeyValues: map[string]interface{}{
+				"some_header_key": "some_header_value",
 			},
 			And: &mock.Assert{
 				Type:  mock.AssertType_MethodMatch,
@@ -227,11 +215,8 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 		Route: "foobar",
 		Assert: &mock.Assert{
 			Type: mock.AssertType_HeaderMatch,
-			KeyValues: []mock.Kv{
-				mock.Kv{
-					Key:   "some_header_key",
-					Value: "some_header_value",
-				},
+			KeyValues: map[string]interface{}{
+				"some_header_key": "some_header_value",
 			},
 			And: &mock.Assert{
 				Type:  mock.AssertType_MethodMatch,

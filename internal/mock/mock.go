@@ -66,7 +66,7 @@ type AssertConfig struct {
 type Assert struct {
 	Type      AssertType             `json:"type"`
 	Data      map[string]interface{} `json:"data"`
-	KeyValues []Kv                   `json:"key_values"`
+	KeyValues map[string]interface{} `json:"key_values"`
 	Value     string                 `json:"value"`
 	And       *Assert                `json:"and"`
 	Or        *Assert                `json:"or"`
@@ -180,8 +180,8 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *Assert) (*[]V
 	validationErrors := make([]ValidationError, 0)
 
 	for i, _ := range assert.KeyValues {
-		key := assert.KeyValues[i].Key
-		value := assert.KeyValues[i].Value
+		key := i
+		value := assert.KeyValues[i]
 
 		valueFromRequestRecord, ok := requestRecord.Headers[key]
 		if !ok {
