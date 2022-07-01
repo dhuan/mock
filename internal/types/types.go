@@ -60,10 +60,11 @@ type EndpointConfig struct {
 }
 
 type RequestRecord struct {
-	Route   string      `json:"route"`
-	Method  string      `json:"method"`
-	Headers http.Header `json:"headers"`
-	Body    *[]byte     `json:"body"`
+	Route       string      `json:"route"`
+	Querystring string      `json:"querystring"`
+	Method      string      `json:"method"`
+	Headers     http.Header `json:"headers"`
+	Body        *[]byte     `json:"body"`
 }
 
 type MockFs interface {

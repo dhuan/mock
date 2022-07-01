@@ -90,9 +90,11 @@ func routeNameToRequestRecordFileRouteName(route string) string {
 func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
 	route := utils.ReplaceRegex(r.RequestURI, []string{`^\/`}, "")
 	headers := buildHeadersForRequestRecord(&r.Header)
+	routeParsed, querystring := parseRoute(route)
 	requestRecord := &types.RequestRecord{
-		Route:   route,
-		Headers: *headers,
+		Route:       routeParsed,
+		Querystring: querystring,
+		Headers:     *headers,
 	}
 	hasJsonBody := hasHeaderWithValue(headers, "content-type", "application/json") || requestHasBody(r)
 
@@ -109,6 +111,16 @@ func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
 	requestRecord.Method = strings.ToLower(r.Method)
 
 	return requestRecord, nil
+}
+
+func parseRoute(route string) (string, string) {
+	splitResult := strings.Split(route, "?")
+
+	if len(splitResult) == 1 {
+		return splitResult[0], ""
+	}
+
+	return splitResult[0], splitResult[1]
 }
 
 func requestHasBody(req *http.Request) bool {
