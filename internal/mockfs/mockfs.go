@@ -96,17 +96,12 @@ func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
 		Querystring: querystring,
 		Headers:     *headers,
 	}
-	hasJsonBody := hasHeaderWithValue(headers, "content-type", "application/json") || requestHasBody(r)
 
-	requestBody := make([]byte, 0)
-	requestRecord.Body = &requestBody
-	if hasJsonBody {
-		requestBody, err := extractBodyFromRequest(r)
-		if err != nil {
-			return requestRecord, err
-		}
-		requestRecord.Body = &requestBody
+	requestBody, err := extractBodyFromRequest(r)
+	if err != nil {
+		return requestRecord, err
 	}
+	requestRecord.Body = &requestBody
 
 	requestRecord.Method = strings.ToLower(r.Method)
 
@@ -174,5 +169,13 @@ func hasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSe
 }
 
 func extractBodyFromRequest(req *http.Request) ([]byte, error) {
-	return ioutil.ReadAll(req.Body)
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Println("Failed to parse request body:")
+		fmt.Println(err)
+
+		return []byte(""), nil
+	}
+
+	return body, nil
 }
