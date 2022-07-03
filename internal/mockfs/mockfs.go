@@ -144,7 +144,16 @@ func buildRequestRecordJson(requestRecord *types.RequestRecord) ([]byte, error) 
 func nowStr() string {
 	now := time.Now()
 
-	return fmt.Sprint(now.Unix())
+	return fmt.Sprintf(
+		"%d%d%d%d%d%d%d",
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		now.Hour(),
+		now.Minute(),
+		now.Second(),
+		now.Nanosecond(),
+	)
 }
 
 func writeNewFile(filePath string, fileContent []byte) error {
