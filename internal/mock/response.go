@@ -3,6 +3,7 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -28,9 +29,17 @@ func ResolveEndpointResponse(
 ) (*Response, error) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
+	requestBody := []byte("")
+	if request.Body != nil {
+		requestBodyRead, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			panic(err)
+		}
+		requestBody = requestBodyRead
+	}
 
 	if hasResponseIf {
-		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(request, endpointConfig)
+		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(request, requestBody, endpointConfig)
 		matchingResponseIf = matchingResponseIfB
 		hasResponseIf = foundMatchingResponseIf
 	}
@@ -66,12 +75,12 @@ func resolveResponseStatusCode(statusCode int) int {
 	return statusCode
 }
 
-func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
+func resolveResponseIf(request *http.Request, requestBody []byte, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
 	matchingResponseIfs := make([]int, 0)
 
 	for responseIfKey, _ := range endpointConfig.ResponseIf {
 		responseIf := endpointConfig.ResponseIf[responseIfKey]
-		matches := resolveSingleResponseIf(request, responseIf.Condition)
+		matches := resolveSingleResponseIf(request, requestBody, responseIf.Condition)
 
 		if matches {
 			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
@@ -85,9 +94,9 @@ func resolveResponseIf(request *http.Request, endpointConfig *types.EndpointConf
 	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
 }
 
-func resolveSingleResponseIf(request *http.Request, condition *types.Condition) bool {
+func resolveSingleResponseIf(request *http.Request, requestBody []byte, condition *types.Condition) bool {
 	conditionFunction := resolveConditionFunction(condition)
-	result := conditionFunction(request, condition)
+	result := conditionFunction(request, requestBody, condition)
 	hasAnd := condition.And != nil
 	hasOr := condition.Or != nil
 
@@ -96,11 +105,11 @@ func resolveSingleResponseIf(request *http.Request, condition *types.Condition) 
 	}
 
 	if result && hasAnd {
-		return resolveSingleResponseIf(request, condition.And)
+		return resolveSingleResponseIf(request, requestBody, condition.And)
 	}
 
 	if !result && hasOr {
-		return resolveSingleResponseIf(request, condition.Or)
+		return resolveSingleResponseIf(request, requestBody, condition.Or)
 	}
 
 	if !result && !hasOr {
@@ -110,15 +119,19 @@ func resolveSingleResponseIf(request *http.Request, condition *types.Condition) 
 	return false
 }
 
-func resolveConditionFunction(condition *types.Condition) func(request *http.Request, condition *types.Condition) bool {
+func resolveConditionFunction(condition *types.Condition) func(request *http.Request, requestBody []byte, condition *types.Condition) bool {
 	if condition.Type == types.ConditionType_QuerystringMatch {
 		return conditionQuerystringMatch
+	}
+
+	if condition.Type == types.ConditionType_FormMatch {
+		return conditionFormMatch
 	}
 
 	panic("Failed to resolve condition func!")
 }
 
-func conditionQuerystringMatch(request *http.Request, condition *types.Condition) bool {
+func conditionQuerystringMatch(request *http.Request, requestBody []byte, condition *types.Condition) bool {
 	query := request.URL.Query()
 	isSingle := condition.Key != "" && condition.Value != ""
 	isMultiple := len(condition.KeyValues) > 0
@@ -136,6 +149,37 @@ func conditionQuerystringMatch(request *http.Request, condition *types.Condition
 	}
 
 	panic("Failed to resolve query string match!")
+}
+
+func conditionFormMatch(request *http.Request, requestBody []byte, condition *types.Condition) bool {
+	formValues, err := parseFormBody(request, requestBody)
+	if err != nil {
+		panic(err)
+	}
+
+	for i, _ := range condition.KeyValues {
+		formValue, ok := formValues[i]
+		if !ok || formValue != condition.KeyValues[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func parseFormBody(request *http.Request, requestBody []byte) (map[string]string, error) {
+	formValuesParsed := make(map[string]string)
+
+	formValues, err := url.ParseQuery(string(requestBody))
+	if err != nil {
+		return formValuesParsed, err
+	}
+
+	for i, _ := range formValues {
+		formValuesParsed[i] = formValues[i][0]
+	}
+
+	return formValuesParsed, nil
 }
 
 func conditionQuerystringMatchWithMany(request *http.Request, condition *types.Condition, query url.Values) bool {

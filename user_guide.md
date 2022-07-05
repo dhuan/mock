@@ -13,6 +13,7 @@
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
     - [Condition Options Reference](#condition-options-reference)
       - [`querystring_match`](#querystring_match)
+      - [`form_match`](#form_match)
 - [Test Assertions](#test-assertions)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
@@ -263,6 +264,20 @@ It's also possible to have multiple key/value pairs in the same condition. You w
 ```json
 {
   "type": "querystring_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
+}
+```
+
+##### `form_match`
+
+Matches against the Request's form-encoded data.
+
+```json
+{
+  "type": "form_match",
   "key_values": {
     "some_key": "some value",
     "another_key": "another value"
