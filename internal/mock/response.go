@@ -152,6 +152,10 @@ func conditionQuerystringMatch(request *http.Request, requestBody []byte, condit
 }
 
 func conditionFormMatch(request *http.Request, requestBody []byte, condition *types.Condition) bool {
+	if len(condition.KeyValues) == 0 {
+		return false
+	}
+
 	formValues, err := parseFormBody(request, requestBody)
 	if err != nil {
 		panic(err)

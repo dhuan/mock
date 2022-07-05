@@ -2,7 +2,9 @@ package mock_test
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/dhuan/mock/internal/mock"
@@ -491,5 +493,48 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 			"Some-header-key":      "Some header value",
 		},
 		response.Headers,
+	)
+}
+
+func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
+	requestMock = httptest.NewRequest(
+		http.MethodPost,
+		"/",
+		strings.NewReader("foo=bar&foo2=bar2"),
+	)
+	requestMock.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	osMockInstance := osMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "post",
+		Response: []byte(`default response.`),
+		ResponseIf: []types.ResponseIf{
+			types.ResponseIf{
+				Response: []byte(`this response shall not be returned.`),
+				Condition: &types.Condition{
+					Type:  types.ConditionType_QuerystringMatch,
+					Key:   "foo",
+					Value: "bar",
+				},
+			},
+			types.ResponseIf{
+				Response: []byte(`good!`),
+				Condition: &types.Condition{
+					Type: types.ConditionType_FormMatch,
+					KeyValues: map[string]interface{}{
+						"foo":  "bar",
+						"foo2": "bar2",
+					},
+				},
+			},
+		},
+	}
+
+	response, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, &state, &endpointConfig)
+
+	assert.Equal(
+		t,
+		[]byte(`good!`),
+		response.Body,
 	)
 }
