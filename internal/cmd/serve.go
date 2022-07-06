@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/dhuan/mock/internal/mock"
@@ -31,6 +32,19 @@ var serveCmd = &cobra.Command{
 		router.Use(middleware.Logger)
 
 		prepareConfig(config)
+
+		endpointConfigErrors, err := mock.ValidateEndpointConfigs(config.Endpoints)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(endpointConfigErrors) > 0 {
+			fmt.Println("mock can't be started. The following errors were found in your configuration:")
+			fmt.Println("")
+			displayEndpointConfigErrors(endpointConfigErrors, config.Endpoints)
+
+			os.Exit(1)
+		}
 
 		tempDir, err := utils.MktempDir()
 		fmt.Println(fmt.Sprintf("Temporary folder created for Request Records: %s", tempDir))
@@ -70,6 +84,41 @@ var serveCmd = &cobra.Command{
 
 		http.ListenAndServe(fmt.Sprintf(":%s", flagPort), router)
 	},
+}
+
+func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigError) string {
+	if endpointConfigError.Code == mock.EndpointConfigErrorCode_EndpointDuplicate {
+		duplicateIndexParsed, err := strconv.Atoi(endpointConfigError.Metadata["duplicate_index"])
+		if err != nil {
+			panic(err)
+		}
+		duplicateIndex := duplicateIndexParsed + 1
+
+		return fmt.Sprintf(
+			"This endpoint has a duplicate (Endpoint #%d). A combination of route and method must be unique. If you're looking to define different responses for the same endpoint/method, look for \"Conditional Responses\" in the documentation.",
+			duplicateIndex,
+		)
+	}
+
+	panic("Failed to resolve endpoint error description.")
+}
+
+func displayEndpointConfigErrors(endpointConfigErrors []mock.EndpointConfigError, endpointConfigs []types.EndpointConfig) {
+	for i, endpointConfigError := range endpointConfigErrors {
+		endpointRoute := endpointConfigs[endpointConfigError.EndpointIndex].Route
+		endpointMethod := endpointConfigs[endpointConfigError.EndpointIndex].Method
+
+		fmt.Println(
+			fmt.Sprintf(
+				"%d: Endpoint #%d (%s %s):\n%s",
+				i+1,
+				endpointConfigError.EndpointIndex+1,
+				endpointMethod,
+				endpointRoute,
+				resolveEndpointErrorDescription(&endpointConfigError),
+			),
+		)
+	}
 }
 
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {

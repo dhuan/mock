@@ -65,3 +65,12 @@ func JoinMap[K comparable, V comparable](mapDst map[K]V, mapSrc map[K]V) {
 		mapDst[i] = v
 	}
 }
+
+func MapContains[K comparable, V comparable](m map[K]V, key K, value V) bool {
+	valueExtracted, ok := m[key]
+	if !ok {
+		return false
+	}
+
+	return value == valueExtracted
+}
