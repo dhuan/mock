@@ -15,6 +15,7 @@
       - [`querystring_match`](#querystring_match)
       - [`form_match`](#form_match)
 - [Test Assertions](#test-assertions)
+  - [Which Request to assert against?](#which-request-to-assert-against)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
     - [`header_match`](#header_match)
@@ -337,6 +338,21 @@ However in case a request had been made to that endpoint, with the, say, `POST` 
 > mock tells you whether the assertion passed or not by including "Validation Errors" into the `validation_errors` response field. Another indicative is the Response Status - `200` is success, `400` means your assertion failed.
 
 With that we've seen a very simple assertion. There are other things that can be asserted in a HTTP Request, such as the header values passed, the body payload etc. [For a reference of all available assertion options, skip to this section.](#assertion-options-reference)
+
+### Which Request to assert against?
+
+By default, Assertions are based on the 1st Request. In cases where you want to assert against a Request other than the first, you'll use the `nth` Assertion Option.
+
+```diff
+ {
+   "route": "foo/bar",
++  "nth": 2,
+   "assert": {
+     "type": "method_match",
+     "value": "post"
+   }
+ }
+```
 
 ### Assertion Chaining
 

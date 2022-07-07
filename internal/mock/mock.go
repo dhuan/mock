@@ -57,6 +57,7 @@ type AssertHeader map[string][]string
 
 type AssertConfig struct {
 	Route    string                 `json:"route"`
+	Nth      int                    `json:"nth"`
 	Method   string                 `json:"method"`
 	Headers  AssertHeader           `json:"headers"`
 	BodyJson map[string]interface{} `json:"body_json"`
@@ -108,7 +109,11 @@ func Validate(
 		return &validationErrors, nil
 	}
 
-	requestRecord := requestRecords[0]
+	nth := assertConfig.Nth
+	if nth == 0 {
+		nth = 1
+	}
+	requestRecord := requestRecords[nth-1]
 
 	return validate(requestRecord, assertConfig.Assert, jsonValidate)
 }

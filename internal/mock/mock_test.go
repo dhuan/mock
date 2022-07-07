@@ -310,3 +310,78 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 		validationErrors,
 	)
 }
+
+func Test_Validate_Nth(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+	addToMockedRequestRecords(
+		"foobar",
+		"post",
+		[][]string{},
+		[]byte(`{"foo":"bar","some_key":"some_value"}`),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route: "foobar",
+		Assert: &mock.Assert{
+			Type:  mock.AssertType_MethodMatch,
+			Value: "get",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+
+	assertConfig = mock.AssertConfig{
+		Route: "foobar",
+		Nth:   2,
+		Assert: &mock.Assert{
+			Type:  mock.AssertType_MethodMatch,
+			Value: "get",
+		},
+	}
+	validationErrors, _ = mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{
+			mock.ValidationError{
+				Code: mock.Validation_error_code_method_mismatch,
+				Metadata: map[string]string{
+					"method_requested": "post",
+					"method_expected":  "get",
+				},
+			},
+		},
+		validationErrors,
+	)
+
+	assertConfig = mock.AssertConfig{
+		Route: "foobar",
+		Nth:   2,
+		Assert: &mock.Assert{
+			Type:  mock.AssertType_MethodMatch,
+			Value: "post",
+		},
+	}
+	validationErrors, _ = mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+
+	assertConfig = mock.AssertConfig{
+		Route: "foobar",
+		Nth:   1,
+		Assert: &mock.Assert{
+			Type:  mock.AssertType_MethodMatch,
+			Value: "get",
+		},
+	}
+	validationErrors, _ = mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+}
