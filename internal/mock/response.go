@@ -3,7 +3,6 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -24,19 +23,12 @@ type Response struct {
 func ResolveEndpointResponse(
 	readFile ReadFileFunc,
 	request *http.Request,
+	requestBody []byte,
 	state *types.State,
 	endpointConfig *types.EndpointConfig,
 ) (*Response, error) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
-	requestBody := []byte("")
-	if request.Body != nil {
-		requestBodyRead, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			panic(err)
-		}
-		requestBody = requestBodyRead
-	}
 
 	if hasResponseIf {
 		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(request, requestBody, endpointConfig)

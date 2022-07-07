@@ -18,8 +18,8 @@ type MockFs struct {
 	State *types.State
 }
 
-func (this MockFs) StoreRequestRecord(r *http.Request, endpointConfig *types.EndpointConfig) error {
-	requestRecord, err := buildRequestRecord(r)
+func (this MockFs) StoreRequestRecord(r *http.Request, requestBody []byte, endpointConfig *types.EndpointConfig) error {
+	requestRecord, err := buildRequestRecord(r, requestBody)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func routeNameToRequestRecordFileRouteName(route string) string {
 	return strings.ReplaceAll(route, "/", "__")
 }
 
-func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
+func buildRequestRecord(r *http.Request, requestBody []byte) (*types.RequestRecord, error) {
 	route := utils.ReplaceRegex(r.RequestURI, []string{`^\/`}, "")
 	headers := buildHeadersForRequestRecord(&r.Header)
 	routeParsed, querystring := parseRoute(route)
@@ -97,10 +97,6 @@ func buildRequestRecord(r *http.Request) (*types.RequestRecord, error) {
 		Headers:     *headers,
 	}
 
-	requestBody, err := extractBodyFromRequest(r)
-	if err != nil {
-		return requestRecord, err
-	}
 	requestRecord.Body = &requestBody
 
 	requestRecord.Method = strings.ToLower(r.Method)
@@ -175,16 +171,4 @@ func hasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSe
 	}
 
 	return false
-}
-
-func extractBodyFromRequest(req *http.Request) ([]byte, error) {
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		fmt.Println("Failed to parse request body:")
-		fmt.Println(err)
-
-		return []byte(""), nil
-	}
-
-	return body, nil
 }

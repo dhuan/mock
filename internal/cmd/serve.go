@@ -123,7 +123,11 @@ func displayEndpointConfigErrors(endpointConfigErrors []mock.EndpointConfigError
 
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		response, err := mock.ResolveEndpointResponse(os.ReadFile, r, state, endpointConfig)
+		requestBody, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+		response, err := mock.ResolveEndpointResponse(os.ReadFile, r, requestBody, state, endpointConfig)
 		if err != nil {
 			panic(err)
 		}
@@ -138,7 +142,7 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 
 		addHeaders(w, response)
 
-		err = mockFs.StoreRequestRecord(r, endpointConfig)
+		err = mockFs.StoreRequestRecord(r, requestBody, endpointConfig)
 		if err != nil {
 			panic(err)
 		}

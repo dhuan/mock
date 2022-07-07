@@ -52,7 +52,7 @@ type mockMockFs struct {
 	State *types.State
 }
 
-func (this mockMockFs) StoreRequestRecord(r *http.Request, endpointConfig *types.EndpointConfig) error {
+func (this mockMockFs) StoreRequestRecord(r *http.Request, requestBody []byte, endpointConfig *types.EndpointConfig) error {
 	return nil
 }
 
