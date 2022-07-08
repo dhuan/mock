@@ -162,6 +162,43 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 	)
 }
 
+func Test_Validate_HeaderMismatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"get",
+		[][]string{[]string{"some_header_key", "some_header_value"}},
+		[]byte(``),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route: "foobar",
+		Assert: &mock.Assert{
+			Type: mock.AssertType_HeaderMatch,
+			KeyValues: map[string]interface{}{
+				"some_header_key": "a_different_header_value",
+			},
+		},
+	}
+
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{
+			mock.ValidationError{
+				Code: mock.Validation_error_code_header_value_mismatch,
+				Metadata: map[string]string{
+					"header_key":             "some_header_key",
+					"header_value_requested": "some_header_value",
+					"header_value_expected":  "a_different_header_value",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
 func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(

@@ -204,7 +204,9 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *Assert) (*[]V
 			validationErrors = append(validationErrors, ValidationError{
 				Code: Validation_error_code_header_value_mismatch,
 				Metadata: map[string]string{
-					"missing_header_key": key,
+					"header_key":             key,
+					"header_value_requested": strings.Join(valueFromRequestRecord, ""),
+					"header_value_expected":  value.(string),
 				},
 			})
 		}
