@@ -1,6 +1,6 @@
 # mock
 
-**mock** enables you to quickly setup a HTTP server for end-to-end tests. You can...
+**mock** enables you to quickly setup a HTTP server for end-to-end tests.
 
 - Define endpoints and their respective responses;
 - Make assertions on...
