@@ -64,7 +64,8 @@ func validateEndpointConfig(
 		duplicates = findDuplicates(endpointConfig, endpointConfigIndex, endpointConfigs)
 		if len(duplicates) > 0 {
 			endpointConfigErrors = append(endpointConfigErrors, EndpointConfigError{
-				Code: EndpointConfigErrorCode_EndpointDuplicate,
+				EndpointIndex: endpointConfigIndex,
+				Code:          EndpointConfigErrorCode_EndpointDuplicate,
 				Metadata: map[string]string{
 					"duplicate_index": fmt.Sprint(duplicates[0]),
 				},
@@ -74,7 +75,8 @@ func validateEndpointConfig(
 
 	if !utils.AnyEquals[string](available_http_methods, endpointConfig.Method) {
 		endpointConfigErrors = append(endpointConfigErrors, EndpointConfigError{
-			Code: EndpointConfigErrorCode_InvalidMethod,
+			EndpointIndex: endpointConfigIndex,
+			Code:          EndpointConfigErrorCode_InvalidMethod,
 			Metadata: map[string]string{
 				"method": endpointConfig.Method,
 			},

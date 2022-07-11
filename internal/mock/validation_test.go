@@ -65,7 +65,7 @@ func Test_ValidateEndpointConfigs_InvalidMethod(t *testing.T) {
 		[]mock.EndpointConfigError{
 			mock.EndpointConfigError{
 				Code:          mock.EndpointConfigErrorCode_InvalidMethod,
-				EndpointIndex: 0,
+				EndpointIndex: 1,
 				Metadata: map[string]string{
 					"method": "foobar",
 				},
