@@ -117,7 +117,7 @@ func displayEndpointConfigErrors(endpointConfigErrors []mock.EndpointConfigError
 
 		fmt.Println(
 			fmt.Sprintf(
-				"%d: Endpoint #%d (%s %s):\n%s",
+				"%d: Endpoint #%d (%s %s):\n%s\n",
 				i+1,
 				endpointConfigError.EndpointIndex+1,
 				endpointMethod,
