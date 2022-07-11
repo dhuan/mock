@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/dhuan/mock/internal/types"
@@ -18,6 +19,7 @@ const (
 	AssertType_HeaderMatch
 	AssertType_MethodMatch
 	AssertType_JsonBodyMatch
+	AssertType_FormMatch
 )
 
 func (this *AssertType) UnmarshalJSON(data []byte) error {
@@ -41,6 +43,12 @@ func (this *AssertType) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
+	if assertTypeText == "form_match" {
+		*this = AssertType_FormMatch
+
+		return nil
+	}
+
 	return errors.New(fmt.Sprintf("Failed to parse Assert Type: %s", assertTypeText))
 }
 
@@ -51,6 +59,8 @@ var (
 	Validation_error_code_body_mismatch               = "body_mismatch"
 	Validation_error_code_request_has_no_body_content = "request_has_no_body_content"
 	Validation_error_code_method_mismatch             = "method_mismatch"
+	Validation_error_code_form_key_does_not_exist     = "form_key_does_not_exist"
+	Validation_error_code_form_value_mismatch         = "form_value_mismatch"
 )
 
 type AssertHeader map[string][]string
@@ -179,6 +189,10 @@ func resolveAssertTypeFunc(
 		return assertJsonBodyMatch(jsonValidate)
 	}
 
+	if assertType == AssertType_FormMatch {
+		return assertFormMatch
+	}
+
 	panic(fmt.Sprintf("Failed to resolve assert type: %d", assertType))
 }
 
@@ -238,6 +252,64 @@ func assertMethodMatch(requestRecord *types.RequestRecord, assert *Assert) (*[]V
 	}
 
 	return &validationErrors, nil
+}
+
+func assertFormMatch(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {
+	validationErrors := make([]ValidationError, 0)
+	requestBody := string(*requestRecord.Body)
+
+	parsedForm, err := parseForm(requestBody)
+	if err != nil {
+		panic(err)
+	}
+
+	for i, _ := range assert.KeyValues {
+		value, ok := parsedForm[i]
+		if !ok {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{
+					Code: Validation_error_code_form_key_does_not_exist,
+					Metadata: map[string]string{
+						"form_key": i,
+					},
+				},
+			)
+
+			continue
+		}
+
+		if value != assert.KeyValues[i] {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{
+					Code: Validation_error_code_form_value_mismatch,
+					Metadata: map[string]string{
+						"form_key":             i,
+						"form_value_requested": value,
+						"form_value_expected":  assert.KeyValues[i].(string),
+					},
+				},
+			)
+		}
+	}
+
+	return &validationErrors, nil
+}
+
+func parseForm(requestBody string) (map[string]string, error) {
+	formValues := make(map[string]string)
+
+	values, err := url.ParseQuery(requestBody)
+	if err != nil {
+		return formValues, err
+	}
+
+	for i, _ := range values {
+		formValues[i] = values[i][0]
+	}
+
+	return formValues, nil
 }
 
 func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.RequestRecord, assert *Assert) (*[]ValidationError, error) {

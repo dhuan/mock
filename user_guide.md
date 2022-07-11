@@ -18,6 +18,7 @@
   - [Which Request to assert against?](#which-request-to-assert-against)
   - [Assertion Chaining](#assertion-chaining)
   - [Assertion Options Reference](#assertion-options-reference)
+    - [`form_match`](#form_match-1)
     - [`header_match`](#header_match)
     - [`json_body_match`](#json_body_match)
     - [`method_match`](#method_match)
@@ -407,6 +408,20 @@ As shown in the example, chaining options are nested within a parent assertion. 
 ```
 
 ### Assertion Options Reference
+
+#### `form_match`
+
+Matches against the Request's Form Payload.
+
+```json
+{
+  "type": "form_match",
+  "key_values": {
+    "some_form_key": "some_form_value",
+    "another_form_key": "another_form_value"
+  }
+}
+```
 
 #### `header_match`
 
