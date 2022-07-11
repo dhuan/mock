@@ -458,3 +458,75 @@ func Test_Validate_Nth(t *testing.T) {
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
+
+func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"post",
+		[][]string{},
+		[]byte(`foo=bar&hello=world`),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route: "foobar",
+		Assert: &mock.Assert{
+			Type: mock.AssertType_FormMatch,
+			KeyValues: map[string]interface{}{
+				"some_key": "some_value",
+			},
+		},
+	}
+
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{
+			mock.ValidationError{
+				Code: mock.Validation_error_code_form_key_does_not_exist,
+				Metadata: map[string]string{
+					"form_key": "some_key",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"post",
+		[][]string{},
+		[]byte(`foo=bar&hello=world`),
+	)
+
+	assertConfig := mock.AssertConfig{
+		Route: "foobar",
+		Assert: &mock.Assert{
+			Type: mock.AssertType_FormMatch,
+			KeyValues: map[string]interface{}{
+				"foo": "not_bar",
+			},
+		},
+	}
+
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]mock.ValidationError{
+			mock.ValidationError{
+				Code: mock.Validation_error_code_form_value_mismatch,
+				Metadata: map[string]string{
+					"form_key":             "foo",
+					"form_value_requested": "bar",
+					"form_value_expected":  "not_bar",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
