@@ -61,19 +61,19 @@ var serveCmd = &cobra.Command{
 			endpointConfig := config.Endpoints[i]
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
-			if strings.ToLower(endpointConfig.Method) == "get" {
+			if endpointConfig.Method == "get" {
 				router.Get(route, newEndpointHandler(state, &endpointConfig, mockFs))
 			}
 
-			if strings.ToLower(endpointConfig.Method) == "post" {
+			if endpointConfig.Method == "post" {
 				router.Post(route, newEndpointHandler(state, &endpointConfig, mockFs))
 			}
 
-			if strings.ToLower(endpointConfig.Method) == "patch" {
+			if endpointConfig.Method == "patch" {
 				router.Patch(route, newEndpointHandler(state, &endpointConfig, mockFs))
 			}
 
-			if strings.ToLower(endpointConfig.Method) == "put" {
+			if endpointConfig.Method == "put" {
 				router.Put(route, newEndpointHandler(state, &endpointConfig, mockFs))
 			}
 		}
@@ -97,6 +97,13 @@ func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigErr
 		return fmt.Sprintf(
 			"This endpoint has a duplicate (Endpoint #%d). A combination of route and method must be unique. If you're looking to define different responses for the same endpoint/method, look for \"Conditional Responses\" in the documentation.",
 			duplicateIndex,
+		)
+	}
+
+	if endpointConfigError.Code == mock.EndpointConfigErrorCode_InvalidMethod {
+		return fmt.Sprintf(
+			"The given method, \"%s\" , is invalid. The available HTTP Methods you can use are POST, GET, PUT, PATCH, and DELETE.",
+			endpointConfigError.Metadata["method"],
 		)
 	}
 
@@ -194,6 +201,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 
 func prepareConfig(mockConfig *MockConfig) {
 	for i, endpoint := range mockConfig.Endpoints {
+		mockConfig.Endpoints[i].Method = strings.ToLower(mockConfig.Endpoints[i].Method)
 		mockConfig.Endpoints[i].Route = utils.ReplaceRegex(endpoint.Route, []string{`^\/`}, "")
 	}
 }

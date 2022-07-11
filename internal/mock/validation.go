@@ -12,12 +12,21 @@ type EndpointConfigErrorCode int
 const (
 	EndpointConfigErrorCode_Unknown EndpointConfigErrorCode = iota
 	EndpointConfigErrorCode_EndpointDuplicate
+	EndpointConfigErrorCode_InvalidMethod
 )
 
 type EndpointConfigError struct {
 	Code          EndpointConfigErrorCode
 	EndpointIndex int
 	Metadata      map[string]string
+}
+
+var available_http_methods = []string{
+	"post",
+	"get",
+	"put",
+	"patch",
+	"delete",
 }
 
 func ValidateEndpointConfigs(endpointConfigs []types.EndpointConfig) ([]EndpointConfigError, error) {
@@ -61,6 +70,15 @@ func validateEndpointConfig(
 				},
 			})
 		}
+	}
+
+	if !utils.AnyEquals[string](available_http_methods, endpointConfig.Method) {
+		endpointConfigErrors = append(endpointConfigErrors, EndpointConfigError{
+			Code: EndpointConfigErrorCode_InvalidMethod,
+			Metadata: map[string]string{
+				"method": endpointConfig.Method,
+			},
+		})
 	}
 
 	return endpointConfigErrors, nil

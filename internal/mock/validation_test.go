@@ -12,17 +12,17 @@ func Test_ValidateEndpointConfigs_Duplicates(t *testing.T) {
 	endpointConfigs := []types.EndpointConfig{
 		types.EndpointConfig{
 			Route:    "foo/bar",
-			Method:   "GET",
+			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
 		},
 		types.EndpointConfig{
 			Route:    "hello/world",
-			Method:   "GET",
+			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
 		},
 		types.EndpointConfig{
 			Route:    "foo/bar",
-			Method:   "GET",
+			Method:   "get",
 			Response: []byte(`{"hello":"world"}`),
 		},
 	}
@@ -37,6 +37,37 @@ func Test_ValidateEndpointConfigs_Duplicates(t *testing.T) {
 				EndpointIndex: 0,
 				Metadata: map[string]string{
 					"duplicate_index": "2",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_ValidateEndpointConfigs_InvalidMethod(t *testing.T) {
+	endpointConfigs := []types.EndpointConfig{
+		types.EndpointConfig{
+			Route:    "foo/bar",
+			Method:   "get",
+			Response: []byte(`{"foo":"bar"}`),
+		},
+		types.EndpointConfig{
+			Route:    "hello/world",
+			Method:   "foobar",
+			Response: []byte(`{"foo":"bar"}`),
+		},
+	}
+
+	validationErrors, _ := mock.ValidateEndpointConfigs(endpointConfigs)
+
+	assert.Equal(
+		t,
+		[]mock.EndpointConfigError{
+			mock.EndpointConfigError{
+				Code:          mock.EndpointConfigErrorCode_InvalidMethod,
+				EndpointIndex: 0,
+				Metadata: map[string]string{
+					"method": "foobar",
 				},
 			},
 		},
