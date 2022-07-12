@@ -76,6 +76,10 @@ var serveCmd = &cobra.Command{
 			if endpointConfig.Method == "put" {
 				router.Put(route, newEndpointHandler(state, &endpointConfig, mockFs))
 			}
+
+			if endpointConfig.Method == "delete" {
+				router.Delete(route, newEndpointHandler(state, &endpointConfig, mockFs))
+			}
 		}
 
 		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
