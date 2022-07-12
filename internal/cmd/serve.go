@@ -107,6 +107,12 @@ func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigErr
 		)
 	}
 
+	if endpointConfigError.Code == mock.EndpointConfigErrorCode_RouteWithQuerystring {
+		return fmt.Sprintf(
+			"Routes cannot have querystrings. Read about \"response_if\" in the documentation to learn how to set Conditional Responses based on querystrings.",
+		)
+	}
+
 	panic("Failed to resolve endpoint error description.")
 }
 

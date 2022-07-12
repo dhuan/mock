@@ -2,6 +2,7 @@ package mock
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
@@ -13,6 +14,7 @@ const (
 	EndpointConfigErrorCode_Unknown EndpointConfigErrorCode = iota
 	EndpointConfigErrorCode_EndpointDuplicate
 	EndpointConfigErrorCode_InvalidMethod
+	EndpointConfigErrorCode_RouteWithQuerystring
 )
 
 type EndpointConfigError struct {
@@ -80,6 +82,14 @@ func validateEndpointConfig(
 			Metadata: map[string]string{
 				"method": endpointConfig.Method,
 			},
+		})
+	}
+
+	if strings.Contains(endpointConfig.Route, "?") {
+		endpointConfigErrors = append(endpointConfigErrors, EndpointConfigError{
+			EndpointIndex: endpointConfigIndex,
+			Code:          EndpointConfigErrorCode_RouteWithQuerystring,
+			Metadata:      map[string]string{},
 		})
 	}
 
