@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -138,13 +140,32 @@ func displayEndpointConfigErrors(endpointConfigErrors []mock.EndpointConfigError
 	}
 }
 
+func readFile(name string) ([]byte, error) {
+	_, err := os.Stat(name)
+	if errors.Is(err, os.ErrNotExist) {
+		return []byte(""), mock.ErrResponseFileDoesNotExist
+	}
+
+	return os.ReadFile(name)
+}
+
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestBody, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			panic(err)
 		}
-		response, err := mock.ResolveEndpointResponse(os.ReadFile, r, requestBody, state, endpointConfig)
+		response, err, errorMetadata := mock.ResolveEndpointResponse(readFile, r, requestBody, state, endpointConfig)
+		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
+			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
+			w.WriteHeader(400)
+			w.Write([]byte(fmt.Sprintf(
+				"File does not exist: %s",
+				errorMetadata["file"],
+			)))
+
+			return
+		}
 		if err != nil {
 			panic(err)
 		}
