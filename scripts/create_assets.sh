@@ -52,5 +52,5 @@ TARGET_FOLDERS=$(ls ./release_downloads)
 
 for TARGET_FOLDER in ${TARGET_FOLDERS[@]}
 do
-    zip "./release_downloads/${APP_NAME}_${APP_VERSION}_${TARGET_FOLDER}.zip" -j ./release_downloads/"${TARGET_FOLDER}"/*
+    tar czvf "./release_downloads/${APP_NAME}_${APP_VERSION}_${TARGET_FOLDER}.tar.gz" -C "./release_downloads/""${TARGET_FOLDER}" .
 done
