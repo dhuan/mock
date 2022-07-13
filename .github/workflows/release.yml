@@ -1,0 +1,30 @@
+name: Release
+
+on:                                                                                                                                                           
+  push:                                                                                                                                                       
+    tags:                                                                                                                                                    
+      - 'v*'
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v3
+      with:
+        go-version: ^1.18
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v3
+
+    - name: Create assets
+      run: bash scripts/create_assets.sh
+
+    - name: Release
+      run: |
+          bash scripts/create_release.sh
+      env:
+          GH_KEY: ${{ secrets.GITHUB_TOKEN }}
