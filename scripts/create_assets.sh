@@ -1,9 +1,11 @@
 set -ex
 
-MOCK_VERSION=$(echo $GITHUB_REF | cut -d '/' -f 3)
-if [[ -z "$MOCK_VERSION" ]]
+BUILD_BIN_PATH="./bin/mock"
+APP_NAME="mock"
+APP_VERSION=$(echo $GITHUB_REF | cut -d '/' -f 3)
+if [[ -z "$APP_VERSION" ]]
 then
-    MOCK_VERSION="dev"
+    APP_VERSION="dev"
 fi
 
 TARGETS=(
@@ -36,12 +38,12 @@ do
 
     TMP_BKP=$(mktemp)
     cp internal/cmd/version.go "$TMP_BKP"
-    sed -i "s/__VERSION__/$MOCK_VERSION/g" internal/cmd/version.go
+    sed -i "s/__VERSION__/$APP_VERSION/g" internal/cmd/version.go
     sed -i "s/__GOOS__/$GOOS/g" internal/cmd/version.go
     sed -i "s/__GOARCH__/$GOARCH/g" internal/cmd/version.go
 
     GOOS=$GOOS GOARCH=$GOARCH make
-    cp ./bin/mock "$TARGET_PATH"/.
+    cp "$BUILD_BIN_PATH" "$TARGET_PATH"/.
 
     cp "$TMP_BKP" internal/cmd/version.go
 done
@@ -50,5 +52,5 @@ TARGET_FOLDERS=$(ls ./release_downloads)
 
 for TARGET_FOLDER in ${TARGET_FOLDERS[@]}
 do
-    zip "./release_downloads/mock_${MOCK_VERSION}_${TARGET_FOLDER}.zip" -j ./release_downloads/"${TARGET_FOLDER}"/*
+    zip "./release_downloads/${APP_NAME}_${APP_VERSION}_${TARGET_FOLDER}.zip" -j ./release_downloads/"${TARGET_FOLDER}"/*
 done
