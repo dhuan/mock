@@ -1,6 +1,10 @@
 set -ex
 
 MOCK_VERSION=$(echo $GITHUB_REF | cut -d '/' -f 3)
+if [[ -z "$MOCK_VERSION" ]]
+then
+    MOCK_VERSION="dev"
+fi
 
 TARGETS=(
     "linux,386"
@@ -37,6 +41,7 @@ do
     sed -i "s/__GOARCH__/$GOARCH/g" internal/cmd/version.go
 
     GOOS=$GOOS GOARCH=$GOARCH make
+    cp ./bin/mock "$TARGET_PATH"/.
 
     cp "$TMP_BKP" internal/cmd/version.go
 done
