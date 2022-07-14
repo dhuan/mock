@@ -60,6 +60,10 @@ func (this mockMockFs) GetRecordsMatchingRoute(route string) ([]*types.RequestRe
 	return mock_request_records, nil
 }
 
+func (this mockMockFs) RemoveAllRequestRecords() error {
+	return nil
+}
+
 func Test_Validate_NoCalls(t *testing.T) {
 	assertConfig := mock.AssertConfig{
 		Route: "foobar",

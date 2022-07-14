@@ -37,6 +37,19 @@ func (this MockFs) StoreRequestRecord(r *http.Request, requestBody []byte, endpo
 	return nil
 }
 
+func (this MockFs) RemoveAllRequestRecords() error {
+	walkFrom := this.State.RequestRecordDirectoryPath
+	err := filepath.Walk(walkFrom, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		return os.Remove(path)
+	})
+
+	return err
+}
+
 func buildEndpointId(endpointConfig *types.EndpointConfig) string {
 	return strings.ReplaceAll(endpointConfig.Route, "/", "__")
 }

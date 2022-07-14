@@ -85,6 +85,7 @@ var serveCmd = &cobra.Command{
 		}
 
 		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
+		router.Post("/__mock__/reset", resetApiHandler(mockFs, state, config))
 
 		fmt.Println(fmt.Sprintf("Mock server is listening on port %s.", flagPort))
 
@@ -227,6 +228,22 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(responseJson)
+	}
+}
+
+func resetApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := mockFs.RemoveAllRequestRecords()
+		if err != nil {
+			log.Println("Failed to remove Request Records.")
+			log.Println(err)
+
+			w.WriteHeader(400)
+
+			return
+		}
+
+		w.WriteHeader(200)
 	}
 }
 
