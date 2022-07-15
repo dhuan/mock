@@ -11,6 +11,14 @@ type E2eState struct {
 	BinaryPath string
 }
 
+func NewState() *E2eState {
+	state := &E2eState{
+		BinaryPath: fmt.Sprintf("%s/bin/mock", pwd()),
+	}
+
+	return state
+}
+
 func RunMock(state *E2eState, command string) ([]byte, error) {
 	parseCommandVars(&command)
 	commandParameters := toCommandParameters(command)

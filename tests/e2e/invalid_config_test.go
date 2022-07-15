@@ -8,10 +8,7 @@ import (
 )
 
 func Test_E2E_WithInvalidConfig(t *testing.T) {
-	state := &e2eutils.E2eState{
-		BinaryPath: "/home/dev/github.com/dhuan/mock/bin/mock",
-	}
-	out, _ := e2eutils.RunMock(state, "serve -c {{TEST_DATA_PATH}}/config_invalid/config.json -p {{TEST_E2E_PORT}}")
+	out, _ := e2eutils.RunMock(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_invalid/config.json -p {{TEST_E2E_PORT}}")
 
 	assert.Equal(
 		t,
