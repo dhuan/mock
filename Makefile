@@ -4,7 +4,7 @@ build:
 	mv ./mock ./bin/.
 
 test_unit:
-	go test -v $(shell git ls-files | grep _test.go)
+	go test -v $(shell git ls-files | grep _test.go | grep -v e2e)
 
 test_e2e:
-	go test -v $(shell find tests | grep _test.go)
+	go test -v $(shell find tests | grep 'e2e.*_test.go')
