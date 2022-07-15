@@ -6,4 +6,5 @@ build:
 test_unit:
 	go test -v $(shell git ls-files | grep _test.go)
 
-test: test_unit
+test_e2e:
+	go test -v $(shell find tests | grep _test.go)

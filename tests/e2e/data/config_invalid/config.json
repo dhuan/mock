@@ -1,0 +1,14 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar",
+      "method": "invalid_method",
+      "response": "testing!"
+    },
+    {
+      "route": "another/endpoint?foo=bar",
+      "method": "get",
+      "response": "hello!"
+    }
+  ]
+}
