@@ -1,10 +1,12 @@
 package tests_e2e
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type E2eState struct {
@@ -30,6 +32,38 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 	}
 
 	return []byte(trimCommandOutput(string(result))), nil
+}
+
+func RunMockBg(state *E2eState, command string) {
+	parseCommandVars(&command)
+	commandParameters := toCommandParameters(command)
+
+	cmd := exec.Command(state.BinaryPath, commandParameters...)
+	buf := &bytes.Buffer{}
+	cmd.Stdout = buf
+	err := cmd.Start()
+	if err != nil {
+		panic(err)
+	}
+
+	serverIsReady := waitForOutputInCommand("Mock server is listening on port 4000.", 4, buf)
+	if !serverIsReady {
+		panic("Something went wrong while waiting for mock to start up.")
+	}
+}
+
+func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.Buffer) bool {
+	for attempts > 0 {
+		if strings.Contains(buffer.String(), expectedOutput) {
+			return true
+		}
+
+		time.Sleep(500 * time.Millisecond)
+
+		attempts--
+	}
+
+	return false
 }
 
 func parseCommandVars(command *string) {

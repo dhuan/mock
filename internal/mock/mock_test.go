@@ -6,6 +6,7 @@ import (
 
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/types"
+	. "github.com/dhuan/mock/pkg/mock"
 	"github.com/stretchr/testify/assert"
 	testifymock "github.com/stretchr/testify/mock"
 )
@@ -65,10 +66,10 @@ func (this mockMockFs) RemoveAllRequestRecords() error {
 }
 
 func Test_Validate_NoCalls(t *testing.T) {
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_HeaderMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -79,9 +80,9 @@ func Test_Validate_NoCalls(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code:     mock.Validation_error_code_no_call,
+		&[]ValidationError{
+			ValidationError{
+				Code:     Validation_error_code_no_call,
 				Metadata: map[string]string{},
 			},
 		},
@@ -98,10 +99,10 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 		[]byte(``),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_HeaderMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
@@ -112,9 +113,9 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_header_not_included,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_header_not_included,
 				Metadata: map[string]string{
 					"missing_header_key": "foo",
 				},
@@ -133,10 +134,10 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 		[]byte(``),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_HeaderMatch,
 			KeyValues: map[string]interface{}{
 				"foo":  "bar",
 				"foo2": "bar2",
@@ -148,15 +149,15 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_header_not_included,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_header_not_included,
 				Metadata: map[string]string{
 					"missing_header_key": "foo",
 				},
 			},
-			mock.ValidationError{
-				Code: mock.Validation_error_code_header_not_included,
+			ValidationError{
+				Code: Validation_error_code_header_not_included,
 				Metadata: map[string]string{
 					"missing_header_key": "foo2",
 				},
@@ -175,10 +176,10 @@ func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 		[]byte(``),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type:  mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type:  AssertType_HeaderMatch,
 			Key:   "some_header_key",
 			Value: "a_different_header_value",
 		},
@@ -188,9 +189,9 @@ func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_header_value_mismatch,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_header_value_mismatch,
 				Metadata: map[string]string{
 					"header_key":             "some_header_key",
 					"header_value_requested": "some_header_value",
@@ -211,10 +212,10 @@ func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 		[]byte(``),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_HeaderMatch,
 			KeyValues: map[string]interface{}{
 				"some_header_key": "a_different_header_value",
 			},
@@ -225,9 +226,9 @@ func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_header_value_mismatch,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_header_value_mismatch,
 				Metadata: map[string]string{
 					"header_key":             "some_header_key",
 					"header_value_requested": "some_header_value",
@@ -248,15 +249,15 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 		[]byte(``),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_HeaderMatch,
 			KeyValues: map[string]interface{}{
 				"some_header_key": "some_header_value",
 			},
-			And: &mock.Assert{
-				Type:  mock.AssertType_MethodMatch,
+			And: &AssertOptions{
+				Type:  AssertType_MethodMatch,
 				Value: "post",
 			},
 		},
@@ -266,9 +267,9 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_method_mismatch,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_method_mismatch,
 				Metadata: map[string]string{
 					"method_requested": "get",
 					"method_expected":  "post",
@@ -288,15 +289,15 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 		[]byte(``),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_HeaderMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_HeaderMatch,
 			KeyValues: map[string]interface{}{
 				"some_header_key": "some_header_value",
 			},
-			And: &mock.Assert{
-				Type:  mock.AssertType_MethodMatch,
+			And: &AssertOptions{
+				Type:  AssertType_MethodMatch,
 				Value: "get",
 			},
 		},
@@ -306,7 +307,7 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{},
+		&[]ValidationError{},
 		validationErrors,
 	)
 }
@@ -320,10 +321,10 @@ func Test_Validate_JsonBodyAssertion_Match(t *testing.T) {
 		[]byte(`{"foo":"bar", "some_key": "some_value"}`),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_JsonBodyMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_JsonBodyMatch,
 			Data: map[string]interface{}{
 				"foo":      "bar",
 				"some_key": "some_value",
@@ -340,7 +341,7 @@ func Test_Validate_JsonBodyAssertion_Match(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{},
+		&[]ValidationError{},
 		validationErrors,
 	)
 }
@@ -354,10 +355,10 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 		[]byte(`{"foo":"bar","some_key":"some_value"}`),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_JsonBodyMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_JsonBodyMatch,
 			Data: map[string]interface{}{
 				"foo":         "bar",
 				"some_key":    "some_value",
@@ -375,9 +376,9 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_body_mismatch,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_body_mismatch,
 				Metadata: map[string]string{
 					"body_requested": `{"foo":"bar","some_key":"some_value"}`,
 					"body_expected":  `{"another_key":"another_value","foo":"bar","some_key":"some_value"}`,
@@ -403,10 +404,10 @@ func Test_Validate_Nth(t *testing.T) {
 		[]byte(`{"foo":"bar","some_key":"some_value"}`),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type:  mock.AssertType_MethodMatch,
+		Assert: &AssertOptions{
+			Type:  AssertType_MethodMatch,
 			Value: "get",
 		},
 	}
@@ -414,11 +415,11 @@ func Test_Validate_Nth(t *testing.T) {
 
 	assert.Equal(t, 0, len(*validationErrors))
 
-	assertConfig = mock.AssertConfig{
+	assertConfig = AssertConfig{
 		Route: "foobar",
 		Nth:   2,
-		Assert: &mock.Assert{
-			Type:  mock.AssertType_MethodMatch,
+		Assert: &AssertOptions{
+			Type:  AssertType_MethodMatch,
 			Value: "get",
 		},
 	}
@@ -426,9 +427,9 @@ func Test_Validate_Nth(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_method_mismatch,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_method_mismatch,
 				Metadata: map[string]string{
 					"method_requested": "post",
 					"method_expected":  "get",
@@ -438,11 +439,11 @@ func Test_Validate_Nth(t *testing.T) {
 		validationErrors,
 	)
 
-	assertConfig = mock.AssertConfig{
+	assertConfig = AssertConfig{
 		Route: "foobar",
 		Nth:   2,
-		Assert: &mock.Assert{
-			Type:  mock.AssertType_MethodMatch,
+		Assert: &AssertOptions{
+			Type:  AssertType_MethodMatch,
 			Value: "post",
 		},
 	}
@@ -450,11 +451,11 @@ func Test_Validate_Nth(t *testing.T) {
 
 	assert.Equal(t, 0, len(*validationErrors))
 
-	assertConfig = mock.AssertConfig{
+	assertConfig = AssertConfig{
 		Route: "foobar",
 		Nth:   1,
-		Assert: &mock.Assert{
-			Type:  mock.AssertType_MethodMatch,
+		Assert: &AssertOptions{
+			Type:  AssertType_MethodMatch,
 			Value: "get",
 		},
 	}
@@ -472,10 +473,10 @@ func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
 		[]byte(`foo=bar&hello=world`),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_FormMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_FormMatch,
 			KeyValues: map[string]interface{}{
 				"some_key": "some_value",
 			},
@@ -486,9 +487,9 @@ func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_form_key_does_not_exist,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_form_key_does_not_exist,
 				Metadata: map[string]string{
 					"form_key": "some_key",
 				},
@@ -507,10 +508,10 @@ func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
 		[]byte(`foo=bar&hello=world`),
 	)
 
-	assertConfig := mock.AssertConfig{
+	assertConfig := AssertConfig{
 		Route: "foobar",
-		Assert: &mock.Assert{
-			Type: mock.AssertType_FormMatch,
+		Assert: &AssertOptions{
+			Type: AssertType_FormMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "not_bar",
 			},
@@ -521,9 +522,9 @@ func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
 
 	assert.Equal(
 		t,
-		&[]mock.ValidationError{
-			mock.ValidationError{
-				Code: mock.Validation_error_code_form_value_mismatch,
+		&[]ValidationError{
+			ValidationError{
+				Code: Validation_error_code_form_value_mismatch,
 				Metadata: map[string]string{
 					"form_key":             "foo",
 					"form_value_requested": "bar",

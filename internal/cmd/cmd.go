@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/types"
+	mocklib "github.com/dhuan/mock/pkg/mock"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ type MockConfig struct {
 }
 
 type MockApiResponse struct {
-	ValidationErrors *[]mock.ValidationError `json:"validation_errors"`
+	ValidationErrors *[]mocklib.ValidationError `json:"validation_errors"`
 }
 
 var (
