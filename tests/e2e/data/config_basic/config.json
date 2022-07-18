@@ -1,0 +1,9 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar",
+      "method": "POST",
+      "response": "testing!"
+    }
+  ]
+}
