@@ -37,6 +37,30 @@ func ListsEqual[T comparable](listA []T, listB []T) bool {
 	return true
 }
 
+func ListsEqualUnsorted[T comparable](listA, listB []T) bool {
+	if len(listA) != len(listB) {
+		return false
+	}
+
+	for i, _ := range listA {
+		if IndexOf[T](listB, listA[i]) == -1 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func IndexOf[T comparable](list []T, value T) int {
+	for i, _ := range list {
+		if list[i] == value {
+			return i
+		}
+	}
+
+	return -1
+}
+
 func MktempDir() (string, error) {
 	result, err := exec.Command("mktemp", "-d").Output()
 	if err != nil {
@@ -137,4 +161,14 @@ func WrapIn(wrapper string) func(subject string) string {
 	return func(subject string) string {
 		return fmt.Sprintf(`"%s"`, subject)
 	}
+}
+
+func GetKeys[T_Key comparable, T_Value interface{}](subject map[T_Key]T_Value) []T_Key {
+	keys := make([]T_Key, 0, len(subject))
+
+	for key, _ := range subject {
+		keys = append(keys, key)
+	}
+
+	return keys
 }

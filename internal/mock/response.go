@@ -117,11 +117,36 @@ func resolveConditionFunction(condition *types.Condition) func(request *http.Req
 		return conditionQuerystringMatch
 	}
 
+	if condition.Type == types.ConditionType_QuerystringExactMatch {
+		return conditionQuerystringMatchExact
+	}
+
 	if condition.Type == types.ConditionType_FormMatch {
 		return conditionFormMatch
 	}
 
 	panic("Failed to resolve condition func!")
+}
+
+func conditionQuerystringMatchExact(request *http.Request, requestBody []byte, condition *types.Condition) bool {
+	query := request.URL.Query()
+	isSingle := condition.Key != "" && condition.Value != ""
+
+	if isSingle {
+		return query.Has(condition.Key) && len(query) == 1 && conditionQuerystringMatch(request, requestBody, condition)
+	}
+
+	if len(query) != len(condition.KeyValues) {
+		return false
+	}
+
+	queryKeys := utils.GetKeys[string, []string](query)
+	conditionKeys := utils.GetKeys[string, interface{}](condition.KeyValues)
+	if !utils.ListsEqualUnsorted[string](queryKeys, conditionKeys) {
+		return false
+	}
+
+	return conditionQuerystringMatch(request, requestBody, condition)
 }
 
 func conditionQuerystringMatch(request *http.Request, requestBody []byte, condition *types.Condition) bool {

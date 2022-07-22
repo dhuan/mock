@@ -14,6 +14,7 @@ type ConditionType int
 const (
 	ConditionType_None ConditionType = iota
 	ConditionType_QuerystringMatch
+	ConditionType_QuerystringExactMatch
 	ConditionType_FormMatch
 )
 
@@ -22,6 +23,12 @@ func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
 
 	if conditionTypeText == "querystring_match" {
 		*this = ConditionType_QuerystringMatch
+
+		return nil
+	}
+
+	if conditionTypeText == "querystring_exact" {
+		*this = ConditionType_QuerystringExactMatch
 
 		return nil
 	}

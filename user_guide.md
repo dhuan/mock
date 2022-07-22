@@ -13,6 +13,7 @@
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
     - [Condition Options Reference](#condition-options-reference)
       - [`querystring_match`](#querystring_match)
+      - [`querystring_exact_match`](#querystring_exact_match)
       - [`form_match`](#form_match)
 - [Test Assertions](#test-assertions)
   - [Which Request to assert against?](#which-request-to-assert-against)
@@ -261,6 +262,32 @@ Matches against a Querystring in the Request. For example, a Request having the 
   "type": "querystring_match",
   "key": "foo",
   "value": "bar"
+}
+```
+
+You can also use `key_values` and set multiple pairs:
+
+```json
+{
+  "type": "querystring_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
+}
+```
+
+##### `querystring_exact_match`
+
+Matches against Querystring values, like `querystring_match`. The difference being that it matches only if the Request's Querystring contains only the specified Querystrings and no other.
+
+```json
+{
+  "type": "querystring_exact_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
 }
 ```
 
