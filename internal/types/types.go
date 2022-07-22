@@ -27,7 +27,7 @@ func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
 		return nil
 	}
 
-	if conditionTypeText == "querystring_exact" {
+	if conditionTypeText == "querystring_exact_match" {
 		*this = ConditionType_QuerystringExactMatch
 
 		return nil
