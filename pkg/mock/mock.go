@@ -3,13 +3,19 @@ package mock
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/dhuan/mock/internal/utils"
 )
+
+var assert_type_encoding_map = map[AssertType]string{
+	AssertType_HeaderMatch:   "header_match",
+	AssertType_MethodMatch:   "method_match",
+	AssertType_JsonBodyMatch: "json_body_match",
+	AssertType_FormMatch:     "form_match",
+}
 
 type AssertType int
 
@@ -22,53 +28,17 @@ const (
 )
 
 func (this *AssertType) UnmarshalJSON(data []byte) error {
-	assertTypeText := utils.Unquote(string(data))
-
-	if assertTypeText == "header_match" {
-		*this = AssertType_HeaderMatch
-
-		return nil
-	}
-
-	if assertTypeText == "method_match" {
-		*this = AssertType_MethodMatch
-
-		return nil
-	}
-
-	if assertTypeText == "json_body_match" {
-		*this = AssertType_JsonBodyMatch
-
-		return nil
-	}
-
-	if assertTypeText == "form_match" {
-		*this = AssertType_FormMatch
-
-		return nil
-	}
-
-	return errors.New(fmt.Sprintf("Failed to parse Assert Type: %s", assertTypeText))
+	return utils.UnmarshalJsonHelper[AssertType](this, assert_type_encoding_map, data, "Failed to parse Assert Type: %s")
 }
 
 func (this *AssertType) MarshalJSON() ([]byte, error) {
-	if *this == AssertType_HeaderMatch {
-		return []byte(`"header_match"`), nil
-	}
+	encodingMapPrepared := utils.MapMapValueOnly[AssertType, string, string](assert_type_encoding_map, utils.WrapIn(`"`))
 
-	if *this == AssertType_MethodMatch {
-		return []byte(`"method_match"`), nil
-	}
-
-	if *this == AssertType_JsonBodyMatch {
-		return []byte(`"json_body_match"`), nil
-	}
-
-	if *this == AssertType_FormMatch {
-		return []byte(`"form_match"`), nil
-	}
-
-	return []byte(""), errors.New(fmt.Sprintf("Failed to parse Assert Type: %d", *this))
+	return utils.MarshalJsonHelper[AssertType](
+		encodingMapPrepared,
+		"Failed to parse Assert Type: %d",
+		this,
+	)
 }
 
 var (

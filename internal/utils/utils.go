@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"os/exec"
 	"regexp"
@@ -83,4 +85,56 @@ func AnyEquals[T comparable](list []T, value T) bool {
 	}
 
 	return false
+}
+
+func MarshalJsonHelper[T comparable](
+	mapValues map[T]string,
+	errorMessage string,
+	value *T,
+) ([]byte, error) {
+	for i, _ := range mapValues {
+		if *value == i {
+			return []byte(mapValues[i]), nil
+		}
+	}
+
+	return []byte(""), errors.New(fmt.Sprintf(errorMessage, *value))
+}
+
+func UnmarshalJsonHelper[T comparable](
+	value *T,
+	mapValues map[T]string,
+	data []byte,
+	errorMessage string,
+) error {
+	assertTypeText := Unquote(string(data))
+
+	for key, _ := range mapValues {
+		if assertTypeText == mapValues[key] {
+			*value = key
+
+			return nil
+		}
+	}
+
+	return errors.New(fmt.Sprintf(errorMessage, assertTypeText))
+}
+
+func MapMapValueOnly[T_Key comparable, T_Value comparable, T_ValueB interface{}](
+	subject map[T_Key]T_Value,
+	transform func(value T_Value) T_ValueB,
+) map[T_Key]T_ValueB {
+	result := make(map[T_Key]T_ValueB)
+
+	for key, _ := range subject {
+		result[key] = transform(subject[key])
+	}
+
+	return result
+}
+
+func WrapIn(wrapper string) func(subject string) string {
+	return func(subject string) string {
+		return fmt.Sprintf(`"%s"`, subject)
+	}
 }
