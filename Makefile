@@ -3,6 +3,8 @@ build:
 	mkdir -p bin
 	mv ./mock ./bin/.
 
+test: test_unit test_e2e
+
 test_unit:
 	go test -v $(shell git ls-files | grep _test.go | grep -v e2e)
 
