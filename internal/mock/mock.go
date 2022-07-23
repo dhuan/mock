@@ -40,7 +40,7 @@ func Validate(
 		validationErrors = append(
 			validationErrors,
 			ValidationError{
-				Code:     Validation_error_code_no_call,
+				Code:     ValidationErrorCode_NoCall,
 				Metadata: map[string]string{},
 			},
 		)
@@ -142,7 +142,7 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions
 		valueFromRequestRecord, ok := requestRecord.Headers[key]
 		if !ok {
 			validationErrors = append(validationErrors, ValidationError{
-				Code: Validation_error_code_header_not_included,
+				Code: ValidationErrorCode_HeaderNotIncluded,
 				Metadata: map[string]string{
 					"missing_header_key": key,
 				},
@@ -153,7 +153,7 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions
 
 		if value != strings.Join(valueFromRequestRecord, "") {
 			validationErrors = append(validationErrors, ValidationError{
-				Code: Validation_error_code_header_value_mismatch,
+				Code: ValidationErrorCode_HeaderValueMismatch,
 				Metadata: map[string]string{
 					"header_key":             key,
 					"header_value_requested": strings.Join(valueFromRequestRecord, ""),
@@ -171,7 +171,7 @@ func assertMethodMatch(requestRecord *types.RequestRecord, assert *AssertOptions
 
 	if requestRecord.Method != assert.Value {
 		validationErrors = append(validationErrors, ValidationError{
-			Code: Validation_error_code_method_mismatch,
+			Code: ValidationErrorCode_MethodMismatch,
 			Metadata: map[string]string{
 				"method_requested": requestRecord.Method,
 				"method_expected":  assert.Value,
@@ -197,7 +197,7 @@ func assertFormMatch(requestRecord *types.RequestRecord, assert *AssertOptions) 
 			validationErrors = append(
 				validationErrors,
 				ValidationError{
-					Code: Validation_error_code_form_key_does_not_exist,
+					Code: ValidationErrorCode_FormKeyDoesNotExist,
 					Metadata: map[string]string{
 						"form_key": i,
 					},
@@ -211,7 +211,7 @@ func assertFormMatch(requestRecord *types.RequestRecord, assert *AssertOptions) 
 			validationErrors = append(
 				validationErrors,
 				ValidationError{
-					Code: Validation_error_code_form_value_mismatch,
+					Code: ValidationErrorCode_FormValueMismatch,
 					Metadata: map[string]string{
 						"form_key":             i,
 						"form_value_requested": value,
@@ -264,7 +264,7 @@ func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.Re
 
 			validationErrors = append(
 				validationErrors,
-				ValidationError{Code: Validation_error_code_body_mismatch, Metadata: map[string]string{
+				ValidationError{Code: ValidationErrorCode_BodyMismatch, Metadata: map[string]string{
 					"body_requested": string(requestRecordReformatted),
 					"body_expected":  string(assertJson),
 				}},

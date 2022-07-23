@@ -82,7 +82,7 @@ func Test_Validate_NoCalls(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code:     Validation_error_code_no_call,
+				Code:     ValidationErrorCode_NoCall,
 				Metadata: map[string]string{},
 			},
 		},
@@ -115,7 +115,7 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_header_not_included,
+				Code: ValidationErrorCode_HeaderNotIncluded,
 				Metadata: map[string]string{
 					"missing_header_key": "foo",
 				},
@@ -151,13 +151,13 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_header_not_included,
+				Code: ValidationErrorCode_HeaderNotIncluded,
 				Metadata: map[string]string{
 					"missing_header_key": "foo",
 				},
 			},
 			ValidationError{
-				Code: Validation_error_code_header_not_included,
+				Code: ValidationErrorCode_HeaderNotIncluded,
 				Metadata: map[string]string{
 					"missing_header_key": "foo2",
 				},
@@ -191,7 +191,7 @@ func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_header_value_mismatch,
+				Code: ValidationErrorCode_HeaderValueMismatch,
 				Metadata: map[string]string{
 					"header_key":             "some_header_key",
 					"header_value_requested": "some_header_value",
@@ -228,7 +228,7 @@ func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_header_value_mismatch,
+				Code: ValidationErrorCode_HeaderValueMismatch,
 				Metadata: map[string]string{
 					"header_key":             "some_header_key",
 					"header_value_requested": "some_header_value",
@@ -269,7 +269,7 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_method_mismatch,
+				Code: ValidationErrorCode_MethodMismatch,
 				Metadata: map[string]string{
 					"method_requested": "get",
 					"method_expected":  "post",
@@ -378,7 +378,7 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_body_mismatch,
+				Code: ValidationErrorCode_BodyMismatch,
 				Metadata: map[string]string{
 					"body_requested": `{"foo":"bar","some_key":"some_value"}`,
 					"body_expected":  `{"another_key":"another_value","foo":"bar","some_key":"some_value"}`,
@@ -429,7 +429,7 @@ func Test_Validate_Nth(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_method_mismatch,
+				Code: ValidationErrorCode_MethodMismatch,
 				Metadata: map[string]string{
 					"method_requested": "post",
 					"method_expected":  "get",
@@ -489,7 +489,7 @@ func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_form_key_does_not_exist,
+				Code: ValidationErrorCode_FormKeyDoesNotExist,
 				Metadata: map[string]string{
 					"form_key": "some_key",
 				},
@@ -524,7 +524,7 @@ func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
 		t,
 		&[]ValidationError{
 			ValidationError{
-				Code: Validation_error_code_form_value_mismatch,
+				Code: ValidationErrorCode_FormValueMismatch,
 				Metadata: map[string]string{
 					"form_key":             "foo",
 					"form_value_requested": "bar",

@@ -41,16 +41,16 @@ func (this *AssertType) MarshalJSON() ([]byte, error) {
 	)
 }
 
-var (
-	Validation_error_code_header_value_mismatch       = "header_value_mismatch"
-	Validation_error_code_no_call                     = "no_call"
-	Validation_error_code_header_not_included         = "header_not_included"
-	Validation_error_code_body_mismatch               = "body_mismatch"
-	Validation_error_code_request_has_no_body_content = "request_has_no_body_content"
-	Validation_error_code_method_mismatch             = "method_mismatch"
-	Validation_error_code_form_key_does_not_exist     = "form_key_does_not_exist"
-	Validation_error_code_form_value_mismatch         = "form_value_mismatch"
-)
+var validation_error_code_encoding_map = map[ValidationErrorCode]string{
+	ValidationErrorCode_HeaderValueMismatch:     "header_value_mismatch",
+	ValidationErrorCode_NoCall:                  "no_call",
+	ValidationErrorCode_HeaderNotIncluded:       "header_not_included",
+	ValidationErrorCode_BodyMismatch:            "body_mismatch",
+	ValidationErrorCode_RequestHasNoBodyContent: "request_has_no_body_content",
+	ValidationErrorCode_MethodMismatch:          "method_mismatch",
+	ValidationErrorCode_FormKeyDoesNotExist:     "form_key_does_not_exist",
+	ValidationErrorCode_FormValueMismatch:       "form_value_mismatch",
+}
 
 type AssertHeader map[string][]string
 
@@ -72,8 +72,44 @@ type AssertOptions struct {
 }
 
 type ValidationError struct {
-	Code     string            `json:"code"`
-	Metadata map[string]string `json:"metadata"`
+	Code     ValidationErrorCode `json:"code"`
+	Metadata map[string]string   `json:"metadata"`
+}
+
+type ValidationErrorCode int
+
+const (
+	ValidationErrorCode_Unknown ValidationErrorCode = iota
+	ValidationErrorCode_NoCall
+	ValidationErrorCode_MethodMismatch
+	ValidationErrorCode_HeaderNotIncluded
+	ValidationErrorCode_HeaderValueMismatch
+	ValidationErrorCode_BodyMismatch
+	ValidationErrorCode_RequestHasNoBodyContent
+	ValidationErrorCode_FormKeyDoesNotExist
+	ValidationErrorCode_FormValueMismatch
+)
+
+func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {
+	encodingMapPrepared := utils.MapMapValueOnly[ValidationErrorCode, string, string](
+		validation_error_code_encoding_map,
+		utils.WrapIn(`"`),
+	)
+
+	return utils.MarshalJsonHelper[ValidationErrorCode](
+		encodingMapPrepared,
+		"Failed to parse Validation Error Code: %d",
+		this,
+	)
+}
+
+func (this *ValidationErrorCode) UnmarshalJSON(data []byte) error {
+	return utils.UnmarshalJsonHelper[ValidationErrorCode](
+		this,
+		validation_error_code_encoding_map,
+		data,
+		"Failed to parse Validation Error Code: %s",
+	)
 }
 
 type MockConfig struct {

@@ -24,7 +24,7 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 	assert.Equal(
 		t,
 		[]mocklib.ValidationError{
-			{Code: "no_call", Metadata: map[string]string{}},
+			{Code: mocklib.ValidationErrorCode_NoCall, Metadata: map[string]string{}},
 		},
 		validationErrors,
 	)
@@ -50,7 +50,7 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 		t,
 		[]mocklib.ValidationError{
 			{
-				Code: "method_mismatch",
+				Code: mocklib.ValidationErrorCode_MethodMismatch,
 				Metadata: map[string]string{
 					"method_expected":  "put",
 					"method_requested": "post",
@@ -110,7 +110,7 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 		t,
 		[]mocklib.ValidationError{
 			{
-				Code: "header_not_included",
+				Code: mocklib.ValidationErrorCode_HeaderNotIncluded,
 				Metadata: map[string]string{
 					"missing_header_key": "some_header_key",
 				},
