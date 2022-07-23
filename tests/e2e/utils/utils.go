@@ -3,6 +3,7 @@ package tests_e2e
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -64,7 +65,7 @@ func RunMockBg(state *E2eState, command string) KillMockFunc {
 	}
 }
 
-func Request(config *mocklib.MockConfig, method, route, payload string, headers map[string]string) {
+func Request(config *mocklib.MockConfig, method, route, payload string, headers map[string]string) []byte {
 	request, err := http.NewRequest(
 		method,
 		fmt.Sprintf("http://%s/%s", config.Url, route),
@@ -79,10 +80,17 @@ func Request(config *mocklib.MockConfig, method, route, payload string, headers 
 	}
 
 	client := &http.Client{}
-	_, err = client.Do(request)
+	response, err := client.Do(request)
 	if err != nil {
 		panic(err)
 	}
+
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	return responseBody
 }
 
 func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.Buffer) bool {

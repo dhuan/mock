@@ -1,0 +1,62 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar",
+      "method": "POST",
+      "response": "This is the default response.",
+      "response_if": [
+        {
+          "response": "Congratulations!",
+          "condition": {
+            "type": "querystring_match",
+            "key_values": {
+              "key3": "value3"
+            }
+          }
+        },
+        {
+          "response": "Hello world!",
+          "condition": {
+            "type": "querystring_exact_match",
+            "key_values": {
+              "key1": "value1",
+              "key2": "value2"
+            }
+          }
+        },
+        {
+          "response": "Hello world! (Condition with AND chaining)",
+          "condition": {
+            "type": "querystring_match",
+            "key_values": {
+              "key1": "value1",
+              "key2": "value2"
+            },
+            "and": {
+              "type": "querystring_match",
+              "key_values": {
+                "key4": "value4"
+              }
+            }
+          }
+        },
+        {
+          "response": "Hello world! (Condition with OR chaining)",
+          "condition": {
+            "type": "querystring_match",
+            "key_values": {
+              "key5": "value5",
+              "key5": "value5"
+            },
+            "or": {
+              "type": "querystring_match",
+              "key_values": {
+                "key6": "value6"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
