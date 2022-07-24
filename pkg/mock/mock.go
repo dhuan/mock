@@ -57,7 +57,6 @@ type AssertHeader map[string][]string
 type AssertConfig struct {
 	Route  string         `json:"route"`
 	Nth    int            `json:"nth"`
-	Method string         `json:"method"`
 	Assert *AssertOptions `json:"assert"`
 }
 
