@@ -65,6 +65,16 @@ func RunMockBg(state *E2eState, command string) KillMockFunc {
 	}
 }
 
+func MockAssert(assertConfig *mocklib.AssertConfig) []mocklib.ValidationError {
+	mockConfig := mocklib.Init("localhost:4000")
+	validationErrors, err := mocklib.Assert(mockConfig, assertConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	return validationErrors
+}
+
 func Request(config *mocklib.MockConfig, method, route, payload string, headers map[string]string) []byte {
 	request, err := http.NewRequest(
 		method,

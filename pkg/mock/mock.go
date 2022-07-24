@@ -125,10 +125,10 @@ type AssertResponse struct {
 	ValidationErrors []ValidationError `json:"validation_errors"`
 }
 
-func Assert(config *MockConfig, assertConfig *AssertConfig) []ValidationError {
+func Assert(config *MockConfig, assertConfig *AssertConfig) ([]ValidationError, error) {
 	bodyJson, err := json.Marshal(assertConfig)
 	if err != nil {
-		panic(err)
+		return make([]ValidationError, 0, 0), err
 	}
 
 	request, err := http.NewRequest(
@@ -137,25 +137,25 @@ func Assert(config *MockConfig, assertConfig *AssertConfig) []ValidationError {
 		bytes.NewBuffer([]byte(bodyJson)),
 	)
 	if err != nil {
-		panic(err)
+		return make([]ValidationError, 0, 0), err
 	}
 
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		panic(err)
+		return make([]ValidationError, 0, 0), err
 	}
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		panic(err)
+		return make([]ValidationError, 0, 0), err
 	}
 
 	var responseParsed AssertResponse
 	err = json.Unmarshal(responseBody, &responseParsed)
 	if err != nil {
-		panic(err)
+		return make([]ValidationError, 0, 0), err
 	}
 
-	return responseParsed.ValidationErrors
+	return responseParsed.ValidationErrors, nil
 }

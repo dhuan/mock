@@ -12,8 +12,7 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
-	mockConfig := mocklib.Init("localhost:4000")
-	validationErrors := mocklib.Assert(mockConfig, &mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Assert: &mocklib.AssertOptions{
 			Type:  mocklib.AssertType_MethodMatch,
@@ -35,10 +34,9 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
-
 	e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, map[string]string{})
 
-	validationErrors := mocklib.Assert(mockConfig, &mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Assert: &mocklib.AssertOptions{
 			Type:  mocklib.AssertType_MethodMatch,
@@ -69,7 +67,7 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, map[string]string{})
 
-	validationErrors := mocklib.Assert(mockConfig, &mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Assert: &mocklib.AssertOptions{
 			Type:  mocklib.AssertType_MethodMatch,
@@ -92,7 +90,7 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, map[string]string{})
 
-	validationErrors := mocklib.Assert(mockConfig, &mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Assert: &mocklib.AssertOptions{
 			Type:  mocklib.AssertType_MethodMatch,
@@ -130,7 +128,7 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 		"some_header_key": "some_header_value",
 	})
 
-	validationErrors := mocklib.Assert(mockConfig, &mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Assert: &mocklib.AssertOptions{
 			Type:  mocklib.AssertType_MethodMatch,
