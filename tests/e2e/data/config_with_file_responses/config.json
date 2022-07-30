@@ -1,0 +1,19 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar/1",
+      "method": "POST",
+      "response": "file:response_a.txt"
+    },
+    {
+      "route": "foo/bar/2",
+      "method": "POST",
+      "response": "file:some_folder/response.txt"
+    },
+    {
+      "route": "foo/bar/3",
+      "method": "POST",
+      "response": "file:response_b.json"
+    }
+  ]
+}
