@@ -2,15 +2,18 @@ package tests_e2e
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
+	"testing"
 	"time"
 
 	mocklib "github.com/dhuan/mock/pkg/mock"
+	"github.com/stretchr/testify/assert"
 )
 
 type E2eState struct {
@@ -160,4 +163,52 @@ func pwd() string {
 	}
 
 	return fmt.Sprintf("%s/../..", wd)
+}
+
+func RunTest(
+	t *testing.T,
+	configurationFilePath,
+	method,
+	route string,
+	assertionFunc func(t *testing.T, response []byte),
+) {
+	killMock := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
+	defer killMock()
+
+	mockConfig := mocklib.Init("localhost:4000")
+	responseBody := Request(mockConfig, method, route, "", map[string]string{})
+
+	assertionFunc(t, responseBody)
+}
+
+func StringMatches(expected string) func(t *testing.T, response []byte) {
+	return func(t *testing.T, responseBody []byte) {
+		assert.Equal(t, expected, string(responseBody))
+	}
+}
+
+func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response []byte) {
+	return func(t *testing.T, responseBody []byte) {
+		jsonEncodedA, err := json.Marshal(expectedJson)
+		if err != nil {
+			t.Fatal("Failed to parse JSON from expected input!")
+		}
+
+		jsonEncodedB, err := encodeJsonAgain(responseBody)
+		if err != nil {
+			t.Fatal("Failed to parse JSON from response!")
+		}
+
+		assert.Equal(t, string(jsonEncodedA), string(jsonEncodedB))
+	}
+}
+
+func encodeJsonAgain(encodedJson []byte) ([]byte, error) {
+	var jsonTarget map[string]interface{}
+	err := json.Unmarshal(encodedJson, &jsonTarget)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return json.Marshal(jsonTarget)
 }
