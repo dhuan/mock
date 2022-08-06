@@ -212,3 +212,7 @@ func encodeJsonAgain(encodedJson []byte) ([]byte, error) {
 
 	return json.Marshal(jsonTarget)
 }
+
+var ContentTypeJsonHeaders map[string]string = map[string]string{
+	"Content-type": "application/json",
+}
