@@ -119,6 +119,36 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 	)
 }
 
+func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
+	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	defer killMock()
+
+	mockConfig := mocklib.Init("localhost:4000")
+	e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
+
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+		Route: "foo/bar",
+		Nth:   2,
+		Assert: &mocklib.AssertOptions{
+			Type: mocklib.AssertType_JsonBodyMatch,
+			Data: map[string]interface{}{
+				"foo": "bar",
+			},
+		},
+	})
+
+	assert.Equal(
+		t,
+		[]mocklib.ValidationError{
+			mocklib.ValidationError{
+				Code:     mocklib.ValidationErrorCode_NthOutOfRange,
+				Metadata: map[string]string{},
+			},
+		},
+		validationErrors,
+	)
+}
+
 func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()

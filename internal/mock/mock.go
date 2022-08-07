@@ -52,6 +52,19 @@ func Validate(
 	if nth == 0 {
 		nth = 1
 	}
+
+	if (nth - 1) > (len(requestRecords) - 1) {
+		validationErrors = append(
+			validationErrors,
+			ValidationError{
+				Code:     ValidationErrorCode_NthOutOfRange,
+				Metadata: map[string]string{},
+			},
+		)
+
+		return &validationErrors, nil
+	}
+
 	requestRecord := requestRecords[nth-1]
 
 	return validate(requestRecord, assertConfig.Assert, jsonValidate)

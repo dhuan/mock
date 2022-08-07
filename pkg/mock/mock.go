@@ -50,6 +50,7 @@ var validation_error_code_encoding_map = map[ValidationErrorCode]string{
 	ValidationErrorCode_MethodMismatch:          "method_mismatch",
 	ValidationErrorCode_FormKeyDoesNotExist:     "form_key_does_not_exist",
 	ValidationErrorCode_FormValueMismatch:       "form_value_mismatch",
+	ValidationErrorCode_NthOutOfRange:           "nth_out_of_range",
 }
 
 type AssertHeader map[string][]string
@@ -87,6 +88,7 @@ const (
 	ValidationErrorCode_RequestHasNoBodyContent
 	ValidationErrorCode_FormKeyDoesNotExist
 	ValidationErrorCode_FormValueMismatch
+	ValidationErrorCode_NthOutOfRange
 )
 
 func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {
