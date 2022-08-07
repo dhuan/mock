@@ -464,6 +464,43 @@ func Test_Validate_Nth(t *testing.T) {
 	assert.Equal(t, 0, len(*validationErrors))
 }
 
+func Test_Validate_Nth_OutOfRange(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+	addToMockedRequestRecords(
+		"foobar",
+		"post",
+		[][]string{},
+		[]byte(`{"foo":"bar","some_key":"some_value"}`),
+	)
+
+	assertConfig := AssertConfig{
+		Nth:   3,
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_MethodMatch,
+			Value: "get",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code:     ValidationErrorCode_NthOutOfRange,
+				Metadata: map[string]string{},
+			},
+		},
+		validationErrors,
+	)
+}
+
 func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(
