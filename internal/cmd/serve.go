@@ -87,9 +87,12 @@ var serveCmd = &cobra.Command{
 		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
 		router.Post("/__mock__/reset", resetApiHandler(mockFs, state, config))
 
-		fmt.Println(fmt.Sprintf("Mock server is listening on port %s.", flagPort))
+		fmt.Println(fmt.Sprintf("Starting Mock server on port %s.", flagPort))
 
-		http.ListenAndServe(fmt.Sprintf(":%s", flagPort), router)
+		if err = http.ListenAndServe(fmt.Sprintf(":%s", flagPort), router); err != nil {
+			log.Println("An error occurred while starting up the server.")
+			log.Fatalln(err)
+		}
 	},
 }
 

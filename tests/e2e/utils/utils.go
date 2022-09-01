@@ -55,7 +55,7 @@ func RunMockBg(state *E2eState, command string) KillMockFunc {
 		panic(err)
 	}
 
-	serverIsReady := waitForOutputInCommand("Mock server is listening on port 4000.", 4, buf)
+	serverIsReady := waitForOutputInCommand("Starting Mock server on port 4000.", 4, buf)
 	if !serverIsReady {
 		panic("Something went wrong while waiting for mock to start up.")
 	}
