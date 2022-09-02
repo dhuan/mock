@@ -111,6 +111,46 @@ func assertFormMatch(requestRecord *types.RequestRecord, assert *AssertOptions) 
 	return &validationErrors, nil
 }
 
+func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+	validationErrors := make([]ValidationError, 0)
+
+	if requestRecord.Querystring == "" {
+		return &[]ValidationError{ValidationError{
+			Code:     ValidationErrorCode_RequestHasNoQuerystring,
+			Metadata: map[string]string{},
+		}}, nil
+	}
+
+	parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
+	if err != nil {
+		return &validationErrors, err
+	}
+
+	expectedKeyValuePairs := make(map[string]string)
+
+	if assert.Key != "" {
+		expectedKeyValuePairs[assert.Key] = assert.Value
+	}
+
+	for key, _ := range expectedKeyValuePairs {
+		if expectedKeyValuePairs[key] != parsedQuery[key][0] {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{
+					Code: ValidationErrorCode_QuerystringMismatch,
+					Metadata: map[string]string{
+						"querystring_key":             key,
+						"querystring_value_expected":  expectedKeyValuePairs[key],
+						"querystring_value_requested": parsedQuery[key][0],
+					},
+				},
+			)
+		}
+	}
+
+	return &validationErrors, nil
+}
+
 func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
 	return func(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
 		validationErrors := make([]ValidationError, 0)

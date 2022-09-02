@@ -11,10 +11,11 @@ import (
 )
 
 var assert_type_encoding_map = map[AssertType]string{
-	AssertType_HeaderMatch:   "header_match",
-	AssertType_MethodMatch:   "method_match",
-	AssertType_JsonBodyMatch: "json_body_match",
-	AssertType_FormMatch:     "form_match",
+	AssertType_HeaderMatch:      "header_match",
+	AssertType_MethodMatch:      "method_match",
+	AssertType_JsonBodyMatch:    "json_body_match",
+	AssertType_FormMatch:        "form_match",
+	AssertType_QuerystringMatch: "querystring_match",
 }
 
 type AssertType int
@@ -25,6 +26,7 @@ const (
 	AssertType_MethodMatch
 	AssertType_JsonBodyMatch
 	AssertType_FormMatch
+	AssertType_QuerystringMatch
 )
 
 func (this *AssertType) UnmarshalJSON(data []byte) error {
@@ -51,6 +53,8 @@ var validation_error_code_encoding_map = map[ValidationErrorCode]string{
 	ValidationErrorCode_FormKeyDoesNotExist:     "form_key_does_not_exist",
 	ValidationErrorCode_FormValueMismatch:       "form_value_mismatch",
 	ValidationErrorCode_NthOutOfRange:           "nth_out_of_range",
+	ValidationErrorCode_RequestHasNoQuerystring: "request_has_no_querystring",
+	ValidationErrorCode_QuerystringMismatch:     "querystring_mismatch",
 }
 
 type AssertHeader map[string][]string
@@ -89,6 +93,8 @@ const (
 	ValidationErrorCode_FormKeyDoesNotExist
 	ValidationErrorCode_FormValueMismatch
 	ValidationErrorCode_NthOutOfRange
+	ValidationErrorCode_RequestHasNoQuerystring
+	ValidationErrorCode_QuerystringMismatch
 )
 
 func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {

@@ -2,6 +2,7 @@ package mock_test
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/dhuan/mock/internal/mock"
@@ -30,7 +31,7 @@ func reset() {
 	mockJsonValidateInstance = mockJsonValidate{}
 }
 
-func addToMockedRequestRecords(route string, method string, headers [][]string, body []byte) {
+func addToMockedRequestRecords(fullRoute string, method string, headers [][]string, body []byte) {
 	httpHeaders := make(http.Header)
 
 	for _, headerValues := range headers {
@@ -38,15 +39,27 @@ func addToMockedRequestRecords(route string, method string, headers [][]string, 
 		httpHeaders[headerKey] = headerValues[1:]
 	}
 
+	route, querystring := parseRoute(fullRoute)
+
 	mock_request_records = append(
 		mock_request_records,
 		&types.RequestRecord{
-			Route:   route,
-			Method:  method,
-			Headers: httpHeaders,
-			Body:    &body,
+			Route:       route,
+			Method:      method,
+			Headers:     httpHeaders,
+			Body:        &body,
+			Querystring: querystring,
 		},
 	)
+}
+
+func parseRoute(fullRoute string) (string, string) {
+	split := strings.Split(fullRoute, "?")
+	if len(split) < 2 {
+		return fullRoute, ""
+	}
+
+	return split[0], split[1]
 }
 
 type mockMockFs struct {
@@ -566,6 +579,72 @@ func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
 					"form_key":             "foo",
 					"form_value_requested": "bar",
 					"form_value_expected":  "not_bar",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_Querystring_FailBecauseRequestHasNoQuerystring(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code:     ValidationErrorCode_RequestHasNoQuerystring,
+				Metadata: map[string]string{},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_Querystring_FailBecauseQuerystringDoesNotMatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=not_bar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringMismatch,
+				Metadata: map[string]string{
+					"querystring_key":             "foo",
+					"querystring_value_expected":  "bar",
+					"querystring_value_requested": "not_bar",
 				},
 			},
 		},

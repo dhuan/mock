@@ -127,6 +127,10 @@ func resolveAssertTypeFunc(
 		return assertFormMatch
 	}
 
+	if assertType == AssertType_QuerystringMatch {
+		return assertQuerystringMatch
+	}
+
 	panic(fmt.Sprintf("Failed to resolve assert type: %d", assertType))
 }
 
