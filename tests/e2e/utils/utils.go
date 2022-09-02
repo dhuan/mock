@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -35,10 +36,10 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
 	result, err := cmd.CombinedOutput()
 	if err != nil {
-		return []byte(trimCommandOutput(string(result))), err
+		return []byte(cleanupCommandOutput(string(result))), err
 	}
 
-	return []byte(trimCommandOutput(string(result))), nil
+	return []byte(cleanupCommandOutput(string(result))), nil
 }
 
 type KillMockFunc func()
@@ -50,6 +51,7 @@ func RunMockBg(state *E2eState, command string) KillMockFunc {
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
 	buf := &bytes.Buffer{}
 	cmd.Stdout = buf
+	cmd.Stderr = buf
 	err := cmd.Start()
 	if err != nil {
 		panic(err)
@@ -134,6 +136,34 @@ func parseCommandVars(command *string) {
 			-1,
 		)
 	}
+}
+
+func replaceRegex(subject string, find []string, replaceWith string) string {
+	if len(find) == 0 {
+		return subject
+	}
+
+	re := regexp.MustCompile(find[0])
+
+	return replaceRegex(
+		re.ReplaceAllString(subject, replaceWith),
+		find[1:],
+		replaceWith,
+	)
+}
+
+func replaceRegexForEachLine(subject string, find []string, replaceWith string) string {
+	lines := strings.Split(subject, "\n")
+
+	for i, _ := range lines {
+		lines[i] = replaceRegex(lines[i], find, replaceWith)
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func cleanupCommandOutput(str string) string {
+	return replaceRegexForEachLine(trimCommandOutput(str), []string{`^[0-9\/]{1,} [0-9\:]{1,} `}, "")
 }
 
 func trimCommandOutput(str string) string {

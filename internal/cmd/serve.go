@@ -41,15 +41,15 @@ var serveCmd = &cobra.Command{
 		}
 
 		if len(endpointConfigErrors) > 0 {
-			fmt.Println("mock can't be started. The following errors were found in your configuration:")
-			fmt.Println("")
+			log.Println("mock can't be started. The following errors were found in your configuration:")
+			log.Println("")
 			displayEndpointConfigErrors(endpointConfigErrors, config.Endpoints)
 
 			os.Exit(1)
 		}
 
 		tempDir, err := utils.MktempDir()
-		fmt.Println(fmt.Sprintf("Temporary folder created for Request Records: %s", tempDir))
+		log.Println(fmt.Sprintf("Temporary folder created for Request Records: %s", tempDir))
 		if err != nil {
 			panic(err)
 		}
@@ -87,7 +87,7 @@ var serveCmd = &cobra.Command{
 		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
 		router.Post("/__mock__/reset", resetApiHandler(mockFs, state, config))
 
-		fmt.Println(fmt.Sprintf("Starting Mock server on port %s.", flagPort))
+		log.Println(fmt.Sprintf("Starting Mock server on port %s.", flagPort))
 
 		if err = http.ListenAndServe(fmt.Sprintf(":%s", flagPort), router); err != nil {
 			log.Println("An error occurred while starting up the server.")
@@ -131,7 +131,7 @@ func displayEndpointConfigErrors(endpointConfigErrors []mock.EndpointConfigError
 		endpointRoute := endpointConfigs[endpointConfigError.EndpointIndex].Route
 		endpointMethod := endpointConfigs[endpointConfigError.EndpointIndex].Method
 
-		fmt.Println(
+		log.Println(
 			fmt.Sprintf(
 				"%d: Endpoint #%d (%s %s):\n%s\n",
 				i+1,
@@ -174,7 +174,7 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 			panic(err)
 		}
 		if response.EndpointContentType == types.Endpoint_content_type_unknown {
-			fmt.Println(fmt.Sprintf("Failed to resolve endpoint content type for route %s", endpointConfig.Route))
+			log.Println(fmt.Sprintf("Failed to resolve endpoint content type for route %s", endpointConfig.Route))
 
 			return
 		}
@@ -198,7 +198,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 	return func(w http.ResponseWriter, r *http.Request) {
 		assertConfig, err := mock.ParseAssertRequest(r)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			w.WriteHeader(400)
 
 			return
@@ -206,7 +206,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 
 		validationErrors, err := mock.Validate(mockFs, jsonValidate, assertConfig)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			w.WriteHeader(500)
 
 			return
@@ -215,7 +215,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 		response := MockApiResponse{validationErrors}
 		responseJson, err := json.Marshal(response)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			w.WriteHeader(400)
 			w.Header().Add("Content-Type", "application/json")
 			w.Write(responseJson)
