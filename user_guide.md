@@ -23,6 +23,7 @@
     - [`header_match`](#header_match)
     - [`json_body_match`](#json_body_match)
     - [`method_match`](#method_match)
+    - [`querystring_match`](#querystring_match-1)
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
@@ -487,6 +488,19 @@ The HTTP Method (Get, Post etc) the Request was called with.
 {
   "type": "method_match",
   "value": "post"
+}
+```
+
+#### `querystring_match`
+
+Asserts against the Querystring value defined in the URL.
+
+```json
+{
+  "type": "querystring_match",
+  "key_values": {
+    "some_key": "some_value"
+  }
 }
 ```
 
