@@ -132,6 +132,10 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 		expectedKeyValuePairs[assert.Key] = assert.Value
 	}
 
+	for key, value := range assert.KeyValues {
+		expectedKeyValuePairs[key] = value.(string)
+	}
+
 	for key, _ := range expectedKeyValuePairs {
 		if expectedKeyValuePairs[key] != parsedQuery[key][0] {
 			validationErrors = append(

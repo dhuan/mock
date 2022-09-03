@@ -651,3 +651,94 @@ func Test_Validate_Querystring_FailBecauseQuerystringDoesNotMatch(t *testing.T) 
 		validationErrors,
 	)
 }
+
+func Test_Validate_Querystring_Matching_WithOne(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+}
+
+func Test_Validate_Querystring_Failing_WithMany(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=not_bar&hello=ola",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type: AssertType_QuerystringMatch,
+			KeyValues: map[string]interface{}{
+				"foo":   "bar",
+				"hello": "world",
+			},
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringMismatch,
+				Metadata: map[string]string{
+					"querystring_key":             "foo",
+					"querystring_value_expected":  "bar",
+					"querystring_value_requested": "not_bar",
+				},
+			},
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringMismatch,
+				Metadata: map[string]string{
+					"querystring_key":             "hello",
+					"querystring_value_expected":  "world",
+					"querystring_value_requested": "ola",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_Querystring_Passing_WithMany(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar&hello=world",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type: AssertType_QuerystringMatch,
+			KeyValues: map[string]interface{}{
+				"foo":   "bar",
+				"hello": "world",
+			},
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+}
