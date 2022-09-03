@@ -137,6 +137,21 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 	}
 
 	for key, _ := range expectedKeyValuePairs {
+		_, ok := parsedQuery[key]
+		if !ok {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{
+					Code: ValidationErrorCode_QuerystringKeyNotSet,
+					Metadata: map[string]string{
+						"querystring_key": key,
+					},
+				},
+			)
+
+			continue
+		}
+
 		if expectedKeyValuePairs[key] != parsedQuery[key][0] {
 			validationErrors = append(
 				validationErrors,

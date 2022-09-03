@@ -742,3 +742,36 @@ func Test_Validate_Querystring_Passing_WithMany(t *testing.T) {
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
+
+func Test_Validate_Querystring_FailBecauseExpectedQuerystringKeyWasNotInTheRequest(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringMatch,
+			Key:   "hello",
+			Value: "world",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringKeyNotSet,
+				Metadata: map[string]string{
+					"querystring_key": "hello",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
