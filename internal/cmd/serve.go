@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -87,9 +88,17 @@ var serveCmd = &cobra.Command{
 		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
 		router.Post("/__mock__/reset", resetApiHandler(mockFs, state, config))
 
-		log.Println(fmt.Sprintf("Starting Mock server on port %s.", flagPort))
+		log.Println(fmt.Sprintf("Starting server on port %s.", flagPort))
 
-		if err = http.ListenAndServe(fmt.Sprintf(":%s", flagPort), router); err != nil {
+		listener, err := net.Listen("tcp", fmt.Sprintf(":%s", flagPort))
+		if err != nil {
+			log.Println("An error occurred while starting up the server.")
+			log.Fatalln(err)
+		}
+
+		log.Println("Server started.")
+
+		if err = http.Serve(listener, router); err != nil {
 			log.Println("An error occurred while starting up the server.")
 			log.Fatalln(err)
 		}
