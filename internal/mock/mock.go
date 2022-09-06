@@ -69,13 +69,13 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 	validationErrors := make([]ValidationError, 0)
 	assertFunc := resolveAssertTypeFunc(assert.Type, jsonValidate)
 	validationErrorsCurrent, err := assertFunc(requestRecord, assert)
-	success := len(*validationErrorsCurrent) == 0
+	success := len(validationErrorsCurrent) == 0
 	if err != nil {
 		return &validationErrors, err
 	}
 
 	if !success {
-		validationErrors = append(validationErrors, *validationErrorsCurrent...)
+		validationErrors = append(validationErrors, validationErrorsCurrent...)
 	}
 
 	if success && !hasAnd {
@@ -88,7 +88,7 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 			return &validationErrors, err
 		}
 
-		validationErrors = append(*furtherValidationErrors, *validationErrorsCurrent...)
+		validationErrors = append(*furtherValidationErrors, validationErrorsCurrent...)
 	}
 
 	if !success && hasOr {
@@ -101,7 +101,7 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 			return furtherValidationErrors, nil
 		}
 
-		validationErrors = append(*furtherValidationErrors, *validationErrorsCurrent...)
+		validationErrors = append(*furtherValidationErrors, validationErrorsCurrent...)
 	}
 
 	return &validationErrors, nil
@@ -110,7 +110,7 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 func resolveAssertTypeFunc(
 	assertType AssertType,
 	jsonValidate JsonValidate,
-) func(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+) func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	if assertType == AssertType_HeaderMatch {
 		return assertHeaderMatch
 	}

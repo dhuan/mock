@@ -10,7 +10,7 @@ import (
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
-func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 	keyValues := assert.KeyValues
 	if keyValues == nil {
@@ -49,10 +49,10 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions
 		}
 	}
 
-	return &validationErrors, nil
+	return validationErrors, nil
 }
 
-func assertMethodMatch(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+func assertMethodMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
 	if requestRecord.Method != assert.Value {
@@ -65,10 +65,10 @@ func assertMethodMatch(requestRecord *types.RequestRecord, assert *AssertOptions
 		})
 	}
 
-	return &validationErrors, nil
+	return validationErrors, nil
 }
 
-func assertFormMatch(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+func assertFormMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 	requestBody := string(*requestRecord.Body)
 
@@ -108,14 +108,14 @@ func assertFormMatch(requestRecord *types.RequestRecord, assert *AssertOptions) 
 		}
 	}
 
-	return &validationErrors, nil
+	return validationErrors, nil
 }
 
-func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
 	if requestRecord.Querystring == "" {
-		return &[]ValidationError{ValidationError{
+		return []ValidationError{ValidationError{
 			Code:     ValidationErrorCode_RequestHasNoQuerystring,
 			Metadata: map[string]string{},
 		}}, nil
@@ -123,7 +123,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 
 	parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
 	if err != nil {
-		return &validationErrors, err
+		return validationErrors, err
 	}
 
 	expectedKeyValuePairs := make(map[string]string)
@@ -167,17 +167,17 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 		}
 	}
 
-	return &validationErrors, nil
+	return validationErrors, nil
 }
 
-func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
-	return func(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
+	return func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 		validationErrors := make([]ValidationError, 0)
 
 		var jsonResult map[string]interface{}
 		err := json.Unmarshal(*requestRecord.Body, &jsonResult)
 		if err != nil {
-			return &validationErrors, err
+			return validationErrors, err
 		}
 
 		jsonValidationResult := jsonValidate(jsonResult, assert.Data)
@@ -201,7 +201,7 @@ func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.Re
 			)
 		}
 
-		return &validationErrors, nil
+		return validationErrors, nil
 	}
 }
 
