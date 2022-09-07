@@ -11,11 +11,12 @@ import (
 )
 
 var assert_type_encoding_map = map[AssertType]string{
-	AssertType_HeaderMatch:      "header_match",
-	AssertType_MethodMatch:      "method_match",
-	AssertType_JsonBodyMatch:    "json_body_match",
-	AssertType_FormMatch:        "form_match",
-	AssertType_QuerystringMatch: "querystring_match",
+	AssertType_HeaderMatch:           "header_match",
+	AssertType_MethodMatch:           "method_match",
+	AssertType_JsonBodyMatch:         "json_body_match",
+	AssertType_FormMatch:             "form_match",
+	AssertType_QuerystringMatch:      "querystring_match",
+	AssertType_QuerystringExactMatch: "querystring_exact_match",
 }
 
 type AssertType int
@@ -27,6 +28,7 @@ const (
 	AssertType_JsonBodyMatch
 	AssertType_FormMatch
 	AssertType_QuerystringMatch
+	AssertType_QuerystringExactMatch
 )
 
 func (this *AssertType) UnmarshalJSON(data []byte) error {

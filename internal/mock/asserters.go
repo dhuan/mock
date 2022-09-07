@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sort"
 	"strings"
 
 	"github.com/dhuan/mock/internal/types"
+	"github.com/dhuan/mock/internal/utils"
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
@@ -233,4 +235,55 @@ func parseForm(requestBody string) (map[string]string, error) {
 	}
 
 	return formValues, nil
+}
+
+func assertQuerystringExactMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
+	validationErrors, err := assertQuerystringMatch(requestRecord, assert)
+	if err != nil {
+		return validationErrors, err
+	}
+
+	parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
+	if err != nil {
+		return validationErrors, err
+	}
+
+	if len(validationErrors) > 0 {
+		return validationErrors, nil
+	}
+
+	missingKeys := make([]string, 0)
+	expectedKeys := make([]string, 0)
+	requestedKeys := make([]string, 0)
+
+	if assert.Key != "" {
+		expectedKeys = append(expectedKeys, assert.Key)
+	}
+
+	for key, _ := range assert.KeyValues {
+		expectedKeys = append(expectedKeys, key)
+	}
+
+	for key, _ := range parsedQuery {
+		requestedKeys = append(requestedKeys, key)
+
+		if utils.IndexOf[string](expectedKeys, key) == -1 {
+			missingKeys = append(missingKeys, key)
+		}
+	}
+
+	sort.Strings(expectedKeys)
+	sort.Strings(requestedKeys)
+
+	if len(missingKeys) > 0 {
+		validationErrors = append(
+			validationErrors,
+			ValidationError{Code: ValidationErrorCode_QuerystringMismatch, Metadata: map[string]string{
+				"querystring_keys_expected":  strings.Join(expectedKeys, ","),
+				"querystring_keys_requested": strings.Join(requestedKeys, ","),
+			}},
+		)
+	}
+
+	return validationErrors, nil
 }

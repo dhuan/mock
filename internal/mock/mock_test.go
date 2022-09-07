@@ -722,7 +722,7 @@ func Test_Validate_Querystring_Failing_WithMany(t *testing.T) {
 func Test_Validate_Querystring_Passing_WithMany(t *testing.T) {
 	reset()
 	addToMockedRequestRecords(
-		"foobar?foo=bar&hello=world",
+		"foobar?foo=bar&hello=world&somekey=somevalue",
 		"get",
 		[][]string{},
 		[]byte(``),
@@ -769,6 +769,192 @@ func Test_Validate_Querystring_FailBecauseExpectedQuerystringKeyWasNotInTheReque
 				Code: ValidationErrorCode_QuerystringKeyNotSet,
 				Metadata: map[string]string{
 					"querystring_key": "hello",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_QuerystringExact_Passing_WithOne(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringExactMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+}
+
+func Test_Validate_QuerystringExact_Passing_WithMany(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar&some_key=some_value&another_key=another_value",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringExactMatch,
+			Key:   "foo",
+			Value: "bar",
+			KeyValues: map[string]interface{}{
+				"some_key":    "some_value",
+				"another_key": "another_value",
+			},
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(t, 0, len(*validationErrors))
+}
+
+func Test_Validate_QuerystringExact_FailingBecauseValuesDontMatch(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=not_bar",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringExactMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringMismatch,
+				Metadata: map[string]string{
+					"querystring_key":             "foo",
+					"querystring_value_expected":  "bar",
+					"querystring_value_requested": "not_bar",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_QuerystringExact_FailingBecauseExpectedQuerystringKeyWasNotInTheRequest(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?hello=world",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringExactMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringKeyNotSet,
+				Metadata: map[string]string{
+					"querystring_key": "foo",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_QuerystringExact_FailingBecauseExpectedQuerystringKeyWasNotInTheRequest_WithMany(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar&some_key=some_value&another_key=another_value",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type: AssertType_QuerystringExactMatch,
+			KeyValues: map[string]interface{}{
+				"foo":         "bar",
+				"another_key": "another_value",
+			},
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringMismatch,
+				Metadata: map[string]string{
+					"querystring_keys_expected":  "another_key,foo",
+					"querystring_keys_requested": "another_key,foo,some_key",
+				},
+			},
+		},
+		validationErrors,
+	)
+}
+
+func Test_Validate_QuerystringExact_FailingBecauseItDoesNotMatchExactly(t *testing.T) {
+	reset()
+	addToMockedRequestRecords(
+		"foobar?foo=bar&hello=world",
+		"get",
+		[][]string{},
+		[]byte(``),
+	)
+
+	assertConfig := AssertConfig{
+		Route: "foobar",
+		Assert: &AssertOptions{
+			Type:  AssertType_QuerystringExactMatch,
+			Key:   "foo",
+			Value: "bar",
+		},
+	}
+	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+
+	assert.Equal(
+		t,
+		&[]ValidationError{
+			ValidationError{
+				Code: ValidationErrorCode_QuerystringMismatch,
+				Metadata: map[string]string{
+					"querystring_keys_expected":  "foo",
+					"querystring_keys_requested": "foo,hello",
 				},
 			},
 		},
