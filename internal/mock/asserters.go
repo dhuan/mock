@@ -128,15 +128,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 		return validationErrors, err
 	}
 
-	expectedKeyValuePairs := make(map[string]string)
-
-	if assert.Key != "" {
-		expectedKeyValuePairs[assert.Key] = assert.Value
-	}
-
-	for key, value := range assert.KeyValues {
-		expectedKeyValuePairs[key] = value.(string)
-	}
+	expectedKeyValuePairs := getKeyValuePairsFromAssertionOptions(assert)
 
 	for key, _ := range expectedKeyValuePairs {
 		_, ok := parsedQuery[key]
@@ -161,7 +153,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 					Code: ValidationErrorCode_QuerystringMismatch,
 					Metadata: map[string]string{
 						"querystring_key":             key,
-						"querystring_value_expected":  expectedKeyValuePairs[key],
+						"querystring_value_expected":  expectedKeyValuePairs[key].(string),
 						"querystring_value_requested": parsedQuery[key][0],
 					},
 				},
@@ -286,4 +278,28 @@ func assertQuerystringExactMatch(requestRecord *types.RequestRecord, assert *Ass
 	}
 
 	return validationErrors, nil
+}
+
+func getKeyValuePairsFromAssertionOptions(assert *AssertOptions) map[string]interface{} {
+	keys := make([]string, 0)
+	keyValuePairs := make(map[string]interface{}, 0)
+	keyValuePairsUnsorted := make(map[string]interface{}, 0)
+
+	if assert.Key != "" {
+		keys = append(keys, assert.Key)
+		keyValuePairsUnsorted[assert.Key] = assert.Value
+	}
+
+	for key, value := range assert.KeyValues {
+		keys = append(keys, key)
+		keyValuePairsUnsorted[key] = value
+	}
+
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		keyValuePairs[key] = keyValuePairsUnsorted[key]
+	}
+
+	return keyValuePairs
 }
