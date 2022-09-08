@@ -24,6 +24,7 @@
     - [`json_body_match`](#json_body_match)
     - [`method_match`](#method_match)
     - [`querystring_match`](#querystring_match-1)
+    - [`querystring_exact_match`](#querystring_exact_match-1)
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
@@ -498,6 +499,19 @@ Asserts against the Querystring value defined in the URL.
 ```json
 {
   "type": "querystring_match",
+  "key_values": {
+    "some_key": "some_value"
+  }
+}
+```
+
+#### `querystring_exact_match`
+
+This matcher is similar to `querystring_match`, the difference being that it's an "exact" matcher, meaning that if the request has any extra fields not set in the assertion, it will not pass.
+
+```json
+{
+  "type": "querystring_exact_match",
   "key_values": {
     "some_key": "some_value"
   }
