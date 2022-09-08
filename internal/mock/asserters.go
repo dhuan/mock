@@ -2,7 +2,6 @@ package mock
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"sort"
 	"strings"
@@ -14,14 +13,7 @@ import (
 
 func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
-	keyValues := assert.KeyValues
-	if keyValues == nil {
-		keyValues = make(map[string]interface{})
-	}
-
-	if assert.Key != "" && assert.Value != "" {
-		keyValues[assert.Key] = fmt.Sprint(assert.Value)
-	}
+	keyValues := getKeyValuePairsFromAssertionOptions(assert)
 
 	for i, _ := range keyValues {
 		key := i
