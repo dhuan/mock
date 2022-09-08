@@ -108,6 +108,23 @@ func Request(config *mocklib.MockConfig, method, route, payload string, headers 
 	return responseBody
 }
 
+func RequestApiReset(config *mocklib.MockConfig) {
+	request, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("http://%s/__mock__/reset", config.Url),
+		nil,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	client := &http.Client{}
+	_, err = client.Do(request)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.Buffer) bool {
 	for attempts > 0 {
 		if strings.Contains(buffer.String(), expectedOutput) {
