@@ -15,9 +15,8 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *AssertOptions
 	validationErrors := make([]ValidationError, 0)
 	keyValues := getKeyValuePairsFromAssertionOptions(assert)
 
-	for i, _ := range keyValues {
-		key := i
-		value := keyValues[i]
+	for _, key := range utils.GetSortedKeys[interface{}](keyValues) {
+		value := keyValues[key]
 
 		valueFromRequestRecord, ok := requestRecord.Headers[key]
 		if !ok {
@@ -122,7 +121,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 
 	expectedKeyValuePairs := getKeyValuePairsFromAssertionOptions(assert)
 
-	for key, _ := range expectedKeyValuePairs {
+	for _, key := range utils.GetSortedKeys[interface{}](expectedKeyValuePairs) {
 		_, ok := parsedQuery[key]
 		if !ok {
 			validationErrors = append(
@@ -275,22 +274,15 @@ func assertQuerystringExactMatch(requestRecord *types.RequestRecord, assert *Ass
 func getKeyValuePairsFromAssertionOptions(assert *AssertOptions) map[string]interface{} {
 	keys := make([]string, 0)
 	keyValuePairs := make(map[string]interface{}, 0)
-	keyValuePairsUnsorted := make(map[string]interface{}, 0)
 
 	if assert.Key != "" {
 		keys = append(keys, assert.Key)
-		keyValuePairsUnsorted[assert.Key] = assert.Value
+		keyValuePairs[assert.Key] = assert.Value
 	}
 
 	for key, value := range assert.KeyValues {
 		keys = append(keys, key)
-		keyValuePairsUnsorted[key] = value
-	}
-
-	sort.Strings(keys)
-
-	for _, key := range keys {
-		keyValuePairs[key] = keyValuePairsUnsorted[key]
+		keyValuePairs[key] = value
 	}
 
 	return keyValuePairs

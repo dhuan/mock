@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os/exec"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -169,6 +170,13 @@ func GetKeys[T_Key comparable, T_Value interface{}](subject map[T_Key]T_Value) [
 	for key, _ := range subject {
 		keys = append(keys, key)
 	}
+
+	return keys
+}
+
+func GetSortedKeys[T interface{}](subject map[string]T) []string {
+	keys := GetKeys[string, T](subject)
+	sort.Strings(keys)
 
 	return keys
 }
