@@ -1,5 +1,11 @@
 # Changelog
 
+## master (not released yet)
+
+Features:
+
+- `querystring_exact_match` Assertion Matcher added;
+
 ## 0.1.0
 
 Features:
