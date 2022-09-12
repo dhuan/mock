@@ -19,7 +19,6 @@ import (
 	"github.com/dhuan/mock/internal/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/nsf/jsondiff"
 	"github.com/spf13/cobra"
 )
 
@@ -213,7 +212,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 			return
 		}
 
-		validationErrors, err := mock.Validate(mockFs, jsonValidate, assertConfig)
+		validationErrors, err := mock.Validate(mockFs, assertConfig)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(500)
@@ -264,23 +263,6 @@ func prepareConfig(mockConfig *MockConfig) {
 		mockConfig.Endpoints[i].Method = strings.ToLower(mockConfig.Endpoints[i].Method)
 		mockConfig.Endpoints[i].Route = utils.ReplaceRegex(endpoint.Route, []string{`^\/`}, "")
 	}
-}
-
-func jsonValidate(jsonA map[string]interface{}, jsonB map[string]interface{}) bool {
-	a, err := json.Marshal(jsonA)
-	if err != nil {
-		return false
-	}
-
-	b, err := json.Marshal(jsonB)
-	if err != nil {
-		return false
-	}
-
-	options := jsondiff.DefaultJSONOptions()
-	result, _ := jsondiff.Compare(a, b, &options)
-
-	return result == jsondiff.FullMatch
 }
 
 func resolveConfig(configPath string) (*MockConfig, error) {

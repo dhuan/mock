@@ -3,6 +3,7 @@ package mock
 import (
 	"encoding/json"
 	"net/url"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -155,39 +156,41 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *AssertOp
 	return validationErrors, nil
 }
 
-func assertJsonBodyMatch(jsonValidate JsonValidate) func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
-	return func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
-		validationErrors := make([]ValidationError, 0)
+func assertJsonBodyMatch(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
+	validationErrors := make([]ValidationError, 0)
 
-		var jsonResult map[string]interface{}
-		err := json.Unmarshal(*requestRecord.Body, &jsonResult)
-		if err != nil {
-			return validationErrors, err
-		}
-
-		jsonValidationResult := jsonValidate(jsonResult, assert.Data)
-		if !jsonValidationResult {
-			assertJson, err := json.Marshal(assert.Data)
-			if err != nil {
-				panic(err)
-			}
-
-			requestRecordReformatted, err := reformatJson(requestRecord.Body)
-			if err != nil {
-				panic(err)
-			}
-
-			validationErrors = append(
-				validationErrors,
-				ValidationError{Code: ValidationErrorCode_BodyMismatch, Metadata: map[string]string{
-					"body_requested": string(requestRecordReformatted),
-					"body_expected":  string(assertJson),
-				}},
-			)
-		}
-
-		return validationErrors, nil
+	var jsonResult map[string]interface{}
+	err := json.Unmarshal(*requestRecord.Body, &jsonResult)
+	if err != nil {
+		return validationErrors, err
 	}
+
+	jsonValidationResult, err := jsonValidate(jsonResult, assert.Data)
+	if err != nil {
+		return validationErrors, err
+	}
+
+	if !jsonValidationResult {
+		assertJson, err := json.Marshal(assert.Data)
+		if err != nil {
+			panic(err)
+		}
+
+		requestRecordReformatted, err := reformatJson(requestRecord.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		validationErrors = append(
+			validationErrors,
+			ValidationError{Code: ValidationErrorCode_BodyMismatch, Metadata: map[string]string{
+				"body_requested": string(requestRecordReformatted),
+				"body_expected":  string(assertJson),
+			}},
+		)
+	}
+
+	return validationErrors, nil
 }
 
 func reformatJson(jsonEncoded *[]byte) ([]byte, error) {
@@ -286,4 +289,18 @@ func getKeyValuePairsFromAssertionOptions(assert *AssertOptions) map[string]inte
 	}
 
 	return keyValuePairs
+}
+
+func jsonValidate(a, b map[string]interface{}) (bool, error) {
+	encodedA, err := json.Marshal(a)
+	if err != nil {
+		return false, err
+	}
+
+	encodedB, err := json.Marshal(b)
+	if err != nil {
+		return false, err
+	}
+
+	return reflect.DeepEqual(encodedA, encodedB), nil
 }

@@ -9,8 +9,6 @@ import (
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
-type JsonValidate func(jsonA map[string]interface{}, jsonB map[string]interface{}) bool
-
 func ParseAssertRequest(req *http.Request) (*AssertConfig, error) {
 	var assertConfig AssertConfig
 	decoder := json.NewDecoder(req.Body)
@@ -21,7 +19,6 @@ func ParseAssertRequest(req *http.Request) (*AssertConfig, error) {
 
 func Validate(
 	mockFs types.MockFs,
-	jsonValidate JsonValidate,
 	assertConfig *AssertConfig,
 ) (*[]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
@@ -60,14 +57,14 @@ func Validate(
 
 	requestRecord := requestRecords[nth-1]
 
-	return validate(requestRecord, assertConfig.Assert, jsonValidate)
+	return validate(requestRecord, assertConfig.Assert)
 }
 
-func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonValidate JsonValidate) (*[]ValidationError, error) {
+func validate(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
 	hasAnd := assert.And != nil
 	hasOr := assert.Or != nil
 	validationErrors := make([]ValidationError, 0)
-	assertFunc := resolveAssertTypeFunc(assert.Type, jsonValidate)
+	assertFunc := resolveAssertTypeFunc(assert.Type)
 	validationErrorsCurrent, err := assertFunc(requestRecord, assert)
 	success := len(validationErrorsCurrent) == 0
 	if err != nil {
@@ -83,7 +80,7 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 	}
 
 	if success && hasAnd {
-		furtherValidationErrors, err := validate(requestRecord, assert.And, jsonValidate)
+		furtherValidationErrors, err := validate(requestRecord, assert.And)
 		if err != nil {
 			return &validationErrors, err
 		}
@@ -92,7 +89,7 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 	}
 
 	if !success && hasOr {
-		furtherValidationErrors, err := validate(requestRecord, assert.Or, jsonValidate)
+		furtherValidationErrors, err := validate(requestRecord, assert.Or)
 		if err != nil {
 			return &validationErrors, err
 		}
@@ -109,7 +106,6 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions, jsonVal
 
 func resolveAssertTypeFunc(
 	assertType AssertType,
-	jsonValidate JsonValidate,
 ) func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
 	if assertType == AssertType_HeaderMatch {
 		return assertHeaderMatch
@@ -120,7 +116,7 @@ func resolveAssertTypeFunc(
 	}
 
 	if assertType == AssertType_JsonBodyMatch {
-		return assertJsonBodyMatch(jsonValidate)
+		return assertJsonBodyMatch
 	}
 
 	if assertType == AssertType_FormMatch {

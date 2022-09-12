@@ -9,26 +9,12 @@ import (
 	"github.com/dhuan/mock/internal/types"
 	. "github.com/dhuan/mock/pkg/mock"
 	"github.com/stretchr/testify/assert"
-	testifymock "github.com/stretchr/testify/mock"
 )
 
 var mock_request_records []*types.RequestRecord
 
-type mockJsonValidate struct {
-	testifymock.Mock
-}
-
-var mockJsonValidateInstance = mockJsonValidate{}
-
-func (this *mockJsonValidate) JsonValidate(jsonA map[string]interface{}, jsonB map[string]interface{}) bool {
-	args := this.Called(jsonA, jsonB)
-
-	return args.Get(0).(bool)
-}
-
 func reset() {
 	mock_request_records = make([]*types.RequestRecord, 0)
-	mockJsonValidateInstance = mockJsonValidate{}
 }
 
 func addToMockedRequestRecords(fullRoute string, method string, headers [][]string, body []byte) {
@@ -89,7 +75,7 @@ func Test_Validate_NoCalls(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -122,7 +108,7 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -158,7 +144,7 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -198,7 +184,7 @@ func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -235,7 +221,7 @@ func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -276,7 +262,7 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -316,7 +302,7 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -345,12 +331,7 @@ func Test_Validate_JsonBodyAssertion_Match(t *testing.T) {
 		},
 	}
 
-	mockJsonValidateInstance.On(
-		"JsonValidate",
-		map[string]interface{}{"foo": "bar", "some_key": "some_value"},
-		map[string]interface{}{"foo": "bar", "some_key": "some_value"},
-	).Return(true)
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -380,12 +361,7 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 		},
 	}
 
-	mockJsonValidateInstance.On(
-		"JsonValidate",
-		map[string]interface{}{"foo": "bar", "some_key": "some_value"},
-		map[string]interface{}{"foo": "bar", "some_key": "some_value", "another_key": "another_value"},
-	).Return(false)
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -424,7 +400,7 @@ func Test_Validate_Nth(t *testing.T) {
 			Value: "get",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 
@@ -436,7 +412,7 @@ func Test_Validate_Nth(t *testing.T) {
 			Value: "get",
 		},
 	}
-	validationErrors, _ = mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ = mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -460,7 +436,7 @@ func Test_Validate_Nth(t *testing.T) {
 			Value: "post",
 		},
 	}
-	validationErrors, _ = mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ = mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 
@@ -472,7 +448,7 @@ func Test_Validate_Nth(t *testing.T) {
 			Value: "get",
 		},
 	}
-	validationErrors, _ = mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ = mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
@@ -500,7 +476,7 @@ func Test_Validate_Nth_OutOfRange(t *testing.T) {
 			Value: "get",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -533,7 +509,7 @@ func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -568,7 +544,7 @@ func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
 		},
 	}
 
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -603,7 +579,7 @@ func Test_Validate_Querystring_FailBecauseRequestHasNoQuerystring(t *testing.T) 
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -634,7 +610,7 @@ func Test_Validate_Querystring_FailBecauseQuerystringDoesNotMatch(t *testing.T) 
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -669,7 +645,7 @@ func Test_Validate_Querystring_Matching_WithOne(t *testing.T) {
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
@@ -693,7 +669,7 @@ func Test_Validate_Querystring_Failing_WithMany(t *testing.T) {
 			},
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -738,7 +714,7 @@ func Test_Validate_Querystring_Passing_WithMany(t *testing.T) {
 			},
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
@@ -760,7 +736,7 @@ func Test_Validate_Querystring_FailBecauseExpectedQuerystringKeyWasNotInTheReque
 			Value: "world",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -793,7 +769,7 @@ func Test_Validate_QuerystringExact_Passing_WithOne(t *testing.T) {
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
@@ -819,7 +795,7 @@ func Test_Validate_QuerystringExact_Passing_WithMany(t *testing.T) {
 			},
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(t, 0, len(*validationErrors))
 }
@@ -841,7 +817,7 @@ func Test_Validate_QuerystringExact_FailingBecauseValuesDontMatch(t *testing.T) 
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -876,7 +852,7 @@ func Test_Validate_QuerystringExact_FailingBecauseExpectedQuerystringKeyWasNotIn
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -911,7 +887,7 @@ func Test_Validate_QuerystringExact_FailingBecauseExpectedQuerystringKeyWasNotIn
 			},
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
@@ -945,7 +921,7 @@ func Test_Validate_QuerystringExact_FailingBecauseItDoesNotMatchExactly(t *testi
 			Value: "bar",
 		},
 	}
-	validationErrors, _ := mock.Validate(mockMockFs{}, mockJsonValidateInstance.JsonValidate, &assertConfig)
+	validationErrors, _ := mock.Validate(mockMockFs{}, &assertConfig)
 
 	assert.Equal(
 		t,
