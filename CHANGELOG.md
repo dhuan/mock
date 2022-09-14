@@ -1,6 +1,6 @@
 # Changelog
 
-## master (not released yet)
+## 0.1.1
 
 Features:
 
