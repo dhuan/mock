@@ -54,8 +54,8 @@ func buildEndpointId(endpointConfig *types.EndpointConfig) string {
 	return strings.ReplaceAll(endpointConfig.Route, "/", "__")
 }
 
-func (this MockFs) GetRecordsMatchingRoute(route string) ([]*types.RequestRecord, error) {
-	requestRecords := make([]*types.RequestRecord, 0)
+func (this MockFs) GetRecordsMatchingRoute(route string) ([]types.RequestRecord, error) {
+	requestRecords := make([]types.RequestRecord, 0)
 
 	walkFrom := this.State.RequestRecordDirectoryPath
 	err := filepath.Walk(walkFrom, func(path string, info os.FileInfo, err error) error {
@@ -74,7 +74,7 @@ func (this MockFs) GetRecordsMatchingRoute(route string) ([]*types.RequestRecord
 		}
 
 		if requestRecord.Route == route {
-			requestRecords = append(requestRecords, requestRecord)
+			requestRecords = append(requestRecords, *requestRecord)
 		}
 
 		return nil

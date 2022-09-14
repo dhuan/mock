@@ -57,7 +57,7 @@ func Validate(
 
 	requestRecord := requestRecords[nth-1]
 
-	return validate(requestRecord, assertConfig.Assert)
+	return validate(&requestRecord, assertConfig.Assert)
 }
 
 func validate(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
@@ -134,7 +134,7 @@ func resolveAssertTypeFunc(
 	panic(fmt.Sprintf("Failed to resolve assert type: %d", assertType))
 }
 
-func getRequestRecordMatchingRoute(mockFs types.MockFs, route string) ([]*types.RequestRecord, error) {
+func getRequestRecordMatchingRoute(mockFs types.MockFs, route string) ([]types.RequestRecord, error) {
 	requestRecords, err := mockFs.GetRecordsMatchingRoute(route)
 	if err != nil {
 		return requestRecords, err

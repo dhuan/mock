@@ -83,7 +83,7 @@ type RequestRecord struct {
 
 type MockFs interface {
 	StoreRequestRecord(r *http.Request, requestBody []byte, endpointConfig *EndpointConfig) error
-	GetRecordsMatchingRoute(route string) ([]*RequestRecord, error)
+	GetRecordsMatchingRoute(route string) ([]RequestRecord, error)
 	RemoveAllRequestRecords() error
 }
 
