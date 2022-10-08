@@ -298,7 +298,7 @@ However in case a request had been made to that endpoint, with the, say, `POST` 
 
 > mock tells you whether the assertion passed or not by including "Validation Errors" into the `validation_errors` response field. Another indicative is the Response Status - `200` is success, `400` means your assertion failed.
 
-With that we've seen a very simple assertion. There are other things that can be asserted in a HTTP Request, such as the header values passed, the body payload etc. [For a reference of all available assertion options, skip to this section.](#assertion-options-reference)
+With that we've seen a very simple assertion. There are other things that can be asserted in a HTTP Request, such as the header values passed, the body payload etc. [For a reference of all available condition options, skip to this section.](#conditions-reference)
 
 ### Which Request to assert against?
 
