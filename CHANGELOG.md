@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+This release doesn't have significant changes.
+
 ## 0.1.1
 
 Features:
