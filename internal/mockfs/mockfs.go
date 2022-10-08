@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dhuan/mock/internal/record"
 	"github.com/dhuan/mock/internal/types"
-	"github.com/dhuan/mock/internal/utils"
 )
 
 type MockFs struct {
@@ -19,7 +19,7 @@ type MockFs struct {
 }
 
 func (this MockFs) StoreRequestRecord(r *http.Request, requestBody []byte, endpointConfig *types.EndpointConfig) error {
-	requestRecord, err := buildRequestRecord(r, requestBody)
+	requestRecord, err := record.BuildRequestRecord(r, requestBody)
 	if err != nil {
 		return err
 	}
@@ -100,33 +100,6 @@ func routeNameToRequestRecordFileRouteName(route string) string {
 	return strings.ReplaceAll(route, "/", "__")
 }
 
-func buildRequestRecord(r *http.Request, requestBody []byte) (*types.RequestRecord, error) {
-	route := utils.ReplaceRegex(r.RequestURI, []string{`^\/`}, "")
-	headers := buildHeadersForRequestRecord(&r.Header)
-	routeParsed, querystring := parseRoute(route)
-	requestRecord := &types.RequestRecord{
-		Route:       routeParsed,
-		Querystring: querystring,
-		Headers:     *headers,
-	}
-
-	requestRecord.Body = &requestBody
-
-	requestRecord.Method = strings.ToLower(r.Method)
-
-	return requestRecord, nil
-}
-
-func parseRoute(route string) (string, string) {
-	splitResult := strings.Split(route, "?")
-
-	if len(splitResult) == 1 {
-		return splitResult[0], ""
-	}
-
-	return splitResult[0], splitResult[1]
-}
-
 func requestHasBody(req *http.Request) bool {
 	bodyContent, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -134,16 +107,6 @@ func requestHasBody(req *http.Request) bool {
 	}
 
 	return string(bodyContent) != ""
-}
-
-func buildHeadersForRequestRecord(headers *http.Header) *http.Header {
-	headersNew := make(http.Header)
-
-	for key, value := range *headers {
-		headersNew[strings.ToLower(key)] = value
-	}
-
-	return &headersNew
 }
 
 func buildRequestRecordJson(requestRecord *types.RequestRecord) ([]byte, error) {

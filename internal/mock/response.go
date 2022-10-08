@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
+	"github.com/dhuan/mock/internal/record"
 	"github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
+	. "github.com/dhuan/mock/pkg/mock"
 )
 
 type ReadFileFunc = func(name string) ([]byte, error)
@@ -30,9 +31,13 @@ func ResolveEndpointResponse(
 ) (*Response, error, map[string]string) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
+	requestRecord, err := record.BuildRequestRecord(request, requestBody)
+	if err != nil {
+		return &Response{[]byte(""), types.Endpoint_content_type_unknown, 0, nil}, err, nil
+	}
 
 	if hasResponseIf {
-		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(request, requestBody, endpointConfig)
+		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(requestRecord, endpointConfig)
 		matchingResponseIf = matchingResponseIfB
 		hasResponseIf = foundMatchingResponseIf
 	}
@@ -68,12 +73,12 @@ func resolveResponseStatusCode(statusCode int) int {
 	return statusCode
 }
 
-func resolveResponseIf(request *http.Request, requestBody []byte, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
+func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
 	matchingResponseIfs := make([]int, 0)
 
 	for responseIfKey, _ := range endpointConfig.ResponseIf {
 		responseIf := endpointConfig.ResponseIf[responseIfKey]
-		matches := resolveSingleResponseIf(request, requestBody, responseIf.Condition)
+		matches := resolveSingleResponseIf(requestRecord, responseIf.Condition)
 
 		if matches {
 			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
@@ -87,9 +92,14 @@ func resolveResponseIf(request *http.Request, requestBody []byte, endpointConfig
 	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
 }
 
-func resolveSingleResponseIf(request *http.Request, requestBody []byte, condition *types.Condition) bool {
-	conditionFunction := resolveConditionFunction(condition)
-	result := conditionFunction(request, requestBody, condition)
+func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Condition) bool {
+	conditionFunction := resolveAssertTypeFunc(condition.Type)
+	validationErrors, err := conditionFunction(requestRecord, condition)
+	if err != nil {
+		panic(err)
+	}
+	result := len(validationErrors) == 0
+
 	hasAnd := condition.And != nil
 	hasOr := condition.Or != nil
 
@@ -98,11 +108,11 @@ func resolveSingleResponseIf(request *http.Request, requestBody []byte, conditio
 	}
 
 	if result && hasAnd {
-		return resolveSingleResponseIf(request, requestBody, condition.And)
+		return resolveSingleResponseIf(requestRecord, condition.And)
 	}
 
 	if !result && hasOr {
-		return resolveSingleResponseIf(request, requestBody, condition.Or)
+		return resolveSingleResponseIf(requestRecord, condition.Or)
 	}
 
 	if !result && !hasOr {
@@ -110,114 +120,6 @@ func resolveSingleResponseIf(request *http.Request, requestBody []byte, conditio
 	}
 
 	return false
-}
-
-func resolveConditionFunction(condition *types.Condition) func(request *http.Request, requestBody []byte, condition *types.Condition) bool {
-	if condition.Type == types.ConditionType_QuerystringMatch {
-		return conditionQuerystringMatch
-	}
-
-	if condition.Type == types.ConditionType_QuerystringExactMatch {
-		return conditionQuerystringMatchExact
-	}
-
-	if condition.Type == types.ConditionType_FormMatch {
-		return conditionFormMatch
-	}
-
-	panic("Failed to resolve condition func!")
-}
-
-func conditionQuerystringMatchExact(request *http.Request, requestBody []byte, condition *types.Condition) bool {
-	query := request.URL.Query()
-	isSingle := condition.Key != "" && condition.Value != ""
-
-	if isSingle {
-		return query.Has(condition.Key) && len(query) == 1 && conditionQuerystringMatch(request, requestBody, condition)
-	}
-
-	if len(query) != len(condition.KeyValues) {
-		return false
-	}
-
-	queryKeys := utils.GetKeys[string, []string](query)
-	conditionKeys := utils.GetKeys[string, interface{}](condition.KeyValues)
-	if !utils.ListsEqualUnsorted[string](queryKeys, conditionKeys) {
-		return false
-	}
-
-	return conditionQuerystringMatch(request, requestBody, condition)
-}
-
-func conditionQuerystringMatch(request *http.Request, requestBody []byte, condition *types.Condition) bool {
-	query := request.URL.Query()
-	isSingle := condition.Key != "" && condition.Value != ""
-	isMultiple := len(condition.KeyValues) > 0
-
-	if isSingle {
-		if !query.Has(condition.Key) {
-			return false
-		}
-
-		return condition.Value == query.Get(condition.Key)
-	}
-
-	if isMultiple {
-		return conditionQuerystringMatchWithMany(request, condition, query)
-	}
-
-	panic("Failed to resolve query string match!")
-}
-
-func conditionFormMatch(request *http.Request, requestBody []byte, condition *types.Condition) bool {
-	if len(condition.KeyValues) == 0 {
-		return false
-	}
-
-	formValues, err := parseFormBody(request, requestBody)
-	if err != nil {
-		panic(err)
-	}
-
-	for i, _ := range condition.KeyValues {
-		formValue, ok := formValues[i]
-		if !ok || formValue != condition.KeyValues[i] {
-			return false
-		}
-	}
-
-	return true
-}
-
-func parseFormBody(request *http.Request, requestBody []byte) (map[string]string, error) {
-	formValuesParsed := make(map[string]string)
-
-	formValues, err := url.ParseQuery(string(requestBody))
-	if err != nil {
-		return formValuesParsed, err
-	}
-
-	for i, _ := range formValues {
-		formValuesParsed[i] = formValues[i][0]
-	}
-
-	return formValuesParsed, nil
-}
-
-func conditionQuerystringMatchWithMany(request *http.Request, condition *types.Condition, query url.Values) bool {
-	for i, _ := range condition.KeyValues {
-		value := fmt.Sprint(condition.KeyValues[i])
-
-		if !query.Has(i) {
-			return false
-		}
-
-		if value != query.Get(i) {
-			return false
-		}
-	}
-
-	return true
 }
 
 func resolveEndpointResponseInternal(

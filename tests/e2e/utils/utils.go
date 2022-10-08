@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -44,7 +45,7 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 
 type KillMockFunc func()
 
-func RunMockBg(state *E2eState, command string) KillMockFunc {
+func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer) {
 	parseCommandVars(&command)
 	commandParameters := toCommandParameters(command)
 
@@ -67,13 +68,16 @@ func RunMockBg(state *E2eState, command string) KillMockFunc {
 		if err != nil {
 			panic(err)
 		}
-	}
+	}, buf
 }
 
-func MockAssert(assertConfig *mocklib.AssertConfig) []mocklib.ValidationError {
+func MockAssert(assertConfig *mocklib.AssertConfig, serverOutput *bytes.Buffer) []mocklib.ValidationError {
 	mockConfig := mocklib.Init("localhost:4000")
 	validationErrors, err := mocklib.Assert(mockConfig, assertConfig)
 	if err != nil {
+		log.Println("An error occurred. Here's the server output:")
+		fmt.Println(serverOutput)
+
 		panic(err)
 	}
 
@@ -219,7 +223,7 @@ func RunTest(
 	route string,
 	assertionFunc func(t *testing.T, response []byte),
 ) {
-	killMock := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
+	killMock, _ := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")

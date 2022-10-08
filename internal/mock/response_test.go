@@ -9,13 +9,14 @@ import (
 
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/types"
+	. "github.com/dhuan/mock/pkg/mock"
 	"github.com/stretchr/testify/assert"
 	testifymock "github.com/stretchr/testify/mock"
 )
 
 var readFileMockReturn = []byte("")
 
-var requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}}
+var requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 var requestBody = []byte("")
 
 var state types.State = types.State{
@@ -147,8 +148,8 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 			types.ResponseIf{
 				Response:           []byte(`{"result": "response_one"}`),
 				ResponseStatusCode: 202,
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "foo",
 					Value: "bar",
 				},
@@ -156,8 +157,8 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 			types.ResponseIf{
 				Response:           []byte(`{"result": "response_two"}`),
 				ResponseStatusCode: 203,
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "hello",
 					Value: "world",
 				},
@@ -193,16 +194,16 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_one"}`),
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "foo",
 					Value: "bar",
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`{"result": "response_two"}`),
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "hello",
 					Value: "world",
 				},
@@ -226,7 +227,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}, RequestURI: "?hello=world&foo=bar"}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -237,8 +238,8 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 			types.ResponseIf{
 				Response:           []byte(`response_one`),
 				ResponseStatusCode: 202,
-				Condition: &types.Condition{
-					Type: types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type: ConditionType_QuerystringMatch,
 					KeyValues: map[string]interface{}{
 						"foo":   "not_bar",
 						"hello": "world",
@@ -248,8 +249,8 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 			types.ResponseIf{
 				Response:           []byte(`response_two`),
 				ResponseStatusCode: 203,
-				Condition: &types.Condition{
-					Type: types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type: ConditionType_QuerystringMatch,
 					KeyValues: map[string]interface{}{
 						"foo":   "bar",
 						"hello": "world",
@@ -288,8 +289,8 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 			types.ResponseIf{
 				Response:           []byte(`response_one`),
 				ResponseStatusCode: 202,
-				Condition: &types.Condition{
-					Type: types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type: ConditionType_QuerystringMatch,
 					KeyValues: map[string]interface{}{
 						"some_key": "some_value",
 					},
@@ -298,8 +299,8 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 			types.ResponseIf{
 				Response:           []byte(`response_two`),
 				ResponseStatusCode: 203,
-				Condition: &types.Condition{
-					Type: types.ConditionType_QuerystringExactMatch,
+				Condition: &Condition{
+					Type: ConditionType_QuerystringExactMatch,
 					KeyValues: map[string]interface{}{
 						"hello": "world",
 					},
@@ -324,7 +325,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToConditionalResponse(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}}
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -335,8 +336,8 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 			types.ResponseIf{
 				Response:           []byte(`response_one`),
 				ResponseStatusCode: 202,
-				Condition: &types.Condition{
-					Type: types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type: ConditionType_QuerystringMatch,
 					KeyValues: map[string]interface{}{
 						"some_key": "some_value",
 					},
@@ -345,8 +346,8 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 			types.ResponseIf{
 				Response:           []byte(`response_two`),
 				ResponseStatusCode: 203,
-				Condition: &types.Condition{
-					Type: types.ConditionType_QuerystringExactMatch,
+				Condition: &Condition{
+					Type: ConditionType_QuerystringExactMatch,
 					KeyValues: map[string]interface{}{
 						"hello": "world",
 					},
@@ -371,7 +372,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 }
 
 func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}, RequestURI: "?hello=world&foo=bar"}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -381,12 +382,12 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`response_two`),
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "hello",
 					Value: "world",
-					And: &types.Condition{
-						Type:  types.ConditionType_QuerystringMatch,
+					And: &Condition{
+						Type:  ConditionType_QuerystringMatch,
 						Key:   "foo",
 						Value: "BAR",
 					},
@@ -394,12 +395,12 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 			},
 			types.ResponseIf{
 				Response: []byte(`response_two`),
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "hello",
 					Value: "world",
-					And: &types.Condition{
-						Type:  types.ConditionType_QuerystringMatch,
+					And: &Condition{
+						Type:  ConditionType_QuerystringMatch,
 						Key:   "foo",
 						Value: "bar",
 					},
@@ -424,7 +425,7 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}}
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -434,12 +435,12 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`or chaining!`),
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "foo",
 					Value: "bar",
-					Or: &types.Condition{
-						Type:  types.ConditionType_QuerystringMatch,
+					Or: &Condition{
+						Type:  ConditionType_QuerystringMatch,
 						Key:   "hello",
 						Value: "world",
 					},
@@ -512,7 +513,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=bar"}}
+	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=bar"}, RequestURI: "?foo=bar"}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -530,8 +531,8 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 				Headers: map[string]string{
 					"Another-header-key": "Another header value",
 				},
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "foo",
 					Value: "bar",
 				},
@@ -570,8 +571,8 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 				Headers: map[string]string{
 					"Another-header-key": "Another header value",
 				},
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "foo",
 					Value: "bar",
 				},
@@ -607,16 +608,16 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		ResponseIf: []types.ResponseIf{
 			types.ResponseIf{
 				Response: []byte(`this response shall not be returned.`),
-				Condition: &types.Condition{
-					Type:  types.ConditionType_QuerystringMatch,
+				Condition: &Condition{
+					Type:  ConditionType_QuerystringMatch,
 					Key:   "foo",
 					Value: "bar",
 				},
 			},
 			types.ResponseIf{
 				Response: []byte(`good!`),
-				Condition: &types.Condition{
-					Type: types.ConditionType_FormMatch,
+				Condition: &Condition{
+					Type: ConditionType_FormMatch,
 					KeyValues: map[string]interface{}{
 						"foo":  "bar",
 						"foo2": "bar2",

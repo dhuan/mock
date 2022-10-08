@@ -11,20 +11,16 @@
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
-    - [Condition Options Reference](#condition-options-reference)
-      - [`querystring_match`](#querystring_match)
-      - [`querystring_exact_match`](#querystring_exact_match)
-      - [`form_match`](#form_match)
 - [Test Assertions](#test-assertions)
   - [Which Request to assert against?](#which-request-to-assert-against)
   - [Assertion Chaining](#assertion-chaining)
-  - [Assertion Options Reference](#assertion-options-reference)
-    - [`form_match`](#form_match-1)
-    - [`header_match`](#header_match)
-    - [`json_body_match`](#json_body_match)
-    - [`method_match`](#method_match)
-    - [`querystring_match`](#querystring_match-1)
-    - [`querystring_exact_match`](#querystring_exact_match-1)
+- [Conditions Reference](#conditions-reference)
+  - [`querystring_match`](#querystring_match)
+  - [`querystring_exact_match`](#querystring_exact_match)
+  - [`json_body_match`](#json_body_match)
+  - [`form_match`](#form_match)
+  - [`header_match`](#header_match)
+  - [`method_match`](#method_match)
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
@@ -249,75 +245,7 @@ Some-base-header: Some value for the base header
 Some-Header-Key: Some header value
 ```
 
-#### Condition Options Reference
-
-In the earlier examples, we've seen that we can set Responses to be returned if a certain querystring matched, with the `querystring_match` Condition Option. There are, however, other Condition Options at your disposal for customizing your API.
-
-You'll find all the available Condition Options in this section.
-
-##### `querystring_match`
-
-Matches against a Querystring in the Request. For example, a Request having the `?foo=bar` Querystring will be matched in the following condition:
-
-```json
-{
-  "type": "querystring_match",
-  "key": "foo",
-  "value": "bar"
-}
-```
-
-You can also use `key_values` and set multiple pairs:
-
-```json
-{
-  "type": "querystring_match",
-  "key_values": {
-    "some_key": "some value",
-    "another_key": "another value"
-  }
-}
-```
-
-##### `querystring_exact_match`
-
-Matches against Querystring values, like `querystring_match`. The difference being that it matches only if the Request's Querystring contains only the specified Querystrings and no other.
-
-```json
-{
-  "type": "querystring_exact_match",
-  "key_values": {
-    "some_key": "some value",
-    "another_key": "another value"
-  }
-}
-```
-
-It's also possible to have multiple key/value pairs in the same condition. You will use the `key_values` field instead:
-
-```json
-{
-  "type": "querystring_match",
-  "key_values": {
-    "some_key": "some value",
-    "another_key": "another value"
-  }
-}
-```
-
-##### `form_match`
-
-Matches against the Request's form-encoded data.
-
-```json
-{
-  "type": "form_match",
-  "key_values": {
-    "some_key": "some value",
-    "another_key": "another value"
-  }
-}
-```
+In the examples above, we've seen that we can set Responses to be returned if a certain querystring matched, with the `querystring_match` Condition Option. There are, however, other Condition Options at your disposal for customizing your API. [Read the Condition Reference for a list of all available Conditions.](#conditions-reference)
 
 ## Test Assertions
 
@@ -439,23 +367,90 @@ As shown in the example, chaining options are nested within a parent assertion. 
 }
 ```
 
-### Assertion Options Reference
+## Conditions Reference
 
-#### `form_match`
+When making test assertions with *mock*, *Conditions* enable you to express how you expect a given Request to have been made. *Conditions* are also used when defining [*Conditional Responses*.](#conditional-response)
 
-Matches against the Request's Form Payload.
+In this section you will find a reference of all available Conditions.
+
+### `querystring_match`
+
+Matches against a Querystring in the Request. For example, a Request having the `?foo=bar` Querystring will be matched in the following condition:
+
+```json
+{
+  "type": "querystring_match",
+  "key": "foo",
+  "value": "bar"
+}
+```
+
+You can also use `key_values` and set multiple pairs:
+
+```json
+{
+  "type": "querystring_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
+}
+```
+
+### `querystring_exact_match`
+
+Matches against Querystring values, like `querystring_match`. The difference being that it matches only if the Request's Querystring contains only the specified Querystrings and no other.
+
+```json
+{
+  "type": "querystring_exact_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
+}
+```
+
+It's also possible to have multiple key/value pairs in the same condition. You will use the `key_values` field instead:
+
+```json
+{
+  "type": "querystring_match",
+  "key_values": {
+    "some_key": "some value",
+    "another_key": "another value"
+  }
+}
+```
+
+### `json_body_match`
+
+Matches against the JSON body payload que Request was called with.
+
+```json
+{
+  "type": "json_body_match",
+  "data": {
+    "foo": "bar"
+  }
+}
+```
+
+### `form_match`
+
+Matches against the Request's form-encoded data.
 
 ```json
 {
   "type": "form_match",
   "key_values": {
-    "some_form_key": "some_form_value",
-    "another_form_key": "another_form_value"
+    "some_key": "some value",
+    "another_key": "another value"
   }
 }
 ```
 
-#### `header_match`
+### `header_match`
 
 Matches against the Request's header.
 
@@ -468,22 +463,9 @@ Matches against the Request's header.
 }
 ```
 
-#### `json_body_match`
+### `method_match`
 
-The body payload que Request was called with.
-
-```json
-{
-  "type": "json_body_match",
-  "data": {
-    "foo": "bar"
-  }
-}
-```
-
-#### `method_match`
-
-The HTTP Method (Get, Post etc) the Request was called with.
+Matches against the HTTP Method (Get, Post etc) the Request was called with.
 
 ```json
 {
@@ -492,31 +474,6 @@ The HTTP Method (Get, Post etc) the Request was called with.
 }
 ```
 
-#### `querystring_match`
-
-Asserts against the Querystring value defined in the URL.
-
-```json
-{
-  "type": "querystring_match",
-  "key_values": {
-    "some_key": "some_value"
-  }
-}
-```
-
-#### `querystring_exact_match`
-
-This matcher is similar to `querystring_match`, the difference being that it's an "exact" matcher, meaning that if the request has any extra fields not set in the assertion, it will not pass.
-
-```json
-{
-  "type": "querystring_exact_match",
-  "key_values": {
-    "some_key": "some_value"
-  }
-}
-```
 
 ## Mock API Reference
 

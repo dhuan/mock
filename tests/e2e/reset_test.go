@@ -9,7 +9,7 @@ import (
 )
 
 func Test_E2E_Resetting(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -17,13 +17,13 @@ func Test_E2E_Resetting(t *testing.T) {
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type: mocklib.AssertType_JsonBodyMatch,
-			Data: map[string]interface{}{
+		Assert: &mocklib.Condition{
+			Type: mocklib.ConditionType_JsonBodyMatch,
+			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(t, 0, len(validationErrors))
 
@@ -31,13 +31,13 @@ func Test_E2E_Resetting(t *testing.T) {
 
 	validationErrors = e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type: mocklib.AssertType_JsonBodyMatch,
-			Data: map[string]interface{}{
+		Assert: &mocklib.Condition{
+			Type: mocklib.ConditionType_JsonBodyMatch,
+			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,

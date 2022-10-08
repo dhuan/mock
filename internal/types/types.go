@@ -1,59 +1,16 @@
 package types
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/dhuan/mock/internal/utils"
+	. "github.com/dhuan/mock/pkg/mock"
 )
-
-type ConditionType int
-
-const (
-	ConditionType_None ConditionType = iota
-	ConditionType_QuerystringMatch
-	ConditionType_QuerystringExactMatch
-	ConditionType_FormMatch
-)
-
-func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
-	conditionTypeText := utils.Unquote(string(data))
-
-	if conditionTypeText == "querystring_match" {
-		*this = ConditionType_QuerystringMatch
-
-		return nil
-	}
-
-	if conditionTypeText == "querystring_exact_match" {
-		*this = ConditionType_QuerystringExactMatch
-
-		return nil
-	}
-
-	if conditionTypeText == "form_match" {
-		*this = ConditionType_FormMatch
-
-		return nil
-	}
-
-	return errors.New(fmt.Sprintf("Failed to parse Condition Type: %s", conditionTypeText))
-}
 
 type State struct {
 	RequestRecordDirectoryPath string
 	ConfigFolderPath           string
-}
-
-type Condition struct {
-	Type      ConditionType          `json:"type"`
-	Key       string                 `json:"key"`
-	Value     string                 `json:"value"`
-	KeyValues map[string]interface{} `json:"key_values"`
-	And       *Condition             `json:"and"`
-	Or        *Condition             `json:"or"`
 }
 
 type ResponseIf struct {

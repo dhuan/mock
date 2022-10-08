@@ -9,16 +9,16 @@ import (
 )
 
 func Test_E2E_Assertion_NoCalls(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type:  mocklib.AssertType_MethodMatch,
+		Assert: &mocklib.Condition{
+			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -30,7 +30,7 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 }
 
 func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -38,11 +38,11 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type:  mocklib.AssertType_MethodMatch,
+		Assert: &mocklib.Condition{
+			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "put",
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -60,7 +60,7 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_WithNth(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -70,13 +70,13 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Nth:   2,
-		Assert: &mocklib.AssertOptions{
-			Type: mocklib.AssertType_JsonBodyMatch,
-			Data: map[string]interface{}{
+		Assert: &mocklib.Condition{
+			Type: mocklib.ConditionType_JsonBodyMatch,
+			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -86,7 +86,7 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 }
 
 func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -96,13 +96,13 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Nth:   1,
-		Assert: &mocklib.AssertOptions{
-			Type: mocklib.AssertType_JsonBodyMatch,
-			Data: map[string]interface{}{
+		Assert: &mocklib.Condition{
+			Type: mocklib.ConditionType_JsonBodyMatch,
+			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -120,7 +120,7 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 }
 
 func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -129,13 +129,13 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
 		Nth:   2,
-		Assert: &mocklib.AssertOptions{
-			Type: mocklib.AssertType_JsonBodyMatch,
-			Data: map[string]interface{}{
+		Assert: &mocklib.Condition{
+			Type: mocklib.ConditionType_JsonBodyMatch,
+			KeyValues: map[string]interface{}{
 				"foo": "bar",
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -150,7 +150,7 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 }
 
 func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -159,11 +159,11 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type:  mocklib.AssertType_MethodMatch,
+		Assert: &mocklib.Condition{
+			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -173,7 +173,7 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -182,17 +182,17 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type:  mocklib.AssertType_MethodMatch,
+		Assert: &mocklib.Condition{
+			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
-			And: &mocklib.AssertOptions{
-				Type: mocklib.AssertType_HeaderMatch,
+			And: &mocklib.Condition{
+				Type: mocklib.ConditionType_HeaderMatch,
 				KeyValues: map[string]interface{}{
 					"some_header_key": "some_header_value",
 				},
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,
@@ -209,7 +209,7 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
-	killMock := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
@@ -220,17 +220,17 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",
-		Assert: &mocklib.AssertOptions{
-			Type:  mocklib.AssertType_MethodMatch,
+		Assert: &mocklib.Condition{
+			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
-			And: &mocklib.AssertOptions{
-				Type: mocklib.AssertType_HeaderMatch,
+			And: &mocklib.Condition{
+				Type: mocklib.ConditionType_HeaderMatch,
 				KeyValues: map[string]interface{}{
 					"some_header_key": "some_header_value",
 				},
 			},
 		},
-	})
+	}, serverOutput)
 
 	assert.Equal(
 		t,

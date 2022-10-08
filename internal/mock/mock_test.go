@@ -10,7 +10,7 @@ import (
 func Test_Validate_NoCalls(t *testing.T) {
 	RunUnitTest(
 		t,
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_HeaderMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_HeaderMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_NoCall, map[string]string{}),
 	)
 }
@@ -19,7 +19,7 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_HeaderMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_HeaderMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_HeaderNotIncluded, map[string]string{
 			"missing_header_key": "foo",
 		}),
@@ -30,7 +30,7 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_HeaderMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_HeaderMatch, map[string]interface{}{
 			"foo":  "bar",
 			"foo2": "bar2",
 		})),
@@ -48,7 +48,7 @@ func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_HeaderMatch, "some_header_key", "a_different_header_value")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_HeaderMatch, "some_header_key", "a_different_header_value")),
 		ExpectOneValidationError(ValidationErrorCode_HeaderValueMismatch, map[string]string{
 			"header_key":             "some_header_key",
 			"header_value_requested": "some_header_value",
@@ -61,7 +61,7 @@ func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_HeaderMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_HeaderMatch, map[string]interface{}{
 			"some_header_key": "a_different_header_value",
 		})),
 		ExpectOneValidationError(ValidationErrorCode_HeaderValueMismatch, map[string]string{
@@ -77,13 +77,13 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 		t,
 		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
 		Validate("foobar",
-			&AssertOptions{
-				Type: AssertType_HeaderMatch,
+			&Condition{
+				Type: ConditionType_HeaderMatch,
 				KeyValues: map[string]interface{}{
 					"some_header_key": "some_header_value",
 				},
-				And: &AssertOptions{
-					Type:  AssertType_MethodMatch,
+				And: &Condition{
+					Type:  ConditionType_MethodMatch,
 					Value: "post",
 				},
 			},
@@ -100,13 +100,13 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 		t,
 		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
 		Validate("foobar",
-			&AssertOptions{
-				Type: AssertType_HeaderMatch,
+			&Condition{
+				Type: ConditionType_HeaderMatch,
 				KeyValues: map[string]interface{}{
 					"some_header_key": "some_header_value",
 				},
-				And: &AssertOptions{
-					Type:  AssertType_MethodMatch,
+				And: &Condition{
+					Type:  ConditionType_MethodMatch,
 					Value: "get",
 				},
 			},
@@ -119,7 +119,7 @@ func Test_Validate_JsonBodyAssertion_Match(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddPostRequestRecordWithPayload("foobar", `{"foo":"bar", "some_key": "some_value"}`),
-		Validate("foobar", AssertOptionsWithData(AssertType_HeaderMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithData(ConditionType_JsonBodyMatch, map[string]interface{}{
 			"foo":      "bar",
 			"some_key": "some_value",
 		})),
@@ -131,7 +131,7 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddPostRequestRecordWithPayload("foobar", `{"foo":"bar", "some_key": "some_value"}`),
-		Validate("foobar", AssertOptionsWithData(AssertType_JsonBodyMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithData(ConditionType_JsonBodyMatch, map[string]interface{}{
 			"foo":         "bar",
 			"some_key":    "some_value",
 			"another_key": "another_value",
@@ -149,18 +149,18 @@ func Test_Validate_Nth(t *testing.T) {
 		AddGetRequestRecord("foobar"),
 		AddPostRequestRecordWithPayload("foobar", `{"foo":"bar", "some_key": "some_value"}`),
 
-		Validate("foobar", AssertOptionsWithValue(AssertType_MethodMatch, "get")),
+		Validate("foobar", AssertOptionsWithValue(ConditionType_MethodMatch, "get")),
 		ExpectZeroValidationErrors,
 
 		RemoveValidationErrors,
-		ValidateNth(2, "foobar", AssertOptionsWithValue(AssertType_MethodMatch, "get")),
+		ValidateNth(2, "foobar", AssertOptionsWithValue(ConditionType_MethodMatch, "get")),
 		ExpectOneValidationError(ValidationErrorCode_MethodMismatch, map[string]string{
 			"method_requested": "post",
 			"method_expected":  "get",
 		}),
 
 		RemoveValidationErrors,
-		ValidateNth(1, "foobar", AssertOptionsWithValue(AssertType_MethodMatch, "get")),
+		ValidateNth(1, "foobar", AssertOptionsWithValue(ConditionType_MethodMatch, "get")),
 		ExpectZeroValidationErrors,
 	)
 }
@@ -170,7 +170,7 @@ func Test_Validate_Nth_OutOfRange(t *testing.T) {
 		t,
 		AddGetRequestRecord("foobar"),
 		AddPostRequestRecordWithPayload("foobar", `{"foo":"bar", "some_key": "some_value"}`),
-		ValidateNth(3, "foobar", AssertOptionsWithValue(AssertType_MethodMatch, "get")),
+		ValidateNth(3, "foobar", AssertOptionsWithValue(ConditionType_MethodMatch, "get")),
 		ExpectOneValidationError(ValidationErrorCode_NthOutOfRange, map[string]string{}),
 	)
 }
@@ -179,7 +179,7 @@ func Test_Validate_FormMatch_FormKeyNotExisting(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddPostRequestRecordWithPayload("foobar", `{"foo":"bar", "hello": "world"}`),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_FormMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_FormMatch, map[string]interface{}{
 			"some_key": "some_value",
 		})),
 		ExpectOneValidationError(ValidationErrorCode_FormKeyDoesNotExist, map[string]string{
@@ -192,7 +192,7 @@ func Test_Validate_FormMatch_FormValueMismatch(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddPostRequestRecordWithPayload("foobar", `foo=bar&hello=world`),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_FormMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_FormMatch, map[string]interface{}{
 			"foo": "not_bar",
 		})),
 		ExpectOneValidationError(ValidationErrorCode_FormValueMismatch, map[string]string{
@@ -207,7 +207,7 @@ func Test_Validate_Querystring_FailBecauseRequestHasNoQuerystring(t *testing.T) 
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar"),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_QuerystringMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_QuerystringMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_RequestHasNoQuerystring, map[string]string{}),
 	)
 }
@@ -216,7 +216,7 @@ func Test_Validate_Querystring_FailBecauseQuerystringDoesNotMatch(t *testing.T) 
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=not_bar"),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_QuerystringMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_QuerystringMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_QuerystringMismatch, map[string]string{
 			"querystring_key":             "foo",
 			"querystring_value_expected":  "bar",
@@ -229,7 +229,7 @@ func Test_Validate_Querystring_Matching_WithOne(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=bar"),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_QuerystringMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_QuerystringMatch, "foo", "bar")),
 		ExpectValidationErrorsCount(0),
 	)
 }
@@ -238,7 +238,7 @@ func Test_Validate_Querystring_Failing_WithMany(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=not_bar&hello=ola"),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_QuerystringMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_QuerystringMatch, map[string]interface{}{
 			"foo":   "bar",
 			"hello": "world",
 		})),
@@ -260,7 +260,7 @@ func Test_Validate_Querystring_Passing_WithMany(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=bar&hello=world&somekey=somevalue"),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_QuerystringMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_QuerystringMatch, map[string]interface{}{
 			"foo":   "bar",
 			"hello": "world",
 		})),
@@ -272,7 +272,7 @@ func Test_Validate_Querystring_FailBecauseExpectedQuerystringKeyWasNotInTheReque
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=bar"),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_QuerystringExactMatch, "hello", "world")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_QuerystringExactMatch, "hello", "world")),
 		ExpectOneValidationError(ValidationErrorCode_QuerystringKeyNotSet, map[string]string{
 			"querystring_key": "hello",
 		}),
@@ -283,7 +283,7 @@ func Test_Validate_QuerystringExact_Passing_WithOne(t *testing.T) {
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=bar"),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_QuerystringExactMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_QuerystringExactMatch, map[string]interface{}{
 			"foo": "bar",
 		})),
 		ExpectZeroValidationErrors,
@@ -296,8 +296,8 @@ func Test_Validate_QuerystringExact_Passing_WithMany(t *testing.T) {
 		AddGetRequestRecord("foobar?foo=bar&some_key=some_value&another_key=another_value"),
 		Validate(
 			"foobar",
-			&AssertOptions{
-				Type:  AssertType_QuerystringExactMatch,
+			&Condition{
+				Type:  ConditionType_QuerystringExactMatch,
 				Key:   "foo",
 				Value: "bar",
 				KeyValues: map[string]interface{}{
@@ -314,7 +314,7 @@ func Test_Validate_QuerystringExact_FailingBecauseValuesDontMatch(t *testing.T) 
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=not_bar"),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_QuerystringExactMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_QuerystringExactMatch, map[string]interface{}{
 			"foo": "bar",
 		})),
 		ExpectOneValidationError(ValidationErrorCode_QuerystringMismatch, map[string]string{
@@ -329,7 +329,7 @@ func Test_Validate_QuerystringExact_FailingBecauseExpectedQuerystringKeyWasNotIn
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?hello=world"),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_QuerystringExactMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_QuerystringExactMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_QuerystringKeyNotSet, map[string]string{
 			"querystring_key": "foo",
 		}),
@@ -340,7 +340,7 @@ func Test_Validate_QuerystringExact_FailingBecauseExpectedQuerystringKeyWasNotIn
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=bar&some_key=some_value&another_key=another_value"),
-		Validate("foobar", AssertOptionsWithKeyValues(AssertType_QuerystringExactMatch, map[string]interface{}{
+		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_QuerystringExactMatch, map[string]interface{}{
 			"foo":         "bar",
 			"another_key": "another_value",
 		})),
@@ -355,7 +355,7 @@ func Test_Validate_QuerystringExact_FailingBecauseItDoesNotMatchExactly(t *testi
 	RunUnitTest(
 		t,
 		AddGetRequestRecord("foobar?foo=bar&hello=world"),
-		Validate("foobar", AssertOptionsWithKeyValue(AssertType_QuerystringExactMatch, "foo", "bar")),
+		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_QuerystringExactMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_QuerystringMismatch, map[string]string{
 			"querystring_keys_expected":  "foo",
 			"querystring_keys_requested": "foo,hello",

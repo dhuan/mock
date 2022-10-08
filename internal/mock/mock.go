@@ -60,7 +60,7 @@ func Validate(
 	return validate(&requestRecord, assertConfig.Assert)
 }
 
-func validate(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]ValidationError, error) {
+func validate(requestRecord *types.RequestRecord, assert *Condition) (*[]ValidationError, error) {
 	hasAnd := assert.And != nil
 	hasOr := assert.Or != nil
 	validationErrors := make([]ValidationError, 0)
@@ -105,33 +105,33 @@ func validate(requestRecord *types.RequestRecord, assert *AssertOptions) (*[]Val
 }
 
 func resolveAssertTypeFunc(
-	assertType AssertType,
-) func(requestRecord *types.RequestRecord, assert *AssertOptions) ([]ValidationError, error) {
-	if assertType == AssertType_HeaderMatch {
+	conditionType ConditionType,
+) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+	if conditionType == ConditionType_HeaderMatch {
 		return assertHeaderMatch
 	}
 
-	if assertType == AssertType_MethodMatch {
+	if conditionType == ConditionType_MethodMatch {
 		return assertMethodMatch
 	}
 
-	if assertType == AssertType_JsonBodyMatch {
+	if conditionType == ConditionType_JsonBodyMatch {
 		return assertJsonBodyMatch
 	}
 
-	if assertType == AssertType_FormMatch {
+	if conditionType == ConditionType_FormMatch {
 		return assertFormMatch
 	}
 
-	if assertType == AssertType_QuerystringMatch {
+	if conditionType == ConditionType_QuerystringMatch {
 		return assertQuerystringMatch
 	}
 
-	if assertType == AssertType_QuerystringExactMatch {
+	if conditionType == ConditionType_QuerystringExactMatch {
 		return assertQuerystringExactMatch
 	}
 
-	panic(fmt.Sprintf("Failed to resolve assert type: %d", assertType))
+	panic(fmt.Sprintf("Failed to resolve assert type: %d", conditionType))
 }
 
 func getRequestRecordMatchingRoute(mockFs types.MockFs, route string) ([]types.RequestRecord, error) {

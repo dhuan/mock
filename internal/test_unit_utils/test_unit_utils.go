@@ -25,7 +25,7 @@ func RunUnitTest(t *testing.T, funcs ...TestOperationFunc) {
 		make([]types.RequestRecord, 0),
 	}
 
-	for i, _ := range funcs {
+	for i := range funcs {
 		funcs[i](t, state)
 	}
 }
@@ -88,7 +88,7 @@ func AddToMockedRequestRecords(state *unitTestState, fullRoute, method string, h
 	)
 }
 
-func Validate(route string, assertOptions *AssertOptions) TestOperationFunc {
+func Validate(route string, assertOptions *Condition) TestOperationFunc {
 	return func(t *testing.T, state *unitTestState) {
 		assertConfig := AssertConfig{
 			Route:  route,
@@ -105,7 +105,7 @@ func Validate(route string, assertOptions *AssertOptions) TestOperationFunc {
 	}
 }
 
-func ValidateNth(nth int, route string, assertOptions *AssertOptions) TestOperationFunc {
+func ValidateNth(nth int, route string, assertOptions *Condition) TestOperationFunc {
 	return func(t *testing.T, state *unitTestState) {
 		assertConfig := AssertConfig{
 			Nth:    nth,
@@ -127,30 +127,30 @@ func RemoveValidationErrors(t *testing.T, state *unitTestState) {
 	state.validationErrors = make([]ValidationError, 0)
 }
 
-func AssertOptionsWithKeyValue(assertType AssertType, key, value string) *AssertOptions {
-	return &AssertOptions{
+func AssertOptionsWithKeyValue(assertType ConditionType, key, value string) *Condition {
+	return &Condition{
 		Type:  assertType,
 		Key:   key,
 		Value: value,
 	}
 }
 
-func AssertOptionsWithKeyValues(assertType AssertType, keyValues map[string]interface{}) *AssertOptions {
-	return &AssertOptions{
+func AssertOptionsWithKeyValues(assertType ConditionType, keyValues map[string]interface{}) *Condition {
+	return &Condition{
 		Type:      assertType,
 		KeyValues: keyValues,
 	}
 }
 
-func AssertOptionsWithData(assertType AssertType, data map[string]interface{}) *AssertOptions {
-	return &AssertOptions{
+func AssertOptionsWithData(assertType ConditionType, data map[string]interface{}) *Condition {
+	return &Condition{
 		Type: assertType,
-		Data: data,
+		KeyValues: data,
 	}
 }
 
-func AssertOptionsWithValue(assertType AssertType, value string) *AssertOptions {
-	return &AssertOptions{
+func AssertOptionsWithValue(assertType ConditionType, value string) *Condition {
+	return &Condition{
 		Type:  assertType,
 		Value: value,
 	}
@@ -161,7 +161,7 @@ func ExpectOneValidationError(errorCode ValidationErrorCode, errorMetadata map[s
 		assert.Equal(
 			t,
 			[]ValidationError{
-				ValidationError{
+				{
 					Code:     errorCode,
 					Metadata: errorMetadata,
 				},

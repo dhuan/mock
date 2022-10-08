@@ -10,41 +10,6 @@ import (
 	"github.com/dhuan/mock/internal/utils"
 )
 
-var assert_type_encoding_map = map[AssertType]string{
-	AssertType_HeaderMatch:           "header_match",
-	AssertType_MethodMatch:           "method_match",
-	AssertType_JsonBodyMatch:         "json_body_match",
-	AssertType_FormMatch:             "form_match",
-	AssertType_QuerystringMatch:      "querystring_match",
-	AssertType_QuerystringExactMatch: "querystring_exact_match",
-}
-
-type AssertType int
-
-const (
-	AssertType_None AssertType = iota
-	AssertType_HeaderMatch
-	AssertType_MethodMatch
-	AssertType_JsonBodyMatch
-	AssertType_FormMatch
-	AssertType_QuerystringMatch
-	AssertType_QuerystringExactMatch
-)
-
-func (this *AssertType) UnmarshalJSON(data []byte) error {
-	return utils.UnmarshalJsonHelper[AssertType](this, assert_type_encoding_map, data, "Failed to parse Assert Type: %s")
-}
-
-func (this *AssertType) MarshalJSON() ([]byte, error) {
-	encodingMapPrepared := utils.MapMapValueOnly[AssertType, string, string](assert_type_encoding_map, utils.WrapIn(`"`))
-
-	return utils.MarshalJsonHelper[AssertType](
-		encodingMapPrepared,
-		"Failed to parse Assert Type: %d",
-		this,
-	)
-}
-
 var validation_error_code_encoding_map = map[ValidationErrorCode]string{
 	ValidationErrorCode_HeaderValueMismatch:     "header_value_mismatch",
 	ValidationErrorCode_NoCall:                  "no_call",
@@ -63,19 +28,9 @@ var validation_error_code_encoding_map = map[ValidationErrorCode]string{
 type AssertHeader map[string][]string
 
 type AssertConfig struct {
-	Route  string         `json:"route"`
-	Nth    int            `json:"nth"`
-	Assert *AssertOptions `json:"assert"`
-}
-
-type AssertOptions struct {
-	Type      AssertType             `json:"type"`
-	Data      map[string]interface{} `json:"data"`
-	KeyValues map[string]interface{} `json:"key_values"`
-	Key       string                 `json:"key"`
-	Value     string                 `json:"value"`
-	And       *AssertOptions         `json:"and"`
-	Or        *AssertOptions         `json:"or"`
+	Route  string     `json:"route"`
+	Nth    int        `json:"nth"`
+	Assert *Condition `json:"assert"`
 }
 
 type ValidationError struct {
@@ -102,12 +57,12 @@ const (
 )
 
 func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {
-	encodingMapPrepared := utils.MapMapValueOnly[ValidationErrorCode, string, string](
+	encodingMapPrepared := utils.MapMapValueOnly(
 		validation_error_code_encoding_map,
 		utils.WrapIn(`"`),
 	)
 
-	return utils.MarshalJsonHelper[ValidationErrorCode](
+	return utils.MarshalJsonHelper(
 		encodingMapPrepared,
 		"Failed to parse Validation Error Code: %d",
 		this,
@@ -115,7 +70,7 @@ func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {
 }
 
 func (this *ValidationErrorCode) UnmarshalJSON(data []byte) error {
-	return utils.UnmarshalJsonHelper[ValidationErrorCode](
+	return utils.UnmarshalJsonHelper(
 		this,
 		validation_error_code_encoding_map,
 		data,
