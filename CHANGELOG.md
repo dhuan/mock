@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+This release fixes a bug in the `json_body_match` condition option.
+
 ## 0.1.2
 
 This release doesn't have significant changes.
