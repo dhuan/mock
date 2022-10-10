@@ -11,7 +11,7 @@ var condition_type_code_encoding_map = map[ConditionType]string{
 	ConditionType_None:                  "none",
 	ConditionType_HeaderMatch:           "header_match",
 	ConditionType_MethodMatch:           "method_match",
-	ConditionType_JsonBodyMatch:         "jsonbody_match",
+	ConditionType_JsonBodyMatch:         "json_body_match",
 	ConditionType_FormMatch:             "form_match",
 	ConditionType_QuerystringMatch:      "querystring_match",
 	ConditionType_QuerystringExactMatch: "querystring_exact_match",
@@ -44,7 +44,7 @@ func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
 		return nil
 	}
 
-	if conditionTypeText == "jsonbody_match" {
+	if conditionTypeText == "json_body_match" {
 		*this = ConditionType_JsonBodyMatch
 
 		return nil

@@ -327,7 +327,7 @@ Assertions can be combined with chaining options `and` and `or`. In the followin
     "value": "post",
     "and": {
       "type": "json_body_match",
-      "data": {
+      "key_values": {
         "foo": "bar"
       }
     }
@@ -430,7 +430,7 @@ Matches against the JSON body payload que Request was called with.
 ```json
 {
   "type": "json_body_match",
-  "data": {
+  "key_values": {
     "foo": "bar"
   }
 }

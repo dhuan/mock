@@ -56,7 +56,7 @@ curl -v http://localhost:4000/__mock__/assert -d @- <<EOF
   "route": "foo/bar",
   "assert": {
     "type": "json_body_match",
-    "data": {
+    "key_values": {
       "some_key": "some_value"
     },
     "and": {
