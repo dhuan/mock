@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/dhuan/mock/internal/utils"
 )
@@ -125,4 +126,39 @@ func Assert(config *MockConfig, assertConfig *AssertConfig) ([]ValidationError, 
 	}
 
 	return responseParsed.ValidationErrors, nil
+}
+
+func ToReadableError(validationErrors []ValidationError) string {
+	result := make([]string, 0)
+
+	for i := range validationErrors {
+		validationErrorEncoded, ok := validation_error_code_encoding_map[validationErrors[i].Code]
+
+		if !ok {
+			return "Failed to parse!"
+		}
+
+		metadataKeys := utils.GetSortedKeys(validationErrors[i].Metadata)
+		metadataEncoded := make([]string, len(metadataKeys))
+		for i2, metadataKey := range metadataKeys {
+			metadataEncoded[i2] = fmt.Sprintf("%s: %s", metadataKey, validationErrors[i].Metadata[metadataKey])
+		}
+
+		errorMessage := fmt.Sprintf(
+			"Error: %s",
+			validationErrorEncoded,
+		)
+
+		if len(metadataKeys) > 0 {
+			errorMessage = fmt.Sprintf(
+				"Error: %s\n%s",
+				validationErrorEncoded,
+				strings.Join(metadataEncoded, "\n"),
+			)
+		}
+
+		result = append(result, errorMessage)
+	}
+
+	return strings.Join(result, "\n\n")
 }
