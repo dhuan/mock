@@ -238,3 +238,25 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 		validationErrors,
 	)
 }
+
+func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
+	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	defer killMock()
+
+	assertMethods := []string{"post", "POST"}
+
+	for _, assertMethod := range assertMethods {
+		mockConfig := mocklib.Init("localhost:4000")
+		e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, map[string]string{})
+
+		validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+			Route: "foo/bar",
+			Assert: &mocklib.Condition{
+				Type:  mocklib.ConditionType_MethodMatch,
+				Value: assertMethod,
+			},
+		}, serverOutput)
+
+		assert.Equal(t, 0, len(validationErrors))
+	}
+}

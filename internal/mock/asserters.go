@@ -49,7 +49,7 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *Condition) ([
 func assertMethodMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
-	if requestRecord.Method != assert.Value {
+	if requestRecord.Method != strings.ToLower(assert.Value) {
 		validationErrors = append(validationErrors, ValidationError{
 			Code: ValidationErrorCode_MethodMismatch,
 			Metadata: map[string]string{
