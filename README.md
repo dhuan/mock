@@ -43,7 +43,7 @@ Below is a configuration file sample, defining two simple endpoints:
 Let's now make a request to the `foo/bar` endpoint:
 
 ```sh
-curl localhost:4000/foo/bar \
+$ curl localhost:4000/foo/bar \
   -H 'Content-type: application/json' \
   -d '{"some_key":"some_value"}'
 ```
@@ -51,7 +51,7 @@ curl localhost:4000/foo/bar \
 And then let's make assertions - Let's verify whether the `foo/bar` endpoint was called with the expected values:
 
 ```sh
-curl -v http://localhost:4000/__mock__/assert -d @- <<EOF
+$ curl -v http://localhost:4000/__mock__/assert -d @- <<EOF
 {
   "route": "foo/bar",
   "assert": {
