@@ -27,7 +27,7 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := resolveConfig(flagConfig)
 		if err != nil {
-			panic(err)
+			exitWithError(err.Error())
 		}
 
 		router := chi.NewRouter()
@@ -270,7 +270,7 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 
 	configFileContent, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		return &mockConfig, err
+		return &mockConfig, errors.New(fmt.Sprintf("Unable to read configuration file \"%s\". Make sure it exists and/or is readable, then try again.", configPath))
 	}
 
 	if err = json.Unmarshal(configFileContent, &mockConfig); err != nil {
@@ -284,4 +284,10 @@ func addHeaders(w http.ResponseWriter, response *mock.Response) {
 	for headerKey, _ := range response.Headers {
 		w.Header().Add(headerKey, response.Headers[headerKey])
 	}
+}
+
+func exitWithError(errorMessage string) {
+	fmt.Println(errorMessage)
+
+	os.Exit(1)
 }
