@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4
+
+- The *mock* installable Go library has existed before this release but now it is documented in the User Guide. Add `github.com/dhuan/mock/pkg/mock` to your Go project and write tests with it.
+- Helper function `ToReadableError()` added in the library to stringify a group of Validation Errors.
+- Bug fixed - HTTP Method value in Assertion now works independently of case sensitiveness.
+
+Minor stuff:
+
+- Fail gracefully if given configuration file does not exist or/and not readable.
+
 ## 0.1.3
 
 This release fixes a bug in the `json_body_match` condition option.
