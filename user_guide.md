@@ -11,6 +11,7 @@
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
+  - [Handling CORS](#handling-cors)
 - [Test Assertions](#test-assertions)
   - [Which Request to assert against?](#which-request-to-assert-against)
   - [Assertion Chaining](#assertion-chaining)
@@ -247,6 +248,14 @@ Some-Header-Key: Some header value
 ```
 
 In the examples above, we've seen that we can set Responses to be returned if a certain querystring matched, with the `querystring_match` Condition Option. There are, however, other Condition Options at your disposal for customizing your API. [Read the Condition Reference for a list of all available Conditions.](#conditions-reference)
+
+### Handling CORS
+
+The `--cors` flag can be used when running *mock*. It will take care of setting up all the necessary headers in your API's Responses to enable browser clients to comunicate without problems:
+
+```sh
+$ mock serve --cors -c /path/to/your/config.json
+```
 
 ## Test Assertions
 
