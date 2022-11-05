@@ -20,6 +20,7 @@ type MockApiResponse struct {
 var (
 	flagConfig string
 	flagPort   string
+	flagCors   bool
 )
 
 var rootCmd = &cobra.Command{
@@ -33,6 +34,7 @@ func Execute() {
 	serveCmd.PersistentFlags().StringVarP(&flagConfig, "config", "c", "", "configuration file")
 	serveCmd.MarkPersistentFlagRequired("config")
 	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "3000", "port to listen on")
+	serveCmd.PersistentFlags().BoolVar(&flagCors, "cors", false, "enable CORS")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

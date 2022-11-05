@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -20,6 +21,11 @@ import (
 
 type E2eState struct {
 	BinaryPath string
+}
+
+type Response struct {
+	Body    []byte
+	Headers map[string]string
 }
 
 func NewState() *E2eState {
@@ -84,7 +90,7 @@ func MockAssert(assertConfig *mocklib.AssertConfig, serverOutput *bytes.Buffer) 
 	return validationErrors
 }
 
-func Request(config *mocklib.MockConfig, method, route, payload string, headers map[string]string) []byte {
+func Request(config *mocklib.MockConfig, method, route, payload string, headers map[string]string) *Response {
 	request, err := http.NewRequest(
 		method,
 		fmt.Sprintf("http://%s/%s", config.Url, route),
@@ -109,7 +115,21 @@ func Request(config *mocklib.MockConfig, method, route, payload string, headers 
 		panic(err)
 	}
 
-	return responseBody
+	return &Response{
+		Body:    responseBody,
+		Headers: parseHeaders(response.Header),
+	}
+}
+
+func parseHeaders(headers http.Header) map[string]string {
+	parsedHeaders := make(map[string]string)
+	sortedKeys := getSortedKeys(headers)
+
+	for _, key := range sortedKeys {
+		parsedHeaders[key] = strings.Join(headers[key], ",")
+	}
+
+	return parsedHeaders
 }
 
 func RequestApiReset(config *mocklib.MockConfig) {
@@ -176,7 +196,7 @@ func replaceRegex(subject string, find []string, replaceWith string) string {
 func replaceRegexForEachLine(subject string, find []string, replaceWith string) string {
 	lines := strings.Split(subject, "\n")
 
-	for i, _ := range lines {
+	for i := range lines {
 		lines[i] = replaceRegex(lines[i], find, replaceWith)
 	}
 
@@ -229,7 +249,7 @@ func RunTest(
 	mockConfig := mocklib.Init("localhost:4000")
 	responseBody := Request(mockConfig, method, route, "", map[string]string{})
 
-	assertionFunc(t, responseBody)
+	assertionFunc(t, responseBody.Body)
 }
 
 func StringMatches(expected string) func(t *testing.T, response []byte) {
@@ -266,4 +286,47 @@ func encodeJsonAgain(encodedJson []byte) ([]byte, error) {
 
 var ContentTypeJsonHeaders map[string]string = map[string]string{
 	"Content-type": "application/json",
+}
+
+func getSortedKeys[T interface{}](subject map[string]T) []string {
+	keys := GetKeys(subject)
+	sort.Strings(keys)
+
+	return keys
+}
+
+func GetKeys[T_Key comparable, T_Value interface{}](subject map[T_Key]T_Value) []T_Key {
+	keys := make([]T_Key, 0, len(subject))
+
+	for key := range subject {
+		keys = append(keys, key)
+	}
+
+	return keys
+}
+
+func AssertMapHasValues[T_Key comparable, T_Value comparable](
+	t *testing.T,
+	subject map[T_Key]T_Value,
+	values map[T_Key]T_Value,
+) {
+	for key, value := range values {
+		valueb, ok := subject[key]
+
+		if !ok {
+			t.Error(fmt.Sprintf("Key '%+v' does not exist in given map.", key))
+		}
+
+		assert.Equal(t, value, valueb)
+	}
+}
+
+func IndexOf[T comparable](list []T, value T) int {
+	for i, _ := range list {
+		if list[i] == value {
+			return i
+		}
+	}
+
+	return -1
 }

@@ -32,6 +32,9 @@ var serveCmd = &cobra.Command{
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
+		router.Use(handleOptions(flagCors))
+		router.NotFound(onNotFound(flagCors))
+		router.MethodNotAllowed(onMethodNotAllowed(flagCors))
 
 		prepareConfig(config)
 
@@ -192,6 +195,10 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 
 		addHeaders(w, response)
 
+		if flagCors {
+			setCorsHeaders(w)
+		}
+
 		err = mockFs.StoreRequestRecord(r, requestBody, endpointConfig)
 		if err != nil {
 			panic(err)
@@ -290,4 +297,54 @@ func exitWithError(errorMessage string) {
 	fmt.Println(errorMessage)
 
 	os.Exit(1)
+}
+
+func onNotFound(corsEnabled bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !corsEnabled {
+			w.WriteHeader(404)
+
+			return
+		}
+
+		setCorsHeaders(w)
+
+		w.WriteHeader(404)
+	}
+}
+
+func onMethodNotAllowed(corsEnabled bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !corsEnabled {
+			w.WriteHeader(405)
+
+			return
+		}
+
+		setCorsHeaders(w)
+
+		w.WriteHeader(405)
+	}
+}
+
+func handleOptions(corsEnabled bool) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.ToLower(r.Method) == "options" {
+				setCorsHeaders(w)
+				w.WriteHeader(200)
+
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+func setCorsHeaders(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Credentials", "true")
+	w.Header().Add("Access-Control-Allow-Headers", "*")
+	w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 }
