@@ -10,17 +10,17 @@ import (
 
 func Test_ValidateEndpointConfigs_Duplicates(t *testing.T) {
 	endpointConfigs := []types.EndpointConfig{
-		types.EndpointConfig{
+		{
 			Route:    "foo/bar",
 			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
 		},
-		types.EndpointConfig{
+		{
 			Route:    "hello/world",
 			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
 		},
-		types.EndpointConfig{
+		{
 			Route:    "foo/bar",
 			Method:   "get",
 			Response: []byte(`{"hello":"world"}`),
@@ -32,7 +32,7 @@ func Test_ValidateEndpointConfigs_Duplicates(t *testing.T) {
 	assert.Equal(
 		t,
 		[]mock.EndpointConfigError{
-			mock.EndpointConfigError{
+			{
 				Code:          mock.EndpointConfigErrorCode_EndpointDuplicate,
 				EndpointIndex: 0,
 				Metadata: map[string]string{
@@ -46,12 +46,12 @@ func Test_ValidateEndpointConfigs_Duplicates(t *testing.T) {
 
 func Test_ValidateEndpointConfigs_InvalidMethod(t *testing.T) {
 	endpointConfigs := []types.EndpointConfig{
-		types.EndpointConfig{
+		{
 			Route:    "foo/bar",
 			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
 		},
-		types.EndpointConfig{
+		{
 			Route:    "hello/world",
 			Method:   "foobar",
 			Response: []byte(`{"foo":"bar"}`),
@@ -63,7 +63,7 @@ func Test_ValidateEndpointConfigs_InvalidMethod(t *testing.T) {
 	assert.Equal(
 		t,
 		[]mock.EndpointConfigError{
-			mock.EndpointConfigError{
+			{
 				Code:          mock.EndpointConfigErrorCode_InvalidMethod,
 				EndpointIndex: 1,
 				Metadata: map[string]string{
@@ -77,12 +77,12 @@ func Test_ValidateEndpointConfigs_InvalidMethod(t *testing.T) {
 
 func Test_ValidateEndpointConfigs_WithQuerystring(t *testing.T) {
 	endpointConfigs := []types.EndpointConfig{
-		types.EndpointConfig{
+		{
 			Route:    "foo/bar",
 			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
 		},
-		types.EndpointConfig{
+		{
 			Route:    "hello/world?foo=bar",
 			Method:   "get",
 			Response: []byte(`{"foo":"bar"}`),
@@ -94,7 +94,7 @@ func Test_ValidateEndpointConfigs_WithQuerystring(t *testing.T) {
 	assert.Equal(
 		t,
 		[]mock.EndpointConfigError{
-			mock.EndpointConfigError{
+			{
 				Code:          mock.EndpointConfigErrorCode_RouteWithQuerystring,
 				EndpointIndex: 1,
 				Metadata:      map[string]string{},
