@@ -37,3 +37,13 @@ func Test_E2E_Response_JsonResponse(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_Response_ShellScript(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"GET",
+		"foo/bar",
+		StringMatches("Hello world! This response was generated from a shell script.\n"),
+	)
+}

@@ -180,3 +180,17 @@ func GetSortedKeys[T interface{}](subject map[string]T) []string {
 
 	return keys
 }
+
+func ToCommandParams(command string) (string, []string) {
+	commandSplit := strings.Split(command, " ")
+
+	if len(commandSplit) == 0 {
+		return "", []string{}
+	}
+
+	if len(commandSplit) == 1 {
+		return commandSplit[0], []string{}
+	}
+
+	return commandSplit[0], commandSplit[1:]
+}

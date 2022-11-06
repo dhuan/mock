@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -164,13 +165,26 @@ func readFile(name string) ([]byte, error) {
 	return os.ReadFile(name)
 }
 
+func execute(command string) (*mock.ExecResult, error) {
+	commandName, commandParams := utils.ToCommandParams(command)
+	cmd := exec.Command(commandName, commandParams...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return &mock.ExecResult{}, err
+	}
+
+	return &mock.ExecResult{
+		Output: out,
+	}, nil
+}
+
 func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestBody, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			panic(err)
 		}
-		response, err, errorMetadata := mock.ResolveEndpointResponse(readFile, r, requestBody, state, endpointConfig)
+		response, err, errorMetadata := mock.ResolveEndpointResponse(readFile, execute, r, requestBody, state, endpointConfig)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
 			w.WriteHeader(400)

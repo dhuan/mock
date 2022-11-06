@@ -15,6 +15,8 @@ import (
 
 type ReadFileFunc = func(name string) ([]byte, error)
 
+type ExecFunc = func(command string) (*ExecResult, error)
+
 type Response struct {
 	Body                []byte
 	EndpointContentType types.Endpoint_content_type
@@ -22,8 +24,13 @@ type Response struct {
 	Headers             map[string]string
 }
 
+type ExecResult struct {
+	Output []byte
+}
+
 func ResolveEndpointResponse(
 	readFile ReadFileFunc,
+    exec ExecFunc,
 	request *http.Request,
 	requestBody []byte,
 	state *types.State,
@@ -45,6 +52,7 @@ func ResolveEndpointResponse(
 	if hasResponseIf {
 		return resolveEndpointResponseInternal(
 			readFile,
+            exec,
 			state,
 			matchingResponseIf.Response,
 			resolveResponseStatusCode(matchingResponseIf.ResponseStatusCode),
@@ -56,6 +64,7 @@ func ResolveEndpointResponse(
 
 	return resolveEndpointResponseInternal(
 		readFile,
+        exec,
 		state,
 		endpointConfig.Response,
 		resolveResponseStatusCode(endpointConfig.ResponseStatusCode),
@@ -124,6 +133,7 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 
 func resolveEndpointResponseInternal(
 	readFile ReadFileFunc,
+    exec ExecFunc,
 	state *types.State,
 	response types.EndpointConfigResponse,
 	responseStatusCode int,
@@ -168,6 +178,24 @@ func resolveEndpointResponseInternal(
 		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
 
+	if endpointConfigContentType == types.Endpoint_content_type_shell {
+		scriptFilePath := fmt.Sprintf(
+			"%s/%s",
+			state.ConfigFolderPath,
+			strings.Replace(string(response), "sh:", "", -1),
+		)
+
+        execResult, err := exec(fmt.Sprintf(
+            "sh %s",
+            scriptFilePath,
+        ))
+        if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+        }
+
+		return &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+    }
+
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
 		err := json.Unmarshal(response, &jsonParsed)
@@ -189,6 +217,10 @@ func resolveEndpointResponseInternal(
 func resolveEndpointConfigContentType(response types.EndpointConfigResponse) types.Endpoint_content_type {
 	if utils.BeginsWith(string(response), "file:") {
 		return types.Endpoint_content_type_file
+	}
+
+	if utils.BeginsWith(string(response), "sh:") {
+		return types.Endpoint_content_type_shell
 	}
 
 	if utils.BeginsWith(string(response), "{") {

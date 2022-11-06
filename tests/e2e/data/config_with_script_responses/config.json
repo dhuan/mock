@@ -1,0 +1,10 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar",
+      "method": "GET",
+      "response": "sh:handler.sh"
+    }
+  ]
+}
+

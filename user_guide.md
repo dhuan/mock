@@ -8,6 +8,7 @@
   - [Response with headers](#response-with-headers)
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
+  - [Responses from Shell scripts](#responses-from-shell-scripts)
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
@@ -109,6 +110,24 @@ In the earlier example, `response` is a JSON object containing the response JSON
 ```
 
 Given the configuration above, the `foo/bar` endpoint's response is defined in the `response_foobar.json` file.
+
+### Responses from Shell scripts
+
+You can write shell scripts that will act as "handlers" for your API's Requests (or Controllers if you like to think in terms of the MVC pattern.)
+
+```json
+{
+  "endpoints": [
+    {
+      "route": "foo/bar",
+      "method": "POST",
+      "response": "sh:./my_shell_script.sh"
+    }
+  ]
+}
+```
+
+In the example above, any request to `POST /foo/bar` will result in *mock* executing the `my_shell_script.sh`. Any output produced from that script executation will result in the HTTP Response returned by your API.
 
 ### Conditional Response
 

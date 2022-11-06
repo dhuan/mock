@@ -34,8 +34,17 @@ func (this *osMock) ReadFile(name string) ([]byte, error) {
 	return args.Get(0).([]byte), nil
 }
 
+type execMock struct {
+	testifymock.Mock
+}
+
+func (this *execMock) Exec(command string) (*mock.ExecResult, error) {
+	return &mock.ExecResult{}, nil
+}
+
 func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -43,7 +52,14 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		Headers:  map[string]string{},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+		osMockInstance.ReadFile,
+		execMockInstance.Exec,
+		requestMock,
+		requestBody,
+		&state,
+		&endpointConfig,
+	)
 
 	assert.Equal(
 		t,
@@ -60,6 +76,7 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 
 func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -67,7 +84,14 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		Headers:  map[string]string{},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -84,6 +108,7 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 
 func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -93,7 +118,14 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 
 	osMockInstance.On("ReadFile", "/path/to/somewhere/./response_foobar").Return([]byte("Hello world!"), nil)
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -110,6 +142,7 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 
 func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -117,13 +150,21 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 		Headers:  map[string]string{},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(t, 200, response.StatusCode)
 }
 
 func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:              "foo/bar",
 		Method:             "post",
@@ -132,13 +173,21 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 		Headers:            map[string]string{},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(t, 201, response.StatusCode)
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -166,7 +215,14 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(t, 203, response.StatusCode)
 
@@ -185,6 +241,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=WORLD"}}
+	execMockInstance := execMock{}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -211,7 +268,14 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -229,6 +293,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}, RequestURI: "?hello=world&foo=bar"}
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -260,7 +325,14 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(t, 203, response.StatusCode)
 
@@ -280,6 +352,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDefault(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -309,7 +382,14 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -327,6 +407,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToConditionalResponse(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -356,7 +437,14 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -374,6 +462,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}, RequestURI: "?hello=world&foo=bar"}
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -409,7 +498,14 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -427,6 +523,7 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -449,7 +546,14 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -466,6 +570,7 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 
 func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -475,7 +580,14 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -488,6 +600,7 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 
 func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -500,7 +613,14 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -514,6 +634,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 
 func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=bar"}, RequestURI: "?foo=bar"}
+	execMockInstance := execMock{}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
@@ -540,7 +661,14 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -555,6 +683,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_ConditionNotMatching(t *testing.T) {
 	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=not_bar"}}
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -580,7 +709,14 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
@@ -601,6 +737,7 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 	requestMock.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	requestBody = []byte("foo=bar&foo2=bar2")
 	osMockInstance := osMock{}
+	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
 		Route:    "foo/bar",
 		Method:   "post",
@@ -627,7 +764,14 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		},
 	}
 
-	response, _, _ := mock.ResolveEndpointResponse(osMockInstance.ReadFile, requestMock, requestBody, &state, &endpointConfig)
+	response, _, _ := mock.ResolveEndpointResponse(
+        osMockInstance.ReadFile,
+		execMockInstance.Exec,
+        requestMock,
+        requestBody,
+        &state,
+        &endpointConfig,
+    )
 
 	assert.Equal(
 		t,
