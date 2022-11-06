@@ -39,7 +39,11 @@ var serveCmd = &cobra.Command{
 
 		prepareConfig(config)
 
-		endpointConfigErrors, err := mock.ValidateEndpointConfigs(config.Endpoints)
+		endpointConfigErrors, err := mock.ValidateEndpointConfigs(
+            config.Endpoints,
+            readFile,
+            filepath.Dir(flagConfig),
+        )
 		if err != nil {
 			panic(err)
 		}
@@ -132,6 +136,13 @@ func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigErr
 	if endpointConfigError.Code == mock.EndpointConfigErrorCode_RouteWithQuerystring {
 		return fmt.Sprintf(
 			"Routes cannot have querystrings. Read about \"response_if\" in the documentation to learn how to set Conditional Responses based on querystrings.",
+		)
+	}
+
+	if endpointConfigError.Code == mock.EndpointConfigErrorCode_FileUnreadable {
+		return fmt.Sprintf(
+            "The file provided for the endpoint's response is either unreadable or does not exist: %s",
+            endpointConfigError.Metadata["file_path"],
 		)
 	}
 

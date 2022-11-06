@@ -13,6 +13,7 @@ type EndpointConfigErrorCode int
 const (
 	EndpointConfigErrorCode_Unknown EndpointConfigErrorCode = iota
 	EndpointConfigErrorCode_EndpointDuplicate
+	EndpointConfigErrorCode_FileUnreadable
 	EndpointConfigErrorCode_InvalidMethod
 	EndpointConfigErrorCode_RouteWithQuerystring
 )
@@ -31,11 +32,15 @@ var available_http_methods = []string{
 	"delete",
 }
 
-func ValidateEndpointConfigs(endpointConfigs []types.EndpointConfig) ([]EndpointConfigError, error) {
+func ValidateEndpointConfigs(
+	endpointConfigs []types.EndpointConfig,
+	readFile ReadFileFunc,
+	configDirPath string,
+) ([]EndpointConfigError, error) {
 	endpointConfigErrors := make([]EndpointConfigError, 0)
 
 	for i, endpointConfig := range endpointConfigs {
-		newEndpointConfigErrors, err := validateEndpointConfig(&endpointConfig, i, endpointConfigs, endpointConfigErrors)
+		newEndpointConfigErrors, err := validateEndpointConfig(&endpointConfig, i, endpointConfigs, endpointConfigErrors, readFile, configDirPath)
 		if err != nil {
 			return endpointConfigErrors, err
 		}
@@ -51,6 +56,8 @@ func validateEndpointConfig(
 	endpointConfigIndex int,
 	endpointConfigs []types.EndpointConfig,
 	currentEndpointConfigErrors []EndpointConfigError,
+	readFile ReadFileFunc,
+	configDirPath string,
 ) ([]EndpointConfigError, error) {
 	endpointConfigErrors := make([]EndpointConfigError, 0)
 
@@ -93,7 +100,69 @@ func validateEndpointConfig(
 		})
 	}
 
+	fileReferences := getFileReferences(endpointConfig)
+	if len(fileReferences) > 0 {
+		newEndpointConfigErrors, err := validateFiles(fileReferences, endpointConfigIndex, readFile, configDirPath)
+		if err != nil {
+			return endpointConfigErrors, err
+		}
+
+		if len(newEndpointConfigErrors) > 0 {
+			endpointConfigErrors = append(endpointConfigErrors, newEndpointConfigErrors...)
+		}
+	}
+
 	return endpointConfigErrors, nil
+}
+
+func validateFiles(
+	filePaths []string,
+	endpointIndex int,
+	readFile ReadFileFunc,
+	configDirPath string,
+) ([]EndpointConfigError, error) {
+	errors := make([]EndpointConfigError, 0)
+
+	for i := range filePaths {
+		_, err := readFile(fmt.Sprintf("%s/%s", configDirPath, filePaths[i]))
+		if err != nil {
+			errors = append(errors, EndpointConfigError{
+				Code:          EndpointConfigErrorCode_FileUnreadable,
+				EndpointIndex: endpointIndex,
+				Metadata: map[string]string{
+					"file_path": filePaths[i],
+				},
+			})
+		}
+	}
+
+	return errors, nil
+}
+
+func getFileReferences(endpointConfig *types.EndpointConfig) []string {
+	filePaths := make([]string, 0)
+
+	fileReference, hasFileReference := getFileReferenceFromResponseObject(endpointConfig.Response)
+	if hasFileReference {
+		filePaths = append(filePaths, fileReference)
+	}
+
+	return filePaths
+}
+
+func getFileReferenceFromResponseObject(response types.EndpointConfigResponse) (string, bool) {
+	responseStr := string(response)
+	isFileReference := utils.BeginsWith(responseStr, "file:") || utils.BeginsWith(responseStr, "sh:")
+
+	if !isFileReference {
+		return "", false
+	}
+
+	return utils.ReplaceRegex(
+		responseStr,
+		[]string{"^file:", "^sh:"},
+		"",
+	), true
 }
 
 func hasConfigErrorMatching(
