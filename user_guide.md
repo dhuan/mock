@@ -134,11 +134,11 @@ In the example above, any request to `POST /foo/bar` will result in *mock* execu
 
 The following environment variables can be read from in response shell scripts in order to obtain information about the current request:
 
-- `MOCK_REQUEST_URL`: The full URL. (ex: http://localhost/foo/bar)
-- `MOCK_REQUEST_ENDPOINT`: The endpoint extracted from the URL. (ex: foo/bar)
+- `MOCK_REQUEST_URL`: The full URL. (ex: `http://localhost/foo/bar`)
+- `MOCK_REQUEST_ENDPOINT`: The endpoint extracted from the URL. (ex: `foo/bar`)
 - `MOCK_REQUEST_HEADERS`: A file path containing all HTTP Headers.
 - `MOCK_REQUEST_BODY`: A file path containing the Request's Body (if one exists, otherwise this will be an empty file.)
-- `MOCK_REQUEST_QUERYSTRING`: A file path containing the Request's Querystring (if one exists, otherwise this will be an empty file.)
+- `MOCK_REQUEST_QUERYSTRING`: The Request's Querystring if it exists. (ex: `some_key=some_value&another_key=another_value`)
 - `MOCK_REQUEST_METHOD`: A string indicating the Request's Method.
 
 ### Conditional Response
