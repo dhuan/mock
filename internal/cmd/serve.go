@@ -176,9 +176,11 @@ func readFile(name string) ([]byte, error) {
 	return os.ReadFile(name)
 }
 
-func execute(command string) (*mock.ExecResult, error) {
+func execute(command string, env map[string]string) (*mock.ExecResult, error) {
 	commandName, commandParams := utils.ToCommandParams(command)
 	cmd := exec.Command(commandName, commandParams...)
+    cmd.Env = os.Environ()
+    cmd.Env = append(cmd.Env, utils.ParseEnv(env)...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return &mock.ExecResult{}, err

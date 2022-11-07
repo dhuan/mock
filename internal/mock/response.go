@@ -15,7 +15,7 @@ import (
 
 type ReadFileFunc = func(name string) ([]byte, error)
 
-type ExecFunc = func(command string) (*ExecResult, error)
+type ExecFunc = func(command string, env map[string]string) (*ExecResult, error)
 
 type Response struct {
 	Body                []byte
@@ -30,7 +30,7 @@ type ExecResult struct {
 
 func ResolveEndpointResponse(
 	readFile ReadFileFunc,
-    exec ExecFunc,
+	exec ExecFunc,
 	request *http.Request,
 	requestBody []byte,
 	state *types.State,
@@ -51,8 +51,11 @@ func ResolveEndpointResponse(
 
 	if hasResponseIf {
 		return resolveEndpointResponseInternal(
+			request,
+			requestRecord,
+			requestBody,
 			readFile,
-            exec,
+			exec,
 			state,
 			matchingResponseIf.Response,
 			resolveResponseStatusCode(matchingResponseIf.ResponseStatusCode),
@@ -63,8 +66,11 @@ func ResolveEndpointResponse(
 	}
 
 	return resolveEndpointResponseInternal(
+		request,
+		requestRecord,
+		requestBody,
 		readFile,
-        exec,
+		exec,
 		state,
 		endpointConfig.Response,
 		resolveResponseStatusCode(endpointConfig.ResponseStatusCode),
@@ -132,8 +138,11 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 }
 
 func resolveEndpointResponseInternal(
+	request *http.Request,
+	requestRecord *types.RequestRecord,
+	requestBody []byte,
 	readFile ReadFileFunc,
-    exec ExecFunc,
+	exec ExecFunc,
 	state *types.State,
 	response types.EndpointConfigResponse,
 	responseStatusCode int,
@@ -185,16 +194,39 @@ func resolveEndpointResponseInternal(
 			strings.Replace(string(response), "sh:", "", -1),
 		)
 
-        execResult, err := exec(fmt.Sprintf(
-            "sh %s",
-            scriptFilePath,
-        ))
-        if err != nil {
+		protocol := "http://"
+		if request.TLS != nil {
+			protocol = "https://"
+		}
+
+		endpoint := utils.ReplaceRegex(request.URL.Path, []string{"^/"}, "")
+		querystring := requestRecord.Querystring
+		headersFile, err := utils.CreateTempFile(utils.ToHeadersText(requestRecord.Headers))
+		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-        }
+		}
+		bodyFile, err := utils.CreateTempFile(string(requestBody))
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		execResult, err := exec(fmt.Sprintf(
+			"sh %s",
+			scriptFilePath,
+		), map[string]string{
+			"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
+			"MOCK_REQUEST_ENDPOINT":    endpoint,
+			"MOCK_REQUEST_METHOD":      request.Method,
+			"MOCK_REQUEST_QUERYSTRING": querystring,
+			"MOCK_REQUEST_HEADERS":     headersFile,
+			"MOCK_REQUEST_BODY":        bodyFile,
+		})
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
 
 		return &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
-    }
+	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}

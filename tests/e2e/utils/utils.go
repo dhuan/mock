@@ -241,13 +241,15 @@ func RunTest(
 	configurationFilePath,
 	method,
 	route string,
+    headers map[string]string,
+    body string,
 	assertionFunc func(t *testing.T, response []byte),
 ) {
 	killMock, _ := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
-	responseBody := Request(mockConfig, method, route, "", map[string]string{})
+	responseBody := Request(mockConfig, method, route, body, headers)
 
 	assertionFunc(t, responseBody.Body)
 }

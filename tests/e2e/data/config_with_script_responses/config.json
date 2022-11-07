@@ -4,6 +4,16 @@
       "route": "foo/bar",
       "method": "GET",
       "response": "sh:handler.sh"
+    },
+    {
+      "route": "foo/bar/2",
+      "method": "GET",
+      "response": "sh:print_request_details.sh"
+    },
+    {
+      "route": "foo/bar/3",
+      "method": "POST",
+      "response": "sh:print_request_details_with_payload.sh"
     }
   ]
 }

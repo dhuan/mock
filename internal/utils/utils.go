@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"os/exec"
 	"regexp"
 	"sort"
@@ -193,4 +194,40 @@ func ToCommandParams(command string) (string, []string) {
 	}
 
 	return commandSplit[0], commandSplit[1:]
+}
+
+func ParseEnv(env map[string]string) []string {
+	result := make([]string, len(env))
+	keys := GetKeys(env)
+
+	for i, key := range keys {
+		result[i] = fmt.Sprintf("%s=%s", key, env[key])
+	}
+
+	return result
+}
+
+func ToHeadersText(headers http.Header) string {
+	textLines := make([]string, len(headers))
+	headerKeys := GetSortedKeys(headers)
+
+	for i, headerKey := range headerKeys {
+		textLines[i] = fmt.Sprintf("%s: %s", headerKey, strings.Join(headers[headerKey], ","))
+	}
+
+	return strings.Join(textLines, "\n")
+}
+
+func CreateTempFile(content string) (string, error) {
+	mktempResult, err := exec.Command("mktemp").Output()
+	if err != nil {
+		return "", err
+	}
+    fileName := strings.TrimSuffix(string(mktempResult), "\n")
+
+	if err = os.WriteFile(fileName, []byte(content), 0644); err != nil {
+        return "", err
+    }
+
+	return fileName, err
 }
