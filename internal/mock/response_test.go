@@ -38,7 +38,7 @@ type execMock struct {
 	testifymock.Mock
 }
 
-func (this *execMock) Exec(command string) (*mock.ExecResult, error) {
+func (this *execMock) Exec(command string, headers map[string]string) (*mock.ExecResult, error) {
 	return &mock.ExecResult{}, nil
 }
 
