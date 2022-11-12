@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/dhuan/mock/internal/record"
@@ -210,22 +211,55 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
+		responseStatusCodeFile, err := utils.CreateTempFile("")
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		responseHeadersFile, err := utils.CreateTempFile("")
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
 		execResult, err := exec(fmt.Sprintf(
 			"sh %s",
 			scriptFilePath,
 		), map[string]string{
-			"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
-			"MOCK_REQUEST_ENDPOINT":    endpoint,
-			"MOCK_REQUEST_METHOD":      request.Method,
-			"MOCK_REQUEST_QUERYSTRING": querystring,
-			"MOCK_REQUEST_HEADERS":     headersFile,
-			"MOCK_REQUEST_BODY":        bodyFile,
+			"MOCK_REQUEST_URL":          fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
+			"MOCK_REQUEST_ENDPOINT":     endpoint,
+			"MOCK_REQUEST_METHOD":       request.Method,
+			"MOCK_REQUEST_QUERYSTRING":  querystring,
+			"MOCK_REQUEST_HEADERS":      headersFile,
+			"MOCK_REQUEST_BODY":         bodyFile,
+			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
+			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
 		})
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		return &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		extraHeaders, err := extractHeadersFromFile(responseHeadersFile, readFile)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		extraHeadersKeys := utils.GetSortedKeys(extraHeaders)
+		for _, headerKey := range extraHeadersKeys {
+			headers[headerKey] = extraHeaders[headerKey]
+		}
+
+		statusCode, err := extractStatusCodeFromFile(responseStatusCodeFile, readFile)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		response := &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}
+
+		if statusCode != -1 {
+			response.StatusCode = statusCode
+		}
+
+		return response, nil, errorMetadata
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
@@ -260,4 +294,64 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 	}
 
 	return types.Endpoint_content_type_plaintext
+}
+
+func extractHeadersFromFile(filePath string, readFile ReadFileFunc) (map[string]string, error) {
+	headers := make(map[string]string)
+
+	fileContent, err := readFile(filePath)
+
+	if err != nil {
+		return headers, err
+	}
+
+	fileContentText := utils.RemoveEmptyLines(string(fileContent))
+
+	if fileContentText == "" {
+		return headers, nil
+	}
+
+	headerLines := strings.Split(fileContentText, "\n")
+
+	for i := range headerLines {
+		headerKey, headerValue, ok := parseHeaderLine(headerLines[i])
+		if !ok {
+			continue
+		}
+
+		headers[headerKey] = headerValue
+	}
+
+	return headers, nil
+}
+
+func extractStatusCodeFromFile(filePath string, readFile ReadFileFunc) (int, error) {
+	fileContent, err := readFile(filePath)
+
+	if err != nil {
+		return -1, err
+	}
+
+	fileContentText := utils.RemoveEmptyLines(string(fileContent))
+
+	if fileContentText == "" {
+		return -1, nil
+	}
+
+	statusCodeParsed, err := strconv.Atoi(fileContentText)
+	if err != nil {
+		return -1, err
+	}
+
+	return statusCodeParsed, nil
+}
+
+func parseHeaderLine(text string) (string, string, bool) {
+	splitResult := strings.Split(text, ":")
+
+	if len(splitResult) < 2 {
+		return "", "", false
+	}
+
+	return splitResult[0], strings.Join(splitResult[1:], ":"), true
 }

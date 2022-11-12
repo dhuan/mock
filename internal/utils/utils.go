@@ -231,3 +231,24 @@ func CreateTempFile(content string) (string, error) {
 
 	return fileName, err
 }
+
+func RemoveEmptyLines(text string) string {
+	return FilterLines(text, HasText)
+}
+
+func HasText(text string) bool {
+	return strings.TrimSpace(text) != ""
+}
+
+func FilterLines(text string, filterFunc func(line string) bool) string {
+	linesFiltered := make([]string, 0)
+	lines := strings.Split(text, "\n")
+
+	for i := range lines {
+		if filterFunc(lines[i]) {
+			linesFiltered = append(linesFiltered, lines[i])
+		}
+	}
+
+	return strings.Join(linesFiltered, "\n")
+}

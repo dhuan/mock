@@ -141,6 +141,24 @@ The following environment variables can be read from in response shell scripts i
 - `MOCK_REQUEST_QUERYSTRING`: The Request's Querystring if it exists. (ex: `some_key=some_value&another_key=another_value`)
 - `MOCK_REQUEST_METHOD`: A string indicating the Request's Method.
 
+The environment variables above provide you with information about the Request that's being currently handled, the next ones enable you to further define the HTTP Response:
+
+- `MOCK_RESPONSE_STATUS_CODE`: A file that your handler can write to, to define the HTTP Status Code. 
+- `MOCK_RESPONSE_HEADERS`: A file that your handler can write to, to define the HTTP Headers.
+
+In the following example, we'll see what a Handler looks like, which responds with a simple `Hello world!` body content, a `201` Status Code and a few custom HTTP Headers.
+
+```sh
+echo Hello world!
+
+cat <<EOF > $MOCK_RESPONSE_HEADERS
+Some-Header-Key: Some Header Value
+Another-Header-Key: Another Header Value
+EOF
+
+echo 201 > $MOCK_RESPONSE_STATUS_CODE
+```
+
 ### Conditional Response
 
 You may want to define different responses for the same endpoint, based on certain conditions. The `response_if` parameter enables you to achieve that.

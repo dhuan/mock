@@ -24,8 +24,9 @@ type E2eState struct {
 }
 
 type Response struct {
-	Body    []byte
-	Headers map[string]string
+	Body       []byte
+	Headers    map[string]string
+	StatusCode int
 }
 
 func NewState() *E2eState {
@@ -116,8 +117,9 @@ func Request(config *mocklib.MockConfig, method, route, payload string, headers 
 	}
 
 	return &Response{
-		Body:    responseBody,
-		Headers: parseHeaders(response.Header),
+		Body:       responseBody,
+		Headers:    parseHeaders(response.Header),
+		StatusCode: response.StatusCode,
 	}
 }
 
@@ -241,33 +243,60 @@ func RunTest(
 	configurationFilePath,
 	method,
 	route string,
-    headers map[string]string,
-    body string,
-	assertionFunc func(t *testing.T, response []byte),
+	headers map[string]string,
+	body string,
+	assertionFunc ...func(t *testing.T, response *Response),
 ) {
 	killMock, _ := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
 	defer killMock()
 
 	mockConfig := mocklib.Init("localhost:4000")
-	responseBody := Request(mockConfig, method, route, body, headers)
+	response := Request(mockConfig, method, route, body, headers)
 
-	assertionFunc(t, responseBody.Body)
-}
-
-func StringMatches(expected string) func(t *testing.T, response []byte) {
-	return func(t *testing.T, responseBody []byte) {
-		assert.Equal(t, expected, string(responseBody))
+	for i := range assertionFunc {
+		assertionFunc[i](t, response)
 	}
 }
 
-func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response []byte) {
-	return func(t *testing.T, responseBody []byte) {
+func StringMatches(expected string) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
+		assert.Equal(t, expected, string(response.Body))
+	}
+}
+
+func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
+		assert.Equal(t, expectedStatusCode, response.StatusCode)
+	}
+}
+
+func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
+		expectedHeadersKeys := getSortedKeys(expectedHeaders)
+
+		for _, expectedHeaderKey := range expectedHeadersKeys {
+			headerValue, ok := response.Headers[expectedHeaderKey]
+			if !ok {
+				t.Error(
+					fmt.Sprintf("Header key does not exist in the resulting request: %s", expectedHeaderKey),
+				)
+
+				return
+			}
+
+			assert.Equal(t, expectedHeaders[expectedHeaderKey], headerValue)
+		}
+	}
+}
+
+func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
 		jsonEncodedA, err := json.Marshal(expectedJson)
 		if err != nil {
 			t.Fatal("Failed to parse JSON from expected input!")
 		}
 
-		jsonEncodedB, err := encodeJsonAgain(responseBody)
+		jsonEncodedB, err := encodeJsonAgain(response.Body)
 		if err != nil {
 			t.Fatal("Failed to parse JSON from response!")
 		}

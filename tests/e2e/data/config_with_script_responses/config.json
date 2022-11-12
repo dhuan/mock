@@ -14,6 +14,11 @@
       "route": "foo/bar/3",
       "method": "POST",
       "response": "sh:print_request_details_with_payload.sh"
+    },
+    {
+      "route": "foo/bar/4",
+      "method": "POST",
+      "response": "sh:handler_with_custom_headers_and_status_code.sh"
     }
   ]
 }

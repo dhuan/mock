@@ -91,3 +91,21 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables_WithPayload(t 
 This is the request payload.`),
 	)
 }
+
+func Test_E2E_Response_ShellScript_CustomHeadersAndStatusCode(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"POST",
+		"foo/bar/4",
+		nil,
+		"This is the request payload.",
+		StringMatches(`Hello world!
+`),
+		HeadersMatch(map[string]string{
+			"Some-Header-Key":    "Some Header Value",
+			"Another-Header-Key": "Another Header Value",
+		}),
+		StatusCodeMatches(201),
+	)
+}
