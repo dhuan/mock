@@ -52,7 +52,7 @@ func Test_E2E_Response_ShellScript(t *testing.T) {
 		"foo/bar",
 		nil,
 		"",
-		StringMatches("Hello world! This response was generated from a shell script.\n"),
+		StringMatches("Hello world! This response was generated from a shell script."),
 	)
 }
 
@@ -100,8 +100,7 @@ func Test_E2E_Response_ShellScript_CustomHeadersAndStatusCode(t *testing.T) {
 		"foo/bar/4",
 		nil,
 		"This is the request payload.",
-		StringMatches(`Hello world!
-`),
+		StringMatches(`Hello world!`),
 		HeadersMatch(map[string]string{
 			"Some-Header-Key":    "Some Header Value",
 			"Another-Header-Key": "Another Header Value",
