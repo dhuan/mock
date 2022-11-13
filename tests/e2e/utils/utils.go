@@ -29,6 +29,15 @@ type Response struct {
 	StatusCode int
 }
 
+func getTestPort() string {
+	port := os.Getenv("MOCK_TEST_PORT")
+	if port == "" {
+		port = "4000"
+	}
+
+	return port
+}
+
 func NewState() *E2eState {
 	state := &E2eState{
 		BinaryPath: fmt.Sprintf("%s/bin/mock", pwd()),
@@ -38,7 +47,7 @@ func NewState() *E2eState {
 }
 
 func RunMock(state *E2eState, command string) ([]byte, error) {
-	parseCommandVars(&command)
+	replaceVars(&command)
 	commandParameters := toCommandParameters(command)
 
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
@@ -52,8 +61,8 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 
 type KillMockFunc func()
 
-func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer) {
-	parseCommandVars(&command)
+func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig) {
+	replaceVars(&command)
 	commandParameters := toCommandParameters(command)
 
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
@@ -65,7 +74,7 @@ func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer) {
 		panic(err)
 	}
 
-	serverIsReady := waitForOutputInCommand("Starting server on port 4000.", 4, buf)
+	serverIsReady := waitForOutputInCommand("Starting server on port", 4, buf)
 	if !serverIsReady {
 		panic("Something went wrong while waiting for mock to start up.")
 	}
@@ -75,11 +84,11 @@ func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer) {
 		if err != nil {
 			panic(err)
 		}
-	}, buf
+	}, buf, mocklib.Init(fmt.Sprintf("localhost:%s", getTestPort()))
 }
 
 func MockAssert(assertConfig *mocklib.AssertConfig, serverOutput *bytes.Buffer) []mocklib.ValidationError {
-	mockConfig := mocklib.Init("localhost:4000")
+	mockConfig := mocklib.Init(fmt.Sprintf("localhost:%s", getTestPort()))
 	validationErrors, err := mocklib.Assert(mockConfig, assertConfig)
 	if err != nil {
 		log.Println("An error occurred. Here's the server output:")
@@ -165,10 +174,10 @@ func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.B
 	return false
 }
 
-func parseCommandVars(command *string) {
+func replaceVars(command *string) {
 	vars := map[string]string{
 		"TEST_DATA_PATH": fmt.Sprintf("%s/tests/e2e/data", pwd()),
-		"TEST_E2E_PORT":  "4000",
+		"TEST_E2E_PORT":  getTestPort(),
 	}
 
 	for key, value := range vars {
@@ -247,10 +256,9 @@ func RunTest(
 	body string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	killMock, _ := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
+	killMock, _, mockConfig := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
 	defer killMock()
 
-	mockConfig := mocklib.Init("localhost:4000")
 	response := Request(mockConfig, method, route, body, headers)
 
 	for i := range assertionFunc {
@@ -260,6 +268,8 @@ func RunTest(
 
 func StringMatches(expected string) func(t *testing.T, response *Response) {
 	return func(t *testing.T, response *Response) {
+		replaceVars(&expected)
+
 		assert.Equal(t, expected, string(response.Body))
 	}
 }

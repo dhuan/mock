@@ -67,7 +67,7 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) 
 			"Another-Header-Key": "Another-Header-Value",
 		},
 		"",
-		StringMatches(`URL: http://localhost:4000/foo/bar/2
+		StringMatches(`URL: http://localhost:{{TEST_E2E_PORT}}/foo/bar/2
 Endpoint: foo/bar/2
 Method: GET
 Querystring: some_key=some_value&another_key=another_value

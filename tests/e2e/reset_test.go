@@ -9,10 +9,9 @@ import (
 )
 
 func Test_E2E_Resetting(t *testing.T) {
-	killMock, serverOutput := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
 	defer killMock()
 
-	mockConfig := mocklib.Init("localhost:4000")
 	e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
