@@ -274,6 +274,24 @@ func StringMatches(expected string) func(t *testing.T, response *Response) {
 	}
 }
 
+func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
+		replaceVars(&expectedLine)
+
+		assert.Equal(t, expectedLine, getLineFromString(lineNumber-1, string(response.Body)))
+	}
+}
+
+func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
+		assert.Regexp(
+			t,
+			regexp.MustCompile(regex),
+			getLineFromString(lineNumber-1, string(response.Body)),
+		)
+	}
+}
+
 func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response) {
 	return func(t *testing.T, response *Response) {
 		assert.Equal(t, expectedStatusCode, response.StatusCode)
@@ -370,4 +388,14 @@ func IndexOf[T comparable](list []T, value T) int {
 	}
 
 	return -1
+}
+
+func getLineFromString(lineNumber int, str string) string {
+	lines := strings.Split(str, "\n")
+
+	if (len(lines) - 1) < lineNumber {
+		return ""
+	}
+
+	return lines[lineNumber]
 }

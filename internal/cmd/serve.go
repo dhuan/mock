@@ -40,10 +40,10 @@ var serveCmd = &cobra.Command{
 		prepareConfig(config)
 
 		endpointConfigErrors, err := mock.ValidateEndpointConfigs(
-            config.Endpoints,
-            readFile,
-            filepath.Dir(flagConfig),
-        )
+			config.Endpoints,
+			readFile,
+			filepath.Dir(flagConfig),
+		)
 		if err != nil {
 			panic(err)
 		}
@@ -141,8 +141,8 @@ func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigErr
 
 	if endpointConfigError.Code == mock.EndpointConfigErrorCode_FileUnreadable {
 		return fmt.Sprintf(
-            "The file provided for the endpoint's response is either unreadable or does not exist: %s",
-            endpointConfigError.Metadata["file_path"],
+			"The file provided for the endpoint's response is either unreadable or does not exist: %s",
+			endpointConfigError.Metadata["file_path"],
 		)
 	}
 
@@ -179,10 +179,11 @@ func readFile(name string) ([]byte, error) {
 func execute(command string, env map[string]string) (*mock.ExecResult, error) {
 	commandName, commandParams := utils.ToCommandParams(command)
 	cmd := exec.Command(commandName, commandParams...)
-    cmd.Env = os.Environ()
-    cmd.Env = append(cmd.Env, utils.ParseEnv(env)...)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, utils.ParseEnv(env)...)
 	out, err := cmd.CombinedOutput()
-	if err != nil {
+	hasOutput := len(out) > 0
+	if err != nil && !hasOutput {
 		return &mock.ExecResult{}, err
 	}
 

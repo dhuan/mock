@@ -67,7 +67,7 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) 
 			"Another-Header-Key": "Another-Header-Value",
 		},
 		"",
-		StringMatches(`URL: http://localhost:{{TEST_E2E_PORT}}/foo/bar/2
+		StringMatches(`URL: http://localhost:4000/foo/bar/2
 Endpoint: foo/bar/2
 Method: GET
 Querystring: some_key=some_value&another_key=another_value
@@ -106,5 +106,18 @@ func Test_E2E_Response_ShellScript_CustomHeadersAndStatusCode(t *testing.T) {
 			"Another-Header-Key": "Another Header Value",
 		}),
 		StatusCodeMatches(201),
+	)
+}
+
+func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"POST",
+		"foo/bar/5",
+		nil,
+		"This is the request payload.",
+		LineEquals(1, `Hello world!`),
+		LineRegexMatches(2, `tests/e2e/data/config_with_script_responses/handler_with_command_that_fails.sh: line 3: please_fail: command not found`),
 	)
 }

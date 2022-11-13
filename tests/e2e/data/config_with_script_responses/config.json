@@ -19,6 +19,11 @@
       "route": "foo/bar/4",
       "method": "POST",
       "response": "sh:handler_with_custom_headers_and_status_code.sh"
+    },
+    {
+      "route": "foo/bar/5",
+      "method": "POST",
+      "response": "sh:handler_with_command_that_fails.sh"
     }
   ]
 }
