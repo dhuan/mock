@@ -118,6 +118,6 @@ func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
 		nil,
 		"This is the request payload.",
 		LineEquals(1, `Hello world!`),
-		LineRegexMatches(2, `tests/e2e/data/config_with_script_responses/handler_with_command_that_fails.sh: line 3: please_fail: command not found`),
+		LineRegexMatches(2, `tests/e2e/data/config_with_script_responses/handler_with_command_that_fails.sh:.*3: please_fail:.* not found$`),
 	)
 }
