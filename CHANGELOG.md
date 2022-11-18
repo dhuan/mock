@@ -1,5 +1,14 @@
 # Changelog
 
+## Not released yet
+
+- Endpoint responses from shell scripts are now supported (with `sh:some_handler.sh`). Read the User Guide for more details;
+- `--cors` option added to facilitate usage with webapps;
+
+Minor stuff:
+
+- When trying to reference response files that do not exist, *mock* now prevents starting and shows error, failing gracefully.
+
 ## 0.1.4
 
 - The *mock* installable Go library has existed before this release but now it is documented in the User Guide. Add `github.com/dhuan/mock/pkg/mock` to your Go project and write tests with it.
