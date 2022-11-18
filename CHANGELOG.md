@@ -1,6 +1,6 @@
 # Changelog
 
-## Not released yet
+## 0.2.0
 
 - Endpoint responses from shell scripts are now supported (with `sh:some_handler.sh`). Read the User Guide for more details;
 - `--cors` option added to facilitate usage with webapps;
