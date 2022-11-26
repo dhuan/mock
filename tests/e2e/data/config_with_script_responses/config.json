@@ -23,6 +23,11 @@
     {
       "route": "foo/bar/5",
       "method": "POST",
+      "response": "sh:handler_with_parameters.sh foobar"
+    },
+    {
+      "route": "foo/bar/6",
+      "method": "POST",
       "response": "sh:handler_with_command_that_fails.sh"
     }
   ]

@@ -223,11 +223,11 @@ func CreateTempFile(content string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-    fileName := strings.TrimSuffix(string(mktempResult), "\n")
+	fileName := strings.TrimSuffix(string(mktempResult), "\n")
 
 	if err = os.WriteFile(fileName, []byte(content), 0644); err != nil {
-        return "", err
-    }
+		return "", err
+	}
 
 	return fileName, err
 }
@@ -251,4 +251,14 @@ func FilterLines(text string, filterFunc func(line string) bool) string {
 	}
 
 	return strings.Join(linesFiltered, "\n")
+}
+
+func GetWord(index int, str, fallback string) string {
+	splitResult := strings.Split(str, " ")
+
+	if (len(splitResult) - 1) < index {
+		return fallback
+	}
+
+	return splitResult[index]
 }

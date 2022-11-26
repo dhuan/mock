@@ -109,12 +109,24 @@ func Test_E2E_Response_ShellScript_CustomHeadersAndStatusCode(t *testing.T) {
 	)
 }
 
-func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
+func Test_E2E_Response_ShellScript_WithParameter(t *testing.T) {
 	RunTest(
 		t,
 		"config_with_script_responses/config.json",
 		"POST",
 		"foo/bar/5",
+		nil,
+		"This is the request payload.",
+        StringMatches(`Parameter: foobar`),
+	)
+}
+
+func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"POST",
+		"foo/bar/6",
 		nil,
 		"This is the request payload.",
 		LineEquals(1, `Hello world!`),

@@ -158,11 +158,11 @@ func getFileReferenceFromResponseObject(response types.EndpointConfigResponse) (
 		return "", false
 	}
 
-	return utils.ReplaceRegex(
+	return utils.GetWord(0, utils.ReplaceRegex(
 		responseStr,
 		[]string{"^file:", "^sh:"},
 		"",
-	), true
+	), ""), true
 }
 
 func hasConfigErrorMatching(
