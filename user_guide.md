@@ -155,7 +155,9 @@ The following environment variables can be read from in response shell scripts i
 - `MOCK_REQUEST_QUERYSTRING`: The Request's Querystring if it exists. (ex: `some_key=some_value&another_key=another_value`)
 - `MOCK_REQUEST_METHOD`: A string indicating the Request's Method.
 
-The environment variables above provide you with information about the Request that's being currently handled, the next ones enable you to further define the HTTP Response:
+Endpoint parameters can also be read from shell scripts. Suppose an endpoint exists as such: `user/{user_id}`. We could then retrieve the User ID parameter by reading the `MOCK_REQUEST_ENDPOINT_PARAM_USER_ID` environment variable.
+
+So far we've seen environment variables that provide us with information about the Request that's being currently handled. The following environment variables enable you to further define the HTTP Response:
 
 - `MOCK_RESPONSE_STATUS_CODE`: A file that your handler can write to, to define the HTTP Status Code. 
 - `MOCK_RESPONSE_HEADERS`: A file that your handler can write to, to define the HTTP Headers.

@@ -117,7 +117,7 @@ func Test_E2E_Response_ShellScript_WithParameter(t *testing.T) {
 		"foo/bar/5",
 		nil,
 		"This is the request payload.",
-        StringMatches(`Parameter: foobar`),
+		StringMatches(`Parameter: foobar`),
 	)
 }
 
@@ -131,5 +131,18 @@ func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
 		"This is the request payload.",
 		LineEquals(1, `Hello world!`),
 		LineRegexMatches(2, `tests/e2e/data/config_with_script_responses/handler_with_command_that_fails.sh:.*3: please_fail:.* not found$`),
+	)
+}
+
+func Test_E2E_Response_ShellScript_ReadingEndpointParams(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"GET",
+		"users/country/brazil/page/7",
+		nil,
+		"",
+		LineEquals(1, `Country: brazil`),
+		LineEquals(2, `Page: 7`),
 	)
 }

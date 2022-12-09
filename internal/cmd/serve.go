@@ -198,7 +198,16 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 		if err != nil {
 			panic(err)
 		}
-		response, err, errorMetadata := mock.ResolveEndpointResponse(readFile, execute, r, requestBody, state, endpointConfig)
+
+		response, err, errorMetadata := mock.ResolveEndpointResponse(
+			readFile,
+			execute,
+			r,
+			requestBody,
+			state,
+			endpointConfig,
+            getEndpointParams(r),
+		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
 			w.WriteHeader(400)
@@ -375,4 +384,15 @@ func setCorsHeaders(w http.ResponseWriter) {
 	w.Header().Add("Access-Control-Allow-Credentials", "true")
 	w.Header().Add("Access-Control-Allow-Headers", "*")
 	w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+}
+
+func getEndpointParams(r *http.Request) map[string]string {
+	params := make(map[string]string)
+	chiUrlParams := chi.RouteContext(r.Context()).URLParams
+
+	for i := range chiUrlParams.Keys {
+		params[chiUrlParams.Keys[i]] = chiUrlParams.Values[i]
+	}
+
+	return params
 }

@@ -29,6 +29,11 @@
       "route": "foo/bar/6",
       "method": "POST",
       "response": "sh:handler_with_command_that_fails.sh"
+    },
+    {
+      "route": "users/country/{user_country}/page/{page}",
+      "method": "GET",
+      "response": "sh:handler_get_users.sh"
     }
   ]
 }

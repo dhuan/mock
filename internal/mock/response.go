@@ -36,6 +36,7 @@ func ResolveEndpointResponse(
 	requestBody []byte,
 	state *types.State,
 	endpointConfig *types.EndpointConfig,
+	endpointParams map[string]string,
 ) (*Response, error, map[string]string) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
@@ -63,6 +64,7 @@ func ResolveEndpointResponse(
 			endpointConfig,
 			matchingResponseIf,
 			hasResponseIf,
+			endpointParams,
 		)
 	}
 
@@ -78,6 +80,7 @@ func ResolveEndpointResponse(
 		endpointConfig,
 		matchingResponseIf,
 		hasResponseIf,
+		endpointParams,
 	)
 }
 
@@ -150,6 +153,7 @@ func resolveEndpointResponseInternal(
 	endpointConfig *types.EndpointConfig,
 	responseIf *types.ResponseIf,
 	hasResponseIf bool,
+	endpointParams map[string]string,
 ) (*Response, error, map[string]string) {
 	errorMetadata := make(map[string]string)
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
@@ -221,10 +225,7 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		execResult, err := exec(fmt.Sprintf(
-			"sh %s",
-			scriptFilePath,
-		), map[string]string{
+		requestVariables := map[string]string{
 			"MOCK_REQUEST_URL":          fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
 			"MOCK_REQUEST_ENDPOINT":     endpoint,
 			"MOCK_REQUEST_METHOD":       request.Method,
@@ -233,7 +234,13 @@ func resolveEndpointResponseInternal(
 			"MOCK_REQUEST_BODY":         bodyFile,
 			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
 			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
-		})
+		}
+
+		if len(endpointParams) > 0 {
+			addUrlParamsToRequestVariables(requestVariables, endpointParams)
+		}
+
+		execResult, err := exec(fmt.Sprintf("sh %s", scriptFilePath), requestVariables)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -354,4 +361,14 @@ func parseHeaderLine(text string) (string, string, bool) {
 	}
 
 	return splitResult[0], strings.Join(splitResult[1:], ":"), true
+}
+
+func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]string) {
+	endpointParamKeys := utils.GetSortedKeys(endpointParams)
+
+	for _, key := range endpointParamKeys {
+		keyTransformed := fmt.Sprintf("MOCK_REQUEST_ENDPOINT_PARAM_%s", strings.ToUpper(key))
+
+		requestVariables[keyTransformed] = endpointParams[key]
+	}
 }
