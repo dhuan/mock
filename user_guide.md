@@ -51,7 +51,27 @@ The simplest endpoint configuration we can define looks like this:
 
 A `POST` HTTP Request to `/foo/bar` will respond you with `{"foo":"bar"}`, as can be seen in the `response` endpoint configuration parameter above.
 
-In the next sections we'll look at other ways how you can setup endpoints.
+Endpoint Routes can also be set with wildcards:
+
+```json
+ {
+   "endpoints": [
+     {
++      "route": "foo/bar/*",
+       "method": "POST",
+       "response": {
+         "foo": "bar"
+       }
+     }
+   ]
+ }
+```
+
+With the configuration above, requests such as `foo/bar/anything` and `/foo/bar/hello/world` will be responded by the same Endpoint.
+
+Besides wildcards, routes can have placeholder variables as well, such as `foo/bar/{some_variable}`. In order to read that variable and do something useful with it, you will need to [define shell scripts that act as handlers for your Endpoints.](#responses-from-shell-scripts)
+
+In the next sections we'll look at other ways of setting up endpoints.
 
 ### Response with headers
 

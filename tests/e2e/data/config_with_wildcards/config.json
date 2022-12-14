@@ -1,0 +1,14 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar/*",
+      "method": "GET",
+      "response": "Test 1."
+    },
+    {
+      "route": "user/{user_id}",
+      "method": "GET",
+      "response": "Test 2."
+    }
+  ]
+}
