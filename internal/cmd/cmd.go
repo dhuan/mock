@@ -21,6 +21,7 @@ var (
 	flagConfig string
 	flagPort   string
 	flagCors   bool
+	flagDelay  int64
 )
 
 var rootCmd = &cobra.Command{
@@ -35,6 +36,7 @@ func Execute() {
 	serveCmd.MarkPersistentFlagRequired("config")
 	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "3000", "port to listen on")
 	serveCmd.PersistentFlags().BoolVar(&flagCors, "cors", false, "enable CORS")
+	serveCmd.PersistentFlags().Int64VarP(&flagDelay, "delay", "d", 0, "configuration file")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

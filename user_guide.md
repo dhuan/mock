@@ -28,6 +28,8 @@
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
+- [Options Reference](#options-reference)
+  - [`-d` or `--delay`](#-d-or---delay)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -658,3 +660,15 @@ Makes Test Assertions, such as "endpoint X was called with Y payload.". The [Tes
 ### `POST __mock__/reset`
 
 Removes all Request Records that have been made so far. This has the same effect as stopping and starting *mock* over again. There are no parameters or payload fields to this endpoint.
+
+## Options Reference
+
+### `-d` or `--delay`
+
+Sets the amount of milliseconds that each request will wait before receiving a response. When not set, requests receive responses immediately.
+
+The following example configures *mock* to delay every request to 3 seconds:
+
+```
+$ mock -c /path/to/config.json --delay 3000
+```

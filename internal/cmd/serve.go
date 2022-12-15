@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"time"
 	"net/http"
 	"os"
 	"os/exec"
@@ -72,23 +73,23 @@ var serveCmd = &cobra.Command{
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
 			if endpointConfig.Method == "get" {
-				router.Get(route, newEndpointHandler(state, &endpointConfig, mockFs))
+				router.Get(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "post" {
-				router.Post(route, newEndpointHandler(state, &endpointConfig, mockFs))
+				router.Post(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "patch" {
-				router.Patch(route, newEndpointHandler(state, &endpointConfig, mockFs))
+				router.Patch(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "put" {
-				router.Put(route, newEndpointHandler(state, &endpointConfig, mockFs))
+				router.Put(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "delete" {
-				router.Delete(route, newEndpointHandler(state, &endpointConfig, mockFs))
+				router.Delete(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
 			}
 		}
 
@@ -192,7 +193,12 @@ func execute(command string, env map[string]string) (*mock.ExecResult, error) {
 	}, nil
 }
 
-func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig, mockFs types.MockFs) http.HandlerFunc {
+func newEndpointHandler(
+    state *types.State,
+    endpointConfig *types.EndpointConfig,
+    mockFs types.MockFs,
+    delay int64,
+) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestBody, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -240,6 +246,10 @@ func newEndpointHandler(state *types.State, endpointConfig *types.EndpointConfig
 		if err != nil {
 			panic(err)
 		}
+
+        if delay > 0 {
+            time.Sleep(time.Duration(delay) * time.Millisecond)
+        }
 
 		w.WriteHeader(response.StatusCode)
 		w.Write(response.Body)

@@ -399,3 +399,21 @@ func getLineFromString(lineNumber int, str string) string {
 
 	return lines[lineNumber]
 }
+
+func AssertTimeDifferenceLessThanSeconds(t *testing.T, timeA, timeB time.Time, seconds int) {
+	a := timeA.Unix()
+	b := timeB.Unix()
+
+	diffSeconds := int(b - a)
+
+	assert.Less(t, diffSeconds, seconds)
+}
+
+func AssertTimeDifferenceEqualOrMoreThanSeconds(t *testing.T, timeA, timeB time.Time, seconds int) {
+	a := timeA.Unix()
+	b := timeB.Unix()
+
+	diffSeconds := int(b - a)
+
+	assert.GreaterOrEqual(t, diffSeconds, seconds)
+}
