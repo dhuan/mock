@@ -29,6 +29,7 @@
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
 - [Options Reference](#options-reference)
+  - [`--cors`](#--cors)
   - [`-d` or `--delay`](#-d-or---delay)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -663,6 +664,14 @@ Removes all Request Records that have been made so far. This has the same effect
 
 ## Options Reference
 
+### `--cors`
+
+With `--cors` all HTTP Responses will include the necessary headers so that your browser does not complain about cross-origin requests.
+
+```
+$ mock serve -c /path/to/config.json --cors
+```
+
 ### `-d` or `--delay`
 
 Sets the amount of milliseconds that each request will wait before receiving a response. When not set, requests receive responses immediately.
@@ -670,5 +679,5 @@ Sets the amount of milliseconds that each request will wait before receiving a r
 The following example configures *mock* to delay every request to 3 seconds:
 
 ```
-$ mock -c /path/to/config.json --delay 3000
+$ mock serve -c /path/to/config.json --delay 3000
 ```
