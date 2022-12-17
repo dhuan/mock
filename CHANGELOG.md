@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Endpoint Routes can now contain wildcards or placeholder variables;
+- Shell Script Response Handlers now support params, such as: `"response": "sh:./my_shell_script.sh some_param another_param"`;
+- `--delay` option added enabling you to simulate slow APIs;
+
 ## 0.2.0
 
 - Endpoint responses from shell scripts are now supported (with `sh:some_handler.sh`). Read the User Guide for more details;
