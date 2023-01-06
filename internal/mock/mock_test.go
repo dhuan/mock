@@ -143,6 +143,17 @@ func Test_Validate_JsonBodyAssertion_Mismatch(t *testing.T) {
 	)
 }
 
+func Test_Validate_JsonBodyAssertion_Fail_RequestHasNoBody(t *testing.T) {
+	RunUnitTest(
+		t,
+		AddPostRequestRecordWithPayload("foobar", ``),
+		Validate("foobar", AssertOptionsWithData(ConditionType_JsonBodyMatch, map[string]interface{}{
+			"foo": "bar",
+		})),
+		ExpectOneValidationError(ValidationErrorCode_RequestHasNoBody, map[string]string{}),
+	)
+}
+
 func Test_Validate_Nth(t *testing.T) {
 	RunUnitTest(
 		t,

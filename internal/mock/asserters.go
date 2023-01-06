@@ -159,6 +159,15 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *Conditio
 func assertJsonBodyMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
+	if len(*requestRecord.Body) == 0 {
+		validationErrors = append(
+			validationErrors,
+			ValidationError{Code: ValidationErrorCode_RequestHasNoBody, Metadata: map[string]string{}},
+		)
+
+		return validationErrors, nil
+	}
+
 	var jsonResult map[string]interface{}
 	err := json.Unmarshal(*requestRecord.Body, &jsonResult)
 	if err != nil {
