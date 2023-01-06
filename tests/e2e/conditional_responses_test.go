@@ -12,8 +12,8 @@ func Test_E2E_ConditionalResponses_ReceivingDefaultResponse(t *testing.T) {
 		"config_with_conditional_response/config.json",
 		"POST",
 		"foo/bar",
-        nil,
-        "",
+		nil,
+		"",
 		StringMatches("This is the default response."),
 	)
 }
@@ -24,8 +24,8 @@ func Test_E2E_ConditionalResponses_ReceivingConditionalResponse(t *testing.T) {
 		"config_with_conditional_response/config.json",
 		"POST",
 		"foo/bar?key1=value1&key2=value2",
-        nil,
-        "",
+		nil,
+		"",
 		StringMatches("Hello world!"),
 	)
 }
@@ -36,8 +36,8 @@ func Test_E2E_ConditionalResponses_ReceivingConditionalResponse_WithAndChaining(
 		"config_with_conditional_response/config.json",
 		"POST",
 		"foo/bar?key1=value1&key2=value2&key4=value4",
-        nil,
-        "",
+		nil,
+		"",
 		StringMatches("Hello world! (Condition with AND chaining)"),
 	)
 }
@@ -48,8 +48,8 @@ func Test_E2E_ConditionalResponses_ReceivingConditionalResponse_WithOrChaining(t
 		"config_with_conditional_response/config.json",
 		"POST",
 		"foo/bar?key1=value1&key6=value6",
-        nil,
-        "",
+		nil,
+		"",
 		StringMatches("Hello world! (Condition with OR chaining)"),
 	)
 }

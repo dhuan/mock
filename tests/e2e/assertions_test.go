@@ -236,7 +236,7 @@ func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
 	assertMethods := []string{"post", "POST"}
 
 	for _, assertMethod := range assertMethods {
-        e2eutils.RequestApiReset(mockConfig)
+		e2eutils.RequestApiReset(mockConfig)
 		e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, map[string]string{})
 
 		validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{

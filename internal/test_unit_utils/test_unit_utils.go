@@ -144,7 +144,7 @@ func AssertOptionsWithKeyValues(assertType ConditionType, keyValues map[string]i
 
 func AssertOptionsWithData(assertType ConditionType, data map[string]interface{}) *Condition {
 	return &Condition{
-		Type: assertType,
+		Type:      assertType,
 		KeyValues: data,
 	}
 }

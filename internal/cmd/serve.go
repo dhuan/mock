@@ -7,13 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	"time"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/mockfs"
@@ -194,10 +194,10 @@ func execute(command string, env map[string]string) (*mock.ExecResult, error) {
 }
 
 func newEndpointHandler(
-    state *types.State,
-    endpointConfig *types.EndpointConfig,
-    mockFs types.MockFs,
-    delay int64,
+	state *types.State,
+	endpointConfig *types.EndpointConfig,
+	mockFs types.MockFs,
+	delay int64,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestBody, err := ioutil.ReadAll(r.Body)
@@ -212,7 +212,7 @@ func newEndpointHandler(
 			requestBody,
 			state,
 			endpointConfig,
-            getEndpointParams(r),
+			getEndpointParams(r),
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
@@ -247,9 +247,9 @@ func newEndpointHandler(
 			panic(err)
 		}
 
-        if delay > 0 {
-            time.Sleep(time.Duration(delay) * time.Millisecond)
-        }
+		if delay > 0 {
+			time.Sleep(time.Duration(delay) * time.Millisecond)
+		}
 
 		w.WriteHeader(response.StatusCode)
 		w.Write(response.Body)
