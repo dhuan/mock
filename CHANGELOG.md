@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+Bugs fixed:
+
+- Trying to assert with "Json Body" on a Request that didn't have any payload would result in 500 Status Code API Error;
+
 ## 0.3.0
 
 - Endpoint Routes can now contain wildcards or placeholder variables;
