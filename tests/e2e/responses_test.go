@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -67,8 +68,8 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) 
 			"Another-Header-Key": "Another-Header-Value",
 		},
 		"",
-		StringMatches(`Server Host: localhost:4000
-URL: http://localhost:4000/foo/bar/2
+		StringMatches(fmt.Sprintf(`Server Host: localhost:4000
+URL: http://localhost:%s/foo/bar/2
 Endpoint: foo/bar/2
 Method: GET
 Querystring: some_key=some_value&another_key=another_value
@@ -76,7 +77,7 @@ Headers:
 accept-encoding: gzip
 another-header-key: Another-Header-Value
 some-header-key: Some-Header-Value
-user-agent: Go-http-client/1.1`),
+user-agent: Go-http-client/1.1`, GetTestPort())),
 	)
 }
 

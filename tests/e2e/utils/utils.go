@@ -29,7 +29,7 @@ type Response struct {
 	StatusCode int
 }
 
-func getTestPort() string {
+func GetTestPort() string {
 	port := os.Getenv("MOCK_TEST_PORT")
 	if port == "" {
 		port = "4000"
@@ -84,11 +84,11 @@ func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer, *m
 		if err != nil {
 			panic(err)
 		}
-	}, buf, mocklib.Init(fmt.Sprintf("localhost:%s", getTestPort()))
+	}, buf, mocklib.Init(fmt.Sprintf("localhost:%s", GetTestPort()))
 }
 
 func MockAssert(assertConfig *mocklib.AssertConfig, serverOutput *bytes.Buffer) []mocklib.ValidationError {
-	mockConfig := mocklib.Init(fmt.Sprintf("localhost:%s", getTestPort()))
+	mockConfig := mocklib.Init(fmt.Sprintf("localhost:%s", GetTestPort()))
 	validationErrors, err := mocklib.Assert(mockConfig, assertConfig)
 	if err != nil {
 		log.Println("An error occurred. Here's the server output:")
@@ -177,7 +177,7 @@ func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.B
 func replaceVars(command *string) {
 	vars := map[string]string{
 		"TEST_DATA_PATH": fmt.Sprintf("%s/tests/e2e/data", pwd()),
-		"TEST_E2E_PORT":  getTestPort(),
+		"TEST_E2E_PORT":  GetTestPort(),
 	}
 
 	for key, value := range vars {
