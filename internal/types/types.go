@@ -9,6 +9,7 @@ import (
 )
 
 type State struct {
+	ListenPort                 string
 	RequestRecordDirectoryPath string
 	ConfigFolderPath           string
 }

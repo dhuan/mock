@@ -2,6 +2,10 @@
 
 ## Unreleased yet
 
+Additions:
+
+- New Request Handler Variable added: `MOCK_HOST` for retrieving the current host that the Mock server is listening on.
+
 Bugs fixed:
 
 - Trying to assert with "Json Body" on a Request that didn't have any payload would result in 500 Status Code API Error;

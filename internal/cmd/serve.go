@@ -65,6 +65,7 @@ var serveCmd = &cobra.Command{
 		state := &types.State{
 			RequestRecordDirectoryPath: tempDir,
 			ConfigFolderPath:           filepath.Dir(flagConfig),
+			ListenPort:                 flagPort,
 		}
 		mockFs := mockfs.MockFs{State: state}
 
