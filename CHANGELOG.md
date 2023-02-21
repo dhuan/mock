@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased yet
+## 0.4.0
 
 Additions:
 
