@@ -16,7 +16,7 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *Condition) ([
 	validationErrors := make([]ValidationError, 0)
 	keyValues := getKeyValuePairsFromAssertionOptions(assert)
 
-	for _, key := range utils.GetSortedKeys[interface{}](keyValues) {
+	for _, key := range utils.GetSortedKeys(keyValues) {
 		value := keyValues[key]
 
 		valueFromRequestRecord, ok := requestRecord.Headers[key]
@@ -71,7 +71,7 @@ func assertFormMatch(requestRecord *types.RequestRecord, assert *Condition) ([]V
 		panic(err)
 	}
 
-	for i, _ := range assert.KeyValues {
+	for i := range assert.KeyValues {
 		value, ok := parsedForm[i]
 		if !ok {
 			validationErrors = append(
@@ -109,7 +109,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *Conditio
 	validationErrors := make([]ValidationError, 0)
 
 	if requestRecord.Querystring == "" {
-		return []ValidationError{ValidationError{
+		return []ValidationError{{
 			Code:     ValidationErrorCode_RequestHasNoQuerystring,
 			Metadata: map[string]string{},
 		}}, nil
@@ -122,7 +122,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *Conditio
 
 	expectedKeyValuePairs := getKeyValuePairsFromAssertionOptions(assert)
 
-	for _, key := range utils.GetSortedKeys[interface{}](expectedKeyValuePairs) {
+	for _, key := range utils.GetSortedKeys(expectedKeyValuePairs) {
 		_, ok := parsedQuery[key]
 		if !ok {
 			validationErrors = append(
@@ -225,7 +225,7 @@ func parseForm(requestBody string) (map[string]string, error) {
 		return formValues, err
 	}
 
-	for i, _ := range values {
+	for i := range values {
 		formValues[i] = values[i][0]
 	}
 
@@ -255,14 +255,14 @@ func assertQuerystringExactMatch(requestRecord *types.RequestRecord, assert *Con
 		expectedKeys = append(expectedKeys, assert.Key)
 	}
 
-	for key, _ := range assert.KeyValues {
+	for key := range assert.KeyValues {
 		expectedKeys = append(expectedKeys, key)
 	}
 
-	for key, _ := range parsedQuery {
+	for key := range parsedQuery {
 		requestedKeys = append(requestedKeys, key)
 
-		if utils.IndexOf[string](expectedKeys, key) == -1 {
+		if utils.IndexOf(expectedKeys, key) == -1 {
 			missingKeys = append(missingKeys, key)
 		}
 	}

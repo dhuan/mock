@@ -95,7 +95,7 @@ func resolveResponseStatusCode(statusCode int) int {
 func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
 	matchingResponseIfs := make([]int, 0)
 
-	for responseIfKey, _ := range endpointConfig.ResponseIf {
+	for responseIfKey := range endpointConfig.ResponseIf {
 		responseIf := endpointConfig.ResponseIf[responseIfKey]
 		matches := resolveSingleResponseIf(requestRecord, responseIf.Condition)
 
@@ -158,13 +158,13 @@ func resolveEndpointResponseInternal(
 	errorMetadata := make(map[string]string)
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
 	headers := make(map[string]string)
-	utils.JoinMap[string, string](headers, endpointConfig.Headers)
-	utils.JoinMap[string, string](headers, endpointConfig.HeadersBase)
+	utils.JoinMap(headers, endpointConfig.Headers)
+	utils.JoinMap(headers, endpointConfig.HeadersBase)
 
 	if hasResponseIf {
 		headers = make(map[string]string)
-		utils.JoinMap[string, string](headers, endpointConfig.HeadersBase)
-		utils.JoinMap[string, string](headers, responseIf.Headers)
+		utils.JoinMap(headers, endpointConfig.HeadersBase)
+		utils.JoinMap(headers, responseIf.Headers)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {

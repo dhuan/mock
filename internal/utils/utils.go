@@ -30,7 +30,7 @@ func Unquote(subject string) string {
 }
 
 func ListsEqual[T comparable](listA []T, listB []T) bool {
-	for i, _ := range listA {
+	for i := range listA {
 		if listA[i] != listB[i] {
 			return false
 		}
@@ -44,8 +44,8 @@ func ListsEqualUnsorted[T comparable](listA, listB []T) bool {
 		return false
 	}
 
-	for i, _ := range listA {
-		if IndexOf[T](listB, listA[i]) == -1 {
+	for i := range listA {
+		if IndexOf(listB, listA[i]) == -1 {
 			return false
 		}
 	}
@@ -54,7 +54,7 @@ func ListsEqualUnsorted[T comparable](listA, listB []T) bool {
 }
 
 func IndexOf[T comparable](list []T, value T) int {
-	for i, _ := range list {
+	for i := range list {
 		if list[i] == value {
 			return i
 		}
@@ -104,7 +104,7 @@ func MapContains[K comparable, V comparable](m map[K]V, key K, value V) bool {
 }
 
 func AnyEquals[T comparable](list []T, value T) bool {
-	for i, _ := range list {
+	for i := range list {
 		if value == list[i] {
 			return true
 		}
@@ -118,7 +118,7 @@ func MarshalJsonHelper[T comparable](
 	errorMessage string,
 	value *T,
 ) ([]byte, error) {
-	for i, _ := range mapValues {
+	for i := range mapValues {
 		if *value == i {
 			return []byte(mapValues[i]), nil
 		}
@@ -135,7 +135,7 @@ func UnmarshalJsonHelper[T comparable](
 ) error {
 	assertTypeText := Unquote(string(data))
 
-	for key, _ := range mapValues {
+	for key := range mapValues {
 		if assertTypeText == mapValues[key] {
 			*value = key
 
@@ -152,7 +152,7 @@ func MapMapValueOnly[T_Key comparable, T_Value comparable, T_ValueB interface{}]
 ) map[T_Key]T_ValueB {
 	result := make(map[T_Key]T_ValueB)
 
-	for key, _ := range subject {
+	for key := range subject {
 		result[key] = transform(subject[key])
 	}
 
@@ -168,7 +168,7 @@ func WrapIn(wrapper string) func(subject string) string {
 func GetKeys[T_Key comparable, T_Value interface{}](subject map[T_Key]T_Value) []T_Key {
 	keys := make([]T_Key, 0, len(subject))
 
-	for key, _ := range subject {
+	for key := range subject {
 		keys = append(keys, key)
 	}
 
@@ -176,7 +176,7 @@ func GetKeys[T_Key comparable, T_Value interface{}](subject map[T_Key]T_Value) [
 }
 
 func GetSortedKeys[T interface{}](subject map[string]T) []string {
-	keys := GetKeys[string, T](subject)
+	keys := GetKeys(subject)
 	sort.Strings(keys)
 
 	return keys

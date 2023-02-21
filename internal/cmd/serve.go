@@ -69,7 +69,7 @@ var serveCmd = &cobra.Command{
 		}
 		mockFs := mockfs.MockFs{State: state}
 
-		for i, _ := range config.Endpoints {
+		for i := range config.Endpoints {
 			endpointConfig := config.Endpoints[i]
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
@@ -336,7 +336,7 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 }
 
 func addHeaders(w http.ResponseWriter, response *mock.Response) {
-	for headerKey, _ := range response.Headers {
+	for headerKey := range response.Headers {
 		w.Header().Add(headerKey, response.Headers[headerKey])
 	}
 }

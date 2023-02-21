@@ -82,7 +82,7 @@ func validateEndpointConfig(
 		}
 	}
 
-	if !utils.AnyEquals[string](available_http_methods, endpointConfig.Method) {
+	if !utils.AnyEquals(available_http_methods, endpointConfig.Method) {
 		endpointConfigErrors = append(endpointConfigErrors, EndpointConfigError{
 			EndpointIndex: endpointConfigIndex,
 			Code:          EndpointConfigErrorCode_InvalidMethod,
@@ -172,7 +172,7 @@ func hasConfigErrorMatching(
 	metadataValue string,
 ) bool {
 	for _, configError := range errors {
-		if configError.Code == errorCode && utils.MapContains[string, string](configError.Metadata, metadataKey, metadataValue) {
+		if configError.Code == errorCode && utils.MapContains(configError.Metadata, metadataKey, metadataValue) {
 			return true
 		}
 	}
@@ -187,7 +187,7 @@ func findDuplicates(
 ) []int {
 	duplicates := make([]int, 0)
 
-	for i, _ := range endpointConfigs {
+	for i := range endpointConfigs {
 		if i == endpointConfigIndex {
 			continue
 		}
