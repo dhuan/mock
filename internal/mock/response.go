@@ -201,7 +201,11 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		return &Response{
+			[]byte(utils.ReplaceVars(string(fileContent), requestVariables)),
+			endpointConfigContentType,
+			responseStatusCode,
+			headers}, nil, errorMetadata
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_shell {

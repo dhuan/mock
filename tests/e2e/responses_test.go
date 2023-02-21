@@ -166,3 +166,21 @@ func Test_E2E_Response_Json_UsingVariables(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
+	RunTest(
+		t,
+		"config_responses_using_variables/config.json",
+		"GET",
+		"response_json_using_variables/with_file",
+		nil,
+		"",
+		JsonMatches(map[string]interface{}{
+			"MOCK_HOST":                fmt.Sprintf("localhost:%s", GetTestPort()),
+			"MOCK_REQUEST_URL":         "http://localhost:4000/response_json_using_variables/with_file",
+			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables/with_file",
+			"MOCK_REQUEST_METHOD":      "GET",
+			"MOCK_REQUEST_QUERYSTRING": "",
+		}),
+	)
+}

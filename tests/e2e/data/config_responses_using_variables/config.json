@@ -10,6 +10,11 @@
         "MOCK_REQUEST_METHOD": "$MOCK_REQUEST_METHOD",
         "MOCK_REQUEST_QUERYSTRING": "$MOCK_REQUEST_QUERYSTRING"
       }
+    },
+    {
+      "route": "response_json_using_variables/with_file",
+      "method": "get",
+      "response": "file:response.json"
     }
   ]
 }
