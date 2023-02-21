@@ -5,6 +5,7 @@
 Additions:
 
 - New Request Handler Variable added: `MOCK_HOST` for retrieving the current host that the Mock server is listening on.
+- Enable JSON Responses to include environment variables, which previously could only be read by Shell Script responses.
 
 Bugs fixed:
 

@@ -175,6 +175,18 @@ func resolveEndpointResponseInternal(
 		return &Response{[]byte(utils.Unquote(string(response))), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
 
+	requestVariables, err := buildVars(
+		state,
+		endpointConfigContentType,
+		responseStatusCode,
+		requestRecord,
+		request,
+		requestBody,
+	)
+	if err != nil {
+		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+	}
+
 	if endpointConfigContentType == types.Endpoint_content_type_file {
 		responseFile := fmt.Sprintf(
 			"%s/%s",
@@ -199,17 +211,10 @@ func resolveEndpointResponseInternal(
 			strings.Replace(string(response), "sh:", "", -1),
 		)
 
-		protocol := "http://"
-		if request.TLS != nil {
-			protocol = "https://"
+		if len(endpointParams) > 0 {
+			addUrlParamsToRequestVariables(requestVariables, endpointParams)
 		}
 
-		endpoint := utils.ReplaceRegex(request.URL.Path, []string{"^/"}, "")
-		querystring := requestRecord.Querystring
-		headersFile, err := utils.CreateTempFile(utils.ToHeadersText(requestRecord.Headers))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
 		bodyFile, err := utils.CreateTempFile(string(requestBody))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
@@ -225,23 +230,19 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		mockHost := fmt.Sprintf("localhost:%s", state.ListenPort)
+		headersFile, err := utils.CreateTempFile(utils.ToHeadersText(requestRecord.Headers))
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
 
-		requestVariables := map[string]string{
-			"MOCK_HOST":                 mockHost,
-			"MOCK_REQUEST_URL":          fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
-			"MOCK_REQUEST_ENDPOINT":     endpoint,
-			"MOCK_REQUEST_METHOD":       request.Method,
-			"MOCK_REQUEST_QUERYSTRING":  querystring,
+		fileVars := map[string]string{
 			"MOCK_REQUEST_HEADERS":      headersFile,
 			"MOCK_REQUEST_BODY":         bodyFile,
 			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
 			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
 		}
 
-		if len(endpointParams) > 0 {
-			addUrlParamsToRequestVariables(requestVariables, endpointParams)
-		}
+		utils.JoinMap(requestVariables, fileVars)
 
 		execResult, err := exec(fmt.Sprintf("sh %s", scriptFilePath), requestVariables)
 		if err != nil {
@@ -284,7 +285,9 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		return &Response{jsonEncoded, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables))
+
+		return &Response{jsonEncodedModified, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
 
 	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, nil, errorMetadata
@@ -374,4 +377,29 @@ func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]
 
 		requestVariables[keyTransformed] = endpointParams[key]
 	}
+}
+
+func buildVars(
+	state *types.State,
+	endpointConfigContentType types.Endpoint_content_type,
+	responseStatusCode int,
+	requestRecord *types.RequestRecord,
+	request *http.Request,
+	requestBody []byte,
+) (map[string]string, error) {
+	endpoint := utils.ReplaceRegex(request.URL.Path, []string{"^/"}, "")
+	mockHost := fmt.Sprintf("localhost:%s", state.ListenPort)
+	querystring := requestRecord.Querystring
+	protocol := "http://"
+	if request.TLS != nil {
+		protocol = "https://"
+	}
+
+	return map[string]string{
+		"MOCK_HOST":                mockHost,
+		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
+		"MOCK_REQUEST_ENDPOINT":    endpoint,
+		"MOCK_REQUEST_METHOD":      request.Method,
+		"MOCK_REQUEST_QUERYSTRING": querystring,
+	}, nil
 }

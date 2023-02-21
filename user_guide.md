@@ -10,6 +10,8 @@
   - [File-based response content](#file-based-response-content)
   - [Responses from Shell scripts](#responses-from-shell-scripts)
     - [Environment Variables for Request Handlers](#environment-variables-for-request-handlers)
+      - [Endpoint Parameters](#endpoint-parameters)
+      - [Response Files that can be written to by shell scripts](#response-files-that-can-be-written-to-by-shell-scripts)
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
     - [Headers in Conditional Responses](#headers-in-conditional-responses)
@@ -169,7 +171,7 @@ To further customize your script handlers, you may also pass parameters, just li
 
 #### Environment Variables for Request Handlers
 
-The following environment variables can be read from in response shell scripts in order to obtain information about the current request:
+A set of environment variables can be read from in response shell scripts in order to obtain useful information about the current request. Static responses (such as JSON) also have access to the same variables. Reading them is done through writing the variable name prefixed with a "$" - for example `$MOCK_REQUEST_URL`. The following are the variables avaiable:
 
 - `MOCK_REQUEST_URL`: The full URL. (ex: `http://localhost/foo/bar`)
 - `MOCK_REQUEST_ENDPOINT`: The endpoint extracted from the URL. (ex: `foo/bar`)
@@ -182,7 +184,11 @@ The following environment variables provide other general information not relate
 
 - `MOCK_HOST`: The hostname + port combination to which Mock is currently listening. (ex: `localhost:3000`)
 
+##### Endpoint Parameters
+
 Endpoint parameters can also be read from shell scripts. Suppose an endpoint exists as such: `user/{user_id}`. We could then retrieve the User ID parameter by reading the `MOCK_REQUEST_ENDPOINT_PARAM_USER_ID` environment variable.
+
+##### Response Files that can be written to by shell scripts
 
 So far we've seen environment variables that provide us with information about the Request that's being currently handled. The following environment variables enable you to further define the HTTP Response:
 
