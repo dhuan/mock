@@ -1,0 +1,13 @@
+{
+  "endpoints": [
+    {
+      "route": "with/headers",
+      "method": "GET",
+      "response": "testing!",
+      "response_headers": {
+          "Some-Header-Key": "Some header value",
+          "Another-Header-Key": "Another header value"
+      }
+    }
+  ]
+}
