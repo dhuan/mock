@@ -5,8 +5,8 @@
       "method": "GET",
       "response": "testing!",
       "response_headers": {
-          "Some-Header-Key": "Some header value",
-          "Another-Header-Key": "Another header value"
+        "Some-Header-Key": "Some header value",
+        "Another-Header-Key": "Another header value"
       }
     },
     {
@@ -14,13 +14,41 @@
       "method": "GET",
       "response": "testing!",
       "response_headers_base": {
-          "Base-Header-One": "A base header",
-          "Base-Header-Two": "Another base header"
+        "Base-Header-One": "A base header",
+        "Base-Header-Two": "Another base header"
       },
       "response_headers": {
-          "Some-Header-Key": "Some header value",
-          "Another-Header-Key": "Another header value"
+        "Some-Header-Key": "Some header value",
+        "Another-Header-Key": "Another header value"
       }
+    },
+    {
+      "route": "with/conditional/responses/and/base/headers",
+      "method": "GET",
+      "response": "testing!",
+      "response_headers_base": {
+        "Base-Header-One": "A base header",
+        "Base-Header-Two": "Another base header"
+      },
+      "response_headers": {
+        "Some-Header-Key": "Some header value",
+        "Another-Header-Key": "Another header value"
+      },
+      "response_if": [
+        {
+          "response": "Congratulations!",
+          "response_headers": {
+            "Header-For-Conditional-Response-One": "Some header value",
+            "Header-For-Conditional-Response-Two": "Another header value"
+          },
+          "condition": {
+            "type": "querystring_match",
+            "key_values": {
+              "some_key": "some_value"
+            }
+          }
+        }
+      ]
     }
   ]
 }

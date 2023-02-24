@@ -317,6 +317,20 @@ func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response
 	}
 }
 
+func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Response) {
+	return func(t *testing.T, response *Response) {
+		for _, headerKey := range headerKeys {
+			_, exists := response.Headers[headerKey]
+
+			if exists {
+				t.Error(
+					fmt.Sprintf("Expected header key to not exist, but it does: %s", headerKey),
+				)
+			}
+		}
+	}
+}
+
 func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response) {
 	return func(t *testing.T, response *Response) {
 		jsonEncodedA, err := json.Marshal(expectedJson)
