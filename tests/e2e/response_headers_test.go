@@ -20,3 +20,20 @@ func Test_E2E_ResponseWithHeaders(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_ResponseWithHeaders_AndBaseHeaders(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_headers/config.json",
+		"GET",
+		"with/headers/and/base/headers",
+		nil,
+		"",
+		HeadersMatch(map[string]string{
+			"Base-Header-One":    "A base header",
+			"Base-Header-Two":    "Another base header",
+			"Some-Header-Key":    "Some header value",
+			"Another-Header-Key": "Another header value",
+		}),
+	)
+}

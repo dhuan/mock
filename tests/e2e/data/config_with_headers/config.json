@@ -8,6 +8,19 @@
           "Some-Header-Key": "Some header value",
           "Another-Header-Key": "Another header value"
       }
+    },
+    {
+      "route": "with/headers/and/base/headers",
+      "method": "GET",
+      "response": "testing!",
+      "response_headers_base": {
+          "Base-Header-One": "A base header",
+          "Base-Header-Two": "Another base header"
+      },
+      "response_headers": {
+          "Some-Header-Key": "Some header value",
+          "Another-Header-Key": "Another header value"
+      }
     }
   ]
 }
