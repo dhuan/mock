@@ -26,6 +26,6 @@ func Test_E2E_RequestWithPlaceholderVariable(t *testing.T) {
 		"user/123",
 		nil,
 		"",
-		StringMatches("Test 2."),
+		StringMatches("User ID: 123"),
 	)
 }

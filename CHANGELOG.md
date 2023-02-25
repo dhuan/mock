@@ -14,6 +14,22 @@ Now: `MOCK_ROUTE_PARAM_FOO`
 
 Check the User Guide for more details.
 
+### Features
+
+- Route Parameters can be captured in the Response string. Before, the parameters could only be read by Shell Scripts Responses. A response can now be set as follows:
+
+```json
+{
+  "endpoints": [
+    {
+      "route": "book/{book_name}",
+      "method": "GET",
+      "response": "file:./books/${book_name}.txt"
+    }
+  ]
+}
+```
+
 ## 0.4.0
 
 Additions:

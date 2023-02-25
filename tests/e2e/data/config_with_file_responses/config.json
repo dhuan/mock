@@ -14,6 +14,11 @@
       "route": "foo/bar/3",
       "method": "POST",
       "response": "file:response_b.json"
+    },
+    {
+      "route": "books/{book_name}/content",
+      "method": "GET",
+      "response": "file:./books/${book_name}.txt"
     }
   ]
 }

@@ -45,6 +45,28 @@ func Test_E2E_Response_JsonResponse(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_WithDynamicFileName(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"GET",
+		"books/i_robot/content",
+		nil,
+		"",
+		StringMatches("This is the book 'I, Robot'.\n"),
+	)
+
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"GET",
+		"books/nightfall/content",
+		nil,
+		"",
+		StringMatches("This is the book 'Nightfall'.\n"),
+	)
+}
+
 func Test_E2E_Response_ShellScript(t *testing.T) {
 	RunTest(
 		t,

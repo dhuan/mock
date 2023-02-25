@@ -124,7 +124,13 @@ func validateFiles(
 	errors := make([]EndpointConfigError, 0)
 
 	for i := range filePaths {
-		_, err := readFile(fmt.Sprintf("%s/%s", configDirPath, filePaths[i]))
+		filePath := filePaths[i]
+
+		if filePathIsDynamic(filePath) {
+			continue
+		}
+
+		_, err := readFile(fmt.Sprintf("%s/%s", configDirPath, filePath))
 		if err != nil {
 			errors = append(errors, EndpointConfigError{
 				Code:          EndpointConfigErrorCode_FileUnreadable,
@@ -137,6 +143,10 @@ func validateFiles(
 	}
 
 	return errors, nil
+}
+
+func filePathIsDynamic(filePath string) bool {
+	return strings.Contains(filePath, "${") && strings.Contains(filePath, "}")
 }
 
 func getFileReferences(endpointConfig *types.EndpointConfig) []string {

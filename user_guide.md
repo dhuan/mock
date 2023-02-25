@@ -8,6 +8,7 @@
   - [Response with headers](#response-with-headers)
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
+  - [Route Parameters](#route-parameters)
   - [Responses from Shell scripts](#responses-from-shell-scripts)
     - [Environment Variables for Request Handlers](#environment-variables-for-request-handlers)
       - [Route Parameters - Reading from Shell Scripts](#route-parameters---reading-from-shell-scripts)
@@ -136,6 +137,40 @@ In the earlier example, `response` is a JSON object containing the response JSON
 ```
 
 Given the configuration above, the `foo/bar` endpoint's response is defined in the `response_foobar.json` file.
+
+### Route Parameters
+
+Route Parameters are named route segments that can be captured as values when defining Responses.
+
+```json
+{
+  "endpoints": [
+    {
+      "route": "books/search/author/{author_name}/year/{year}",
+      "method": "GET",
+      "response": "You're searching for books written by ${author_name} in ${year}."
+    }
+  ]
+}
+```
+
+With the endpoint configuration above, a request sent to `books/search/author/asimov/year/1980` would result in the following response: `You're searching for books written by asimov in 1980.`
+
+Besides static responses as exemplified, all kinds of responses can read Route Parameters - a response file name can be dynamic based on a parameter:
+
+```json
+{
+  "endpoints": [
+    {
+      "route": "book/{book_name}",
+      "method": "GET",
+      "response": "file:./books/${book_name}.txt"
+    }
+  ]
+}
+```
+
+> Route Parameters can also be read by Shell-Script Responses. [Read more about it in its own guide section.](#route-parameters---reading-from-shell-scripts)
 
 ### Responses from Shell scripts
 

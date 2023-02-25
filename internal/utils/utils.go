@@ -263,11 +263,15 @@ func GetWord(index int, str, fallback string) string {
 	return splitResult[index]
 }
 
-func ReplaceVars(text string, vars map[string]string) string {
+func ReplaceVars(
+	text string,
+	vars map[string]string,
+	toVarPlaceholder func(varName string) string,
+) string {
 	result := fmt.Sprintf("%s", text)
 
 	for varName, varValue := range vars {
-		currentSearch := fmt.Sprintf("\\$%s", varName)
+		currentSearch := toVarPlaceholder(varName)
 
 		result = ReplaceRegex(result, []string{
 			currentSearch,
@@ -275,4 +279,12 @@ func ReplaceVars(text string, vars map[string]string) string {
 	}
 
 	return result
+}
+
+func ToDolarSignVariablePlaceHolder(varName string) string {
+	return fmt.Sprintf("\\$%s", varName)
+}
+
+func ToDolarSignWithWrapVariablePlaceHolder(varName string) string {
+	return fmt.Sprintf("\\${%s}", varName)
 }

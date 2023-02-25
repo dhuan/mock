@@ -160,6 +160,7 @@ func resolveEndpointResponseInternal(
 	headers := make(map[string]string)
 	utils.JoinMap(headers, endpointConfig.Headers)
 	utils.JoinMap(headers, endpointConfig.HeadersBase)
+	responseStr := utils.ReplaceVars(string(response), endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
 
 	if hasResponseIf {
 		headers = make(map[string]string)
@@ -172,7 +173,7 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
-		return &Response{[]byte(utils.Unquote(string(response))), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		return &Response{[]byte(utils.Unquote(responseStr)), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
 
 	requestVariables, err := buildVars(
@@ -191,7 +192,7 @@ func resolveEndpointResponseInternal(
 		responseFile := fmt.Sprintf(
 			"%s/%s",
 			state.ConfigFolderPath,
-			strings.Replace(string(response), "file:", "", -1),
+			strings.Replace(responseStr, "file:", "", -1),
 		)
 		fileContent, err := readFile(responseFile)
 		if errors.Is(err, ErrResponseFileDoesNotExist) {
@@ -202,7 +203,7 @@ func resolveEndpointResponseInternal(
 		}
 
 		return &Response{
-			[]byte(utils.ReplaceVars(string(fileContent), requestVariables)),
+			[]byte(utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignVariablePlaceHolder)),
 			endpointConfigContentType,
 			responseStatusCode,
 			headers}, nil, errorMetadata
@@ -212,7 +213,7 @@ func resolveEndpointResponseInternal(
 		scriptFilePath := fmt.Sprintf(
 			"%s/%s",
 			state.ConfigFolderPath,
-			strings.Replace(string(response), "sh:", "", -1),
+			strings.Replace(responseStr, "sh:", "", -1),
 		)
 
 		if len(endpointParams) > 0 {
@@ -279,7 +280,7 @@ func resolveEndpointResponseInternal(
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
-		err := json.Unmarshal(response, &jsonParsed)
+		err := json.Unmarshal([]byte(responseStr), &jsonParsed)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -289,7 +290,7 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables))
+		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables, utils.ToDolarSignVariablePlaceHolder))
 
 		return &Response{jsonEncodedModified, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
