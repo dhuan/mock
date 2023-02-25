@@ -10,7 +10,7 @@
   - [File-based response content](#file-based-response-content)
   - [Responses from Shell scripts](#responses-from-shell-scripts)
     - [Environment Variables for Request Handlers](#environment-variables-for-request-handlers)
-      - [Endpoint Parameters](#endpoint-parameters)
+      - [Route Parameters - Reading from Shell Scripts](#route-parameters---reading-from-shell-scripts)
       - [Response Files that can be written to by shell scripts](#response-files-that-can-be-written-to-by-shell-scripts)
   - [Conditional Response](#conditional-response)
     - [Condition Chaining](#condition-chaining)
@@ -184,9 +184,9 @@ The following environment variables provide other general information not relate
 
 - `MOCK_HOST`: The hostname + port combination to which Mock is currently listening. (ex: `localhost:3000`)
 
-##### Endpoint Parameters
+##### Route Parameters - Reading from Shell Scripts
 
-Endpoint parameters can also be read from shell scripts. Suppose an endpoint exists as such: `user/{user_id}`. We could then retrieve the User ID parameter by reading the `MOCK_REQUEST_ENDPOINT_PARAM_USER_ID` environment variable.
+Route Parameters can be read from shell scripts. Suppose an endpoint exists as such: `user/{user_id}`. We could then retrieve the User ID parameter by reading the `MOCK_ROUTE_PARAM_USER_ID` environment variable.
 
 ##### Response Files that can be written to by shell scripts
 

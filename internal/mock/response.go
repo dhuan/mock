@@ -377,7 +377,7 @@ func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]
 	endpointParamKeys := utils.GetSortedKeys(endpointParams)
 
 	for _, key := range endpointParamKeys {
-		keyTransformed := fmt.Sprintf("MOCK_REQUEST_ENDPOINT_PARAM_%s", strings.ToUpper(key))
+		keyTransformed := fmt.Sprintf("MOCK_ROUTE_PARAM_%s", strings.ToUpper(key))
 
 		requestVariables[keyTransformed] = endpointParams[key]
 	}

@@ -1,5 +1,19 @@
 # Changelog
 
+## Not released yet
+
+### Breaking changes
+
+- "Endpoint Parameters" has been renamed to "Route Parameters"
+
+Example - reading a parameter named `foo`:
+
+Before: `MOCK_REQUEST_ENDPOINT_PARAM_FOO`
+
+Now: `MOCK_ROUTE_PARAM_FOO`
+
+Check the User Guide for more details.
+
 ## 0.4.0
 
 Additions:
