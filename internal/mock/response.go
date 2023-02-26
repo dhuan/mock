@@ -203,7 +203,7 @@ func resolveEndpointResponseInternal(
 		}
 
 		return &Response{
-			[]byte(utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignVariablePlaceHolder)),
+			[]byte(utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)),
 			endpointConfigContentType,
 			responseStatusCode,
 			headers}, nil, errorMetadata
@@ -314,7 +314,7 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables, utils.ToDolarSignVariablePlaceHolder))
+		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder))
 
 		return &Response{jsonEncodedModified, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}

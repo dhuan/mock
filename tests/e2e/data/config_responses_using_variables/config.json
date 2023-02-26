@@ -4,11 +4,11 @@
       "route": "response_json_using_variables",
       "method": "get",
       "response": {
-        "MOCK_HOST": "$MOCK_HOST",
-        "MOCK_REQUEST_URL": "$MOCK_REQUEST_URL",
-        "MOCK_REQUEST_ENDPOINT": "$MOCK_REQUEST_ENDPOINT",
-        "MOCK_REQUEST_METHOD": "$MOCK_REQUEST_METHOD",
-        "MOCK_REQUEST_QUERYSTRING": "$MOCK_REQUEST_QUERYSTRING"
+        "MOCK_HOST": "${MOCK_HOST}",
+        "MOCK_REQUEST_URL": "${MOCK_REQUEST_URL}",
+        "MOCK_REQUEST_ENDPOINT": "${MOCK_REQUEST_ENDPOINT}",
+        "MOCK_REQUEST_METHOD": "${MOCK_REQUEST_METHOD}",
+        "MOCK_REQUEST_QUERYSTRING": "${MOCK_REQUEST_QUERYSTRING}"
       }
     },
     {
