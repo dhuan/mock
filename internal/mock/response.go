@@ -294,6 +294,8 @@ func resolveEndpointResponseInternal(
 
 		fileContent, err := readFile(filePath)
 		if err != nil {
+			errorMetadata["file"] = fileRequested
+
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 

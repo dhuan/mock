@@ -17,3 +17,15 @@ func Test_E2E_Response_Fileserver(t *testing.T) {
 		StringMatches("Hello world!\n"),
 	)
 }
+
+func Test_E2E_Response_Fileserver_UnexistingFile(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_static_files/config.json",
+		"GET",
+		"foo/bar/this_file_does_not_exist.txt",
+		nil,
+		"",
+		StringMatches("File does not exist: this_file_does_not_exist.txt"),
+	)
+}
