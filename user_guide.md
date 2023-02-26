@@ -172,6 +172,24 @@ Besides static responses as exemplified, all kinds of responses can read Route P
 
 > Route Parameters can also be read by Shell-Script Responses. [Read more about it in its own guide section.](#route-parameters---reading-from-shell-scripts)
 
+### Serving static files
+
+Static files can easily be served. Suppose we have a folder named `public` where the static files we wish to serve are located.
+
+```json
+{
+  "endpoints": [
+    {
+      "route": "static/*",
+      "method": "GET",
+      "response": "fs:./public"
+    }
+  ]
+}
+```
+
+In the example above, we configured the route "static" to serve files located in the `public` folder. Let's say a file exists located in `public/foobar.html`, then it can be accessed through the URL `/static/foobar.html`.
+
 ### Responses from Shell scripts
 
 You can write shell scripts that will act as "handlers" for your API's Requests (or Controllers if you like to think in terms of the MVC pattern.)

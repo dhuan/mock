@@ -60,6 +60,12 @@ func (this *EndpointConfigResponse) UnmarshalJSON(data []byte) (err error) {
 		return nil
 	}
 
+	if utils.BeginsWith(string(data), `"fs:`) {
+		*this = []byte(utils.Unquote(string(data)))
+
+		return nil
+	}
+
 	if strings.Index(string(data), "{") == 0 {
 		*this = data
 
@@ -76,6 +82,7 @@ type Endpoint_content_type int
 const (
 	Endpoint_content_type_file Endpoint_content_type = iota
 	Endpoint_content_type_shell
+	Endpoint_content_type_fileserver
 	Endpoint_content_type_json
 	Endpoint_content_type_plaintext
 	Endpoint_content_type_unknown

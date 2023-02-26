@@ -1,0 +1,9 @@
+{
+  "endpoints": [
+    {
+      "route": "foo/bar/*",
+      "method": "GET",
+      "response": "fs:./public"
+    }
+  ]
+}

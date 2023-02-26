@@ -30,6 +30,8 @@ Check the User Guide for more details.
 }
 ```
 
+- Static files support, with `fs:./path/to/files`
+
 ## 0.4.0
 
 Additions:

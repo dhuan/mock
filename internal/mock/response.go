@@ -278,6 +278,28 @@ func resolveEndpointResponseInternal(
 		return response, nil, errorMetadata
 	}
 
+	if endpointConfigContentType == types.Endpoint_content_type_fileserver {
+		staticFilesPath := fmt.Sprintf(
+			"%s/%s",
+			state.ConfigFolderPath,
+			strings.Replace(responseStr, "fs:", "", -1),
+		)
+
+		fileRequested, ok := endpointParams["*"]
+		if !ok {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errors.New("Failed to capture file name."), errorMetadata
+		}
+
+		filePath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)
+
+		fileContent, err := readFile(filePath)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+	}
+
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
 		err := json.Unmarshal([]byte(responseStr), &jsonParsed)
@@ -305,6 +327,10 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 
 	if utils.BeginsWith(string(response), "sh:") {
 		return types.Endpoint_content_type_shell
+	}
+
+	if utils.BeginsWith(string(response), "fs:") {
+		return types.Endpoint_content_type_fileserver
 	}
 
 	if utils.BeginsWith(string(response), "{") {
