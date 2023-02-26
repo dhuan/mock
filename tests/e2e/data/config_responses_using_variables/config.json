@@ -15,6 +15,11 @@
       "route": "response_json_using_variables/with_file",
       "method": "get",
       "response": "file:response.json"
+    },
+    {
+      "route": "response_json_reading_route_params/{var_a}/{var_b}",
+      "method": "get",
+      "response": "file:response_reading_route_params.json"
     }
   ]
 }

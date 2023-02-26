@@ -206,3 +206,18 @@ func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_Response_Json_ReadingRouteParams_WithFile(t *testing.T) {
+	RunTest(
+		t,
+		"config_responses_using_variables/config.json",
+		"GET",
+		"response_json_reading_route_params/foo/bar",
+		nil,
+		"",
+		JsonMatches(map[string]interface{}{
+			"var_a": "foo",
+			"var_b": "bar",
+		}),
+	)
+}

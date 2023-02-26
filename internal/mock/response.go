@@ -202,8 +202,11 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
+		responseContent := utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
+		responseContent = utils.ReplaceVars(responseContent, endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
+
 		return &Response{
-			[]byte(utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)),
+			[]byte(responseContent),
 			endpointConfigContentType,
 			responseStatusCode,
 			headers}, nil, errorMetadata
