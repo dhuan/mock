@@ -217,7 +217,7 @@ func newEndpointHandler(
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
-			w.WriteHeader(400)
+			w.WriteHeader(404)
 			w.Write([]byte(fmt.Sprintf(
 				"File does not exist: %s",
 				errorMetadata["file"],

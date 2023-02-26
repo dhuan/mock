@@ -14,6 +14,7 @@ func Test_E2E_Response_Fileserver(t *testing.T) {
 		"foo/bar/hello.txt",
 		nil,
 		"",
+		StatusCodeMatches(200),
 		StringMatches("Hello world!\n"),
 	)
 }
@@ -26,6 +27,7 @@ func Test_E2E_Response_Fileserver_UnexistingFile(t *testing.T) {
 		"foo/bar/this_file_does_not_exist.txt",
 		nil,
 		"",
+		StatusCodeMatches(404),
 		StringMatches("File does not exist: this_file_does_not_exist.txt"),
 	)
 }
