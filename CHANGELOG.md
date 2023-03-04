@@ -1,6 +1,6 @@
 # Changelog
 
-## Not released yet
+## 0.5.0
 
 ### Breaking changes
 
