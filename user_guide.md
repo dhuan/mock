@@ -9,6 +9,7 @@
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
   - [Route Parameters](#route-parameters)
+  - [Serving static files](#serving-static-files)
   - [Responses from Shell scripts](#responses-from-shell-scripts)
     - [Environment Variables for Request Handlers](#environment-variables-for-request-handlers)
       - [Route Parameters - Reading from Shell Scripts](#route-parameters---reading-from-shell-scripts)
