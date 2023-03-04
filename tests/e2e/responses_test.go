@@ -230,6 +230,47 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		"with_no_method_defined",
 		nil,
 		"",
+		StatusCodeMatches(200),
 		StringMatches("Hello world."),
+	)
+
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"POST",
+		"with_no_method_defined",
+		nil,
+		"",
+		StatusCodeMatches(405),
+	)
+
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"PUT",
+		"with_no_method_defined",
+		nil,
+		"",
+		StatusCodeMatches(405),
+	)
+
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"DELETE",
+		"with_no_method_defined",
+		nil,
+		"",
+		StatusCodeMatches(405),
+	)
+
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"PATCH",
+		"with_no_method_defined",
+		nil,
+		"",
+		StatusCodeMatches(405),
 	)
 }
