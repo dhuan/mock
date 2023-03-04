@@ -73,7 +73,7 @@ var serveCmd = &cobra.Command{
 			endpointConfig := config.Endpoints[i]
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
-			if endpointConfig.Method == "get" {
+			if endpointConfig.Method == "get" || endpointConfig.Method == "" {
 				router.Get(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
 			}
 

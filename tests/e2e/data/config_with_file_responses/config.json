@@ -19,6 +19,10 @@
       "route": "books/{book_name}/content",
       "method": "GET",
       "response": "file:./books/${book_name}.txt"
+    },
+    {
+      "route": "with_no_method_defined",
+      "response": "Hello world."
     }
   ]
 }

@@ -14,7 +14,7 @@ Now: `MOCK_ROUTE_PARAM_FOO`
 
 Check the User Guide for more details.
 
-### Features
+### Features & enhancements
 
 - Route Parameters can be captured in the Response string. Before, the parameters could only be read by Shell Scripts Responses. A response can now be set as follows:
 
@@ -30,7 +30,8 @@ Check the User Guide for more details.
 }
 ```
 
-- Static files support, with `fs:./path/to/files`
+- Static files support, with `fs:./path/to/files`;
+- Endpoints can be configured without any HTTP Method - it will default to `GET`;
 
 ## 0.4.0
 

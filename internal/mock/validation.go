@@ -82,7 +82,7 @@ func validateEndpointConfig(
 		}
 	}
 
-	if !utils.AnyEquals(available_http_methods, endpointConfig.Method) {
+	if !utils.AnyEquals(available_http_methods, endpointConfig.Method) && endpointConfig.Method != "" {
 		endpointConfigErrors = append(endpointConfigErrors, EndpointConfigError{
 			EndpointIndex: endpointConfigIndex,
 			Code:          EndpointConfigErrorCode_InvalidMethod,

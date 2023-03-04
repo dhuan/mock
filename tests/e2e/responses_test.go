@@ -221,3 +221,15 @@ func Test_E2E_Response_Json_ReadingRouteParams_WithFile(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_file_responses/config.json",
+		"GET",
+		"with_no_method_defined",
+		nil,
+		"",
+		StringMatches("Hello world."),
+	)
+}
