@@ -5,6 +5,7 @@
       "method": "get",
       "response": {
         "MOCK_HOST": "${MOCK_HOST}",
+        "MOCK_REQUEST_HOST": "${MOCK_REQUEST_HOST}",
         "MOCK_REQUEST_URL": "${MOCK_REQUEST_URL}",
         "MOCK_REQUEST_ENDPOINT": "${MOCK_REQUEST_ENDPOINT}",
         "MOCK_REQUEST_METHOD": "${MOCK_REQUEST_METHOD}",

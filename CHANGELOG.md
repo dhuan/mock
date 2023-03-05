@@ -5,6 +5,7 @@
 ADDED
 
 - Responses can now read environment variables. Previously only shell-script responses had that ability - now any kind of response, either file or static text can achieve the same. Check *Reading Environment Variables* in the User Guide.
+- New variable added to read current request's host `MOCK_REQUEST_HOST`.
 
 ## 0.5.0
 

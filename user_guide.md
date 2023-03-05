@@ -252,6 +252,7 @@ A set of environment variables can be read from in response shell scripts in ord
 
 - `MOCK_REQUEST_URL`: The full URL. (ex: `http://localhost/foo/bar`)
 - `MOCK_REQUEST_ENDPOINT`: The endpoint extracted from the URL. (ex: `foo/bar`)
+- `MOCK_REQUEST_HOST`: The hostname + port combination that the request was sent to. (ex: `example.com:3000`)
 - `MOCK_REQUEST_HEADERS`: A file path containing all HTTP Headers.
 - `MOCK_REQUEST_BODY`: A file path containing the Request's Body (if one exists, otherwise this will be an empty file.)
 - `MOCK_REQUEST_QUERYSTRING`: The Request's Querystring if it exists. (ex: `some_key=some_value&another_key=another_value`)

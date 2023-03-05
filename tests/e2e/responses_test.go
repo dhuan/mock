@@ -91,6 +91,7 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) 
 		},
 		"",
 		StringMatches(fmt.Sprintf(`Server Host: localhost:4000
+Request Host: localhost:%s
 URL: http://localhost:%s/foo/bar/2
 Endpoint: foo/bar/2
 Method: GET
@@ -99,7 +100,7 @@ Headers:
 accept-encoding: gzip
 another-header-key: Another-Header-Value
 some-header-key: Some-Header-Value
-user-agent: Go-http-client/1.1`, GetTestPort())),
+user-agent: Go-http-client/1.1`, GetTestPort(), GetTestPort())),
 	)
 }
 
@@ -181,7 +182,8 @@ func Test_E2E_Response_Json_UsingVariables(t *testing.T) {
 		"",
 		JsonMatches(map[string]interface{}{
 			"MOCK_HOST":                fmt.Sprintf("localhost:%s", GetTestPort()),
-			"MOCK_REQUEST_URL":         "http://localhost:4000/response_json_using_variables",
+			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
+			"MOCK_REQUEST_URL":         fmt.Sprintf("http://localhost:%s/response_json_using_variables", GetTestPort()),
 			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables",
 			"MOCK_REQUEST_METHOD":      "GET",
 			"MOCK_REQUEST_QUERYSTRING": "",
@@ -199,6 +201,7 @@ func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 		"",
 		JsonMatches(map[string]interface{}{
 			"MOCK_HOST":                fmt.Sprintf("localhost:%s", GetTestPort()),
+			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
 			"MOCK_REQUEST_URL":         "http://localhost:4000/response_json_using_variables/with_file",
 			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables/with_file",
 			"MOCK_REQUEST_METHOD":      "GET",

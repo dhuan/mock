@@ -433,6 +433,7 @@ func buildVars(
 
 	return map[string]string{
 		"MOCK_HOST":                mockHost,
+		"MOCK_REQUEST_HOST":        request.Host,
 		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
 		"MOCK_REQUEST_ENDPOINT":    endpoint,
 		"MOCK_REQUEST_METHOD":      request.Method,
