@@ -1,0 +1,1 @@
+The value of FOO is: ${FOO}.

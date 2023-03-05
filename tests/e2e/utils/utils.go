@@ -61,7 +61,7 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 
 type KillMockFunc func()
 
-func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig) {
+func RunMockBg(state *E2eState, command string, env map[string]string) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig) {
 	replaceVars(&command)
 	commandParameters := toCommandParameters(command)
 
@@ -69,6 +69,8 @@ func RunMockBg(state *E2eState, command string) (KillMockFunc, *bytes.Buffer, *m
 	buf := &bytes.Buffer{}
 	cmd.Stdout = buf
 	cmd.Stderr = buf
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, parseEnv(env)...)
 	err := cmd.Start()
 	if err != nil {
 		panic(err)
@@ -256,7 +258,33 @@ func RunTest(
 	body string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	killMock, _, mockConfig := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath))
+	RunTestBase(t, configurationFilePath, method, route, headers, body, nil, assertionFunc...)
+}
+
+func RunTestWithEnv(
+	t *testing.T,
+	configurationFilePath,
+	method,
+	route string,
+	headers map[string]string,
+	body string,
+	env map[string]string,
+	assertionFunc ...func(t *testing.T, response *Response),
+) {
+	RunTestBase(t, configurationFilePath, method, route, headers, body, env, assertionFunc...)
+}
+
+func RunTestBase(
+	t *testing.T,
+	configurationFilePath,
+	method,
+	route string,
+	headers map[string]string,
+	body string,
+	env map[string]string,
+	assertionFunc ...func(t *testing.T, response *Response),
+) {
+	killMock, _, mockConfig := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath), env)
 	defer killMock()
 
 	response := Request(mockConfig, method, route, body, headers)
@@ -430,4 +458,15 @@ func AssertTimeDifferenceEqualOrMoreThanSeconds(t *testing.T, timeA, timeB time.
 	diffSeconds := int(b - a)
 
 	assert.GreaterOrEqual(t, diffSeconds, seconds)
+}
+
+func parseEnv(env map[string]string) []string {
+	result := make([]string, len(env))
+	keys := GetKeys(env)
+
+	for i, key := range keys {
+		result[i] = fmt.Sprintf("%s=%s", key, env[key])
+	}
+
+	return result
 }

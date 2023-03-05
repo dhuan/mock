@@ -20,6 +20,28 @@
       "route": "response_json_reading_route_params/{var_a}/{var_b}",
       "method": "get",
       "response": "file:response_reading_route_params.json"
+    },
+    {
+      "route": "reading/env/vars/text",
+      "method": "get",
+      "response": "The value of FOO is: ${FOO}."
+    },
+    {
+      "route": "reading/env/vars/text_file",
+      "method": "get",
+      "response": "file:response_reading_env_vars.txt"
+    },
+    {
+      "route": "reading/env/vars/json",
+      "method": "get",
+      "response": {
+          "FOO": "${FOO}"
+      }
+    },
+    {
+      "route": "reading/env/vars/json_file",
+      "method": "get",
+      "response": "file:response_reading_env_vars.json"
     }
   ]
 }

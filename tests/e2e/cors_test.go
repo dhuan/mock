@@ -8,7 +8,11 @@ import (
 )
 
 func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
-	killMock, _, mockConfig := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}} --cors")
+	killMock, _, mockConfig := e2eutils.RunMockBg(
+		e2eutils.NewState(),
+		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}} --cors",
+		nil,
+	)
 	defer killMock()
 
 	response := e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
@@ -22,7 +26,11 @@ func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
 }
 
 func Test_E2E_Cors_HeadersAreNotSet(t *testing.T) {
-	killMock, _, mockConfig := e2eutils.RunMockBg(e2eutils.NewState(), "serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}")
+	killMock, _, mockConfig := e2eutils.RunMockBg(
+		e2eutils.NewState(),
+		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
+		nil,
+	)
 	defer killMock()
 
 	response := e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)

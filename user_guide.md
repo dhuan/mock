@@ -9,6 +9,7 @@
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
   - [Route Parameters](#route-parameters)
+  - [Reading Environment Variables](#reading-environment-variables)
   - [Serving static files](#serving-static-files)
   - [Responses from Shell scripts](#responses-from-shell-scripts)
     - [Environment Variables for Request Handlers](#environment-variables-for-request-handlers)
@@ -172,6 +173,28 @@ Besides static responses as exemplified, all kinds of responses can read Route P
 ```
 
 > Route Parameters can also be read by Shell-Script Responses. [Read more about it in its own guide section.](#route-parameters---reading-from-shell-scripts)
+
+### Reading Environment Variables
+
+Responses can include any environment variable. The following example starts up *mock* with a custom environment variable and includes its variable in an endpoint's response.
+
+```sh
+$ FOO=BAR mock serve -c path/to/config.json
+```
+
+And then the configuration file:
+
+```json
+{
+  "endpoints": [
+    {
+      "route": "foo/bar",
+      "method": "GET",
+      "response": "The value of 'FOO' is ${FOO}."
+    }
+  ]
+}
+```
 
 ### Serving static files
 

@@ -206,6 +206,10 @@ func newEndpointHandler(
 			panic(err)
 		}
 
+		endpointParams := getAllEnvVars()
+
+		utils.JoinMap(endpointParams, getEndpointParams(r))
+
 		response, err, errorMetadata := mock.ResolveEndpointResponse(
 			readFile,
 			execute,
@@ -213,7 +217,7 @@ func newEndpointHandler(
 			requestBody,
 			state,
 			endpointConfig,
-			getEndpointParams(r),
+			endpointParams,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
@@ -406,4 +410,22 @@ func getEndpointParams(r *http.Request) map[string]string {
 	}
 
 	return params
+}
+
+func getAllEnvVars() map[string]string {
+	result := make(map[string]string)
+	envPairs := os.Environ()
+	envKeys := make([]string, len(envPairs))
+
+	for i := range envPairs {
+		envKeys[i] = utils.ReplaceRegex(envPairs[i], []string{
+			"=.*$",
+		}, "")
+	}
+
+	for i := range envKeys {
+		result[envKeys[i]] = os.Getenv(envKeys[i])
+	}
+
+	return result
 }
