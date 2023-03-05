@@ -1,6 +1,6 @@
 # Changelog
 
-## Not released yet
+## 0.6.0
 
 ADDED
 
