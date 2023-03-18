@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- Responses with `exec:<SHELL COMMAND>` is now supported.
+
 ## 0.6.0
 
 ADDED
