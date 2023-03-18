@@ -24,18 +24,18 @@ func Test_ToCommandStrings_WithQuotes(t *testing.T) {
 		expected []string
 	}
 
-    tcs := []testCase{
+	tcs := []testCase{
 		{"echo 'foo bar'", []string{"echo", "foo bar"}},
 		{"echo \"foo bar\"", []string{"echo", "foo bar"}},
 		{"echo 'foo' bar", []string{"echo", "foo", "bar"}},
 		{"echo \"foo\" bar", []string{"echo", "foo", "bar"}},
 	}
 
-    for _, tc := range tcs {
-        assert.Equal(
-            t,
-            tc.expected,
-            utils.ToCommandStrings(tc.command),
-        )
-    }
+	for _, tc := range tcs {
+		assert.Equal(
+			t,
+			tc.expected,
+			utils.ToCommandStrings(tc.command),
+		)
+	}
 }
