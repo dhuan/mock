@@ -179,7 +179,8 @@ func readFile(name string) ([]byte, error) {
 }
 
 func execute(command string, env map[string]string) (*mock.ExecResult, error) {
-	commandName, commandParams := utils.ToCommandParams(command)
+	commandStrings := utils.ToCommandStrings(command)
+	commandName, commandParams := utils.ToCommandParams(commandStrings)
 	cmd := exec.Command(commandName, commandParams...)
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, utils.ParseEnv(env)...)

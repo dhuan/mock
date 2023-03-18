@@ -38,7 +38,7 @@
     {
       "route": "with/exec",
       "method": "GET",
-      "response": "exec:/usr/bin/printf 'Hello world!'"
+      "response": "exec:printf 'Hello world!'"
     }
   ]
 }
