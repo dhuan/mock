@@ -244,7 +244,7 @@ To further customize your script handlers, you may also pass parameters, just li
  }
 ```
 
-Alternatively, shell commands can be set for responses as one-liners with the `exec` helper, not requiring you to create a shell script file. The endpoint below responds with a list of the current folder (`ls-la`):
+Alternatively, shell commands can be set as one-liners with `exec` instead of `sh`, not requiring you to create a shell script file. As an example, the endpoint below responds with a list of files of the current folder (`ls -la`):
 
 ```diff
  {
