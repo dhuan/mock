@@ -288,3 +288,18 @@ func ToDolarSignVariablePlaceHolder(varName string) string {
 func ToDolarSignWithWrapVariablePlaceHolder(varName string) string {
 	return fmt.Sprintf("\\${%s}", varName)
 }
+
+func ToCommandStrings(command string) []string {
+    result := make([]string, 0, 0)
+    current := ""
+
+    for _, char := range command {
+        if char == ' ' {
+            result = append(result, current)
+        }
+
+        current = fmt.Sprintf("%s%s", current, string(char))
+    }
+
+    return result
+}

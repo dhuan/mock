@@ -34,6 +34,11 @@
       "route": "users/country/{user_country}/page/{page}",
       "method": "GET",
       "response": "sh:handler_get_users.sh"
+    },
+    {
+      "route": "with/exec",
+      "method": "GET",
+      "response": "exec:/usr/bin/printf 'Hello world!'"
     }
   ]
 }

@@ -223,7 +223,6 @@ You can write shell scripts that will act as "handlers" for your API's Requests 
   "endpoints": [
     {
       "route": "foo/bar",
-      "method": "POST",
       "response": "sh:./my_shell_script.sh"
     }
   ]
@@ -239,8 +238,20 @@ To further customize your script handlers, you may also pass parameters, just li
    "endpoints": [
      {
        "route": "foo/bar",
-       "method": "POST",
 +      "response": "sh:./my_shell_script.sh some_param another_param"
+     }
+   ]
+ }
+```
+
+Alternatively, shell commands can be set for responses as one-liners with the `exec` helper, not requiring you to create a shell script file. The endpoint below responds with a list of the current folder (`ls-la`):
+
+```diff
+ {
+   "endpoints": [
+     {
+       "route": "foo/bar",
++      "response": "exec:ls -la"
      }
    ]
  }
