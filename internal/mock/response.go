@@ -281,6 +281,71 @@ func resolveEndpointResponseInternal(
 		return response, nil, errorMetadata
 	}
 
+	if endpointConfigContentType == types.Endpoint_content_type_exec {
+		execCommand := strings.Replace(responseStr, "exec:", "", -1)
+
+		if len(endpointParams) > 0 {
+			addUrlParamsToRequestVariables(requestVariables, endpointParams)
+		}
+
+		bodyFile, err := utils.CreateTempFile(string(requestBody))
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		responseStatusCodeFile, err := utils.CreateTempFile("")
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		responseHeadersFile, err := utils.CreateTempFile("")
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		headersFile, err := utils.CreateTempFile(utils.ToHeadersText(requestRecord.Headers))
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		fileVars := map[string]string{
+			"MOCK_REQUEST_HEADERS":      headersFile,
+			"MOCK_REQUEST_BODY":         bodyFile,
+			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
+			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
+		}
+
+		utils.JoinMap(requestVariables, fileVars)
+
+		execResult, err := exec(execCommand, requestVariables)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		extraHeaders, err := extractHeadersFromFile(responseHeadersFile, readFile)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		extraHeadersKeys := utils.GetSortedKeys(extraHeaders)
+		for _, headerKey := range extraHeadersKeys {
+			headers[headerKey] = extraHeaders[headerKey]
+		}
+
+		statusCode, err := extractStatusCodeFromFile(responseStatusCodeFile, readFile)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		response := &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}
+
+		if statusCode != -1 {
+			response.StatusCode = statusCode
+		}
+
+		return response, nil, errorMetadata
+	}
+
 	if endpointConfigContentType == types.Endpoint_content_type_fileserver {
 		staticFilesPath := fmt.Sprintf(
 			"%s/%s",
@@ -332,6 +397,10 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 
 	if utils.BeginsWith(string(response), "sh:") {
 		return types.Endpoint_content_type_shell
+	}
+
+	if utils.BeginsWith(string(response), "exec:") {
+		return types.Endpoint_content_type_exec
 	}
 
 	if utils.BeginsWith(string(response), "fs:") {

@@ -277,3 +277,15 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		StatusCodeMatches(405),
 	)
 }
+
+func Test_E2E_Response_Exec(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"GET",
+		"with/exec",
+		nil,
+		"",
+		StringMatches("Hello world!"),
+	)
+}
