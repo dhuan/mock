@@ -44,6 +44,11 @@
       "route": "with/exec/with/pipe",
       "method": "GET",
       "response": "exec:printf '!dlrow olleH' | rev"
+    },
+    {
+      "route": "with/exec/with/env/var",
+      "method": "GET",
+      "response": "exec:printf 'foo: %s' $FOO"
     }
   ]
 }

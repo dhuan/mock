@@ -301,3 +301,18 @@ func Test_E2E_Response_Exec_WithPipe(t *testing.T) {
 		StringMatches("Hello world!"),
 	)
 }
+
+func Test_E2E_Response_Exec_WithEnvVariable(t *testing.T) {
+	RunTestWithEnv(
+		t,
+		"config_with_script_responses/config.json",
+		"GET",
+		"with/exec/with/env/var",
+		nil,
+		"",
+		map[string]string{
+			"FOO": "bar",
+		},
+		StringMatches("foo: bar"),
+	)
+}
