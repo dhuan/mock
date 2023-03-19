@@ -257,6 +257,19 @@ Alternatively, shell commands can be set as one-liners with `exec` instead of `s
  }
 ```
 
+You can use more advanced shell functionalities within `exec`, such as pipes. Let's set an endpoint that returns the amount of files that exist on the home folder:
+
+```diff
+ {
+   "endpoints": [
+     {
+       "route": "foo/bar",
++      "response": "exec:ls ~ | wc -l"
+     }
+   ]
+ }
+```
+
 #### Environment Variables for Request Handlers
 
 A set of environment variables can be read from in response shell scripts in order to obtain useful information about the current request. Static responses (such as JSON) also have access to the same variables. Reading them is done through writing the variable name prefixed with a "$" - for example `$MOCK_REQUEST_URL`. The following are the variables avaiable:

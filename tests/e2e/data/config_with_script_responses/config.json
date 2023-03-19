@@ -39,6 +39,11 @@
       "route": "with/exec",
       "method": "GET",
       "response": "exec:printf 'Hello world!'"
+    },
+    {
+      "route": "with/exec/with/pipe",
+      "method": "GET",
+      "response": "exec:printf '!dlrow olleH' | rev"
     }
   ]
 }

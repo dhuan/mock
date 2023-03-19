@@ -283,6 +283,10 @@ func resolveEndpointResponseInternal(
 
 	if endpointConfigContentType == types.Endpoint_content_type_exec {
 		execCommand := strings.Replace(responseStr, "exec:", "", -1)
+		tempShellScriptFile, err := utils.CreateTempFile(execCommand)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
 
 		if len(endpointParams) > 0 {
 			addUrlParamsToRequestVariables(requestVariables, endpointParams)
@@ -317,7 +321,7 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		execResult, err := exec(execCommand, requestVariables)
+		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), requestVariables)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
