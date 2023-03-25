@@ -36,6 +36,7 @@ func ResolveEndpointResponse(
 	requestBody []byte,
 	state *types.State,
 	endpointConfig *types.EndpointConfig,
+	envVars map[string]string,
 	endpointParams map[string]string,
 ) (*Response, error, map[string]string) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
@@ -64,6 +65,7 @@ func ResolveEndpointResponse(
 			endpointConfig,
 			matchingResponseIf,
 			hasResponseIf,
+			envVars,
 			endpointParams,
 		)
 	}
@@ -80,6 +82,7 @@ func ResolveEndpointResponse(
 		endpointConfig,
 		matchingResponseIf,
 		hasResponseIf,
+		envVars,
 		endpointParams,
 	)
 }
@@ -153,6 +156,7 @@ func resolveEndpointResponseInternal(
 	endpointConfig *types.EndpointConfig,
 	responseIf *types.ResponseIf,
 	hasResponseIf bool,
+	envVars map[string]string,
 	endpointParams map[string]string,
 ) (*Response, error, map[string]string) {
 	errorMetadata := make(map[string]string)
@@ -161,6 +165,7 @@ func resolveEndpointResponseInternal(
 	utils.JoinMap(headers, endpointConfig.Headers)
 	utils.JoinMap(headers, endpointConfig.HeadersBase)
 	responseStr := utils.ReplaceVars(string(response), endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
+	responseStr = utils.ReplaceVars(responseStr, envVars, utils.ToDolarSignWithWrapVariablePlaceHolder)
 
 	if hasResponseIf {
 		headers = make(map[string]string)
@@ -204,6 +209,7 @@ func resolveEndpointResponseInternal(
 
 		responseContent := utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
 		responseContent = utils.ReplaceVars(responseContent, endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
+		responseContent = utils.ReplaceVars(responseContent, envVars, utils.ToDolarSignWithWrapVariablePlaceHolder)
 
 		return &Response{
 			[]byte(responseContent),

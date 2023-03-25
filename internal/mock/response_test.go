@@ -60,6 +60,7 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -92,6 +93,7 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -128,6 +130,7 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -161,6 +164,7 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(t, 200, response.StatusCode)
@@ -184,6 +188,7 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -227,6 +232,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -281,6 +287,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -340,6 +347,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -398,6 +406,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -453,6 +462,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -516,6 +526,7 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -565,6 +576,7 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -600,6 +612,7 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -633,6 +646,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -683,6 +697,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 		&state,
 		&endpointConfig,
 		map[string]string{},
+		map[string]string{},
 	)
 
 	assert.Equal(
@@ -731,6 +746,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 
@@ -787,6 +803,7 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		requestBody,
 		&state,
 		&endpointConfig,
+		map[string]string{},
 		map[string]string{},
 	)
 

@@ -207,9 +207,8 @@ func newEndpointHandler(
 			panic(err)
 		}
 
-		endpointParams := getAllEnvVars()
-
-		utils.JoinMap(endpointParams, getEndpointParams(r))
+		envVars := getAllEnvVars()
+		endpointParams := getEndpointParams(r)
 
 		response, err, errorMetadata := mock.ResolveEndpointResponse(
 			readFile,
@@ -218,6 +217,7 @@ func newEndpointHandler(
 			requestBody,
 			state,
 			endpointConfig,
+			envVars,
 			endpointParams,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
