@@ -316,3 +316,28 @@ func Test_E2E_Response_Exec_WithEnvVariable(t *testing.T) {
 		StringMatches("foo: bar"),
 	)
 }
+
+func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
+	RunTestWithEnv(
+		t,
+		"config_with_script_responses/config.json",
+		"GET",
+		"with/exec/print/env/with/param/bar?foo=bar",
+		nil,
+		"",
+		map[string]string{
+			"FOO": "bar",
+		},
+		LineEquals(1, fmt.Sprintf(`MOCK_HOST=localhost:%s`, GetTestPort())),
+		LineRegexMatches(2, `MOCK_REQUEST_BODY=.*`),
+		LineEquals(3, `MOCK_REQUEST_ENDPOINT=with/exec/print/env/with/param/bar`),
+		LineRegexMatches(4, `MOCK_REQUEST_HEADERS=.*`),
+		LineEquals(5, fmt.Sprintf(`MOCK_REQUEST_HOST=localhost:%s`, GetTestPort())),
+		LineEquals(6, `MOCK_REQUEST_METHOD=GET`),
+		LineEquals(7, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
+		LineEquals(8, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
+		LineRegexMatches(9, `MOCK_RESPONSE_HEADERS=.*`),
+		LineRegexMatches(10, `MOCK_RESPONSE_STATUS_CODE=.*`),
+		LineEquals(11, `MOCK_ROUTE_PARAM_FOO=bar`),
+	)
+}

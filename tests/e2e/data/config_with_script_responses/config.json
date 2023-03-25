@@ -49,6 +49,11 @@
       "route": "with/exec/with/env/var",
       "method": "GET",
       "response": "exec:printf 'foo: %s' $FOO"
+    },
+    {
+      "route": "with/exec/print/env/with/param/{foo}",
+      "method": "GET",
+      "response": "exec:env | grep -i ^mock | sort"
     }
   ]
 }
