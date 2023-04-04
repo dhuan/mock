@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dhuan/mock/internal/args2config"
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/mockfs"
 	"github.com/dhuan/mock/internal/types"
@@ -27,10 +28,25 @@ import (
 var serveCmd = &cobra.Command{
 	Use: "serve",
 	Run: func(cmd *cobra.Command, args []string) {
+		endpointsFromCommandLine := args2config.Parse(os.Args)
+
+		if flagConfig == "" && len(endpointsFromCommandLine) == 0 {
+			exitWithError(cmd.UsageString())
+		}
+
 		config, err := resolveConfig(flagConfig)
 		if err != nil {
 			exitWithError(err.Error())
 		}
+
+		allEndpoints, endpointMergeErrors := mergeEndpoints(config.Endpoints, endpointsFromCommandLine)
+		if len(endpointMergeErrors) > 0 {
+			fmt.Println("failed")
+
+			os.Exit(1)
+		}
+
+		config.Endpoints = allEndpoints
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
@@ -326,6 +342,12 @@ func prepareConfig(mockConfig *MockConfig) {
 }
 
 func resolveConfig(configPath string) (*MockConfig, error) {
+	if configPath == "" {
+		return &MockConfig{
+			Endpoints: []types.EndpointConfig{},
+		}, nil
+	}
+
 	var mockConfig MockConfig
 
 	configFileContent, err := ioutil.ReadFile(configPath)
@@ -430,3 +452,18 @@ func getAllEnvVars() map[string]string {
 
 	return result
 }
+
+func mergeEndpoints(a, b []types.EndpointConfig) ([]types.EndpointConfig, []endpointMergeError) {
+	return append(a, b...), []endpointMergeError{}
+}
+
+type endpointMergeError struct {
+	code  endpointMergeErrorCode
+	index int
+}
+
+type endpointMergeErrorCode int
+
+const (
+	endpointMergeErrorCode_none endpointMergeErrorCode = iota
+)

@@ -234,12 +234,6 @@ func trimCommandOutput(str string) string {
 	return strings.Join(lines, "\n")
 }
 
-func toCommandParameters(command string) []string {
-	splitResult := strings.Split(command, " ")
-
-	return splitResult
-}
-
 func pwd() string {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -258,7 +252,7 @@ func RunTest(
 	body string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, configurationFilePath, method, route, headers, body, nil, assertionFunc...)
+	RunTestBase(t, configurationFilePath, "", method, route, headers, body, nil, assertionFunc...)
 }
 
 func RunTestWithEnv(
@@ -271,12 +265,46 @@ func RunTestWithEnv(
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, configurationFilePath, method, route, headers, body, env, assertionFunc...)
+	RunTestBase(t, configurationFilePath, "", method, route, headers, body, env, assertionFunc...)
+}
+
+func RunTestWithArgs(
+	t *testing.T,
+	configurationFilePath string,
+	args []string,
+	method,
+	route string,
+	headers map[string]string,
+	body string,
+	assertionFunc ...func(t *testing.T, response *Response),
+) {
+	RunTestBase(t, configurationFilePath, strings.Join(args, " "), method, route, headers, body, map[string]string{}, assertionFunc...)
+}
+
+func RunTestWithNoConfigAndWithArgs(
+	t *testing.T,
+	args []string,
+	method,
+	route string,
+	headers map[string]string,
+	body string,
+	assertionFunc ...func(t *testing.T, response *Response),
+) {
+	RunTestBase(t, "", strings.Join(args, " "), method, route, headers, body, map[string]string{}, assertionFunc...)
+}
+
+func resolveCommand(configurationFilePath string) string {
+	if configurationFilePath == "" {
+		return "serve -p {{TEST_E2E_PORT}}"
+	}
+
+	return fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath)
 }
 
 func RunTestBase(
 	t *testing.T,
 	configurationFilePath,
+	extraArgs,
 	method,
 	route string,
 	headers map[string]string,
@@ -284,7 +312,12 @@ func RunTestBase(
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	killMock, _, mockConfig := RunMockBg(NewState(), fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath), env)
+	command := resolveCommand(configurationFilePath)
+	if extraArgs != "" {
+		command = fmt.Sprintf("%s %s", command, extraArgs)
+	}
+
+	killMock, _, mockConfig := RunMockBg(NewState(), command, env)
 	defer killMock()
 
 	response := Request(mockConfig, method, route, body, headers)
@@ -292,6 +325,57 @@ func RunTestBase(
 	for i := range assertionFunc {
 		assertionFunc[i](t, response)
 	}
+}
+
+func toCommandParameters(command string) []string {
+	result := make([]string, 0)
+	current := ""
+	quote := 0
+	lastQuote := ' '
+	quoteMatchLast := false
+	isQuote := false
+
+	for i, char := range command {
+		isQuote = char == '\'' || char == '"'
+		quoteMatchLast = isQuote && char == lastQuote
+
+		if isQuote {
+			lastQuote = char
+		}
+
+		if char == ' ' && quote == 0 {
+			result = append(result, current)
+			current = ""
+
+			continue
+		}
+
+		if i == len(command)-1 {
+			if !isQuote {
+				current = fmt.Sprintf("%s%s", current, string(char))
+			}
+			result = append(result, current)
+			current = ""
+
+			continue
+		}
+
+		if isQuote {
+			if !quoteMatchLast {
+				quote = quote + 1
+
+				continue
+			}
+
+			quote = quote - 1
+
+			continue
+		}
+
+		current = fmt.Sprintf("%s%s", current, string(char))
+	}
+
+	return result
 }
 
 func StringMatches(expected string) func(t *testing.T, response *Response) {
