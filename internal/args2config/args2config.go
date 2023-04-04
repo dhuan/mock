@@ -12,9 +12,6 @@ func Parse(args []string) []types.EndpointConfig {
 			endpointCurrent = endpointCurrent + 1
 		}
 
-		if startingNew(arg) && len(endpoints) > 0 {
-		}
-
 		routeName, isRoute := parseRoute(arg, args, i)
 		if isRoute {
 			endpoints[endpointCurrent].Route = routeName
