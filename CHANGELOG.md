@@ -4,7 +4,8 @@
 
 ADDED
 
-- Responses with `exec:<SHELL COMMAND>` is now supported.
+- Responses with `exec:<SHELL COMMAND>` is now supported;
+- Endpoints can now be defined through command-line parameters, such as: `--route foo/bar --status-code 201 --response "Hello world!"`;
 
 ## 0.6.0
 
