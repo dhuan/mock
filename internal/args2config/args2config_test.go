@@ -80,3 +80,41 @@ func Test_WithTwoEndpoints(t *testing.T) {
 		}),
 	)
 }
+
+func Test_WithStatusCode(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.EndpointConfig{
+			{
+				Route:              "endpoint/one",
+				Method:             "",
+				Response:           []byte("Endpoint one's response."),
+				ResponseStatusCode: 0,
+				Headers:            nil,
+				ResponseIf:         nil,
+				HeadersBase:        nil,
+			},
+			{
+				Route:              "endpoint/two",
+				Method:             "",
+				Response:           []byte("Endpoint two's response."),
+				ResponseStatusCode: 201,
+				Headers:            nil,
+				ResponseIf:         nil,
+				HeadersBase:        nil,
+			},
+		},
+		args2config.Parse([]string{
+			"--route",
+			"endpoint/one",
+			"--response",
+			"Endpoint one's response.",
+			"--route",
+			"endpoint/two",
+			"--status-code",
+			"201",
+			"--response",
+			"Endpoint two's response.",
+		}),
+	)
+}

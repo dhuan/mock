@@ -1,6 +1,7 @@
 package args2config
 
 import "github.com/dhuan/mock/internal/types"
+import "strconv"
 
 func Parse(args []string) []types.EndpointConfig {
 	endpoints := make([]types.EndpointConfig, 0)
@@ -25,6 +26,11 @@ func Parse(args []string) []types.EndpointConfig {
 		response, isResponse := parseResponse(arg, args, i)
 		if isResponse {
 			endpoints[endpointCurrent].Response = response
+		}
+
+		statusCode, isStatusCode := parseStatusCode(arg, args, i)
+		if isStatusCode {
+			endpoints[endpointCurrent].ResponseStatusCode = statusCode
 		}
 	}
 
@@ -57,6 +63,23 @@ func parseMethod(arg string, args []string, i int) (string, bool) {
 	}
 
 	return args[i+1], true
+}
+
+func parseStatusCode(arg string, args []string, i int) (int, bool) {
+	if arg != "--status-code" {
+		return 0, false
+	}
+
+	if i == (len(args) - 1) {
+		return 0, false
+	}
+
+	statusCode, err := strconv.Atoi(args[i+1])
+	if err != nil {
+		return 0, false
+	}
+
+	return statusCode, true
 }
 
 func parseResponse(arg string, args []string, i int) ([]byte, bool) {

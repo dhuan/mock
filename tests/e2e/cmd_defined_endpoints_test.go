@@ -66,6 +66,39 @@ func Test_E2E_CommandLineDefinedEndpoints_WithMultipleEndpoints(t *testing.T) {
 	)
 }
 
+func Test_E2E_CommandLineDefinedEndpoints_WithStatusCode(t *testing.T) {
+	commandArgs := []string{
+		"--route endpoint/one",
+		"--status-code 201",
+		"--response 'First endpoint.'",
+		"--route endpoint/two",
+		"--status-code 202",
+		"--response 'Second endpoint.'",
+	}
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandArgs,
+		"GET",
+		"endpoint/one",
+		nil,
+		"",
+		StatusCodeMatches(201),
+		StringMatches("First endpoint."),
+	)
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandArgs,
+		"GET",
+		"endpoint/two",
+		nil,
+		"",
+		StatusCodeMatches(202),
+		StringMatches("Second endpoint."),
+	)
+}
+
 func Test_E2E_CommandLineDefinedEndpoints_WithoutMethodDefaultsToGet(t *testing.T) {
 	RunTestWithNoConfigAndWithArgs(
 		t,

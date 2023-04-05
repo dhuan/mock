@@ -18,13 +18,14 @@ type MockApiResponse struct {
 }
 
 var (
-	flagConfig   string
-	flagPort     string
-	flagCors     bool
-	flagDelay    int64
-	flagRoute    *[]string
-	flagMethod   *[]string
-	flagResponse *[]string
+	flagConfig     string
+	flagPort       string
+	flagCors       bool
+	flagDelay      int64
+	flagRoute      *[]string
+	flagMethod     *[]string
+	flagStatusCode *[]int
+	flagResponse   *[]string
 )
 
 var rootCmd = &cobra.Command{
@@ -41,6 +42,7 @@ func Execute() {
 	serveCmd.PersistentFlags().Int64VarP(&flagDelay, "delay", "d", 0, "configuration file")
 	flagRoute = serveCmd.PersistentFlags().StringArray("route", []string{}, "endpoint route")
 	flagMethod = serveCmd.PersistentFlags().StringArray("method", []string{}, "endpoint method")
+	flagStatusCode = serveCmd.PersistentFlags().IntSlice("status-code", []int{}, "endpoint response's status code")
 	flagResponse = serveCmd.PersistentFlags().StringArray("response", []string{}, "endpoint response")
 
 	if err := rootCmd.Execute(); err != nil {
