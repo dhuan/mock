@@ -2,6 +2,8 @@ package args2config
 
 import "github.com/dhuan/mock/internal/types"
 import "strconv"
+import "fmt"
+import "log"
 
 func Parse(args []string) []types.EndpointConfig {
 	endpoints := make([]types.EndpointConfig, 0)
@@ -13,24 +15,31 @@ func Parse(args []string) []types.EndpointConfig {
 			endpointCurrent = endpointCurrent + 1
 		}
 
-		routeName, isRoute := parseRoute(arg, args, i)
+		routeName, isRoute := parseParamString("--route", arg, args, i)
 		if isRoute {
 			endpoints[endpointCurrent].Route = routeName
 		}
 
-		method, isMethod := parseMethod(arg, args, i)
+		method, isMethod := parseParamString("--method", arg, args, i)
 		if isMethod {
 			endpoints[endpointCurrent].Method = method
 		}
 
-		response, isResponse := parseResponse(arg, args, i)
+		response, isResponse := parseParamString("--response", arg, args, i)
 		if isResponse {
-			endpoints[endpointCurrent].Response = response
+			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(response)
 		}
 
-		statusCode, isStatusCode := parseStatusCode(arg, args, i)
+		statusCode, isStatusCode := parseParamString("--status-code", arg, args, i)
 		if isStatusCode {
-			endpoints[endpointCurrent].ResponseStatusCode = statusCode
+			statusCodeParsed, err := strconv.Atoi(statusCode)
+			if err != nil {
+				log.Fatalln(fmt.Sprintf("Failed to parse %s", statusCode))
+
+				return endpoints
+			}
+
+			endpoints[endpointCurrent].ResponseStatusCode = statusCodeParsed
 		}
 	}
 
@@ -41,8 +50,8 @@ func startingNew(arg string) bool {
 	return arg == "--route"
 }
 
-func parseRoute(arg string, args []string, i int) (string, bool) {
-	if arg != "--route" {
+func parseParamString(paramName string, arg string, args []string, i int) (string, bool) {
+	if arg != paramName {
 		return "", false
 	}
 
@@ -51,45 +60,4 @@ func parseRoute(arg string, args []string, i int) (string, bool) {
 	}
 
 	return args[i+1], true
-}
-
-func parseMethod(arg string, args []string, i int) (string, bool) {
-	if arg != "--method" {
-		return "", false
-	}
-
-	if i == (len(args) - 1) {
-		return "", false
-	}
-
-	return args[i+1], true
-}
-
-func parseStatusCode(arg string, args []string, i int) (int, bool) {
-	if arg != "--status-code" {
-		return 0, false
-	}
-
-	if i == (len(args) - 1) {
-		return 0, false
-	}
-
-	statusCode, err := strconv.Atoi(args[i+1])
-	if err != nil {
-		return 0, false
-	}
-
-	return statusCode, true
-}
-
-func parseResponse(arg string, args []string, i int) ([]byte, bool) {
-	if arg != "--response" {
-		return []byte(""), false
-	}
-
-	if i == (len(args) - 1) {
-		return []byte(""), false
-	}
-
-	return []byte(args[i+1]), true
 }
