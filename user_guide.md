@@ -5,6 +5,7 @@
 **Table of Contents**
 
 - [Creating APIs](#creating-apis)
+  - [Endpoints defined through command-line parameters](#endpoints-defined-through-command-line-parameters)
   - [Response with headers](#response-with-headers)
   - [Response Status Code](#response-status-code)
   - [File-based response content](#file-based-response-content)
@@ -61,7 +62,7 @@ A `POST` HTTP Request to `/foo/bar` will respond you with `{"foo":"bar"}`, as ca
 
 Endpoint Routes can also be set with wildcards:
 
-```json
+```diff
  {
    "endpoints": [
      {
@@ -81,6 +82,24 @@ Besides wildcards, routes can have placeholder variables as well, such as `foo/b
 
 In the next sections we'll look at other ways of setting up endpoints.
 
+### Endpoints defined through command-line parameters
+
+An alternative for creating configuration file exists - endpoints can be defined all through command-line parameters. Let's start up mock with two endpoints, `hello/world` and `hello/world/again`:
+
+```sh
+mock serve \
+  --route 'hello/world' \
+  --method GET \
+  --response 'Hello world!' \
+  --route 'hello/world/again' \
+  --method POST \
+  --response 'Hello world! This is another endpoint.' 
+```
+
+As shown above, all which can be accomplished through JSON configuration files can be done through command-line parameters, it's just a matter of preference. As we move forward through this manual learning more advanced functionality, you'll be instructed on how to achieve things in both ways - the above only scratches the surface. A few notes to be aware while using command line parameters:
+
+- Both configuration file and command-line parameters can be used together, but when routes are defined as parameters which have been already defined in the configuration file, the former will overwrite the latter. In other words, command-line parameters defined endpoints always overwrite the ones defined in config (which have the same route and method combination).
+
 ### Response with headers
 
 The optional `response_headers` endpoint parameter will add headers to a endpoint's response:
@@ -95,11 +114,23 @@ The optional `response_headers` endpoint parameter will add headers to a endpoin
          "foo": "bar"
        },
 +      "response_headers": {
-+        "Some-Header-Key": "Some header value"
++        "Some-Header-Key": "Some header value",
++        "Another-Header-Key": "Another header value"
 +      }
      }
    ]
 }
+```
+
+To add response headers to an endpoint using command-line parameters:
+
+```diff
+ mock serve \
+   --route "foo/bar" \
+   --method "POST" \
+   --response '{"foo":"bar"}' \
++  --header "Some-Header-Key: Some header value" \
++  --header "Another-Header-Key: Another header value"
 ```
 
 ### Response Status Code
@@ -121,6 +152,15 @@ By default, all responses' status code will be `200`. You can change it using th
 }
 ```
 
+To add response status codes to an endpoint using command-line parameters:
+
+```diff
+ mock serve \
+   --route "foo/bar" \
+   --method "POST" \
+   --response '{"foo":"bar"}' \
++  --status-code 201
+```
 
 ### File-based response content
 
