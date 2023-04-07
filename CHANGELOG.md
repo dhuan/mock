@@ -7,6 +7,10 @@ ADDED
 - Responses with `exec:<SHELL COMMAND>` is now supported;
 - Endpoints can now be defined through command-line parameters, such as: `--route foo/bar --method post --status-code 201 --response "Hello world!"`;
 
+CHANGED
+
+- The `--config` command-line parameter is no longer mandatory since now endpoints can be defined without configuration files;
+
 ## 0.6.0
 
 ADDED
