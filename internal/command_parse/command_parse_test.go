@@ -42,7 +42,7 @@ func Test_WithQuotesMultipleTimes(t *testing.T) {
 	)
 }
 
-func Test_Foobar(t *testing.T) {
+func Test_WithQuotesMultipleTimes_2(t *testing.T) {
 	assert.Equal(
 		t,
 		[]string{
