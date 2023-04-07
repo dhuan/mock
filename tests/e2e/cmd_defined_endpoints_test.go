@@ -99,6 +99,62 @@ func Test_E2E_CommandLineDefinedEndpoints_WithStatusCode(t *testing.T) {
 	)
 }
 
+func Test_E2E_CommandLineDefinedEndpoints_WithHeaders(t *testing.T) {
+	commandArgs := []string{
+		"--route endpoint/one",
+		"--response 'First endpoint.'",
+		"--route endpoint/two",
+		"--header 'Header-One: 1st header'",
+		"--header 'Header-Two: 2nd header'",
+		"--response 'Second endpoint.'",
+		"--route endpoint/three",
+		"--response 'Third endpoint.'",
+		"--header 'Header-Three: 3rd header'",
+	}
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandArgs,
+		"GET",
+		"endpoint/one",
+		nil,
+		"",
+		StringMatches("First endpoint."),
+		HeaderKeysNotIncluded([]string{
+			"Header-One",
+			"Header-Two",
+			"Header-Three",
+		}),
+	)
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandArgs,
+		"GET",
+		"endpoint/two",
+		nil,
+		"",
+		StringMatches("Second endpoint."),
+		HeadersMatch(map[string]string{
+			"Header-One": "1st header",
+			"Header-Two": "2nd header",
+		}),
+	)
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandArgs,
+		"GET",
+		"endpoint/three",
+		nil,
+		"",
+		StringMatches("Third endpoint."),
+		HeadersMatch(map[string]string{
+			"Header-Three": "3rd header",
+		}),
+	)
+}
+
 func Test_E2E_CommandLineDefinedEndpoints_WithoutMethodDefaultsToGet(t *testing.T) {
 	RunTestWithNoConfigAndWithArgs(
 		t,

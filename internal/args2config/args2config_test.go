@@ -118,3 +118,50 @@ func Test_WithStatusCode(t *testing.T) {
 		}),
 	)
 }
+
+func Test_WithHeaders(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.EndpointConfig{
+			{
+				Route:              "endpoint/one",
+				Method:             "",
+				Response:           []byte("Endpoint one's response."),
+				ResponseStatusCode: 0,
+				Headers: map[string]string{
+					"Header-One": "This is the 1st header.",
+					"Header-Two": "This is the 2nd header.",
+				},
+				ResponseIf:  nil,
+				HeadersBase: nil,
+			},
+			{
+				Route:              "endpoint/two",
+				Method:             "",
+				Response:           []byte("Endpoint two's response."),
+				ResponseStatusCode: 0,
+				Headers: map[string]string{
+					"Header-Three": "This is the 3rd header.",
+				},
+				ResponseIf:  nil,
+				HeadersBase: nil,
+			},
+		},
+		args2config.Parse([]string{
+			"--route",
+			"endpoint/one",
+			"--header",
+			"Header-One: This is the 1st header.",
+			"--header",
+			"Header-Two: This is the 2nd header.",
+			"--response",
+			"Endpoint one's response.",
+			"--route",
+			"endpoint/two",
+			"--response",
+			"Endpoint two's response.",
+			"--header",
+			"Header-Three: This is the 3rd header.",
+		}),
+	)
+}

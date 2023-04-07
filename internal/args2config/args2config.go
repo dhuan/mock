@@ -4,6 +4,7 @@ import "github.com/dhuan/mock/internal/types"
 import "strconv"
 import "fmt"
 import "log"
+import "strings"
 
 func Parse(args []string) []types.EndpointConfig {
 	endpoints := make([]types.EndpointConfig, 0)
@@ -28,6 +29,19 @@ func Parse(args []string) []types.EndpointConfig {
 		response, isResponse := parseParamString("--response", arg, args, i)
 		if isResponse {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(response)
+		}
+
+		header, isHeader := parseParamString("--header", arg, args, i)
+		if isHeader {
+			headerKey, headerValue, headerOk := parseHeaderLine(header)
+
+			if headerOk {
+				if len(endpoints[endpointCurrent].Headers) == 0 {
+					endpoints[endpointCurrent].Headers = map[string]string{}
+				}
+
+				endpoints[endpointCurrent].Headers[headerKey] = headerValue
+			}
 		}
 
 		statusCode, isStatusCode := parseParamString("--status-code", arg, args, i)
@@ -60,4 +74,14 @@ func parseParamString(paramName string, arg string, args []string, i int) (strin
 	}
 
 	return args[i+1], true
+}
+
+func parseHeaderLine(text string) (string, string, bool) {
+	splitResult := strings.Split(text, ":")
+
+	if len(splitResult) < 2 {
+		return "", "", false
+	}
+
+	return splitResult[0], strings.TrimSpace(strings.Join(splitResult[1:], ":")), true
 }

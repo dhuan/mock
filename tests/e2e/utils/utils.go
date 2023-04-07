@@ -16,6 +16,7 @@ import (
 	"time"
 
 	mocklib "github.com/dhuan/mock/pkg/mock"
+	"github.com/dhuan/mock/internal/command_parse"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,7 +49,7 @@ func NewState() *E2eState {
 
 func RunMock(state *E2eState, command string) ([]byte, error) {
 	replaceVars(&command)
-	commandParameters := toCommandParameters(command)
+	commandParameters := command_parse.ToCommandParameters(command)
 
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
 	result, err := cmd.CombinedOutput()
@@ -63,7 +64,7 @@ type KillMockFunc func()
 
 func RunMockBg(state *E2eState, command string, env map[string]string) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig) {
 	replaceVars(&command)
-	commandParameters := toCommandParameters(command)
+	commandParameters := command_parse.ToCommandParameters(command)
 
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
 	buf := &bytes.Buffer{}
@@ -325,57 +326,6 @@ func RunTestBase(
 	for i := range assertionFunc {
 		assertionFunc[i](t, response)
 	}
-}
-
-func toCommandParameters(command string) []string {
-	result := make([]string, 0)
-	current := ""
-	quote := 0
-	lastQuote := ' '
-	quoteMatchLast := false
-	isQuote := false
-
-	for i, char := range command {
-		isQuote = char == '\'' || char == '"'
-		quoteMatchLast = isQuote && char == lastQuote
-
-		if isQuote {
-			lastQuote = char
-		}
-
-		if char == ' ' && quote == 0 {
-			result = append(result, current)
-			current = ""
-
-			continue
-		}
-
-		if i == len(command)-1 {
-			if !isQuote {
-				current = fmt.Sprintf("%s%s", current, string(char))
-			}
-			result = append(result, current)
-			current = ""
-
-			continue
-		}
-
-		if isQuote {
-			if !quoteMatchLast {
-				quote = quote + 1
-
-				continue
-			}
-
-			quote = quote - 1
-
-			continue
-		}
-
-		current = fmt.Sprintf("%s%s", current, string(char))
-	}
-
-	return result
 }
 
 func StringMatches(expected string) func(t *testing.T, response *Response) {
