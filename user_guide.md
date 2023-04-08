@@ -166,19 +166,28 @@ To add response status codes to an endpoint using command-line parameters:
 
 In the earlier example, `response` is a JSON object containing the response JSON that you'll be responded with. However, as you setup complex APIs, your configuration file starts getting large and not easily readable. In the following example, we're setting the response content by referencing a file, thus leaving the configuration file more readable:
 
-```json
-{
-  "endpoints": [
-    {
-      "route": "foo/bar",
-      "method": "POST",
-      "response": "file:./response_foobar.json"
-    }
-  ]
-}
+```diff
+  {
+    "endpoints": [
+      {
+        "route": "foo/bar",
+        "method": "POST",
++       "response": "file:path/to/some/file.json"
+      }
+    ]
+  }
 ```
 
-Given the configuration above, the `foo/bar` endpoint's response is defined in the `response_foobar.json` file.
+To define responses referenced by files using command-line parameters, `--response-file` can be used:
+
+```diff
+ mock serve \
+   --route "foo/bar" \
+   --method "POST" \
+   --response-file path/to/some/file.json
+```
+
+The above can also be accomplished with `--response "file:path/to/some/file.json"`.
 
 ### Route Parameters
 

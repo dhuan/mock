@@ -31,6 +31,11 @@ func Parse(args []string) []types.EndpointConfig {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(response)
 		}
 
+		responseFile, isResponseFile := parseParamString("--response-file", arg, args, i)
+		if isResponseFile {
+			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("file:%s", responseFile))
+		}
+
 		header, isHeader := parseParamString("--header", arg, args, i)
 		if isHeader {
 			headerKey, headerValue, headerOk := parseHeaderLine(header)

@@ -119,6 +119,29 @@ func Test_WithStatusCode(t *testing.T) {
 	)
 }
 
+func Test_WithResponseFile(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.EndpointConfig{
+			{
+				Route:              "hello/world",
+				Method:             "",
+				Response:           []byte("file:path/to/some/file.txt"),
+				ResponseStatusCode: 0,
+				Headers:            nil,
+				ResponseIf:         nil,
+				HeadersBase:        nil,
+			},
+		},
+		args2config.Parse([]string{
+			"--route",
+			"hello/world",
+			"--response-file",
+			"path/to/some/file.txt",
+		}),
+	)
+}
+
 func Test_WithHeaders(t *testing.T) {
 	assert.Equal(
 		t,

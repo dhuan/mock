@@ -20,6 +20,22 @@ func Test_E2E_Response_FileResponse(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_FileResponse_WithResponseFileFlag(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route hello/world",
+			"--response-file data/response.txt",
+		},
+		"GET",
+		"hello/world",
+		nil,
+		"",
+		StatusCodeMatches(200),
+		StringMatches("Hello world!\n"),
+	)
+}
+
 func Test_E2E_Response_ResponseInsideFolder(t *testing.T) {
 	RunTest(
 		t,
