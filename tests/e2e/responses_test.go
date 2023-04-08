@@ -2,6 +2,7 @@ package tests_e2e
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -42,6 +43,29 @@ func Test_E2E_Response_JsonResponse(t *testing.T) {
 		JsonMatches(map[string]interface{}{
 			"response_text": "This is a JSON response.",
 		}),
+	)
+}
+
+func Test_E2E_Response_WithFile_WithAbsolutePath(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	filePath := fmt.Sprintf("%s/data/response.txt", pwd)
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route hello/world",
+			"--method get",
+			fmt.Sprintf("--response 'file:%s'", filePath),
+		},
+		"GET",
+		"hello/world",
+		nil,
+		"",
+		StatusCodeMatches(200),
+		StringMatches("Hello world!\n"),
 	)
 }
 

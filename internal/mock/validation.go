@@ -130,7 +130,12 @@ func validateFiles(
 			continue
 		}
 
-		_, err := readFile(fmt.Sprintf("%s/%s", configDirPath, filePath))
+		filePathModified := fmt.Sprintf("%s/%s", configDirPath, filePath)
+		if utils.BeginsWith(filePath, "/") {
+			filePathModified = filePath
+		}
+
+		_, err := readFile(filePathModified)
 		if err != nil {
 			errors = append(errors, EndpointConfigError{
 				Code:          EndpointConfigErrorCode_FileUnreadable,

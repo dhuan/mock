@@ -11,6 +11,10 @@ CHANGED
 
 - The `--config` command-line parameter is no longer mandatory since now endpoints can be defined without configuration files;
 
+FIXED
+
+- Defining responses referenced through files with absolute path fails. (with relative file paths no issues, only absolute);
+
 ## 0.6.0
 
 ADDED

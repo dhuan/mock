@@ -194,11 +194,17 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
-		responseFile := fmt.Sprintf(
-			"%s/%s",
-			state.ConfigFolderPath,
-			strings.Replace(responseStr, "file:", "", -1),
-		)
+		responseStr = strings.Replace(responseStr, "file:", "", -1)
+
+		responseFile := responseStr
+		if !utils.BeginsWith(responseFile, "/") {
+			responseFile = fmt.Sprintf(
+				"%s/%s",
+				state.ConfigFolderPath,
+				responseStr,
+			)
+		}
+
 		fileContent, err := readFile(responseFile)
 		if errors.Is(err, ErrResponseFileDoesNotExist) {
 			errorMetadata["file"] = responseFile
