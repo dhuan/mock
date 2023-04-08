@@ -87,7 +87,7 @@ In the next sections we'll look at other ways of setting up endpoints.
 An alternative for creating configuration file exists - endpoints can be defined all through command-line parameters. Let's start up mock with two endpoints, `hello/world` and `hello/world/again`:
 
 ```sh
-mock serve \
+$ mock serve \
   --route 'hello/world' \
   --method GET \
   --response 'Hello world!' \
@@ -125,7 +125,7 @@ The optional `response_headers` endpoint parameter will add headers to a endpoin
 To add response headers to an endpoint using command-line parameters:
 
 ```diff
- mock serve \
+ $ mock serve \
    --route "foo/bar" \
    --method "POST" \
    --response '{"foo":"bar"}' \
@@ -155,7 +155,7 @@ By default, all responses' status code will be `200`. You can change it using th
 To add response status codes to an endpoint using command-line parameters:
 
 ```diff
- mock serve \
+ $ mock serve \
    --route "foo/bar" \
    --method "POST" \
    --response '{"foo":"bar"}' \
@@ -181,10 +181,10 @@ In the earlier example, `response` is a JSON object containing the response JSON
 To define responses referenced by files using command-line parameters, `--response-file` can be used:
 
 ```diff
- mock serve \
+ $ mock serve \
    --route "foo/bar" \
    --method "POST" \
-   --response-file path/to/some/file.json
++  --response-file path/to/some/file.json
 ```
 
 The above can also be accomplished with `--response "file:path/to/some/file.json"`.
