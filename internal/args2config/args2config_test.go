@@ -142,6 +142,29 @@ func Test_WithResponseFile(t *testing.T) {
 	)
 }
 
+func Test_WithResponseFileServer(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.EndpointConfig{
+			{
+				Route:              "public/*",
+				Method:             "",
+				Response:           []byte("fs:path/to/my/files"),
+				ResponseStatusCode: 0,
+				Headers:            nil,
+				ResponseIf:         nil,
+				HeadersBase:        nil,
+			},
+		},
+		args2config.Parse([]string{
+			"--route",
+			"public/*",
+			"--response-file-server",
+			"path/to/my/files",
+		}),
+	)
+}
+
 func Test_WithHeaders(t *testing.T) {
 	assert.Equal(
 		t,

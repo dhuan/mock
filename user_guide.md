@@ -283,6 +283,14 @@ Static files can easily be served. Suppose we have a folder named `public` where
 
 In the example above, we configured the route "static" to serve files located in the `public` folder. Let's say a file exists located in `public/foobar.html`, then it can be accessed through the URL `/static/foobar.html`.
 
+How about spinning up quickly a static-file server without configuration files?
+
+```diff
+ $ mock serve \
++  --route 'static/*' \
++  --response-file-server /path/to/my/public/files
+```
+
 ### Responses from Shell scripts
 
 You can write shell scripts that will act as "handlers" for your API's Requests (or Controllers if you like to think in terms of the MVC pattern.)
