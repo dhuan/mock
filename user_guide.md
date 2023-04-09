@@ -223,6 +223,16 @@ Besides static responses as exemplified, all kinds of responses can read Route P
 
 > Route Parameters can also be read by Shell-Script Responses. [Read more about it in its own guide section.](#route-parameters---reading-from-shell-scripts)
 
+To read route parameters through endpoints defined by command-line parameters, the same syntax applies:
+
+```diff
+ $ mock serve \
++  --route "book/{book_name}" \
++  --response-file 'books/${book_name}.txt'
+```
+
+> Important: Note in the example above that the response string was wrapped around single-quotes, that is necessary because the variable '${book_name}' is NOT supposed to be processed by the shell program, instead **mock** will process that variable while processing the request's reponse, as `book_name` is a Route Parameter and not a shell variable.
+
 ### Reading Environment Variables
 
 Responses can include any environment variable. The following example starts up *mock* with a custom environment variable and includes its variable in an endpoint's response.
