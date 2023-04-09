@@ -21,6 +21,25 @@ func Test_E2E_Response_ReadingEnvironmentVariable_TextResponse(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_ReadingEnvironmentVariable_TextResponse_WithCmdParams(t *testing.T) {
+	RunTestWithAndWithArgsAndWithEnv(
+		t,
+		[]string{
+			"--route reading/env/vars/text",
+			"--response 'The value of FOO is: ${FOO}.'",
+		},
+		"GET",
+		"reading/env/vars/text",
+		nil,
+		"",
+		map[string]string{
+			"FOO": "BAR",
+		},
+		StatusCodeMatches(200),
+		StringMatches("The value of FOO is: BAR."),
+	)
+}
+
 func Test_E2E_Response_ReadingEnvironmentVariable_TextFileResponse(t *testing.T) {
 	RunTestWithEnv(
 		t,

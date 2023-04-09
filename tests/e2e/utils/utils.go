@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	mocklib "github.com/dhuan/mock/pkg/mock"
 	"github.com/dhuan/mock/internal/command_parse"
+	mocklib "github.com/dhuan/mock/pkg/mock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -292,6 +292,19 @@ func RunTestWithNoConfigAndWithArgs(
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
 	RunTestBase(t, "", strings.Join(args, " "), method, route, headers, body, map[string]string{}, assertionFunc...)
+}
+
+func RunTestWithAndWithArgsAndWithEnv(
+	t *testing.T,
+	args []string,
+	method,
+	route string,
+	headers map[string]string,
+	body string,
+	env map[string]string,
+	assertionFunc ...func(t *testing.T, response *Response),
+) {
+	RunTestBase(t, "", strings.Join(args, " "), method, route, headers, body, env, assertionFunc...)
 }
 
 func resolveCommand(configurationFilePath string) string {

@@ -255,6 +255,16 @@ And then the configuration file:
 }
 ```
 
+Let's accomplish the same but now using command-line parameters instead of configuration file. Note here the usage of single-quotes around the response string, because we don't want these variables to be processed by the shell program, but by *mock* instead:
+
+```diff
+ $ export FOO=bar
+
+ $ mock serve \
++  --route 'foo/bar' \
++  --response 'The value of FOO is ${FOO}.'
+```
+
 ### Serving static files
 
 Static files can easily be served. Suppose we have a folder named `public` where the static files we wish to serve are located.
