@@ -119,6 +119,29 @@ func Test_E2E_Response_ShellScript(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_ShellScript_WithCmdParams(t *testing.T) {
+	responseFormats := []string{
+		"--response 'sh:data/config_with_script_responses/handler.sh'",
+		"--response-sh data/config_with_script_responses/handler.sh",
+	}
+
+	for _, responseFormat := range responseFormats {
+		RunTestWithNoConfigAndWithArgs(
+			t,
+			[]string{
+				"--route foo/bar",
+				responseFormat,
+			},
+			"GET",
+			"foo/bar",
+			nil,
+			"",
+			StatusCodeMatches(200),
+			StringMatches("Hello world! This response was generated from a shell script."),
+		)
+	}
+}
+
 func Test_E2E_Response_ShellScript_WithAbsolutePath(t *testing.T) {
 	pwd, err := os.Getwd()
 	if err != nil {

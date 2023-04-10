@@ -28,6 +28,7 @@ var (
 	flagResponse           *[]string
 	flagResponseFile       *[]string
 	flagResponseFileServer *[]string
+	flagResponseSh         *[]string
 	flagHeader             *[]string
 )
 
@@ -49,6 +50,7 @@ func Execute() {
 	flagResponse = serveCmd.PersistentFlags().StringArray("response", []string{}, "endpoint response")
 	flagResponseFile = serveCmd.PersistentFlags().StringArray("response-file", []string{}, "endpoint response file")
 	flagResponseFileServer = serveCmd.PersistentFlags().StringArray("response-file-server", []string{}, "endpoint response file server")
+	flagResponseSh = serveCmd.PersistentFlags().StringArray("response-sh", []string{}, "endpoint response script")
 	flagHeader = serveCmd.PersistentFlags().StringArray("header", []string{}, "endpoint response header")
 
 	if err := rootCmd.Execute(); err != nil {
