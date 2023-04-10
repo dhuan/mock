@@ -216,11 +216,7 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_shell {
-		scriptFilePath := fmt.Sprintf(
-			"%s/%s",
-			state.ConfigFolderPath,
-			strings.Replace(responseStr, "sh:", "", -1),
-		)
+		scriptFilePath := extractFilePathFromResponseString(responseStr, state.ConfigFolderPath)
 
 		if len(endpointParams) > 0 {
 			addUrlParamsToRequestVariables(requestVariables, endpointParams)

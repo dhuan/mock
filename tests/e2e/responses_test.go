@@ -119,6 +119,28 @@ func Test_E2E_Response_ShellScript(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_ShellScript_WithAbsolutePath(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	filePath := fmt.Sprintf("%s/data/config_with_script_responses/handler.sh", pwd)
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar",
+			fmt.Sprintf("--response 'sh:%s'", filePath),
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		"",
+		StatusCodeMatches(200),
+		StringMatches("Hello world! This response was generated from a shell script."),
+	)
+}
+
 func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) {
 	RunTest(
 		t,
