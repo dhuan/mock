@@ -1,6 +1,8 @@
 package tests_e2e
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -36,6 +38,36 @@ func Test_E2E_Response_Fileserver_WithCmdParams(t *testing.T) {
 	responseFormats := []string{
 		"--response 'fs:data/config_with_static_files/public'",
 		"--response-file-server 'data/config_with_static_files/public'",
+	}
+
+	for _, responseFormat := range responseFormats {
+		RunTestWithNoConfigAndWithArgs(
+			t,
+			[]string{
+				"--route foo/bar/*",
+				responseFormat,
+			},
+			"GET",
+			"foo/bar/hello.txt",
+			nil,
+			"",
+			StatusCodeMatches(200),
+			StringMatches("Hello world!\n"),
+		)
+	}
+}
+
+func Test_E2E_Response_Fileserver_WithCmdParams_WithAbsolutePath(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	folderPath := fmt.Sprintf("%s/data/config_with_static_files/public", pwd)
+
+	responseFormats := []string{
+		fmt.Sprintf("--response 'fs:%s'", folderPath),
+		fmt.Sprintf("--response-file-server '%s'", folderPath),
 	}
 
 	for _, responseFormat := range responseFormats {

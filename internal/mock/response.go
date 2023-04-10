@@ -194,16 +194,7 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
-		responseStr = strings.Replace(responseStr, "file:", "", -1)
-
-		responseFile := responseStr
-		if !utils.BeginsWith(responseFile, "/") {
-			responseFile = fmt.Sprintf(
-				"%s/%s",
-				state.ConfigFolderPath,
-				responseStr,
-			)
-		}
+		responseFile := extractFilePathFromResponseString(responseStr, state.ConfigFolderPath)
 
 		fileContent, err := readFile(responseFile)
 		if errors.Is(err, ErrResponseFileDoesNotExist) {
@@ -363,11 +354,7 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_fileserver {
-		staticFilesPath := fmt.Sprintf(
-			"%s/%s",
-			state.ConfigFolderPath,
-			strings.Replace(responseStr, "fs:", "", -1),
-		)
+		staticFilesPath := extractFilePathFromResponseString(responseStr, state.ConfigFolderPath)
 
 		fileRequested, ok := endpointParams["*"]
 		if !ok {
@@ -404,6 +391,22 @@ func resolveEndpointResponseInternal(
 	}
 
 	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, nil, errorMetadata
+}
+
+func extractFilePathFromResponseString(responseStr, configFolderPath string) string {
+	splitResult := strings.Split(responseStr, ":")
+
+	if len(splitResult) < 2 {
+		return "unknown"
+	}
+
+	filePath := splitResult[1]
+
+	if utils.BeginsWith(filePath, "/") {
+		return filePath
+	}
+
+	return fmt.Sprintf("%s/%s", configFolderPath, filePath)
 }
 
 func resolveEndpointConfigContentType(response types.EndpointConfigResponse) types.Endpoint_content_type {
