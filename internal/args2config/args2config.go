@@ -46,6 +46,11 @@ func Parse(args []string) []types.EndpointConfig {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("sh:%s", responseSh))
 		}
 
+		responseExec, isResponseExec := parseParamString("--exec", arg, args, i)
+		if isResponseExec {
+			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("exec:%s", responseExec))
+		}
+
 		header, isHeader := parseParamString("--header", arg, args, i)
 		if isHeader {
 			headerKey, headerValue, headerOk := parseHeaderLine(header)

@@ -426,3 +426,19 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 		LineEquals(11, `MOCK_ROUTE_PARAM_FOO=bar`),
 	)
 }
+
+func Test_E2E_Response_Exec_WithCmdParams(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar",
+			`--exec 'printf "cexe hguorht detareneg saw txet siht" | rev`,
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		"",
+		StatusCodeMatches(200),
+		StringMatches("this text was generated through exec"),
+	)
+}

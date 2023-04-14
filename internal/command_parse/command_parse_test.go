@@ -57,3 +57,29 @@ func Test_WithQuotesMultipleTimes_2(t *testing.T) {
 		command_parse.ToCommandParameters("serve --param-one 'value one' --param-two 'value two' --param-three 'value three'"),
 	)
 }
+
+func Test_WithSubQuotes(t *testing.T) {
+	assert.Equal(
+		t,
+		[]string{
+			"serve",
+			"--param-one",
+			`here "goes some" text`,
+		},
+		command_parse.ToCommandParameters(`serve --param-one 'here "goes some" text'`),
+	)
+}
+
+func Test_WithSubQuotes_2(t *testing.T) {
+	assert.Equal(
+		t,
+		[]string{
+			"serve",
+			"--param-one",
+			`here "goes some" text`,
+			"--param-two",
+			`here "goes another" text`,
+		},
+		command_parse.ToCommandParameters(`serve --param-one 'here "goes some" text' --param-two 'here "goes another" text'`),
+	)
+}
