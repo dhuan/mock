@@ -188,6 +188,41 @@ func Test_WithResponseSh(t *testing.T) {
 	)
 }
 
+func Test_WithResponseExec(t *testing.T) {
+	responseVariations := [][]string{
+		{
+			"--route",
+			"foo/bar",
+			"--exec",
+			"some command | some other command",
+		},
+		{
+			"--route",
+			"foo/bar",
+			"--response-exec",
+			"some command | some other command",
+		},
+	}
+
+	for _, responseVariation := range responseVariations {
+		assert.Equal(
+			t,
+			[]types.EndpointConfig{
+				{
+					Route:              "foo/bar",
+					Method:             "",
+					Response:           []byte("exec:some command | some other command"),
+					ResponseStatusCode: 0,
+					Headers:            nil,
+					ResponseIf:         nil,
+					HeadersBase:        nil,
+				},
+			},
+			args2config.Parse(responseVariation),
+		)
+	}
+}
+
 func Test_WithHeaders(t *testing.T) {
 	assert.Equal(
 		t,

@@ -46,7 +46,7 @@ func Parse(args []string) []types.EndpointConfig {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("sh:%s", responseSh))
 		}
 
-		responseExec, isResponseExec := parseParamString("--exec", arg, args, i)
+		responseExec, isResponseExec := parseParamStringWithSynonyms([]string{"--exec", "--response-exec"}, arg, args, i)
 		if isResponseExec {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("exec:%s", responseExec))
 		}
@@ -96,6 +96,18 @@ func parseParamString(paramName string, arg string, args []string, i int) (strin
 	return args[i+1], true
 }
 
+func parseParamStringWithSynonyms(paramNames []string, arg string, args []string, i int) (string, bool) {
+	if !anyEquals(paramNames, arg) {
+		return "", false
+	}
+
+	if i == (len(args) - 1) {
+		return "", false
+	}
+
+	return args[i+1], true
+}
+
 func parseHeaderLine(text string) (string, string, bool) {
 	splitResult := strings.Split(text, ":")
 
@@ -104,4 +116,14 @@ func parseHeaderLine(text string) (string, string, bool) {
 	}
 
 	return splitResult[0], strings.TrimSpace(strings.Join(splitResult[1:], ":")), true
+}
+
+func anyEquals[T comparable](list []T, value T) bool {
+	for i := range list {
+		if value == list[i] {
+			return true
+		}
+	}
+
+	return false
 }

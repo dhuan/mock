@@ -428,17 +428,25 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 }
 
 func Test_E2E_Response_Exec_WithCmdParams(t *testing.T) {
-	RunTestWithNoConfigAndWithArgs(
-		t,
-		[]string{
-			"--route foo/bar",
-			`--exec 'printf "cexe hguorht detareneg saw txet siht" | rev`,
-		},
-		"GET",
-		"foo/bar",
-		nil,
-		"",
-		StatusCodeMatches(200),
-		StringMatches("this text was generated through exec"),
-	)
+	flagVariations := []string{
+		`--exec 'printf "cexe hguorht detareneg saw txet siht" | rev'`,
+		`--response-exec 'printf "cexe hguorht detareneg saw txet siht" | rev'`,
+		`--response 'exec:printf "cexe hguorht detareneg saw txet siht" | rev'`,
+	}
+
+	for _, flagVariation := range flagVariations {
+		RunTestWithNoConfigAndWithArgs(
+			t,
+			[]string{
+				"--route foo/bar",
+				flagVariation,
+			},
+			"GET",
+			"foo/bar",
+			nil,
+			"",
+			StatusCodeMatches(200),
+			StringMatches("this text was generated through exec"),
+		)
+	}
 }
