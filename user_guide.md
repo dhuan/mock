@@ -326,7 +326,7 @@ To define responses with shell scripts using command-line parameters, use the fo
 ```diff
  $ mock serve \
 +  --route "foo/bar" \
-+  --response-sh my_shell_script.sh
++  --shell-script my_shell_script.sh
 ```
 
 Alternatively, shell commands can be set as one-liners with `exec` instead of `sh`, not requiring you to create a shell script file. As an example, the endpoint below responds with a list of files of the current folder (`ls -la`):

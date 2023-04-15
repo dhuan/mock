@@ -123,6 +123,7 @@ func Test_E2E_Response_ShellScript_WithCmdParams(t *testing.T) {
 	responseFormats := []string{
 		"--response 'sh:data/config_with_script_responses/handler.sh'",
 		"--response-sh data/config_with_script_responses/handler.sh",
+		"--shell-script data/config_with_script_responses/handler.sh",
 	}
 
 	for _, responseFormat := range responseFormats {

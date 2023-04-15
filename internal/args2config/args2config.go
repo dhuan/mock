@@ -41,7 +41,7 @@ func Parse(args []string) []types.EndpointConfig {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("fs:%s", responseFileServer))
 		}
 
-		responseSh, isResponseSh := parseParamString("--response-sh", arg, args, i)
+		responseSh, isResponseSh := parseParamStringWithSynonyms([]string{"--response-sh", "--shell-script"}, arg, args, i)
 		if isResponseSh {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("sh:%s", responseSh))
 		}
