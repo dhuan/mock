@@ -143,26 +143,33 @@ func Test_WithResponseFile(t *testing.T) {
 }
 
 func Test_WithResponseFileServer(t *testing.T) {
-	assert.Equal(
-		t,
-		[]types.EndpointConfig{
-			{
-				Route:              "public/*",
-				Method:             "",
-				Response:           []byte("fs:path/to/my/files"),
-				ResponseStatusCode: 0,
-				Headers:            nil,
-				ResponseIf:         nil,
-				HeadersBase:        nil,
+	responseVariations := [][]string{
+		{"--response-file-server", "path/to/my/files"},
+		{"--file-server", "path/to/my/files"},
+	}
+
+	for _, responseVariation := range responseVariations {
+		assert.Equal(
+			t,
+			[]types.EndpointConfig{
+				{
+					Route:              "public/*",
+					Method:             "",
+					Response:           []byte("fs:path/to/my/files"),
+					ResponseStatusCode: 0,
+					Headers:            nil,
+					ResponseIf:         nil,
+					HeadersBase:        nil,
+				},
 			},
-		},
-		args2config.Parse([]string{
-			"--route",
-			"public/*",
-			"--response-file-server",
-			"path/to/my/files",
-		}),
-	)
+			args2config.Parse([]string{
+				"--route",
+				"public/*",
+				responseVariation[0],
+				responseVariation[1],
+			}),
+		)
+	}
 }
 
 func Test_WithResponseSh(t *testing.T) {

@@ -36,7 +36,7 @@ func Parse(args []string) []types.EndpointConfig {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("file:%s", responseFile))
 		}
 
-		responseFileServer, isResponseFileServer := parseParamString("--response-file-server", arg, args, i)
+		responseFileServer, isResponseFileServer := parseParamStringWithSynonyms([]string{"--response-file-server", "--file-server"}, arg, args, i)
 		if isResponseFileServer {
 			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("fs:%s", responseFileServer))
 		}

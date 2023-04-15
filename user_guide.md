@@ -288,7 +288,7 @@ How about spinning up quickly a static-file server without configuration files?
 ```diff
  $ mock serve \
 +  --route 'static/*' \
-+  --response-file-server /path/to/my/public/files
++  --file-server /path/to/my/public/files
 ```
 
 ### Responses from Shell scripts
