@@ -284,3 +284,16 @@ func Test_WithHeaders(t *testing.T) {
 		}),
 	)
 }
+
+func Test_WithIrrelevantFlags(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.EndpointConfig{},
+		args2config.Parse([]string{
+			"--foo",
+			"bar",
+			"--hello",
+			"world",
+		}),
+	)
+}

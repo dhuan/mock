@@ -16,65 +16,19 @@ func Parse(args []string) []types.EndpointConfig {
 			endpointCurrent = endpointCurrent + 1
 		}
 
-		routeName, isRoute := parseParamString("--route", arg, args, i)
-		if isRoute {
-			endpoints[endpointCurrent].Route = routeName
+		if endpointCurrent == -1 {
+			continue
 		}
 
-		method, isMethod := parseParamString("--method", arg, args, i)
-		if isMethod {
-			endpoints[endpointCurrent].Method = method
-		}
-
-		response, isResponse := parseParamString("--response", arg, args, i)
-		if isResponse {
-			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(response)
-		}
-
-		responseFile, isResponseFile := parseParamString("--response-file", arg, args, i)
-		if isResponseFile {
-			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("file:%s", responseFile))
-		}
-
-		responseFileServer, isResponseFileServer := parseParamStringWithSynonyms([]string{"--response-file-server", "--file-server"}, arg, args, i)
-		if isResponseFileServer {
-			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("fs:%s", responseFileServer))
-		}
-
-		responseSh, isResponseSh := parseParamStringWithSynonyms([]string{"--response-sh", "--shell-script"}, arg, args, i)
-		if isResponseSh {
-			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("sh:%s", responseSh))
-		}
-
-		responseExec, isResponseExec := parseParamStringWithSynonyms([]string{"--exec", "--response-exec"}, arg, args, i)
-		if isResponseExec {
-			endpoints[endpointCurrent].Response = types.EndpointConfigResponse(fmt.Sprintf("exec:%s", responseExec))
-		}
-
-		header, isHeader := parseParamString("--header", arg, args, i)
-		if isHeader {
-			headerKey, headerValue, headerOk := parseHeaderLine(header)
-
-			if headerOk {
-				if len(endpoints[endpointCurrent].Headers) == 0 {
-					endpoints[endpointCurrent].Headers = map[string]string{}
-				}
-
-				endpoints[endpointCurrent].Headers[headerKey] = headerValue
-			}
-		}
-
-		statusCode, isStatusCode := parseParamString("--status-code", arg, args, i)
-		if isStatusCode {
-			statusCodeParsed, err := strconv.Atoi(statusCode)
-			if err != nil {
-				log.Fatalln(fmt.Sprintf("Failed to parse %s", statusCode))
-
-				return endpoints
-			}
-
-			endpoints[endpointCurrent].ResponseStatusCode = statusCodeParsed
-		}
+		parseParam([]string{"--route"}, arg, args, i, assignRoute(&endpoints[endpointCurrent]))
+		parseParam([]string{"--method"}, arg, args, i, assignMethod(&endpoints[endpointCurrent]))
+		parseParam([]string{"--response"}, arg, args, i, assignResponse(&endpoints[endpointCurrent], ""))
+		parseParam([]string{"--response-file"}, arg, args, i, assignResponse(&endpoints[endpointCurrent], "file:"))
+		parseParam([]string{"--response-file-server", "--file-server"}, arg, args, i, assignResponse(&endpoints[endpointCurrent], "fs:"))
+		parseParam([]string{"--response-sh", "--shell-script"}, arg, args, i, assignResponse(&endpoints[endpointCurrent], "sh:"))
+		parseParam([]string{"--exec", "--response-exec"}, arg, args, i, assignResponse(&endpoints[endpointCurrent], "exec:"))
+		parseParam([]string{"--status-code"}, arg, args, i, assignStatusCode(&endpoints[endpointCurrent]))
+		parseParam([]string{"--header"}, arg, args, i, assignHeader(&endpoints[endpointCurrent]))
 	}
 
 	return endpoints
@@ -84,28 +38,67 @@ func startingNew(arg string) bool {
 	return arg == "--route"
 }
 
-func parseParamString(paramName string, arg string, args []string, i int) (string, bool) {
-	if arg != paramName {
-		return "", false
+func assignRoute(endpointConfig *types.EndpointConfig) func(route string) {
+	return func(route string) {
+		endpointConfig.Route = route
 	}
-
-	if i == (len(args) - 1) {
-		return "", false
-	}
-
-	return args[i+1], true
 }
 
-func parseParamStringWithSynonyms(paramNames []string, arg string, args []string, i int) (string, bool) {
+func assignMethod(endpointConfig *types.EndpointConfig) func(method string) {
+	return func(method string) {
+		endpointConfig.Method = method
+	}
+}
+
+func assignResponse(endpointConfig *types.EndpointConfig, prefix string) func(response string) {
+	return func(response string) {
+		endpointConfig.Response = types.EndpointConfigResponse(fmt.Sprintf("%s%s", prefix, response))
+	}
+}
+
+func assignStatusCode(endpointConfig *types.EndpointConfig) func(statusCode string) {
+	return func(statusCode string) {
+		statusCodeParsed, err := strconv.Atoi(statusCode)
+		if err != nil {
+			log.Fatalln(fmt.Sprintf("Failed to parse %s", statusCode))
+
+			return
+		}
+
+		endpointConfig.ResponseStatusCode = statusCodeParsed
+	}
+}
+
+func assignHeader(endpointConfig *types.EndpointConfig) func(header string) {
+	return func(header string) {
+		headerKey, headerValue, headerOk := parseHeaderLine(header)
+
+		if headerOk {
+			if len(endpointConfig.Headers) == 0 {
+				endpointConfig.Headers = map[string]string{}
+			}
+
+			endpointConfig.Headers[headerKey] = headerValue
+		}
+	}
+}
+
+func parseParam(
+	paramNames []string,
+	arg string,
+	args []string,
+	i int,
+	f func(value string),
+) {
 	if !anyEquals(paramNames, arg) {
-		return "", false
+		return
 	}
 
 	if i == (len(args) - 1) {
-		return "", false
+		return
 	}
 
-	return args[i+1], true
+	f(args[i+1])
 }
 
 func parseHeaderLine(text string) (string, string, bool) {
