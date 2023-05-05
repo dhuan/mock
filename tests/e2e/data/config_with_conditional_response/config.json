@@ -1,7 +1,7 @@
 {
   "endpoints": [
     {
-      "route": "foo/bar",
+      "route": "with_different_responses_based_on_querystring",
       "method": "POST",
       "response": "This is the default response.",
       "response_if": [
