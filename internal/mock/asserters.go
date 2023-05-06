@@ -2,6 +2,7 @@ package mock
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"reflect"
 	"sort"
@@ -65,7 +66,7 @@ func filterRequestRecordsMatchingRouteAndMethod(
 func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	return func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 		filteredRequestRecords := filterRequestRecordsMatchingRouteAndMethod(requestRecords, requestRecord.Route, requestRecord.Method)
-		currentRequestNth := len(filteredRequestRecords) + 1
+		currentRequestNth := fmt.Sprint(len(filteredRequestRecords) + 1)
 
 		if string(currentRequestNth) != assert.Value {
 			return []ValidationError{
