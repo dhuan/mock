@@ -226,6 +226,11 @@ func newEndpointHandler(
 		envVars := getAllEnvVars()
 		endpointParams := getEndpointParams(r)
 
+		requestRecords, err := mockFs.GetRecordsMatchingRoute(endpointConfig.Route)
+		if err != nil {
+			panic(err)
+		}
+
 		response, err, errorMetadata := mock.ResolveEndpointResponse(
 			readFile,
 			execute,
@@ -235,6 +240,7 @@ func newEndpointHandler(
 			endpointConfig,
 			envVars,
 			endpointParams,
+			requestRecords,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))

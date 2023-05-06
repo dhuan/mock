@@ -25,6 +25,7 @@ var validation_error_code_encoding_map = map[ValidationErrorCode]string{
 	ValidationErrorCode_QuerystringMismatch:     "querystring_mismatch",
 	ValidationErrorCode_QuerystringKeyNotSet:    "querystring_key_not_set",
 	ValidationErrorCode_RequestHasNoBody:        "request_has_no_body",
+	ValidationErrorCode_NthMismatch:             "nth_mismatch",
 }
 
 type AssertHeader map[string][]string
@@ -57,6 +58,7 @@ const (
 	ValidationErrorCode_QuerystringMismatch
 	ValidationErrorCode_QuerystringKeyNotSet
 	ValidationErrorCode_RequestHasNoBody
+	ValidationErrorCode_NthMismatch
 )
 
 func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {

@@ -61,6 +61,7 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -95,6 +96,7 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -131,6 +133,7 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -165,6 +168,7 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(t, 200, response.StatusCode)
@@ -190,6 +194,7 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(t, 201, response.StatusCode)
@@ -234,6 +239,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -289,6 +295,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -348,6 +355,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -407,6 +415,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -464,6 +473,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -527,6 +537,7 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -577,6 +588,7 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -613,6 +625,7 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -648,6 +661,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -698,6 +712,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -748,6 +763,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
@@ -805,11 +821,54 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		[]types.RequestRecord{},
 	)
 
 	assert.Equal(
 		t,
 		[]byte(`good!`),
+		response.Body,
+	)
+}
+
+func Test_ResolveEndpointResponse_Condition_Nth_1(t *testing.T) {
+	requestMock = httptest.NewRequest(
+		http.MethodGet,
+		"/",
+		strings.NewReader(""),
+	)
+	osMockInstance := osMock{}
+	execMockInstance := execMock{}
+	endpointConfig := types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "get",
+		Response: []byte(`default response.`),
+		ResponseIf: []types.ResponseIf{
+			{
+				Response: []byte(`this is the second response.`),
+				Condition: &Condition{
+					Type:  ConditionType_Nth,
+					Value: "2",
+				},
+			},
+		},
+	}
+
+	response, _, _ := mock.ResolveEndpointResponse(
+		osMockInstance.ReadFile,
+		execMockInstance.Exec,
+		requestMock,
+		requestBody,
+		&state,
+		&endpointConfig,
+		map[string]string{},
+		map[string]string{},
+		[]types.RequestRecord{},
+	)
+
+	assert.Equal(
+		t,
+		[]byte(`default response.`),
 		response.Body,
 	)
 }

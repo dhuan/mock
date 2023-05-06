@@ -854,6 +854,17 @@ Matches against the HTTP Method (Get, Post etc) the Request was called with.
 }
 ```
 
+### `nth`
+
+Matches if the current request is nth on the request history. Note that both route and method must match. In the example below, a match will occur only if the request is the 2nd made so far to the server.
+
+```json
+{
+  "type": "nth",
+  "value": 2
+}
+```
+
 
 ## Mock API Reference
 
