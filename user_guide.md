@@ -31,6 +31,7 @@
   - [`form_match`](#form_match)
   - [`header_match`](#header_match)
   - [`method_match`](#method_match)
+  - [`nth`](#nth)
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
