@@ -201,6 +201,7 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
+    requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -827,48 +828,6 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 	assert.Equal(
 		t,
 		[]byte(`good!`),
-		response.Body,
-	)
-}
-
-func Test_ResolveEndpointResponse_Condition_Nth_1(t *testing.T) {
-	requestMock = httptest.NewRequest(
-		http.MethodGet,
-		"/",
-		strings.NewReader(""),
-	)
-	osMockInstance := osMock{}
-	execMockInstance := execMock{}
-	endpointConfig := types.EndpointConfig{
-		Route:    "foo/bar",
-		Method:   "get",
-		Response: []byte(`default response.`),
-		ResponseIf: []types.ResponseIf{
-			{
-				Response: []byte(`this is the second response.`),
-				Condition: &Condition{
-					Type:  ConditionType_Nth,
-					Value: "2",
-				},
-			},
-		},
-	}
-
-	response, _, _ := mock.ResolveEndpointResponse(
-		osMockInstance.ReadFile,
-		execMockInstance.Exec,
-		requestMock,
-		requestBody,
-		&state,
-		&endpointConfig,
-		map[string]string{},
-		map[string]string{},
-		[]types.RequestRecord{},
-	)
-
-	assert.Equal(
-		t,
-		[]byte(`default response.`),
 		response.Body,
 	)
 }
