@@ -866,6 +866,14 @@ Matches if the current request is nth on the request history. Note that both rou
 }
 ```
 
+It's also possible to match all subsequent requests after a given number, just add a "+" (plus) sign after the number (note also that to accomplish this, the value must be defined as a string). For example, let's match all requests starting from the second onwards:
+
+```json
+{
+  "type": "nth",
+  "value": "2+"
+}
+```
 
 ## Mock API Reference
 

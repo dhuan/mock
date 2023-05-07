@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -86,6 +87,13 @@ func HasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSe
 
 func BeginsWith(subject, find string) bool {
 	return strings.Index(subject, find) == 0
+}
+
+func EndsWith(subject, find string) bool {
+	lenSubject := len(subject)
+	lenFind := len(find)
+
+	return subject[lenSubject-lenFind:] == find
 }
 
 func JoinMap[K comparable, V comparable](mapDst map[K]V, mapSrc map[K]V) {
@@ -336,4 +344,24 @@ func ToCommandStrings(command string) []string {
 	}
 
 	return result
+}
+
+func ExtractNumbersFromString(str string) (int, error) {
+	resultStr := ""
+
+	for _, char := range str {
+		if !charIsNumber(string(char)) {
+			continue
+		}
+
+		resultStr = fmt.Sprintf("%s%s", resultStr, string(char))
+	}
+
+	return strconv.Atoi(resultStr)
+}
+
+var number_chars = "012346789"
+
+func charIsNumber(char string) bool {
+	return strings.Index(number_chars, char) > -1
 }

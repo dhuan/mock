@@ -66,7 +66,12 @@ func filterRequestRecordsMatchingRouteAndMethod(
 func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	return func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 		filteredRequestRecords := filterRequestRecordsMatchingRouteAndMethod(requestRecords, requestRecord.Route, requestRecord.Method)
-		currentRequestNth := fmt.Sprint(len(filteredRequestRecords) + 1)
+		currentRequestNthNumber := len(filteredRequestRecords) + 1
+		currentRequestNth := fmt.Sprint(currentRequestNthNumber)
+
+		if utils.EndsWith(assert.Value, "+") {
+			return assertNthWithPlus(filteredRequestRecords, currentRequestNthNumber, assert)
+		}
 
 		if string(currentRequestNth) != assert.Value {
 			return []ValidationError{
@@ -79,6 +84,24 @@ func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.R
 
 		return []ValidationError{}, nil
 	}
+}
+
+func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequestNth int, assert *Condition) ([]ValidationError, error) {
+	expected, err := utils.ExtractNumbersFromString(assert.Value)
+	if err != nil {
+		return []ValidationError{}, err
+	}
+
+	if expected <= len(matchingRequestRecords) {
+		return []ValidationError{}, nil
+	}
+
+	return []ValidationError{
+		{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
+			"nth_requested": fmt.Sprint(currentRequestNth),
+			"nth_expected":  assert.Value,
+		}},
+	}, nil
 }
 
 func assertMethodMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {

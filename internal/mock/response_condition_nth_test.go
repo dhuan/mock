@@ -19,26 +19,28 @@ func newRequestRecord(route, method string) types.RequestRecord {
 	}
 }
 
-var endpoint_config_with_nth_conditions = types.EndpointConfig{
-	Route:    "foo/bar",
-	Method:   "get",
-	Response: []byte(`default response.`),
-	ResponseIf: []types.ResponseIf{
-		{
-			Response: []byte(`this is the second response.`),
-			Condition: &Condition{
-				Type:  ConditionType_Nth,
-				Value: "2",
+var endpoint_config_with_nth_conditions = func() *types.EndpointConfig {
+	return &types.EndpointConfig{
+		Route:    "foo/bar",
+		Method:   "get",
+		Response: []byte(`default response.`),
+		ResponseIf: []types.ResponseIf{
+			{
+				Response: []byte(`this is the second response.`),
+				Condition: &Condition{
+					Type:  ConditionType_Nth,
+					Value: "2",
+				},
+			},
+			{
+				Response: []byte(`this is the third response.`),
+				Condition: &Condition{
+					Type:  ConditionType_Nth,
+					Value: "3",
+				},
 			},
 		},
-		{
-			Response: []byte(`this is the third response.`),
-			Condition: &Condition{
-				Type:  ConditionType_Nth,
-				Value: "3",
-			},
-		},
-	},
+	}
 }
 
 func Test_ResolveEndpointResponse_Condition_Nth_FirstRequest(t *testing.T) {
@@ -51,7 +53,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_FirstRequest(t *testing.T) {
 		newRequest("foo/bar", http.MethodGet),
 		requestBody,
 		&state,
-		&endpoint_config_with_nth_conditions,
+		endpoint_config_with_nth_conditions(),
 		map[string]string{},
 		map[string]string{},
 		[]types.RequestRecord{
@@ -73,7 +75,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_SecondRequest(t *testing.T) {
 		newRequest("foo/bar", http.MethodGet),
 		requestBody,
 		&state,
-		&endpoint_config_with_nth_conditions,
+		endpoint_config_with_nth_conditions(),
 		map[string]string{},
 		map[string]string{},
 		[]types.RequestRecord{
@@ -98,7 +100,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_ThirdRequest(t *testing.T) {
 		newRequest("foo/bar", http.MethodGet),
 		requestBody,
 		&state,
-		&endpoint_config_with_nth_conditions,
+		endpoint_config_with_nth_conditions(),
 		map[string]string{},
 		map[string]string{},
 		[]types.RequestRecord{
@@ -112,7 +114,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_ThirdRequest(t *testing.T) {
 	assert.Equal(t, []byte(`this is the third response.`), response.Body)
 }
 
-func Test_ResolveEndpointResponse_Condition_Nth_FourthRequest(t *testing.T) {
+func Test_ResolveEndpointResponse_Condition_Nth_SubsequentRequests(t *testing.T) {
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 
@@ -122,7 +124,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_FourthRequest(t *testing.T) {
 		newRequest("foo/bar", http.MethodGet),
 		requestBody,
 		&state,
-		&endpoint_config_with_nth_conditions,
+		endpoint_config_with_nth_conditions(),
 		map[string]string{},
 		map[string]string{},
 		[]types.RequestRecord{
@@ -133,10 +135,50 @@ func Test_ResolveEndpointResponse_Condition_Nth_FourthRequest(t *testing.T) {
 			newRequestRecord("foo/bar", "get"),
 			newRequestRecord("foo/bar", "get"),
 			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
 		},
 	)
 
 	assert.Equal(t, []byte(`default response.`), response.Body)
+}
+
+func Test_ResolveEndpointResponse_Condition_Nth_WithPlus(t *testing.T) {
+	osMockInstance := osMock{}
+	execMockInstance := execMock{}
+
+	endpointConfig := endpoint_config_with_nth_conditions()
+	endpointConfig.ResponseIf[1].Condition.Value = "3+"
+
+	response, _, _ := mock.ResolveEndpointResponse(
+		osMockInstance.ReadFile,
+		execMockInstance.Exec,
+		newRequest("foo/bar", http.MethodGet),
+		requestBody,
+		&state,
+		endpointConfig,
+		map[string]string{},
+		map[string]string{},
+		[]types.RequestRecord{
+			newRequestRecord("irrelevant_request", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("irrelevant_request", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+		},
+	)
+
+	assert.Equal(t, []byte(`this is the third response.`), response.Body)
 }
 
 func newRequest(route, method string) *http.Request {
