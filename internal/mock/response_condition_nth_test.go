@@ -112,6 +112,33 @@ func Test_ResolveEndpointResponse_Condition_Nth_ThirdRequest(t *testing.T) {
 	assert.Equal(t, []byte(`this is the third response.`), response.Body)
 }
 
+func Test_ResolveEndpointResponse_Condition_Nth_FourthRequest(t *testing.T) {
+	osMockInstance := osMock{}
+	execMockInstance := execMock{}
+
+	response, _, _ := mock.ResolveEndpointResponse(
+		osMockInstance.ReadFile,
+		execMockInstance.Exec,
+		newRequest("foo/bar", http.MethodGet),
+		requestBody,
+		&state,
+		&endpoint_config_with_nth_conditions,
+		map[string]string{},
+		map[string]string{},
+		[]types.RequestRecord{
+			newRequestRecord("irrelevant_request", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("irrelevant_request", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+			newRequestRecord("foo/bar", "get"),
+		},
+	)
+
+	assert.Equal(t, []byte(`default response.`), response.Body)
+}
+
 func newRequest(route, method string) *http.Request {
 	requestMock = httptest.NewRequest(http.MethodGet, "/", strings.NewReader(""))
 	requestMock.RequestURI = "foo/bar"
