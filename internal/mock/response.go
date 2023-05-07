@@ -38,6 +38,7 @@ func ResolveEndpointResponse(
 	endpointConfig *types.EndpointConfig,
 	envVars map[string]string,
 	endpointParams map[string]string,
+	requestRecords []types.RequestRecord,
 ) (*Response, error, map[string]string) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
@@ -47,7 +48,7 @@ func ResolveEndpointResponse(
 	}
 
 	if hasResponseIf {
-		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(requestRecord, endpointConfig)
+		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(requestRecord, endpointConfig, requestRecords)
 		matchingResponseIf = matchingResponseIfB
 		hasResponseIf = foundMatchingResponseIf
 	}
@@ -95,12 +96,12 @@ func resolveResponseStatusCode(statusCode int) int {
 	return statusCode
 }
 
-func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) (*types.ResponseIf, bool) {
+func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig, requestRecords []types.RequestRecord) (*types.ResponseIf, bool) {
 	matchingResponseIfs := make([]int, 0)
 
 	for responseIfKey := range endpointConfig.ResponseIf {
 		responseIf := endpointConfig.ResponseIf[responseIfKey]
-		matches := resolveSingleResponseIf(requestRecord, responseIf.Condition)
+		matches := resolveSingleResponseIf(requestRecord, responseIf.Condition, requestRecords)
 
 		if matches {
 			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
@@ -114,8 +115,8 @@ func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types
 	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
 }
 
-func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Condition) bool {
-	conditionFunction := resolveAssertTypeFunc(condition.Type)
+func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Condition, requestRecords []types.RequestRecord) bool {
+	conditionFunction := resolveAssertTypeFunc(condition.Type, requestRecords)
 	validationErrors, err := conditionFunction(requestRecord, condition)
 	if err != nil {
 		panic(err)
@@ -130,11 +131,11 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 	}
 
 	if result && hasAnd {
-		return resolveSingleResponseIf(requestRecord, condition.And)
+		return resolveSingleResponseIf(requestRecord, condition.And, requestRecords)
 	}
 
 	if !result && hasOr {
-		return resolveSingleResponseIf(requestRecord, condition.Or)
+		return resolveSingleResponseIf(requestRecord, condition.Or, requestRecords)
 	}
 
 	if !result && !hasOr {

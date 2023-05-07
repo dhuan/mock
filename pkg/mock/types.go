@@ -15,6 +15,7 @@ var condition_type_code_encoding_map = map[ConditionType]string{
 	ConditionType_FormMatch:             "form_match",
 	ConditionType_QuerystringMatch:      "querystring_match",
 	ConditionType_QuerystringExactMatch: "querystring_exact_match",
+	ConditionType_Nth:                   "nth",
 }
 
 type ConditionType int
@@ -27,6 +28,7 @@ const (
 	ConditionType_FormMatch
 	ConditionType_QuerystringMatch
 	ConditionType_QuerystringExactMatch
+	ConditionType_Nth
 )
 
 func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
@@ -64,6 +66,12 @@ func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
 
 	if conditionTypeText == "querystring_exact_match" {
 		*this = ConditionType_QuerystringExactMatch
+
+		return nil
+	}
+
+	if conditionTypeText == "nth" {
+		*this = ConditionType_Nth
 
 		return nil
 	}

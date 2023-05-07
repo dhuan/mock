@@ -2,6 +2,7 @@ package mock
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"reflect"
 	"sort"
@@ -44,6 +45,63 @@ func assertHeaderMatch(requestRecord *types.RequestRecord, assert *Condition) ([
 	}
 
 	return validationErrors, nil
+}
+
+func filterRequestRecordsMatchingRouteAndMethod(
+	requestRecords []types.RequestRecord,
+	route,
+	method string,
+) []types.RequestRecord {
+	result := make([]types.RequestRecord, 0)
+
+	for i := range requestRecords {
+		if requestRecords[i].Route == route && requestRecords[i].Method == method {
+			result = append(result, requestRecords[i])
+		}
+	}
+
+	return result
+}
+
+func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+	return func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+		filteredRequestRecords := filterRequestRecordsMatchingRouteAndMethod(requestRecords, requestRecord.Route, requestRecord.Method)
+		currentRequestNthNumber := len(filteredRequestRecords) + 1
+		currentRequestNth := fmt.Sprint(currentRequestNthNumber)
+
+		if utils.EndsWith(assert.Value, "+") {
+			return assertNthWithPlus(filteredRequestRecords, currentRequestNthNumber, assert)
+		}
+
+		if string(currentRequestNth) != assert.Value {
+			return []ValidationError{
+				{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
+					"nth_requested": string(currentRequestNth),
+					"nth_expected":  assert.Value,
+				}},
+			}, nil
+		}
+
+		return []ValidationError{}, nil
+	}
+}
+
+func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequestNth int, assert *Condition) ([]ValidationError, error) {
+	expected, err := utils.ExtractNumbersFromString(assert.Value)
+	if err != nil {
+		return []ValidationError{}, err
+	}
+
+	if expected <= len(matchingRequestRecords) {
+		return []ValidationError{}, nil
+	}
+
+	return []ValidationError{
+		{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
+			"nth_requested": fmt.Sprint(currentRequestNth),
+			"nth_expected":  assert.Value,
+		}},
+	}, nil
 }
 
 func assertMethodMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {

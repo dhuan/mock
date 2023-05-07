@@ -57,14 +57,14 @@ func Validate(
 
 	requestRecord := requestRecords[nth-1]
 
-	return validate(&requestRecord, assertConfig.Assert)
+	return validate(&requestRecord, assertConfig.Assert, requestRecords)
 }
 
-func validate(requestRecord *types.RequestRecord, assert *Condition) (*[]ValidationError, error) {
+func validate(requestRecord *types.RequestRecord, assert *Condition, requestRecords []types.RequestRecord) (*[]ValidationError, error) {
 	hasAnd := assert.And != nil
 	hasOr := assert.Or != nil
 	validationErrors := make([]ValidationError, 0)
-	assertFunc := resolveAssertTypeFunc(assert.Type)
+	assertFunc := resolveAssertTypeFunc(assert.Type, requestRecords)
 	validationErrorsCurrent, err := assertFunc(requestRecord, assert)
 	success := len(validationErrorsCurrent) == 0
 	if err != nil {
@@ -80,7 +80,7 @@ func validate(requestRecord *types.RequestRecord, assert *Condition) (*[]Validat
 	}
 
 	if success && hasAnd {
-		furtherValidationErrors, err := validate(requestRecord, assert.And)
+		furtherValidationErrors, err := validate(requestRecord, assert.And, requestRecords)
 		if err != nil {
 			return &validationErrors, err
 		}
@@ -89,7 +89,7 @@ func validate(requestRecord *types.RequestRecord, assert *Condition) (*[]Validat
 	}
 
 	if !success && hasOr {
-		furtherValidationErrors, err := validate(requestRecord, assert.Or)
+		furtherValidationErrors, err := validate(requestRecord, assert.Or, requestRecords)
 		if err != nil {
 			return &validationErrors, err
 		}
@@ -106,6 +106,7 @@ func validate(requestRecord *types.RequestRecord, assert *Condition) (*[]Validat
 
 func resolveAssertTypeFunc(
 	conditionType ConditionType,
+	requestRecords []types.RequestRecord,
 ) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	if conditionType == ConditionType_HeaderMatch {
 		return assertHeaderMatch
@@ -129,6 +130,10 @@ func resolveAssertTypeFunc(
 
 	if conditionType == ConditionType_QuerystringExactMatch {
 		return assertQuerystringExactMatch
+	}
+
+	if conditionType == ConditionType_Nth {
+		return assertNth(requestRecords)
 	}
 
 	panic(fmt.Sprintf("Failed to resolve assert type: %d", conditionType))

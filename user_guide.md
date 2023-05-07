@@ -31,6 +31,7 @@
   - [`form_match`](#form_match)
   - [`header_match`](#header_match)
   - [`method_match`](#method_match)
+  - [`nth`](#nth)
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
   - [`POST __mock__/reset`](#post-__mock__reset)
@@ -854,6 +855,25 @@ Matches against the HTTP Method (Get, Post etc) the Request was called with.
 }
 ```
 
+### `nth`
+
+Matches if the current request is nth on the request history. Note that both route and method must match. In the example below, a match will occur only if the request is the 2nd made so far to the server.
+
+```json
+{
+  "type": "nth",
+  "value": 2
+}
+```
+
+It's also possible to match all subsequent requests after a given number, just add a "+" (plus) sign after the number (note also that to accomplish this, the value must be defined as a string). For example, let's match all requests starting from the second onwards:
+
+```json
+{
+  "type": "nth",
+  "value": "2+"
+}
+```
 
 ## Mock API Reference
 
