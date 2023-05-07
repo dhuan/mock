@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- `nth` condition option: Conditional responses can be set based on their position in the request history.
+
 ## 0.7.0
 
 ADDED
