@@ -244,6 +244,26 @@ func pwd() string {
 	return fmt.Sprintf("%s/../..", wd)
 }
 
+type TestRequest struct {
+	Method  string
+	Route   string
+	Headers map[string]string
+	Body    string
+}
+
+func NewGetTestRequest(route string) *TestRequest {
+	return &TestRequest{
+		Route: route,
+	}
+}
+
+func NewPostTestRequest(route string) *TestRequest {
+	return &TestRequest{
+		Route:  route,
+		Method: "post",
+	}
+}
+
 func RunTest(
 	t *testing.T,
 	configurationFilePath,
@@ -253,7 +273,23 @@ func RunTest(
 	body string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, configurationFilePath, "", method, route, headers, body, nil, assertionFunc...)
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	RunTestBase(t, configurationFilePath, "", []TestRequest{request}, nil, assertionFunc...)
+}
+
+func RunTestWithMultipleRequests(
+	t *testing.T,
+	configurationFilePath string,
+	requests []TestRequest,
+	assertionFunc ...func(t *testing.T, response *Response),
+) {
+	RunTestBase(t, configurationFilePath, "", requests, nil, assertionFunc...)
 }
 
 func RunTestWithEnv(
@@ -266,7 +302,14 @@ func RunTestWithEnv(
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, configurationFilePath, "", method, route, headers, body, env, assertionFunc...)
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	RunTestBase(t, configurationFilePath, "", []TestRequest{request}, env, assertionFunc...)
 }
 
 func RunTestWithArgs(
@@ -279,7 +322,14 @@ func RunTestWithArgs(
 	body string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, configurationFilePath, strings.Join(args, " "), method, route, headers, body, map[string]string{}, assertionFunc...)
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	RunTestBase(t, configurationFilePath, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
 func RunTestWithNoConfigAndWithArgs(
@@ -291,7 +341,14 @@ func RunTestWithNoConfigAndWithArgs(
 	body string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, "", strings.Join(args, " "), method, route, headers, body, map[string]string{}, assertionFunc...)
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	RunTestBase(t, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
 func RunTestWithAndWithArgsAndWithEnv(
@@ -304,7 +361,14 @@ func RunTestWithAndWithArgsAndWithEnv(
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
-	RunTestBase(t, "", strings.Join(args, " "), method, route, headers, body, env, assertionFunc...)
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	RunTestBase(t, "", strings.Join(args, " "), []TestRequest{request}, env, assertionFunc...)
 }
 
 func resolveCommand(configurationFilePath string) string {
@@ -318,11 +382,8 @@ func resolveCommand(configurationFilePath string) string {
 func RunTestBase(
 	t *testing.T,
 	configurationFilePath,
-	extraArgs,
-	method,
-	route string,
-	headers map[string]string,
-	body string,
+	extraArgs string,
+	requests []TestRequest,
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
@@ -334,7 +395,11 @@ func RunTestBase(
 	killMock, _, mockConfig := RunMockBg(NewState(), command, env)
 	defer killMock()
 
-	response := Request(mockConfig, method, route, body, headers)
+	response := &Response{}
+
+	for i := range requests {
+		response = Request(mockConfig, requests[i].Method, requests[i].Route, requests[i].Body, requests[i].Headers)
+	}
 
 	for i := range assertionFunc {
 		assertionFunc[i](t, response)
@@ -470,7 +535,7 @@ func AssertMapHasValues[T_Key comparable, T_Value comparable](
 }
 
 func IndexOf[T comparable](list []T, value T) int {
-	for i, _ := range list {
+	for i := range list {
 		if list[i] == value {
 			return i
 		}

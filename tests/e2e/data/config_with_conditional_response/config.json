@@ -1,6 +1,11 @@
 {
   "endpoints": [
     {
+      "route": "dummy_endpoint",
+      "method": "GET",
+      "response": "This is a dummy endpoint."
+    },
+    {
       "route": "with_different_responses_based_on_querystring",
       "method": "POST",
       "response": "This is the default response.",
@@ -57,6 +62,44 @@
           }
         }
       ]
+    },
+    {
+      "route": "conditional_response/nth",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Second response",
+          "condition": {
+            "type": "nth",
+            "value": "2"
+          }
+        },
+        {
+          "response": "Third response",
+          "condition": {
+            "type": "nth",
+            "value": "3"
+          }
+        }
+      ]
+    },
+    {
+      "route": "conditional_response/nth/with_plus",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Second response",
+          "condition": {
+            "type": "nth",
+            "value": "2+"
+          }
+        }
+      ]
+    },
+    {
+      "route": "conditional_response/nth",
+      "method": "post",
+      "response": "Default response (post)."
     }
   ]
 }
