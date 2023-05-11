@@ -18,7 +18,7 @@ func Test_Validate_NoCalls(t *testing.T) {
 func Test_Validate_HeaderNotIncluded(t *testing.T) {
 	RunUnitTest(
 		t,
-		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
+		AddGetRequestRecordWithHeaders("foobar", [][]string{{"some_header_key", "some_header_value"}}),
 		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_HeaderMatch, "foo", "bar")),
 		ExpectOneValidationError(ValidationErrorCode_HeaderNotIncluded, map[string]string{
 			"missing_header_key": "foo",
@@ -29,7 +29,7 @@ func Test_Validate_HeaderNotIncluded(t *testing.T) {
 func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 	RunUnitTest(
 		t,
-		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
+		AddGetRequestRecordWithHeaders("foobar", [][]string{{"some_header_key", "some_header_value"}}),
 		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_HeaderMatch, map[string]interface{}{
 			"foo":  "bar",
 			"foo2": "bar2",
@@ -47,7 +47,7 @@ func Test_Validate_HeaderNotIncludedMany(t *testing.T) {
 func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 	RunUnitTest(
 		t,
-		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
+		AddGetRequestRecordWithHeaders("foobar", [][]string{{"some_header_key", "some_header_value"}}),
 		Validate("foobar", AssertOptionsWithKeyValue(ConditionType_HeaderMatch, "some_header_key", "a_different_header_value")),
 		ExpectOneValidationError(ValidationErrorCode_HeaderValueMismatch, map[string]string{
 			"header_key":             "some_header_key",
@@ -60,7 +60,7 @@ func Test_Validate_HeaderMismatch_Single(t *testing.T) {
 func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 	RunUnitTest(
 		t,
-		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
+		AddGetRequestRecordWithHeaders("foobar", [][]string{{"some_header_key", "some_header_value"}}),
 		Validate("foobar", AssertOptionsWithKeyValues(ConditionType_HeaderMatch, map[string]interface{}{
 			"some_header_key": "a_different_header_value",
 		})),
@@ -75,7 +75,7 @@ func Test_Validate_HeaderMismatch_Many(t *testing.T) {
 func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 	RunUnitTest(
 		t,
-		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
+		AddGetRequestRecordWithHeaders("foobar", [][]string{{"some_header_key", "some_header_value"}}),
 		Validate("foobar",
 			&Condition{
 				Type: ConditionType_HeaderMatch,
@@ -98,7 +98,7 @@ func Test_Validate_WithAndChainingAssertingMethodAndHeader_Fail(t *testing.T) {
 func Test_Validate_WithAndChainingAssertingMethodAndHeader(t *testing.T) {
 	RunUnitTest(
 		t,
-		AddGetRequestRecordWithHeaders("foobar", [][]string{[]string{"some_header_key", "some_header_value"}}),
+		AddGetRequestRecordWithHeaders("foobar", [][]string{{"some_header_key", "some_header_value"}}),
 		Validate("foobar",
 			&Condition{
 				Type: ConditionType_HeaderMatch,
