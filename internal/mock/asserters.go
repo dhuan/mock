@@ -69,15 +69,15 @@ func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.R
 		currentRequestNthNumber := len(filteredRequestRecords) + 1
 		currentRequestNth := fmt.Sprint(currentRequestNthNumber)
 
-		if utils.EndsWith(assert.Value, "+") {
+		if utils.EndsWith(string(assert.Value), "+") {
 			return assertNthWithPlus(filteredRequestRecords, currentRequestNthNumber, assert)
 		}
 
-		if string(currentRequestNth) != assert.Value {
+		if string(currentRequestNth) != string(assert.Value) {
 			return []ValidationError{
 				{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
 					"nth_requested": string(currentRequestNth),
-					"nth_expected":  assert.Value,
+					"nth_expected":  string(assert.Value),
 				}},
 			}, nil
 		}
@@ -87,7 +87,7 @@ func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.R
 }
 
 func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequestNth int, assert *Condition) ([]ValidationError, error) {
-	expected, err := utils.ExtractNumbersFromString(assert.Value)
+	expected, err := utils.ExtractNumbersFromString(string(assert.Value))
 	if err != nil {
 		return []ValidationError{}, err
 	}
@@ -99,7 +99,7 @@ func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequ
 	return []ValidationError{
 		{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
 			"nth_requested": fmt.Sprint(currentRequestNth),
-			"nth_expected":  assert.Value,
+			"nth_expected":  string(assert.Value),
 		}},
 	}, nil
 }
@@ -107,12 +107,12 @@ func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequ
 func assertMethodMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
-	if requestRecord.Method != strings.ToLower(assert.Value) {
+	if requestRecord.Method != strings.ToLower(string(assert.Value)) {
 		validationErrors = append(validationErrors, ValidationError{
 			Code: ValidationErrorCode_MethodMismatch,
 			Metadata: map[string]string{
 				"method_requested": requestRecord.Method,
-				"method_expected":  assert.Value,
+				"method_expected":  string(assert.Value),
 			},
 		})
 	}
@@ -347,7 +347,7 @@ func getKeyValuePairsFromAssertionOptions(assert *Condition) map[string]interfac
 
 	if assert.Key != "" {
 		keys = append(keys, assert.Key)
-		keyValuePairs[assert.Key] = assert.Value
+		keyValuePairs[assert.Key] = string(assert.Value)
 	}
 
 	for key, value := range assert.KeyValues {

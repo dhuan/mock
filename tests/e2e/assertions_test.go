@@ -280,7 +280,7 @@ func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
 			Route: "foo/bar",
 			Assert: &mocklib.Condition{
 				Type:  mocklib.ConditionType_MethodMatch,
-				Value: assertMethod,
+				Value: mocklib.ConditionValue(assertMethod),
 			},
 		}, serverOutput)
 

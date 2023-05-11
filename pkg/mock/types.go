@@ -92,10 +92,21 @@ func (this *ConditionType) MarshalJSON() ([]byte, error) {
 	)
 }
 
+type ConditionValue string
+
+func (this *ConditionValue) UnmarshalJSON(data []byte) (err error) {
+	conditionTypeText := utils.Unquote(string(data))
+	var valueStringified ConditionValue = ConditionValue(conditionTypeText)
+
+	*this = valueStringified
+
+	return nil
+}
+
 type Condition struct {
 	Type      ConditionType          `json:"type"`
 	Key       string                 `json:"key"`
-	Value     string                 `json:"value"`
+	Value     ConditionValue         `json:"value"`
 	KeyValues map[string]interface{} `json:"key_values"`
 	And       *Condition             `json:"and"`
 	Or        *Condition             `json:"or"`
