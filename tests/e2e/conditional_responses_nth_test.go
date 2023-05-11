@@ -10,6 +10,7 @@ func Test_E2E_ConditionalResponses_Nth_FirstRequest(t *testing.T) {
 	nthEndpoints := []string{
 		"conditional_response/nth",
 		"conditional_response/nth/with_numbers",
+		"conditional_response/nth/with_param/some_value",
 	}
 
 	for _, nthEndpoint := range nthEndpoints {
@@ -42,6 +43,7 @@ func Test_E2E_ConditionalResponses_Nth_SecondRequest(t *testing.T) {
 	nthEndpoints := []string{
 		"conditional_response/nth",
 		"conditional_response/nth/with_numbers",
+		"conditional_response/nth/with_param/some_value",
 	}
 
 	for _, nthEndpoint := range nthEndpoints {
@@ -67,6 +69,7 @@ func Test_E2E_ConditionalResponses_Nth_ThirdRequest(t *testing.T) {
 	nthEndpoints := []string{
 		"conditional_response/nth",
 		"conditional_response/nth/with_numbers",
+		"conditional_response/nth/with_param/some_value",
 	}
 
 	for _, nthEndpoint := range nthEndpoints {
@@ -94,6 +97,7 @@ func Test_E2E_ConditionalResponses_Nth_FourthRequestFallsbackToDefault(t *testin
 	nthEndpoints := []string{
 		"conditional_response/nth",
 		"conditional_response/nth/with_numbers",
+		"conditional_response/nth/with_param/some_value",
 	}
 
 	for _, nthEndpoint := range nthEndpoints {

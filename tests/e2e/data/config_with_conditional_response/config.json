@@ -84,6 +84,26 @@
       ]
     },
     {
+      "route": "conditional_response/nth/with_param/{some_param}",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Second response",
+          "condition": {
+            "type": "nth",
+            "value": "2"
+          }
+        },
+        {
+          "response": "Third response",
+          "condition": {
+            "type": "nth",
+            "value": "3"
+          }
+        }
+      ]
+    },
+    {
       "route": "conditional_response/nth/with_numbers",
       "response": "Default response",
       "response_if": [

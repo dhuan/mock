@@ -226,7 +226,8 @@ func newEndpointHandler(
 		envVars := getAllEnvVars()
 		endpointParams := getEndpointParams(r)
 
-		requestRecords, err := mockFs.GetRecordsMatchingRoute(endpointConfig.Route)
+		requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
+		requestRecords, err := mockFs.GetRecordsMatchingRoute(requestRoute)
 		if err != nil {
 			panic(err)
 		}
