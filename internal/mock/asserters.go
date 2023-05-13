@@ -13,7 +13,7 @@ import (
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
-func assertHeaderMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+func assertHeaderMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 	keyValues := getKeyValuePairsFromAssertionOptions(assert)
 
@@ -63,27 +63,26 @@ func filterRequestRecordsMatchingRouteAndMethod(
 	return result
 }
 
-func assertNth(requestRecords []types.RequestRecord) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
-	return func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
-		filteredRequestRecords := filterRequestRecordsMatchingRouteAndMethod(requestRecords, requestRecord.Route, requestRecord.Method)
-		currentRequestNthNumber := len(filteredRequestRecords) + 1
-		currentRequestNth := fmt.Sprint(currentRequestNthNumber)
+func assertNth(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+	filteredRequestRecords := filterRequestRecordsMatchingRouteAndMethod(requestRecords, requestRecord.Route, requestRecord.Method)
+	currentRequestNthNumber := len(filteredRequestRecords) + 1
+	currentRequestNth := fmt.Sprint(currentRequestNthNumber)
 
-		if utils.EndsWith(string(assert.Value), "+") {
-			return assertNthWithPlus(filteredRequestRecords, currentRequestNthNumber, assert)
-		}
-
-		if string(currentRequestNth) != string(assert.Value) {
-			return []ValidationError{
-				{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
-					"nth_requested": string(currentRequestNth),
-					"nth_expected":  string(assert.Value),
-				}},
-			}, nil
-		}
-
-		return []ValidationError{}, nil
+	if utils.EndsWith(string(assert.Value), "+") {
+		return assertNthWithPlus(filteredRequestRecords, currentRequestNthNumber, assert)
 	}
+
+	if string(currentRequestNth) != string(assert.Value) {
+		return []ValidationError{
+			{Code: ValidationErrorCode_NthMismatch, Metadata: map[string]string{
+				"nth_requested": string(currentRequestNth),
+				"nth_expected":  string(assert.Value),
+			}},
+		}, nil
+	}
+
+	return []ValidationError{}, nil
+
 }
 
 func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequestNth int, assert *Condition) ([]ValidationError, error) {
@@ -104,7 +103,7 @@ func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequ
 	}, nil
 }
 
-func assertMethodMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+func assertMethodMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
 	if requestRecord.Method != strings.ToLower(string(assert.Value)) {
@@ -120,7 +119,7 @@ func assertMethodMatch(requestRecord *types.RequestRecord, assert *Condition) ([
 	return validationErrors, nil
 }
 
-func assertFormMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+func assertFormMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 	requestBody := string(*requestRecord.Body)
 
@@ -163,7 +162,7 @@ func assertFormMatch(requestRecord *types.RequestRecord, assert *Condition) ([]V
 	return validationErrors, nil
 }
 
-func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+func assertQuerystringMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
 	if requestRecord.Querystring == "" {
@@ -214,7 +213,7 @@ func assertQuerystringMatch(requestRecord *types.RequestRecord, assert *Conditio
 	return validationErrors, nil
 }
 
-func assertJsonBodyMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+func assertJsonBodyMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
 
 	if len(*requestRecord.Body) == 0 {
@@ -290,8 +289,8 @@ func parseForm(requestBody string) (map[string]string, error) {
 	return formValues, nil
 }
 
-func assertQuerystringExactMatch(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
-	validationErrors, err := assertQuerystringMatch(requestRecord, assert)
+func assertQuerystringExactMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+	validationErrors, err := assertQuerystringMatch(requestRecord, requestRecords, assert)
 	if err != nil {
 		return validationErrors, err
 	}

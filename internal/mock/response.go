@@ -117,7 +117,7 @@ func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types
 
 func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Condition, requestRecords []types.RequestRecord) bool {
 	conditionFunction := resolveAssertTypeFunc(condition.Type, requestRecords)
-	validationErrors, err := conditionFunction(requestRecord, condition)
+	validationErrors, err := conditionFunction(requestRecord, requestRecords, condition)
 	if err != nil {
 		panic(err)
 	}

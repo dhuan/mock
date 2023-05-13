@@ -65,7 +65,7 @@ func validate(requestRecord *types.RequestRecord, assert *Condition, requestReco
 	hasOr := assert.Or != nil
 	validationErrors := make([]ValidationError, 0)
 	assertFunc := resolveAssertTypeFunc(assert.Type, requestRecords)
-	validationErrorsCurrent, err := assertFunc(requestRecord, assert)
+	validationErrorsCurrent, err := assertFunc(requestRecord, requestRecords, assert)
 	success := len(validationErrorsCurrent) == 0
 	if err != nil {
 		return &validationErrors, err
@@ -104,39 +104,28 @@ func validate(requestRecord *types.RequestRecord, assert *Condition, requestReco
 	return &validationErrors, nil
 }
 
+type asserterFunc = func(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error)
+
+var asserters_map map[ConditionType]asserterFunc = map[ConditionType]asserterFunc{
+	ConditionType_HeaderMatch:           assertHeaderMatch,
+	ConditionType_MethodMatch:           assertMethodMatch,
+	ConditionType_JsonBodyMatch:         assertJsonBodyMatch,
+	ConditionType_FormMatch:             assertFormMatch,
+	ConditionType_QuerystringMatch:      assertQuerystringMatch,
+	ConditionType_QuerystringExactMatch: assertQuerystringExactMatch,
+	ConditionType_Nth:                   assertNth,
+}
+
 func resolveAssertTypeFunc(
 	conditionType ConditionType,
 	requestRecords []types.RequestRecord,
-) func(requestRecord *types.RequestRecord, assert *Condition) ([]ValidationError, error) {
-	if conditionType == ConditionType_HeaderMatch {
-		return assertHeaderMatch
+) asserterFunc {
+	assert, ok := asserters_map[conditionType]
+	if !ok {
+		panic(fmt.Sprintf("Failed to resolve assert type: %d", conditionType))
 	}
 
-	if conditionType == ConditionType_MethodMatch {
-		return assertMethodMatch
-	}
-
-	if conditionType == ConditionType_JsonBodyMatch {
-		return assertJsonBodyMatch
-	}
-
-	if conditionType == ConditionType_FormMatch {
-		return assertFormMatch
-	}
-
-	if conditionType == ConditionType_QuerystringMatch {
-		return assertQuerystringMatch
-	}
-
-	if conditionType == ConditionType_QuerystringExactMatch {
-		return assertQuerystringExactMatch
-	}
-
-	if conditionType == ConditionType_Nth {
-		return assertNth(requestRecords)
-	}
-
-	panic(fmt.Sprintf("Failed to resolve assert type: %d", conditionType))
+	return assert
 }
 
 func getRequestRecordMatchingRoute(mockFs types.MockFs, route string) ([]types.RequestRecord, error) {
