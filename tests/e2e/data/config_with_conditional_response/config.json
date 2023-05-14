@@ -140,6 +140,34 @@
       "route": "conditional_response/nth",
       "method": "post",
       "response": "Default response (post)."
+    },
+    {
+      "route": "conditional_response/header_match",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Header Match resolved.",
+          "condition": {
+            "type": "header_match",
+            "key_values": {
+                "foo": "bar"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "conditional_response/method_match",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Method Match resolved.",
+          "condition": {
+            "type": "method_match",
+            "value": "post"
+          }
+        }
+      ]
     }
   ]
 }
