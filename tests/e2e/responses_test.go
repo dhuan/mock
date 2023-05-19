@@ -3,6 +3,7 @@ package tests_e2e
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -15,7 +16,7 @@ func Test_E2E_Response_FileResponse(t *testing.T) {
 		"POST",
 		"foo/bar/1",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Hello world! This is response A.\n"),
 	)
 }
@@ -30,7 +31,7 @@ func Test_E2E_Response_FileResponse_WithResponseFileFlag(t *testing.T) {
 		"GET",
 		"hello/world",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world!\n"),
 	)
@@ -43,7 +44,7 @@ func Test_E2E_Response_ResponseInsideFolder(t *testing.T) {
 		"POST",
 		"foo/bar/2",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("This test asserts that you can set response files inside folders.\n"),
 	)
 }
@@ -55,7 +56,7 @@ func Test_E2E_Response_JsonResponse(t *testing.T) {
 		"POST",
 		"foo/bar/3",
 		nil,
-		"",
+		strings.NewReader(""),
 		JsonMatches(map[string]interface{}{
 			"response_text": "This is a JSON response.",
 		}),
@@ -79,7 +80,7 @@ func Test_E2E_Response_WithFile_WithAbsolutePath(t *testing.T) {
 		"GET",
 		"hello/world",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world!\n"),
 	)
@@ -92,7 +93,7 @@ func Test_E2E_Response_WithDynamicFileName(t *testing.T) {
 		"GET",
 		"books/i_robot/content",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("This is the book 'I, Robot'.\n"),
 	)
 
@@ -102,7 +103,7 @@ func Test_E2E_Response_WithDynamicFileName(t *testing.T) {
 		"GET",
 		"books/nightfall/content",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("This is the book 'Nightfall'.\n"),
 	)
 }
@@ -114,7 +115,7 @@ func Test_E2E_Response_ShellScript(t *testing.T) {
 		"GET",
 		"foo/bar",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Hello world! This response was generated from a shell script."),
 	)
 }
@@ -136,7 +137,7 @@ func Test_E2E_Response_ShellScript_WithCmdParams(t *testing.T) {
 			"GET",
 			"foo/bar",
 			nil,
-			"",
+			strings.NewReader(""),
 			StatusCodeMatches(200),
 			StringMatches("Hello world! This response was generated from a shell script."),
 		)
@@ -159,7 +160,7 @@ func Test_E2E_Response_ShellScript_WithAbsolutePath(t *testing.T) {
 		"GET",
 		"foo/bar",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world! This response was generated from a shell script."),
 	)
@@ -175,7 +176,7 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) 
 			"Some-Header-Key":    "Some-Header-Value",
 			"Another-Header-Key": "Another-Header-Value",
 		},
-		"",
+		strings.NewReader(""),
 		StringMatches(fmt.Sprintf(`Server Host: localhost:4000
 Request Host: localhost:%s
 URL: http://localhost:%s/foo/bar/2
@@ -197,7 +198,7 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables_WithPayload(t 
 		"POST",
 		"foo/bar/3",
 		nil,
-		"This is the request payload.",
+		strings.NewReader("This is the request payload."),
 		StringMatches(`Payload:
 This is the request payload.`),
 	)
@@ -210,7 +211,7 @@ func Test_E2E_Response_ShellScript_CustomHeadersAndStatusCode(t *testing.T) {
 		"POST",
 		"foo/bar/4",
 		nil,
-		"This is the request payload.",
+		strings.NewReader("This is the request payload."),
 		StringMatches(`Hello world!`),
 		HeadersMatch(map[string]string{
 			"Some-Header-Key":    "Some Header Value",
@@ -227,7 +228,7 @@ func Test_E2E_Response_ShellScript_WithParameter(t *testing.T) {
 		"POST",
 		"foo/bar/5",
 		nil,
-		"This is the request payload.",
+		strings.NewReader("This is the request payload."),
 		StringMatches(`Parameter: foobar`),
 	)
 }
@@ -239,7 +240,7 @@ func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
 		"POST",
 		"foo/bar/6",
 		nil,
-		"This is the request payload.",
+		strings.NewReader("This is the request payload."),
 		LineEquals(1, `Hello world!`),
 		LineRegexMatches(2, `tests/e2e/data/config_with_script_responses/handler_with_command_that_fails.sh:.*3: please_fail:.* not found$`),
 	)
@@ -252,7 +253,7 @@ func Test_E2E_Response_ShellScript_ReadingEndpointParams(t *testing.T) {
 		"GET",
 		"users/country/brazil/page/7",
 		nil,
-		"",
+		strings.NewReader(""),
 		LineEquals(1, `Country: brazil`),
 		LineEquals(2, `Page: 7`),
 	)
@@ -265,7 +266,7 @@ func Test_E2E_Response_Json_UsingVariables(t *testing.T) {
 		"GET",
 		"response_json_using_variables",
 		nil,
-		"",
+		strings.NewReader(""),
 		JsonMatches(map[string]interface{}{
 			"MOCK_HOST":                fmt.Sprintf("localhost:%s", GetTestPort()),
 			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
@@ -284,7 +285,7 @@ func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 		"GET",
 		"response_json_using_variables/with_file",
 		nil,
-		"",
+		strings.NewReader(""),
 		JsonMatches(map[string]interface{}{
 			"MOCK_HOST":                fmt.Sprintf("localhost:%s", GetTestPort()),
 			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
@@ -303,7 +304,7 @@ func Test_E2E_Response_Json_ReadingRouteParams_WithFile(t *testing.T) {
 		"GET",
 		"response_json_reading_route_params/foo/bar",
 		nil,
-		"",
+		strings.NewReader(""),
 		JsonMatches(map[string]interface{}{
 			"var_a": "foo",
 			"var_b": "bar",
@@ -318,7 +319,7 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		"GET",
 		"with_no_method_defined",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world."),
 	)
@@ -329,7 +330,7 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		"POST",
 		"with_no_method_defined",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(405),
 	)
 
@@ -339,7 +340,7 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		"PUT",
 		"with_no_method_defined",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(405),
 	)
 
@@ -349,7 +350,7 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		"DELETE",
 		"with_no_method_defined",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(405),
 	)
 
@@ -359,7 +360,7 @@ func Test_E2E_WithNoMethodDefinedDefaultsToGet(t *testing.T) {
 		"PATCH",
 		"with_no_method_defined",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(405),
 	)
 }
@@ -371,7 +372,7 @@ func Test_E2E_Response_Exec(t *testing.T) {
 		"GET",
 		"with/exec",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Hello world!"),
 	)
 }
@@ -383,7 +384,7 @@ func Test_E2E_Response_Exec_WithPipe(t *testing.T) {
 		"GET",
 		"with/exec/with/pipe",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Hello world!"),
 	)
 }
@@ -395,7 +396,7 @@ func Test_E2E_Response_Exec_WithEnvVariable(t *testing.T) {
 		"GET",
 		"with/exec/with/env/var",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "bar",
 		},
@@ -410,7 +411,7 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 		"GET",
 		"with/exec/print/env/with/param/bar?foo=bar",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "bar",
 		},
@@ -445,7 +446,7 @@ func Test_E2E_Response_Exec_WithCmdParams(t *testing.T) {
 			"GET",
 			"foo/bar",
 			nil,
-			"",
+			strings.NewReader(""),
 			StatusCodeMatches(200),
 			StringMatches("this text was generated through exec"),
 		)

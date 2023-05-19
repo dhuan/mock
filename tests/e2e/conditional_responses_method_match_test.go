@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -13,7 +14,7 @@ func Test_E2E_ConditionalResponses_MethodMatch_DefaultResponse(t *testing.T) {
 		"GET",
 		"conditional_response/method_match",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Default response"),
 	)
 }

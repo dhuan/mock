@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -19,7 +20,7 @@ func Test_E2E_Delay_WithoutDelay(t *testing.T) {
 	defer killMock()
 
 	timeBeforeRequest := time.Now()
-	response := e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
+	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 	timeAfterRequest := time.Now()
 
 	assert.Equal(t, 200, response.StatusCode)
@@ -42,7 +43,7 @@ func Test_E2E_Delay_WithDelay(t *testing.T) {
 	defer killMock()
 
 	timeBeforeRequest := time.Now()
-	response := e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
+	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 	timeAfterRequest := time.Now()
 
 	assert.Equal(t, 200, response.StatusCode)

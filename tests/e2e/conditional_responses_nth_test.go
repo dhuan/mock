@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -20,7 +21,7 @@ func Test_E2E_ConditionalResponses_Nth_FirstRequest(t *testing.T) {
 			"GET",
 			nthEndpoint,
 			nil,
-			"",
+			strings.NewReader(""),
 			StringMatches("Default response"),
 		)
 

@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -20,7 +21,7 @@ func Test_E2E_ConditionalResponses_QuerystringExactMatch_DefaultResponse(t *test
 			"GET",
 			requestsThatWillNotMatch[i],
 			nil,
-			"",
+			strings.NewReader(""),
 			StringMatches("Default response"),
 		)
 	}
@@ -38,7 +39,7 @@ func Test_E2E_ConditionalResponses_QuerystringExactMatch_ConditionalResponseMatc
 			"GET",
 			requestsThatWillNotMatch[i],
 			nil,
-			"",
+			strings.NewReader(""),
 			StringMatches("Conditional response with Querystring Exact Match resolved."),
 		)
 	}

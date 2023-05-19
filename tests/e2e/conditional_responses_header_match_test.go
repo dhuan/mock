@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -22,7 +23,7 @@ func Test_E2E_ConditionalResponses_HeaderMatch_DefaultResponse(t *testing.T) {
 			"GET",
 			"conditional_response/header_match",
 			headersThatWillNotMatch[i],
-			"",
+			strings.NewReader(""),
 			StringMatches("Default response"),
 		)
 	}
@@ -41,7 +42,7 @@ func Test_E2E_ConditionalResponses_HeaderMatch_MatchConditionalResponse(t *testi
 			"GET",
 			"conditional_response/header_match",
 			headersThatWillMatch[i],
-			"",
+			strings.NewReader(""),
 			StringMatches("Conditional response with Header Match resolved."),
 		)
 	}

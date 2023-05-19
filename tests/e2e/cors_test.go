@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	e2eutils "github.com/dhuan/mock/tests/e2e/utils"
@@ -15,7 +16,7 @@ func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
 	)
 	defer killMock()
 
-	response := e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
+	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
 	e2eutils.AssertMapHasValues(t, response.Headers, map[string]string{
 		"Access-Control-Allow-Credentials": "true",
@@ -33,7 +34,7 @@ func Test_E2E_Cors_HeadersAreNotSet(t *testing.T) {
 	)
 	defer killMock()
 
-	response := e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
+	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
 	headerKeys := e2eutils.GetKeys(response.Headers)
 

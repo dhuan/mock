@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	mocklib "github.com/dhuan/mock/pkg/mock"
@@ -16,7 +17,7 @@ func Test_E2E_Resetting(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", `{"foo":"bar"}`, e2eutils.ContentTypeJsonHeaders)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
 		Route: "foo/bar",

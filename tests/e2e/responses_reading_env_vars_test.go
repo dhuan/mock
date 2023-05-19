@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -13,7 +14,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_TextResponse(t *testing.T) {
 		"GET",
 		"reading/env/vars/text",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "BAR",
 		},
@@ -31,7 +32,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_TextResponse_WithCmdParams(t *
 		"GET",
 		"reading/env/vars/text",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "BAR",
 		},
@@ -47,7 +48,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_TextFileResponse(t *testing.T)
 		"GET",
 		"reading/env/vars/text_file",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "BAR",
 		},
@@ -62,7 +63,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_JsonResponse(t *testing.T) {
 		"GET",
 		"reading/env/vars/json",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "BAR",
 		},
@@ -79,7 +80,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_JsonFileResponse(t *testing.T)
 		"GET",
 		"reading/env/vars/json_file",
 		nil,
-		"",
+		strings.NewReader(""),
 		map[string]string{
 			"FOO": "BAR",
 		},

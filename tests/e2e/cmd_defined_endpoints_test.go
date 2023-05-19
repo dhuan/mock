@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -17,7 +18,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithOneEndpoint(t *testing.T) {
 		"GET",
 		"hello/world",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world!"),
 	)
@@ -39,7 +40,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithMultipleEndpoints(t *testing.T) {
 		"GET",
 		"endpoint/one",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("First endpoint."),
 	)
@@ -50,7 +51,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithMultipleEndpoints(t *testing.T) {
 		"POST",
 		"endpoint/two",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Second endpoint."),
 	)
@@ -61,7 +62,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithMultipleEndpoints(t *testing.T) {
 		"GET",
 		"endpoint/two",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(405),
 	)
 }
@@ -82,7 +83,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithStatusCode(t *testing.T) {
 		"GET",
 		"endpoint/one",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(201),
 		StringMatches("First endpoint."),
 	)
@@ -93,7 +94,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithStatusCode(t *testing.T) {
 		"GET",
 		"endpoint/two",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(202),
 		StringMatches("Second endpoint."),
 	)
@@ -118,7 +119,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithHeaders(t *testing.T) {
 		"GET",
 		"endpoint/one",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("First endpoint."),
 		HeaderKeysNotIncluded([]string{
 			"Header-One",
@@ -133,7 +134,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithHeaders(t *testing.T) {
 		"GET",
 		"endpoint/two",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Second endpoint."),
 		HeadersMatch(map[string]string{
 			"Header-One": "1st header",
@@ -147,7 +148,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithHeaders(t *testing.T) {
 		"GET",
 		"endpoint/three",
 		nil,
-		"",
+		strings.NewReader(""),
 		StringMatches("Third endpoint."),
 		HeadersMatch(map[string]string{
 			"Header-Three": "3rd header",
@@ -165,7 +166,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithoutMethodDefaultsToGet(t *testing.
 		"GET",
 		"hello/world",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world!"),
 	)
@@ -182,7 +183,7 @@ func Test_E2E_CommandLineDefinedEndpoints_WithConfigAndArgs(t *testing.T) {
 		"GET",
 		"hello/world",
 		nil,
-		"",
+		strings.NewReader(""),
 		StatusCodeMatches(200),
 		StringMatches("Hello world!"),
 	)

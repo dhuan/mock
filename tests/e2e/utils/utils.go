@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -103,11 +104,11 @@ func MockAssert(assertConfig *mocklib.AssertConfig, serverOutput *bytes.Buffer) 
 	return validationErrors
 }
 
-func Request(config *mocklib.MockConfig, method, route, payload string, headers map[string]string) *Response {
+func Request(config *mocklib.MockConfig, method, route string, payload io.Reader, headers map[string]string) *Response {
 	request, err := http.NewRequest(
 		method,
 		fmt.Sprintf("http://%s/%s", config.Url, route),
-		bytes.NewBuffer([]byte(payload)),
+		payload,
 	)
 	if err != nil {
 		panic(err)
@@ -248,7 +249,7 @@ type TestRequest struct {
 	Method  string
 	Route   string
 	Headers map[string]string
-	Body    string
+	Body    io.Reader
 }
 
 func NewGetTestRequest(route string) *TestRequest {
@@ -270,7 +271,7 @@ func RunTest(
 	method,
 	route string,
 	headers map[string]string,
-	body string,
+	body io.Reader,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
 	request := TestRequest{
@@ -298,7 +299,7 @@ func RunTestWithEnv(
 	method,
 	route string,
 	headers map[string]string,
-	body string,
+	body io.Reader,
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
@@ -319,7 +320,7 @@ func RunTestWithArgs(
 	method,
 	route string,
 	headers map[string]string,
-	body string,
+	body io.Reader,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
 	request := TestRequest{
@@ -338,7 +339,7 @@ func RunTestWithNoConfigAndWithArgs(
 	method,
 	route string,
 	headers map[string]string,
-	body string,
+	body io.Reader,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {
 	request := TestRequest{
@@ -357,7 +358,7 @@ func RunTestWithAndWithArgsAndWithEnv(
 	method,
 	route string,
 	headers map[string]string,
-	body string,
+	body io.Reader,
 	env map[string]string,
 	assertionFunc ...func(t *testing.T, response *Response),
 ) {

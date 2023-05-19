@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
@@ -21,7 +22,7 @@ func Test_E2E_ConditionalResponses_JsonBodyMatch_DefaultResponse(t *testing.T) {
 			"GET",
 			"conditional_response/json_body_match",
 			nil,
-			requestBodiesThatWillNotMatch[i],
+			strings.NewReader(requestBodiesThatWillNotMatch[i]),
 			StringMatches("Default response"),
 		)
 	}
@@ -39,7 +40,7 @@ func Test_E2E_ConditionalResponses_JsonBodyMatch_ConditionalResponseMatch(t *tes
 			"GET",
 			"conditional_response/json_body_match",
 			nil,
-			requestBodiesThatWillMatch[i],
+			strings.NewReader(requestBodiesThatWillMatch[i]),
 			StringMatches("Conditional response with Json Body Match resolved."),
 		)
 	}
@@ -57,7 +58,7 @@ func Test_E2E_ConditionalResponses_JsonBodyMatch_ConditionalResponseMatch_WithMu
 			"GET",
 			"conditional_response/json_body_match",
 			nil,
-			requestBodiesThatWillMatch[i],
+			strings.NewReader(requestBodiesThatWillMatch[i]),
 			StringMatches("Conditional response with Json Body Match resolved - with multiple fields."),
 		)
 	}
