@@ -223,6 +223,21 @@
           }
         }
       ]
+    },
+    {
+      "route": "conditional_response/form_match",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Form Match resolved.",
+          "condition": {
+            "type": "form_match",
+            "key_values": {
+                "some_key": "some_value"
+            }
+          }
+        }
+      ]
     }
   ]
 }

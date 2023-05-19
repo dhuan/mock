@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
@@ -582,4 +583,14 @@ func parseEnv(env map[string]string) []string {
 	}
 
 	return result
+}
+
+func BuildFormPayload(data map[string]string) io.Reader {
+	dataParsed := make(map[string][]string)
+
+	for key, value := range data {
+		dataParsed[key] = []string{value}
+	}
+
+	return strings.NewReader(url.Values(dataParsed).Encode())
 }
