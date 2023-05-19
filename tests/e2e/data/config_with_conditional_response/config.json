@@ -168,6 +168,61 @@
           }
         }
       ]
+    },
+    {
+      "route": "conditional_response/querystring_match",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Querystring Match resolved.",
+          "condition": {
+            "type": "querystring_match",
+            "key_values": {
+                "foo": "bar"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "conditional_response/querystring_exact_match",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Querystring Exact Match resolved.",
+          "condition": {
+            "type": "querystring_exact_match",
+            "key_values": {
+                "foo": "bar"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "conditional_response/json_body_match",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Json Body Match resolved.",
+          "condition": {
+            "type": "json_body_match",
+            "key_values": {
+                "foo": "bar"
+            }
+          }
+        },
+        {
+          "response": "Conditional response with Json Body Match resolved - with multiple fields.",
+          "condition": {
+            "type": "json_body_match",
+            "key_values": {
+                "some_key": "some_value",
+                "another_key": "another_value"
+            }
+          }
+        }
+      ]
     }
   ]
 }
