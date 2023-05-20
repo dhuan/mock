@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/dhuan/mock/internal/record"
 	"github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
 	. "github.com/dhuan/mock/pkg/mock"
@@ -32,20 +30,16 @@ type ExecResult struct {
 func ResolveEndpointResponse(
 	readFile ReadFileFunc,
 	exec ExecFunc,
-	request *http.Request,
 	requestBody []byte,
 	state *types.State,
 	endpointConfig *types.EndpointConfig,
 	envVars map[string]string,
 	endpointParams map[string]string,
+	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
 ) (*Response, error, map[string]string) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
-	requestRecord, err := record.BuildRequestRecord(request, requestBody)
-	if err != nil {
-		return &Response{[]byte(""), types.Endpoint_content_type_unknown, 0, nil}, err, nil
-	}
 
 	if hasResponseIf {
 		matchingResponseIfB, foundMatchingResponseIf := resolveResponseIf(requestRecord, endpointConfig, requestRecords)
@@ -55,7 +49,6 @@ func ResolveEndpointResponse(
 
 	if hasResponseIf {
 		return resolveEndpointResponseInternal(
-			request,
 			requestRecord,
 			requestBody,
 			readFile,
@@ -72,7 +65,6 @@ func ResolveEndpointResponse(
 	}
 
 	return resolveEndpointResponseInternal(
-		request,
 		requestRecord,
 		requestBody,
 		readFile,
@@ -146,7 +138,6 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 }
 
 func resolveEndpointResponseInternal(
-	request *http.Request,
 	requestRecord *types.RequestRecord,
 	requestBody []byte,
 	readFile ReadFileFunc,
@@ -187,7 +178,6 @@ func resolveEndpointResponseInternal(
 		endpointConfigContentType,
 		responseStatusCode,
 		requestRecord,
-		request,
 		requestBody,
 	)
 	if err != nil {
@@ -505,23 +495,22 @@ func buildVars(
 	endpointConfigContentType types.Endpoint_content_type,
 	responseStatusCode int,
 	requestRecord *types.RequestRecord,
-	request *http.Request,
 	requestBody []byte,
 ) (map[string]string, error) {
-	endpoint := utils.ReplaceRegex(request.URL.Path, []string{"^/"}, "")
+	endpoint := requestRecord.Route
 	mockHost := fmt.Sprintf("localhost:%s", state.ListenPort)
 	querystring := requestRecord.Querystring
 	protocol := "http://"
-	if request.TLS != nil {
+	if requestRecord.Https {
 		protocol = "https://"
 	}
 
 	return map[string]string{
 		"MOCK_HOST":                mockHost,
-		"MOCK_REQUEST_HOST":        request.Host,
-		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s%s", protocol, request.Host, request.URL.Path),
+		"MOCK_REQUEST_HOST":        requestRecord.Host,
+		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
 		"MOCK_REQUEST_ENDPOINT":    endpoint,
-		"MOCK_REQUEST_METHOD":      request.Method,
+		"MOCK_REQUEST_METHOD":      requestRecord.Method,
 		"MOCK_REQUEST_QUERYSTRING": querystring,
 	}, nil
 }

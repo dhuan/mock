@@ -181,7 +181,7 @@ func Test_E2E_Response_ShellScript_RequestDetailsFromEnvVariables(t *testing.T) 
 Request Host: localhost:%s
 URL: http://localhost:%s/foo/bar/2
 Endpoint: foo/bar/2
-Method: GET
+Method: get
 Querystring: some_key=some_value&another_key=another_value
 Headers:
 accept-encoding: gzip
@@ -272,7 +272,7 @@ func Test_E2E_Response_Json_UsingVariables(t *testing.T) {
 			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
 			"MOCK_REQUEST_URL":         fmt.Sprintf("http://localhost:%s/response_json_using_variables", GetTestPort()),
 			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables",
-			"MOCK_REQUEST_METHOD":      "GET",
+			"MOCK_REQUEST_METHOD":      "get",
 			"MOCK_REQUEST_QUERYSTRING": "",
 		}),
 	)
@@ -291,7 +291,7 @@ func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
 			"MOCK_REQUEST_URL":         "http://localhost:4000/response_json_using_variables/with_file",
 			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables/with_file",
-			"MOCK_REQUEST_METHOD":      "GET",
+			"MOCK_REQUEST_METHOD":      "get",
 			"MOCK_REQUEST_QUERYSTRING": "",
 		}),
 	)
@@ -420,7 +420,7 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 		LineEquals(3, `MOCK_REQUEST_ENDPOINT=with/exec/print/env/with/param/bar`),
 		LineRegexMatches(4, `MOCK_REQUEST_HEADERS=.*`),
 		LineEquals(5, fmt.Sprintf(`MOCK_REQUEST_HOST=localhost:%s`, GetTestPort())),
-		LineEquals(6, `MOCK_REQUEST_METHOD=GET`),
+		LineEquals(6, `MOCK_REQUEST_METHOD=get`),
 		LineEquals(7, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
 		LineEquals(8, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
 		LineRegexMatches(9, `MOCK_RESPONSE_HEADERS=.*`),

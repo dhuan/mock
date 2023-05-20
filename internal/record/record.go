@@ -22,6 +22,14 @@ func BuildRequestRecord(r *http.Request, requestBody []byte) (*types.RequestReco
 
 	requestRecord.Method = strings.ToLower(r.Method)
 
+	requestRecord.Host = r.Host
+
+	https := false
+	if r.TLS != nil {
+		https = true
+	}
+	requestRecord.Https = https
+
 	return requestRecord, nil
 }
 

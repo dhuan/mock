@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dhuan/mock/internal/record"
 	"github.com/dhuan/mock/internal/types"
 )
 
@@ -18,12 +17,7 @@ type MockFs struct {
 	State *types.State
 }
 
-func (this MockFs) StoreRequestRecord(r *http.Request, requestBody []byte, endpointConfig *types.EndpointConfig) error {
-	requestRecord, err := record.BuildRequestRecord(r, requestBody)
-	if err != nil {
-		return err
-	}
-
+func (this MockFs) StoreRequestRecord(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) error {
 	requestRecordJson, err := buildRequestRecordJson(requestRecord)
 	if err != nil {
 		return err

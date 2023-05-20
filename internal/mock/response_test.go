@@ -1,10 +1,6 @@
 package mock_test
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strings"
 	"testing"
 
 	"github.com/dhuan/mock/internal/mock"
@@ -16,7 +12,6 @@ import (
 
 var readFileMockReturn = []byte("")
 
-var requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 var requestBody = []byte("")
 
 var state types.State = types.State{
@@ -55,12 +50,12 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -90,12 +85,12 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -127,12 +122,12 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -162,12 +157,12 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -188,12 +183,12 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -201,7 +196,6 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
-    requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -234,12 +228,12 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -259,7 +253,6 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=WORLD"}}
 	execMockInstance := execMock{}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
@@ -290,12 +283,12 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=WORLD"},
 		[]types.RequestRecord{},
 	)
 
@@ -313,7 +306,6 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}, RequestURI: "?hello=world&foo=bar"}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -350,12 +342,12 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
 	)
 
@@ -375,7 +367,6 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDefault(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -410,12 +401,12 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
 	)
 
@@ -433,7 +424,6 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 }
 
 func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToConditionalResponse(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -468,12 +458,12 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+        &types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -488,10 +478,10 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		types.Endpoint_content_type_plaintext,
 		response.EndpointContentType,
 	)
+
 }
 
 func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world&foo=bar"}, RequestURI: "?hello=world&foo=bar"}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -532,12 +522,12 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
 	)
 
@@ -555,7 +545,6 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "hello=world"}, RequestURI: "?hello=world"}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -583,12 +572,12 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -620,12 +609,12 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -656,12 +645,12 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -676,7 +665,6 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 }
 
 func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=bar"}, RequestURI: "?foo=bar"}
 	execMockInstance := execMock{}
 	osMockInstance := osMock{}
 	endpointConfig := types.EndpointConfig{
@@ -707,12 +695,12 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "foo=bar"},
 		[]types.RequestRecord{},
 	)
 
@@ -727,7 +715,6 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 }
 
 func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_ConditionNotMatching(t *testing.T) {
-	requestMock = &http.Request{URL: &url.URL{RawQuery: "foo=not_bar"}}
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -758,12 +745,12 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 
@@ -778,13 +765,6 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 }
 
 func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
-	requestMock = httptest.NewRequest(
-		http.MethodPost,
-		"/",
-		strings.NewReader(""),
-	)
-	requestMock.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	requestBody = []byte("foo=bar&foo2=bar2")
 	osMockInstance := osMock{}
 	execMockInstance := execMock{}
 	endpointConfig := types.EndpointConfig{
@@ -813,15 +793,17 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		},
 	}
 
+	body := []byte("foo=bar&foo2=bar2")
+
 	response, _, _ := mock.ResolveEndpointResponse(
 		osMockInstance.ReadFile,
 		execMockInstance.Exec,
-		requestMock,
 		requestBody,
 		&state,
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
+		&types.RequestRecord{Method: "post", Querystring: "hello=world", Body: &body},
 		[]types.RequestRecord{},
 	)
 

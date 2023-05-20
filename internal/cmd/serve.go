@@ -18,6 +18,7 @@ import (
 	"github.com/dhuan/mock/internal/args2config"
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/mockfs"
+	"github.com/dhuan/mock/internal/record"
 	"github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -232,15 +233,20 @@ func newEndpointHandler(
 			panic(err)
 		}
 
+		requestRecord, err := record.BuildRequestRecord(r, requestBody)
+		if err != nil {
+			panic(err)
+		}
+
 		response, err, errorMetadata := mock.ResolveEndpointResponse(
 			readFile,
 			execute,
-			r,
 			requestBody,
 			state,
 			endpointConfig,
 			envVars,
 			endpointParams,
+			requestRecord,
 			requestRecords,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
@@ -271,7 +277,7 @@ func newEndpointHandler(
 			setCorsHeaders(w)
 		}
 
-		err = mockFs.StoreRequestRecord(r, requestBody, endpointConfig)
+		err = mockFs.StoreRequestRecord(requestRecord, endpointConfig)
 		if err != nil {
 			panic(err)
 		}

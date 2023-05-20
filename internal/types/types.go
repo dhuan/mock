@@ -35,12 +35,14 @@ type RequestRecord struct {
 	Route       string      `json:"route"`
 	Querystring string      `json:"querystring"`
 	Method      string      `json:"method"`
+	Host        string      `json:"host"`
+	Https       bool        `json:"https"`
 	Headers     http.Header `json:"headers"`
 	Body        *[]byte     `json:"body"`
 }
 
 type MockFs interface {
-	StoreRequestRecord(r *http.Request, requestBody []byte, endpointConfig *EndpointConfig) error
+	StoreRequestRecord(requestRecord *RequestRecord, endpointConfig *EndpointConfig) error
 	GetRecordsMatchingRoute(route string) ([]RequestRecord, error)
 	RemoveAllRequestRecords() error
 }
