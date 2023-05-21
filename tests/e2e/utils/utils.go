@@ -381,6 +381,16 @@ func resolveCommand(configurationFilePath string) string {
 	return fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath)
 }
 
+func afterTest(t *testing.T, output *bytes.Buffer) {
+	if t.Failed() {
+		fmt.Println("\n===========================================================================")
+		fmt.Println("Server output for failed test:")
+		fmt.Println("===========================================================================")
+		fmt.Println(output.String())
+		fmt.Println("===========================================================================")
+	}
+}
+
 func RunTestBase(
 	t *testing.T,
 	configurationFilePath,
@@ -394,8 +404,9 @@ func RunTestBase(
 		command = fmt.Sprintf("%s %s", command, extraArgs)
 	}
 
-	killMock, _, mockConfig := RunMockBg(NewState(), command, env)
+	killMock, output, mockConfig := RunMockBg(NewState(), command, env)
 	defer killMock()
+	defer afterTest(t, output)
 
 	response := &Response{}
 
