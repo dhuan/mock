@@ -34,6 +34,10 @@ func Test_E2E_ConditionalResponses_FormMatch_ConditionalResponseMatch(t *testing
 		BuildFormPayload(map[string]string{
 			"some_key": "some_value",
 		}),
+		BuildFormPayload(map[string]string{
+			"some_key":    "some_value",
+			"another_key": "another_value",
+		}),
 	}
 
 	for i := range requestBodiesThatWillMatch {
