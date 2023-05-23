@@ -31,6 +31,7 @@
   - [`form_match`](#form_match)
   - [`header_match`](#header_match)
   - [`method_match`](#method_match)
+  - [`route_param_match`](#route_param_match)
   - [`nth`](#nth)
 - [Mock API Reference](#mock-api-reference)
   - [`POST __mock__/assert`](#post-__mock__assert)
@@ -852,6 +853,18 @@ Matches against the HTTP Method (Get, Post etc) the Request was called with.
 {
   "type": "method_match",
   "value": "post"
+}
+```
+
+### `route_param_match`
+
+Matches against the Route Param in the requested endpoint.
+
+```json
+{
+  "type": "route_param_match",
+  "key": "some_param_name",
+  "value": "some_value"
 }
 ```
 

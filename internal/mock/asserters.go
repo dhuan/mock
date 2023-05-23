@@ -85,6 +85,57 @@ func assertNth(requestRecord *types.RequestRecord, requestRecords []types.Reques
 
 }
 
+func assertRouteParamMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+	validationErrors := make([]ValidationError, 0)
+	keyValues := make(map[string]string)
+	hasKeyAndValue := assert.Key != "" && assert.Value != ""
+
+	if hasKeyAndValue {
+		keyValues[assert.Key] = string(assert.Value)
+	}
+
+	for key := range assert.KeyValues {
+		keyValues[key] = assert.KeyValues[key].(string)
+	}
+
+	for key := range keyValues {
+		exists, equals, value := utils.MapContainsX(requestRecord.RouteParams, key, keyValues[key], "")
+		fmt.Println("!!!!!!!!!!!!!")
+		fmt.Println(exists)
+		fmt.Println(equals)
+		fmt.Println(keyValues[key])
+		fmt.Println(value)
+
+		if !exists {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{
+					Code: ValidationErrorCode_RouteParamDoesNotExistInEndpoint,
+					Metadata: map[string]string{
+						"route_param_key": key,
+					},
+				},
+			)
+		}
+
+		if exists && !equals {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{
+					Code: ValidationErrorCode_RouteParamValueMismatch,
+					Metadata: map[string]string{
+						"route_param_key":             key,
+						"route_param_value_expected":  keyValues[key],
+						"route_param_value_requested": value,
+					},
+				},
+			)
+		}
+	}
+
+	return validationErrors, nil
+}
+
 func assertNthWithPlus(matchingRequestRecords []types.RequestRecord, currentRequestNth int, assert *Condition) ([]ValidationError, error) {
 	expected, err := utils.ExtractNumbersFromString(string(assert.Value))
 	if err != nil {

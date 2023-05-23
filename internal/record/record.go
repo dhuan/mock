@@ -8,7 +8,7 @@ import (
 	"github.com/dhuan/mock/internal/utils"
 )
 
-func BuildRequestRecord(r *http.Request, requestBody []byte) (*types.RequestRecord, error) {
+func BuildRequestRecord(r *http.Request, requestBody []byte, routeParams map[string]string) (*types.RequestRecord, error) {
 	route := utils.ReplaceRegex(r.RequestURI, []string{`^\/`}, "")
 	headers := buildHeadersForRequestRecord(&r.Header)
 	routeParsed, querystring := parseRoute(route)
@@ -29,6 +29,8 @@ func BuildRequestRecord(r *http.Request, requestBody []byte) (*types.RequestReco
 		https = true
 	}
 	requestRecord.Https = https
+
+	requestRecord.RouteParams = routeParams
 
 	return requestRecord, nil
 }

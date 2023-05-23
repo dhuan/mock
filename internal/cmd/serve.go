@@ -233,7 +233,7 @@ func newEndpointHandler(
 			panic(err)
 		}
 
-		requestRecord, err := record.BuildRequestRecord(r, requestBody)
+		requestRecord, err := record.BuildRequestRecord(r, requestBody, endpointParams)
 		if err != nil {
 			panic(err)
 		}

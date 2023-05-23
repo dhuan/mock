@@ -111,6 +111,19 @@ func MapContains[K comparable, V comparable](m map[K]V, key K, value V) bool {
 	return value == valueExtracted
 }
 
+func MapContainsX[K comparable, V comparable](m map[K]V, key K, value, fallback V) (bool, bool, V) {
+	valueExtracted, ok := m[key]
+	if !ok {
+		return false, false, fallback
+	}
+
+	if value == valueExtracted {
+		return true, true, valueExtracted
+	}
+
+	return true, false, valueExtracted
+}
+
 func AnyEquals[T comparable](list []T, value T) bool {
 	for i := range list {
 		if value == list[i] {

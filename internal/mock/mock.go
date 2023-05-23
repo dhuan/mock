@@ -114,6 +114,7 @@ var asserters_map map[ConditionType]asserterFunc = map[ConditionType]asserterFun
 	ConditionType_QuerystringMatch:      assertQuerystringMatch,
 	ConditionType_QuerystringExactMatch: assertQuerystringExactMatch,
 	ConditionType_Nth:                   assertNth,
+	ConditionType_RouteParamMatch:       assertRouteParamMatch,
 }
 
 func resolveAssertTypeFunc(

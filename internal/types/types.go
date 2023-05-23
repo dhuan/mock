@@ -32,13 +32,14 @@ type EndpointConfig struct {
 }
 
 type RequestRecord struct {
-	Route       string      `json:"route"`
-	Querystring string      `json:"querystring"`
-	Method      string      `json:"method"`
-	Host        string      `json:"host"`
-	Https       bool        `json:"https"`
-	Headers     http.Header `json:"headers"`
-	Body        *[]byte     `json:"body"`
+	Route       string            `json:"route"`
+	Querystring string            `json:"querystring"`
+	Method      string            `json:"method"`
+	Host        string            `json:"host"`
+	Https       bool              `json:"https"`
+	Headers     http.Header       `json:"headers"`
+	Body        *[]byte           `json:"body"`
+	RouteParams map[string]string `json:"route_params"`
 }
 
 type MockFs interface {

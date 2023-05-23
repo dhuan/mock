@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- New condition option: `route_param_match`
+
 ## 0.8.0
 
 ADDED

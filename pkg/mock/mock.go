@@ -12,20 +12,22 @@ import (
 )
 
 var validation_error_code_encoding_map = map[ValidationErrorCode]string{
-	ValidationErrorCode_HeaderValueMismatch:     "header_value_mismatch",
-	ValidationErrorCode_NoCall:                  "no_call",
-	ValidationErrorCode_HeaderNotIncluded:       "header_not_included",
-	ValidationErrorCode_BodyMismatch:            "body_mismatch",
-	ValidationErrorCode_RequestHasNoBodyContent: "request_has_no_body_content",
-	ValidationErrorCode_MethodMismatch:          "method_mismatch",
-	ValidationErrorCode_FormKeyDoesNotExist:     "form_key_does_not_exist",
-	ValidationErrorCode_FormValueMismatch:       "form_value_mismatch",
-	ValidationErrorCode_NthOutOfRange:           "nth_out_of_range",
-	ValidationErrorCode_RequestHasNoQuerystring: "request_has_no_querystring",
-	ValidationErrorCode_QuerystringMismatch:     "querystring_mismatch",
-	ValidationErrorCode_QuerystringKeyNotSet:    "querystring_key_not_set",
-	ValidationErrorCode_RequestHasNoBody:        "request_has_no_body",
-	ValidationErrorCode_NthMismatch:             "nth_mismatch",
+	ValidationErrorCode_HeaderValueMismatch:              "header_value_mismatch",
+	ValidationErrorCode_NoCall:                           "no_call",
+	ValidationErrorCode_HeaderNotIncluded:                "header_not_included",
+	ValidationErrorCode_BodyMismatch:                     "body_mismatch",
+	ValidationErrorCode_RequestHasNoBodyContent:          "request_has_no_body_content",
+	ValidationErrorCode_MethodMismatch:                   "method_mismatch",
+	ValidationErrorCode_FormKeyDoesNotExist:              "form_key_does_not_exist",
+	ValidationErrorCode_FormValueMismatch:                "form_value_mismatch",
+	ValidationErrorCode_NthOutOfRange:                    "nth_out_of_range",
+	ValidationErrorCode_RequestHasNoQuerystring:          "request_has_no_querystring",
+	ValidationErrorCode_QuerystringMismatch:              "querystring_mismatch",
+	ValidationErrorCode_QuerystringKeyNotSet:             "querystring_key_not_set",
+	ValidationErrorCode_RequestHasNoBody:                 "request_has_no_body",
+	ValidationErrorCode_NthMismatch:                      "nth_mismatch",
+	ValidationErrorCode_RouteParamValueMismatch:          "route_param_value_mismatch",
+	ValidationErrorCode_RouteParamDoesNotExistInEndpoint: "route_param_does_not_exist_in_endpoint",
 }
 
 type AssertHeader map[string][]string
@@ -59,6 +61,8 @@ const (
 	ValidationErrorCode_QuerystringKeyNotSet
 	ValidationErrorCode_RequestHasNoBody
 	ValidationErrorCode_NthMismatch
+	ValidationErrorCode_RouteParamValueMismatch
+	ValidationErrorCode_RouteParamDoesNotExistInEndpoint
 )
 
 func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {

@@ -238,6 +238,22 @@
           }
         }
       ]
+    },
+    {
+      "route": "conditional_response/route_param_match/{param_one}/{param_two}",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Route Param Match resolved.",
+          "condition": {
+            "type": "route_param_match",
+            "key_values": {
+                "param_one": "foo",
+                "param_two": "bar"
+            }
+          }
+        }
+      ]
     }
   ]
 }
