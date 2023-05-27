@@ -100,12 +100,6 @@ func assertRouteParamMatch(requestRecord *types.RequestRecord, requestRecords []
 
 	for key := range keyValues {
 		exists, equals, value := utils.MapContainsX(requestRecord.RouteParams, key, keyValues[key], "")
-		fmt.Println("!!!!!!!!!!!!!")
-		fmt.Println(exists)
-		fmt.Println(equals)
-		fmt.Println(keyValues[key])
-		fmt.Println(value)
-
 		if !exists {
 			validationErrors = append(
 				validationErrors,

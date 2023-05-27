@@ -28,7 +28,7 @@ func Test_E2E_ConditionalResponses_RouteParamMatch_DefaultResponse(t *testing.T)
 	}
 }
 
-func Test_E2E_ConditionalResponses_RouteParamMatch_ConditionalResponseMach(t *testing.T) {
+func Test_E2E_ConditionalResponses_RouteParamMatch_ConditionalResponseMatch(t *testing.T) {
 	requestRoutesThatWillMatch := []string{
 		"conditional_response/route_param_match/foo/bar",
 	}
@@ -42,6 +42,24 @@ func Test_E2E_ConditionalResponses_RouteParamMatch_ConditionalResponseMach(t *te
 			nil,
 			strings.NewReader(""),
 			StringMatches("Conditional response with Route Param Match resolved."),
+		)
+	}
+}
+
+func Test_E2E_ConditionalResponses_RouteParamMatch_ConditionalResponseMatch_WithKeyAndValueIndividualFields(t *testing.T) {
+	requestRoutesThatWillMatch := []string{
+		"conditional_response/route_param_match/some_value_123/foobar",
+	}
+
+	for i := range requestRoutesThatWillMatch {
+		RunTest(
+			t,
+			"config_with_conditional_response/config.json",
+			"GET",
+			requestRoutesThatWillMatch[i],
+			nil,
+			strings.NewReader(""),
+			StringMatches("Conditional response with Route Param Match resolved. (with key and value individual fields)"),
 		)
 	}
 }

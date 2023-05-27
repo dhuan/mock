@@ -252,6 +252,14 @@
                 "param_two": "bar"
             }
           }
+        },
+        {
+          "response": "Conditional response with Route Param Match resolved. (with key and value individual fields)",
+          "condition": {
+            "type": "route_param_match",
+            "key": "param_one",
+            "value": "some_value_123"
+          }
         }
       ]
     }
