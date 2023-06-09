@@ -1,0 +1,6 @@
+[book]
+authors = ["Dhuan Oliveira"]
+language = "en"
+multilingual = false
+src = "src"
+title = "mock documentation"
