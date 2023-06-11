@@ -13,3 +13,6 @@ test_e2e:
 
 doc_dev:
 	cd doc && mdbook serve
+
+doc_build:
+	sh ./scripts/doc_build.sh
