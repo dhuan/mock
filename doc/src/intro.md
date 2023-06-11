@@ -1,92 +1,33 @@
 # Welcome to mock's documentation!
 
-**mock** enables you to quickly setup an HTTP server for end-to-end tests.
+*mock* enables you to quickly set up HTTP servers for end-to-end tests.
 
-- Define endpoints and their respective responses;
+- Define endpoints and their respective responses through easy syntax;
 - Make assertions on...
   - Whether a given endpoint was requested;
   - If a JSON payload body was passed correctly to a given endpoint;
   - If a header value was passed correctly;
   - And other useful things...
 
-The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](user_guide.md)
-
-## Getting started
-
 ```sh
-$ mock serve -c /path/to/your/config.json -p 4000
+$ mock serve --port 3000 \
+  --route 'time_in/{country}' \
+  --method GET \
+  --exec 'zdump ${country}' \
+  --route 'whois/{domain}' \
+  --method GET \
+  --exec 'whois ${domain}'
 ```
 
-Below is a configuration file sample, defining two simple endpoints:
+Run the example command the above and try these URLs in your browser or any preferred HTTP client: `http://localhost:3000/time_in/Japan` and `http://localhost:3000/whois/google.com`
 
-```
-{
-  "endpoints": [
-    {
-      "route": "foo/bar",
-      "method": "POST",
-      "response": {
-        "foo": "bar"
-      }
-    },
-    {
-      "route": "hello/world",
-      "method": "GET",
-      "response": {
-        "some_key": "some_value"
-      }
-    }
-  ]
-}
-```
+## Quick links
 
-Let's now make a request to the `foo/bar` endpoint:
-
-```sh
-$ curl localhost:4000/foo/bar \
-  -H 'Content-type: application/json' \
-  -d '{"some_key":"some_value"}'
-```
-
-And then let's make assertions - Let's verify whether the `foo/bar` endpoint was called with the expected values:
-
-```sh
-$ curl -v http://localhost:4000/__mock__/assert -d @- <<EOF
-{
-  "route": "foo/bar",
-  "assert": {
-    "type": "json_body_match",
-    "key_values": {
-      "some_key": "some_value"
-    },
-    "and": {
-      "type": "method_match",
-      "value": "put"
-    }
-  }
-}
-EOF
-```
-
-In the command above we're trying to assert the following:
-
-> The `foo/bar` endpoint was called, with the JSON Payload `{"some_key":"some_value"}`, **and** with the `put` method.
-
-Obviously, there's a problem with that assertion - the request we made previously was a `post` request, not `put`, therefore we get a response indicating so:
-
-```sh
-{
-  "validation_errors": [
-    {
-      "code": "method_mismatch",
-      "metadata": {
-        "method_expected": "put",
-        "method_requested": "post"
-      }
-    }
-  ]
-}
-```
+- [Download *mock* for Linux](__DOWNLOAD_LINK_LINUX__)
+- [Download *mock* for MacOS](__DOWNLOAD_LINK_MACOS__)
+- [Releases](https://github.com/dhuan/mock/releases)
+- [*mock*'s source code](https://github.com/dhuan/mock)
+- [Report bugs](https://github.com/dhuan/mock/issues)
 
 ## License
 

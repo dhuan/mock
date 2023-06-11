@@ -30,7 +30,7 @@ Besides static responses as exemplified, all kinds of responses can read Route P
 }
 ```
 
-> Route Parameters can also be read by Shell-Script Responses. [Read more about it in its own guide section.](#route-parameters---reading-from-shell-scripts)
+> Route Parameters can also be read by Shell-Script Responses. [Read more about it in its own guide section.](shell_scripts.md#route-parameters---reading-from-shell-scripts)
 
 To read route parameters through endpoints defined by command-line parameters, the same syntax applies:
 

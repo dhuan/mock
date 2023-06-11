@@ -10,3 +10,6 @@ test_unit:
 
 test_e2e:
 	go test -v $(shell find tests | grep 'e2e.*_test.go')
+
+doc_dev:
+	cd doc && mdbook serve

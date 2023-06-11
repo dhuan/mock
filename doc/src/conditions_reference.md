@@ -1,6 +1,6 @@
 # Conditions Reference
 
-When making test assertions with *mock*, *Conditions* enable you to express how you expect a given Request to have been made. *Conditions* are also used when defining [*Conditional Responses*.](#conditional-response)
+When making test assertions with *mock*, *Conditions* enable you to express how you expect a given Request to have been made. *Conditions* are also used when defining [*Conditional Responses*.](conditional_responses.md)
 
 In this section you will find a reference of all available Conditions.
 
