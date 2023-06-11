@@ -29,6 +29,12 @@ Run the example command the above and try these URLs in your browser or any pref
 - [*mock*'s source code](https://github.com/dhuan/mock)
 - [Report bugs](https://github.com/dhuan/mock/issues)
 
+## Read further...
+
+The core functionalities of *mock* are documented each in their respective sections. Read further to learn:
+- [Creating APIs](apis.md)
+- [Test Assertions](test_assertions.md)
+
 ## License
 
 *mock* is licensed under MIT. For more information check the [LICENSE file.](LICENSE)
