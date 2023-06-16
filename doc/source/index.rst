@@ -50,12 +50,14 @@ License
 file. <https://github.com/dhuan/mock/blob/master/LICENSE>`__
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
 
    install
    changelog
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: User Guide:
 
@@ -66,6 +68,7 @@ file. <https://github.com/dhuan/mock/blob/master/LICENSE>`__
    conditions_reference
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Miscellaneous:
 

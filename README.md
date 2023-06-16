@@ -9,7 +9,7 @@
   - If a header value was passed correctly;
   - And other useful things...
 
-The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](doc/src/intro.md)
+The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](doc/source/index.rst)
 
 ## Getting started
 
