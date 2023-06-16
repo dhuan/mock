@@ -36,7 +36,7 @@ ADDED
 
 ## 0.5.0
 
-### Breaking changes
+Breaking changes
 
 - "Endpoint Parameters" has been renamed to "Route Parameters"
 
@@ -48,7 +48,7 @@ Now: `MOCK_ROUTE_PARAM_FOO`
 
 Check the User Guide for more details.
 
-### Features & enhancements
+Features & enhancements
 
 - Route Parameters can be captured in the Response string. Before, the parameters could only be read by Shell Scripts Responses. A response can now be set as follows:
 
