@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="install.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Mock API Reference" href="api_reference.html" /><link rel="prev" title="Assertion Chaining" href="assertion_chaining.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>mock documentation</title>
+        <title>Test Assertions with mock’s Go package - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">mock  documentation</div></a>
+      <a href="index.html"><div class="brand">mock  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -143,7 +143,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
   <span class="sidebar-brand-text">mock  documentation</span>
@@ -159,7 +159,7 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
@@ -170,9 +170,9 @@
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="assertion_chaining.html">Assertion Chaining</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mock_package.html">Test Assertions with <em>mock</em>’s Go package</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Test Assertions with <em>mock</em>’s Go package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">Mock API Reference</a></li>
@@ -210,68 +210,108 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="welcome-to-mocks-documentation">
-<h1>Welcome to mock’s documentation!<a class="headerlink" href="#welcome-to-mocks-documentation" title="Permalink to this heading">#</a></h1>
-<p><em>mock</em> enables you to quickly set up HTTP servers for end-to-end tests.</p>
-<ul class="simple">
-<li><p>Define endpoints and their respective responses through easy syntax;</p></li>
-<li><p>Make assertions on…</p>
-<ul>
-<li><p>Whether a given endpoint was requested;</p></li>
-<li><p>If a JSON payload body was passed correctly to a given endpoint;</p></li>
-<li><p>If a header value was passed correctly;</p></li>
-<li><p>And other useful things…</p></li>
-</ul>
-</li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;time_in/{country}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;zdump ${country}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;whois/{domain}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;whois ${domain}&#39;</span>
+          <section id="test-assertions-with-mocks-go-package">
+<h1>Test Assertions with <em>mock</em>’s Go package<a class="headerlink" href="#test-assertions-with-mocks-go-package" title="Permalink to this heading">#</a></h1>
+<p>In the previous section we’ve seen how to make test assertions by means
+of HTTP requests. With that we’ve seen how <em>mock</em> is designed to be
+language-agnostic - no matter what programming language you’re using for
+your E2E tests, <em>mock</em> can easily be integrated because HTTP requests
+are all that’s needed for making test assertions. But we’re not limited
+to HTTP requests only, when making assertions. In this section we’ll
+learn how to use <em>mock</em>’s Go package, which enables you to achieve the
+same but without requiring to write requests by hand.</p>
+<p>Let’s take as an example, a test assertion in its plain request format,
+asserting that a request was made to <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code> with the <code class="docutils literal notranslate"><span class="pre">POST</span></code>
+method.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-v<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;localhost:4000/__mock__/assert&quot;</span><span class="w"> </span>-d<span class="w"> </span>@-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">{</span>
+<span class="s">  &quot;route&quot;: &quot;foo/bar&quot;,</span>
+<span class="s">  &quot;assert&quot;: {</span>
+<span class="s">    &quot;type&quot;: &quot;method_match&quot;,</span>
+<span class="s">    &quot;value&quot;: &quot;post&quot;</span>
+<span class="s">  }</span>
+<span class="s">}</span>
+<span class="s">EOF</span>
 </pre></div>
 </div>
-<p>Run the example command the above and try these URLs in your browser or
-any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/time_in/Japan</span></code> and
-<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/whois/google.com</span></code></p>
-<section id="quick-links">
-<h2>Quick links<a class="headerlink" href="#quick-links" title="Permalink to this heading">#</a></h2>
+<p>Let’s now convert it to Go code - what does a test case (using <em>mock</em>)
+look like in Go?</p>
+<div class="highlight-go notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nx">my_test</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;github.com/dhuan/mock/pkg/mock&quot;</span>
+<span class="w">    </span><span class="s">&quot;testing&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">Test_FooBarShouldBeRequested</span><span class="p">(</span><span class="nx">t</span><span class="w"> </span><span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">mockConfig</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">MockConfig</span><span class="p">{</span><span class="nx">Url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;localhost:4000&quot;</span><span class="p">}</span>
+
+<span class="w">    </span><span class="nx">validationErrors</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">mock</span><span class="p">.</span><span class="nx">Assert</span><span class="p">(</span><span class="nx">mockConfig</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">AssertConfig</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">Route</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo/bar&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">Assert</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">Condition</span><span class="p">{</span>
+<span class="w">            </span><span class="nx">Type</span><span class="p">:</span><span class="w">  </span><span class="nx">mock</span><span class="p">.</span><span class="nx">ConditionType_MethodMatch</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">Value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;post&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">    </span><span class="p">})</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">t</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nx">validationErrors</span><span class="p">)</span><span class="w"> </span><span class="p">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">t</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">mock</span><span class="p">.</span><span class="nx">ToReadableError</span><span class="p">(</span><span class="nx">validationErrors</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Just like you get a response containing Validation Errors when using the
+HTTP-request approach, in Go the Validation Errors are returned from the
+<code class="docutils literal notranslate"><span class="pre">mock.Assert(...)</span></code> call.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that with <em>mock</em>’s Go package, we’re simply executing
+assertions. The actual <em>mock server instance</em> is supposed to be
+running and started before your test script starts.</p>
+</div>
+<p>A few things to be noted regarding the Go code snippet above:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_linux-386.tar.gz">Download mock for Linux</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_darwin-amd64.tar.gz">Download mock for MacOS</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases">Releases</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock">mock’s source code</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/issues">Report bugs</a></p></li>
+<li><p>Prior to making assertions, you need to tell the <em>mock</em> library what
+network host+port <em>mock</em> is running at, which is done with
+<code class="docutils literal notranslate"><span class="pre">&amp;mock.MockConfig{Url:</span> <span class="pre">&quot;localhost:4000&quot;}</span></code></p></li>
+<li><p>Besides the <code class="docutils literal notranslate"><span class="pre">validationErrors</span></code> returned from <code class="docutils literal notranslate"><span class="pre">mock.Assert(...)</span></code>,
+we still get a 2nd return value of type <code class="docutils literal notranslate"><span class="pre">error</span></code>. This error is not
+related to <em>mock</em>’s Validation Errors. This error can be something
+like if HTTP failure in case <em>mock</em> is not running on the network
+port you set it to. It’s important to check and fail the test if
+<code class="docutils literal notranslate"><span class="pre">err</span></code> is not <code class="docutils literal notranslate"><span class="pre">nil</span></code> (as shown in the example), otherwise it will
+seem as if your test passed because there are no Validation Errors
+but an actual error occurred.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">validationErrors</span></code> is an empty slice and <code class="docutils literal notranslate"><span class="pre">err</span></code> is nil, then
+your assertion passed successfully.</p></li>
 </ul>
-</section>
-<section id="read-further">
-<h2>Read further…<a class="headerlink" href="#read-further" title="Permalink to this heading">#</a></h2>
-<p>The core functionalities of <em>mock</em> are documented each in their
-respective sections. Read further to learn:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="apis.html">Creating APIs</a></p></li>
-<li><p><a class="reference external" href="test_assertions.html">Test Assertions</a></p></li>
-</ul>
-</section>
-<section id="license">
-<h2>License<a class="headerlink" href="#license" title="Permalink to this heading">#</a></h2>
-<p><em>mock</em> is licensed under MIT. For more information check the <a class="reference external" href="https://github.com/dhuan/mock/blob/master/LICENSE">LICENSE
-file.</a></p>
-<div class="toctree-wrapper compound">
+<p>With that we covered basic assertions. Let’s see now a more complex kind
+of assertion, using <em>Assertion Chaining</em>:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>validationErrors, err := mock.Assert(mockConfig, &amp;mock.AssertConfig{
+<span class="w"> </span>    Route: &quot;foo/bar&quot;,
+<span class="w"> </span>    Assert: &amp;mock.Condition{
+<span class="w"> </span>        Type:  mock.ConditionType_MethodMatch,
+<span class="w"> </span>        Value: &quot;post&quot;,
+<span class="gi">+        And: &amp;mock.Condition{</span>
+<span class="gi">+            Type: mock.ConditionType_JsonBodyMatch,</span>
+<span class="gi">+            KeyValues: map[string]interface{}{</span>
+<span class="gi">+                &quot;some_key&quot;: &quot;some_value&quot;,</span>
+<span class="gi">+            },</span>
+<span class="gi">+        },</span>
+<span class="w"> </span>    },
+<span class="w"> </span>})
+</pre></div>
 </div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-</section>
 </section>
 
         </article>
@@ -279,16 +319,26 @@ file.</a></p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="install.html">
+          <a class="next-page" href="api_reference.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Installation</div>
+                <div class="title">Mock API Reference</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="assertion_chaining.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Assertion Chaining</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -307,31 +357,8 @@ file.</a></p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Welcome to mock’s documentation!</a><ul>
-<li><a class="reference internal" href="#quick-links">Quick links</a></li>
-<li><a class="reference internal" href="#read-further">Read further…</a></li>
-<li><a class="reference internal" href="#license">License</a><ul>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

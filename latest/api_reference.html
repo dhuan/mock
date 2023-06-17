@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="install.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Command-line Options Reference" href="cmd_reference.html" /><link rel="prev" title="Test Assertions with mock’s Go package" href="mock_package.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>mock documentation</title>
+        <title>Mock API Reference - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">mock  documentation</div></a>
+      <a href="index.html"><div class="brand">mock  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -143,7 +143,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
   <span class="sidebar-brand-text">mock  documentation</span>
@@ -159,7 +159,7 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
@@ -175,7 +175,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mock_package.html">Test Assertions with <em>mock</em>’s Go package</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api_reference.html">Mock API Reference</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Mock API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_reference.html">Command-line Options Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditions_reference.html">Conditions Reference</a></li>
 </ul>
@@ -216,61 +216,24 @@
           </label>
         </div>
         <article role="main">
-          <section id="welcome-to-mocks-documentation">
-<h1>Welcome to mock’s documentation!<a class="headerlink" href="#welcome-to-mocks-documentation" title="Permalink to this heading">#</a></h1>
-<p><em>mock</em> enables you to quickly set up HTTP servers for end-to-end tests.</p>
-<ul class="simple">
-<li><p>Define endpoints and their respective responses through easy syntax;</p></li>
-<li><p>Make assertions on…</p>
-<ul>
-<li><p>Whether a given endpoint was requested;</p></li>
-<li><p>If a JSON payload body was passed correctly to a given endpoint;</p></li>
-<li><p>If a header value was passed correctly;</p></li>
-<li><p>And other useful things…</p></li>
-</ul>
-</li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;time_in/{country}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;zdump ${country}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;whois/{domain}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;whois ${domain}&#39;</span>
-</pre></div>
-</div>
-<p>Run the example command the above and try these URLs in your browser or
-any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/time_in/Japan</span></code> and
-<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/whois/google.com</span></code></p>
-<section id="quick-links">
-<h2>Quick links<a class="headerlink" href="#quick-links" title="Permalink to this heading">#</a></h2>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_linux-386.tar.gz">Download mock for Linux</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_darwin-amd64.tar.gz">Download mock for MacOS</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases">Releases</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock">mock’s source code</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/issues">Report bugs</a></p></li>
-</ul>
+          <section id="mock-api-reference">
+<h1>Mock API Reference<a class="headerlink" href="#mock-api-reference" title="Permalink to this heading">#</a></h1>
+<p>Besides the custom endpoints defined in your configuration file, <em>mock</em>
+provides internal endpoints - these are identified by having a
+<code class="docutils literal notranslate"><span class="pre">__mock__</span></code> route prefix, such as the <code class="docutils literal notranslate"><span class="pre">/__mock__/assert</span></code> endpoint,
+which exists for making assertions. In this section you’ll find out
+about each available internal endpoint.</p>
+<section id="post-mock-assert">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">__mock__/assert</span></code><a class="headerlink" href="#post-mock-assert" title="Permalink to this heading">#</a></h2>
+<p>Makes Test Assertions, such as “endpoint X was called with Y payload.”.
+The <a class="reference external" href="test_assertions.html">Test Assertions Section</a> dedicates to
+explaining all about assertions.</p>
 </section>
-<section id="read-further">
-<h2>Read further…<a class="headerlink" href="#read-further" title="Permalink to this heading">#</a></h2>
-<p>The core functionalities of <em>mock</em> are documented each in their
-respective sections. Read further to learn:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="apis.html">Creating APIs</a></p></li>
-<li><p><a class="reference external" href="test_assertions.html">Test Assertions</a></p></li>
-</ul>
-</section>
-<section id="license">
-<h2>License<a class="headerlink" href="#license" title="Permalink to this heading">#</a></h2>
-<p><em>mock</em> is licensed under MIT. For more information check the <a class="reference external" href="https://github.com/dhuan/mock/blob/master/LICENSE">LICENSE
-file.</a></p>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
+<section id="post-mock-reset">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">__mock__/reset</span></code><a class="headerlink" href="#post-mock-reset" title="Permalink to this heading">#</a></h2>
+<p>Removes all Request Records that have been made so far. This has the
+same effect as stopping and starting <em>mock</em> over again. There are no
+parameters or payload fields to this endpoint.</p>
 </section>
 </section>
 
@@ -279,16 +242,26 @@ file.</a></p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="install.html">
+          <a class="next-page" href="cmd_reference.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Installation</div>
+                <div class="title">Command-line Options Reference</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="mock_package.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Test Assertions with <em>mock</em>’s Go package</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -319,12 +292,9 @@ file.</a></p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Welcome to mock’s documentation!</a><ul>
-<li><a class="reference internal" href="#quick-links">Quick links</a></li>
-<li><a class="reference internal" href="#read-further">Read further…</a></li>
-<li><a class="reference internal" href="#license">License</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Mock API Reference</a><ul>
+<li><a class="reference internal" href="#post-mock-assert"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">__mock__/assert</span></code></a></li>
+<li><a class="reference internal" href="#post-mock-reset"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">__mock__/reset</span></code></a></li>
 </ul>
 </li>
 </ul>

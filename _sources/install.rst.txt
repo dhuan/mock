@@ -1,0 +1,53 @@
+Installation
+============
+
+Download *mock*
+---------------
+
+The easiest installation method is simply downloading *mock*\ ’s
+executable file. It’s built as a standalone program with no
+dependencies, so just choose one of the supported OSs and start using
+it, or check the releases page where you’ll find other download formats
+available:
+
+-  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_linux-386.tar.gz>`__
+-  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_darwin-amd64.tar.gz>`__
+-  `Releases <https://github.com/dhuan/mock/releases>`__
+
+Or, here’s a few lines of shell for quickly installing it:
+
+.. code:: sh
+
+   $ wget -O mock.tgz https://github.com/dhuan/mock/releases/download/v0.8.0/mock_v0.8.0_linux-386.tar.gz
+   $ tar xzvf mock.tgz
+   $ ./mock version
+
+Install through source code
+---------------------------
+
+Before proceeding make sure that your system has the following programs
+installed:
+
+-  Golang 1.18 or more recent
+-  GNU Make
+-  Git
+
+Clone *mock*\ ’s source code:
+
+::
+
+   $ git clone https://github.com/dhuan/mock
+
+Move into the new folder where *mock* was cloned run the make command
+for building the program:
+
+::
+
+   $ make build
+
+If executed successfully, the *mock* executable file should’ve been
+created inside the ``bin`` folder from the root repository path.
+
+::
+
+   $ ./bin/mock version
