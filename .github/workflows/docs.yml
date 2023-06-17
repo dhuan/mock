@@ -1,0 +1,41 @@
+name: Publish Docs
+
+on:                                                                                                                                                           
+  push:                                                                                                                                                       
+    branches:
+      - master
+    tags:                                                                                                                                                    
+      - 'v*'
+
+jobs:
+  publish_docs:
+    name: Publish Docs
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Build documentation
+      run: |
+          sudo apt update -y && sudo apt install -y python3 python3-pip python3-sphinx pandoc
+          pip install furo
+          TMP_DIR=$(mktemp -d)
+          mkdir "$TMP_DIR"/latest
+
+          make -s doc_build | make -s github_doc_vars | tar xz -C "$TMP_DIR"/latest
+
+          LATEST_VERSION=$(git tag | tac | grep '^v[0-9]' | head -n 1)
+          git checkout "$LATEST_VERSION"
+          make -s doc_build | make -s github_doc_vars | tar xz -C "$TMP_DIR"
+
+          cp -r "$TMP_DIR" ./docs_html
+
+    - name: Deploy docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs_html
+

@@ -1,5 +1,7 @@
 # mock
 
+*[Language-agnostic API mocking and testing utility](https://dhuan.github.io/mock)*
+
 **mock** enables you to quickly setup a HTTP server for end-to-end tests.
 
 - Define endpoints and their respective responses;
@@ -9,7 +11,7 @@
   - If a header value was passed correctly;
   - And other useful things...
 
-The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](doc/source/index.rst)
+The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](https://dhuan.github.io/mock)
 
 ## Getting started
 
