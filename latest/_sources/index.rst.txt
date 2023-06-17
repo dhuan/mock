@@ -1,5 +1,5 @@
-Welcome to mock’s documentation!
-================================
+mock - Language-agnostic API mocking and testing utility
+========================================================
 
 *mock* enables you to quickly set up HTTP servers for end-to-end tests.
 
@@ -42,6 +42,11 @@ respective sections. Read further to learn:
 
 -  `Creating APIs <apis.html>`__
 -  `Test Assertions <test_assertions.html>`__
+
+----
+
+*Why "language-agnostic"???* - similar tools exist out there but they somehow require you to write in some programming-language when setting up fake APIs for testing. *mock* on the other hand enables you to set things up easily by just writing configuration files.
+
 
 License
 -------
