@@ -1,0 +1,16 @@
+{
+  "middlewares": [
+    {
+      "script_path": "middleware_replace_foo_with_bar.sh",
+      "type": "before_response",
+      "route_match": "*"
+    }
+  ],
+  "endpoints": [
+    {
+      "route": "middleware/before_response/modify_body",
+      "method": "GET",
+      "response": "Text: foo."
+    }
+  ]
+}

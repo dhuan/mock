@@ -10,7 +10,8 @@ import (
 )
 
 type MockConfig struct {
-	Endpoints []types.EndpointConfig `json:"endpoints"`
+	Endpoints   []types.EndpointConfig   `json:"endpoints"`
+	Middlewares []types.MiddlewareConfig `json:"middlewares"`
 }
 
 type MockApiResponse struct {
@@ -18,22 +19,24 @@ type MockApiResponse struct {
 }
 
 var (
-	flagConfig             string
-	flagPort               string
-	flagCors               bool
-	flagDelay              int64
-	flagRoute              *[]string
-	flagMethod             *[]string
-	flagStatusCode         *[]int
-	flagResponse           *[]string
-	flagResponseFile       *[]string
-	flagResponseFileServer *[]string
-	flagFileServer         *[]string
-	flagResponseSh         *[]string
-	flagShellScript        *[]string
-	flagHeader             *[]string
-	flagExec               *[]string
-	flagResponseExec       *[]string
+	flagConfig                   string
+	flagPort                     string
+	flagCors                     bool
+	flagDelay                    int64
+	flagRoute                    *[]string
+	flagMethod                   *[]string
+	flagStatusCode               *[]int
+	flagResponse                 *[]string
+	flagResponseFile             *[]string
+	flagResponseFileServer       *[]string
+	flagFileServer               *[]string
+	flagResponseSh               *[]string
+	flagShellScript              *[]string
+	flagHeader                   *[]string
+	flagExec                     *[]string
+	flagResponseExec             *[]string
+	flagMiddlewareBeforeRequest  *[]string
+	flagMiddlewareBeforeResponse *[]string
 )
 
 var rootCmd = &cobra.Command{
@@ -60,6 +63,8 @@ func Execute() {
 	flagHeader = serveCmd.PersistentFlags().StringArray("header", []string{}, "endpoint response header")
 	flagExec = serveCmd.PersistentFlags().StringArray("exec", []string{}, "endpoint response exec")
 	flagResponseExec = serveCmd.PersistentFlags().StringArray("response-exec", []string{}, "endpoint response exec")
+	flagMiddlewareBeforeRequest = serveCmd.PersistentFlags().StringArray("middleware-before-request", []string{}, "middleware typed 'before-request'")
+	flagMiddlewareBeforeResponse = serveCmd.PersistentFlags().StringArray("middleware-before-response", []string{}, "middleware typed 'before-response'")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

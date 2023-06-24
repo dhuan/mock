@@ -8,15 +8,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_WithEmptyArgs(t *testing.T) {
+func Test_ParseEndpoints_WithEmptyArgs(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{},
-		args2config.Parse([]string{}),
+		args2config.ParseEndpoints([]string{}),
 	)
 }
 
-func Test_WithOneEndpoint(t *testing.T) {
+func Test_ParseEndpoints_WithOneEndpoint(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{
@@ -30,7 +30,7 @@ func Test_WithOneEndpoint(t *testing.T) {
 				HeadersBase:        nil,
 			},
 		},
-		args2config.Parse([]string{
+		args2config.ParseEndpoints([]string{
 			"--route",
 			"foo/bar",
 			"--method",
@@ -41,7 +41,7 @@ func Test_WithOneEndpoint(t *testing.T) {
 	)
 }
 
-func Test_WithTwoEndpoints(t *testing.T) {
+func Test_ParseEndpoints_WithTwoEndpoints(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{
@@ -64,7 +64,7 @@ func Test_WithTwoEndpoints(t *testing.T) {
 				HeadersBase:        nil,
 			},
 		},
-		args2config.Parse([]string{
+		args2config.ParseEndpoints([]string{
 			"--route",
 			"endpoint/one",
 			"--method",
@@ -81,7 +81,7 @@ func Test_WithTwoEndpoints(t *testing.T) {
 	)
 }
 
-func Test_WithStatusCode(t *testing.T) {
+func Test_ParseEndpoints_WithStatusCode(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{
@@ -104,7 +104,7 @@ func Test_WithStatusCode(t *testing.T) {
 				HeadersBase:        nil,
 			},
 		},
-		args2config.Parse([]string{
+		args2config.ParseEndpoints([]string{
 			"--route",
 			"endpoint/one",
 			"--response",
@@ -119,7 +119,7 @@ func Test_WithStatusCode(t *testing.T) {
 	)
 }
 
-func Test_WithResponseFile(t *testing.T) {
+func Test_ParseEndpoints_WithResponseFile(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{
@@ -133,7 +133,7 @@ func Test_WithResponseFile(t *testing.T) {
 				HeadersBase:        nil,
 			},
 		},
-		args2config.Parse([]string{
+		args2config.ParseEndpoints([]string{
 			"--route",
 			"hello/world",
 			"--response-file",
@@ -142,7 +142,7 @@ func Test_WithResponseFile(t *testing.T) {
 	)
 }
 
-func Test_WithResponseFileServer(t *testing.T) {
+func Test_ParseEndpoints_WithResponseFileServer(t *testing.T) {
 	responseVariations := [][]string{
 		{"--response-file-server", "path/to/my/files"},
 		{"--file-server", "path/to/my/files"},
@@ -162,7 +162,7 @@ func Test_WithResponseFileServer(t *testing.T) {
 					HeadersBase:        nil,
 				},
 			},
-			args2config.Parse([]string{
+			args2config.ParseEndpoints([]string{
 				"--route",
 				"public/*",
 				responseVariation[0],
@@ -172,7 +172,7 @@ func Test_WithResponseFileServer(t *testing.T) {
 	}
 }
 
-func Test_WithResponseSh(t *testing.T) {
+func Test_ParseEndpoints_WithResponseSh(t *testing.T) {
 	responseVariations := [][]string{
 		{"--response-sh", "path/to/some/script.sh"},
 		{"--shell-script", "path/to/some/script.sh"},
@@ -192,7 +192,7 @@ func Test_WithResponseSh(t *testing.T) {
 					HeadersBase:        nil,
 				},
 			},
-			args2config.Parse([]string{
+			args2config.ParseEndpoints([]string{
 				"--route",
 				"foo/bar",
 				responseVariation[0],
@@ -203,7 +203,7 @@ func Test_WithResponseSh(t *testing.T) {
 
 }
 
-func Test_WithResponseExec(t *testing.T) {
+func Test_ParseEndpoints_WithResponseExec(t *testing.T) {
 	responseVariations := [][]string{
 		{
 			"--route",
@@ -233,12 +233,12 @@ func Test_WithResponseExec(t *testing.T) {
 					HeadersBase:        nil,
 				},
 			},
-			args2config.Parse(responseVariation),
+			args2config.ParseEndpoints(responseVariation),
 		)
 	}
 }
 
-func Test_WithHeaders(t *testing.T) {
+func Test_ParseEndpoints_WithHeaders(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{
@@ -266,7 +266,7 @@ func Test_WithHeaders(t *testing.T) {
 				HeadersBase: nil,
 			},
 		},
-		args2config.Parse([]string{
+		args2config.ParseEndpoints([]string{
 			"--route",
 			"endpoint/one",
 			"--header",
@@ -285,11 +285,94 @@ func Test_WithHeaders(t *testing.T) {
 	)
 }
 
-func Test_WithIrrelevantFlags(t *testing.T) {
+func Test_ParseEndpoints_WithIrrelevantFlags(t *testing.T) {
 	assert.Equal(
 		t,
 		[]types.EndpointConfig{},
-		args2config.Parse([]string{
+		args2config.ParseEndpoints([]string{
+			"--foo",
+			"bar",
+			"--hello",
+			"world",
+		}),
+	)
+}
+
+func Test_ParseMiddlewares_WithEmptyArgs(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.MiddlewareConfig{},
+		args2config.ParseMiddlewares([]string{}),
+	)
+}
+
+func Test_ParseMiddlewares_WithOneMiddleware_WithoutRouteMatch(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.MiddlewareConfig{
+			{
+				ScriptPath: "/path/to/some/script.sh",
+				Type:       types.MiddlewareType_BeforeResponse,
+				RouteMatch: "*",
+			},
+		},
+		args2config.ParseMiddlewares([]string{
+			"--middleware-before-response",
+			"/path/to/some/script.sh",
+		}),
+	)
+}
+
+func Test_ParseMiddlewares_WithOneMiddleware_WithRouteMatch(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.MiddlewareConfig{
+			{
+				ScriptPath: "/path/to/some/script.sh",
+				Type:       types.MiddlewareType_BeforeResponse,
+				RouteMatch: "foobar",
+			},
+		},
+		args2config.ParseMiddlewares([]string{
+			"--middleware-before-response",
+			"/path/to/some/script.sh",
+			"--route-match",
+			"foobar",
+		}),
+	)
+}
+
+func Test_ParseMiddlewares_WithMultipleMiddlewares(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.MiddlewareConfig{
+			{
+				ScriptPath: "/path/to/some/script.sh",
+				Type:       types.MiddlewareType_BeforeResponse,
+				RouteMatch: "*",
+			},
+			{
+				ScriptPath: "/path/to/another/script.sh",
+				Type:       types.MiddlewareType_BeforeRequest,
+				RouteMatch: "some_regex",
+			},
+		},
+		args2config.ParseMiddlewares([]string{
+			"--middleware-before-response",
+			"/path/to/some/script.sh",
+			"--middleware-before-request",
+			"/path/to/another/script.sh",
+			"--route-match",
+			"some_regex",
+		}),
+	)
+}
+
+func Test_ParseMiddlewares_WithIrrelevantFlags(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.MiddlewareConfig{},
+		args2config.ParseMiddlewares([]string{
 			"--foo",
 			"bar",
 			"--hello",

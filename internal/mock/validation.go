@@ -34,7 +34,7 @@ var available_http_methods = []string{
 
 func ValidateEndpointConfigs(
 	endpointConfigs []types.EndpointConfig,
-	readFile ReadFileFunc,
+	readFile types.ReadFileFunc,
 	configDirPath string,
 ) ([]EndpointConfigError, error) {
 	endpointConfigErrors := make([]EndpointConfigError, 0)
@@ -56,7 +56,7 @@ func validateEndpointConfig(
 	endpointConfigIndex int,
 	endpointConfigs []types.EndpointConfig,
 	currentEndpointConfigErrors []EndpointConfigError,
-	readFile ReadFileFunc,
+	readFile types.ReadFileFunc,
 	configDirPath string,
 ) ([]EndpointConfigError, error) {
 	endpointConfigErrors := make([]EndpointConfigError, 0)
@@ -118,7 +118,7 @@ func validateEndpointConfig(
 func validateFiles(
 	filePaths []string,
 	endpointIndex int,
-	readFile ReadFileFunc,
+	readFile types.ReadFileFunc,
 	configDirPath string,
 ) ([]EndpointConfigError, error) {
 	errors := make([]EndpointConfigError, 0)

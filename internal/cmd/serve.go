@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/dhuan/mock/internal/args2config"
+	mockMiddleware "github.com/dhuan/mock/internal/middleware"
 	"github.com/dhuan/mock/internal/mock"
 	"github.com/dhuan/mock/internal/mockfs"
 	"github.com/dhuan/mock/internal/record"
@@ -29,7 +30,11 @@ import (
 var serveCmd = &cobra.Command{
 	Use: "serve",
 	Run: func(cmd *cobra.Command, args []string) {
-		endpointsFromCommandLine := args2config.Parse(os.Args)
+		endpointsFromCommandLine := args2config.ParseEndpoints(os.Args)
+
+		if flagConfig == "" && len(endpointsFromCommandLine) == 0 {
+			exitWithError(cmd.UsageString())
+		}
 
 		if flagConfig == "" && len(endpointsFromCommandLine) == 0 {
 			exitWithError(cmd.UsageString())
@@ -48,6 +53,9 @@ var serveCmd = &cobra.Command{
 		}
 
 		config.Endpoints = allEndpoints
+
+		middlewaresFromCommandLine := args2config.ParseMiddlewares(os.Args)
+        mergeMiddlewares(config, middlewaresFromCommandLine)
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
@@ -91,23 +99,23 @@ var serveCmd = &cobra.Command{
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
 			if endpointConfig.Method == "get" || endpointConfig.Method == "" {
-				router.Get(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
+				router.Get(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "post" {
-				router.Post(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
+				router.Post(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "patch" {
-				router.Patch(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
+				router.Patch(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "put" {
-				router.Put(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
+				router.Put(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
 			}
 
 			if endpointConfig.Method == "delete" {
-				router.Delete(route, newEndpointHandler(state, &endpointConfig, mockFs, flagDelay))
+				router.Delete(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
 			}
 		}
 
@@ -214,6 +222,7 @@ func execute(command string, env map[string]string) (*mock.ExecResult, error) {
 
 func newEndpointHandler(
 	state *types.State,
+	middlewareConfigs []types.MiddlewareConfig,
 	endpointConfig *types.EndpointConfig,
 	mockFs types.MockFs,
 	delay int64,
@@ -286,8 +295,25 @@ func newEndpointHandler(
 			time.Sleep(time.Duration(delay) * time.Millisecond)
 		}
 
+		middlewareConfigs := mockMiddleware.GetMiddlewareForRequest(middlewareConfigs, r)
+		hasMiddleware := len(middlewareConfigs) > 0
+
+		responseTransformed := response.Body
+		if hasMiddleware {
+			responseTransformed, err = mockMiddleware.RunMiddleware(
+				execute,
+				readFile,
+				state.ConfigFolderPath,
+				middlewareConfigs,
+				responseTransformed,
+			)
+			if err != nil {
+				panic(err)
+			}
+		}
+
 		w.WriteHeader(response.StatusCode)
-		w.Write(response.Body)
+		w.Write(responseTransformed)
 	}
 }
 
@@ -468,6 +494,10 @@ func getAllEnvVars() map[string]string {
 
 func mergeEndpoints(a, b []types.EndpointConfig) ([]types.EndpointConfig, []endpointMergeError) {
 	return append(a, b...), []endpointMergeError{}
+}
+
+func mergeMiddlewares(config *MockConfig, middlewares []types.MiddlewareConfig) {
+    config.Middlewares = append(config.Middlewares, middlewares...)
 }
 
 type endpointMergeError struct {
