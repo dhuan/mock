@@ -4,6 +4,11 @@
       "script_path": "middleware_replace_foo_with_bar.sh",
       "type": "before_response",
       "route_match": "*"
+    },
+    {
+      "script_path": "middleware_duplicate_body.sh",
+      "type": "before_response",
+      "route_match": "filtered_routes"
     }
   ],
   "endpoints": [
@@ -11,6 +16,11 @@
       "route": "middleware/before_response/modify_body",
       "method": "GET",
       "response": "Text: foo."
+    },
+    {
+      "route": "middleware/before_response/modify_body/filtered_routes",
+      "method": "GET",
+      "response": "Hello world!"
     }
   ]
 }

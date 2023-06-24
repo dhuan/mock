@@ -61,3 +61,15 @@ func Test_Middlewares_BeforeResponse_ModifyBody_WithAbsoluteScriptPath_WithCmdPa
 		StringMatches("Text: bar."),
 	)
 }
+
+func Test_Middlewares_BeforeResponse_ModifyBody_WithFilteredRoute(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_middlewares/config.json",
+		"GET",
+		"middleware/before_response/modify_body/filtered_routes",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Hello world!Hello world!"),
+	)
+}

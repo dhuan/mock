@@ -71,5 +71,5 @@ func routeMatch(r *http.Request, middlewareConfig *types.MiddlewareConfig) bool 
 
 	requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
 
-	return utils.RegexTest(requestRoute, middlewareConfig.RouteMatch)
+	return utils.RegexTest(middlewareConfig.RouteMatch, requestRoute)
 }
