@@ -31,7 +31,7 @@ Following is a *mock* configuration file containing middlewares:
    {
     "middlewares": [
         {
-            "script_path": "/path/to/middleware/script.sh",
+            "exec": "sh /path/to/middleware/script.sh",
             "type": "before_response",
             "route_match": "*"
         }
@@ -42,8 +42,8 @@ Following is a *mock* configuration file containing middlewares:
 
 Let's go over each the fields shown in the ``middleware`` objects:
 
-- ``script_path``: Path to a shell script which will act as the Middleware Handler.
-- ``type``: The available Middleware Types are: `before_request`, `before_response`.
+- ``exec``: A shell command that will be executed which can perform a middleware operation, such as changing request/response. Anything that's valid in the shell will be valid here, such as ``sh path/to/some/script.sh`` or ``/path/to/some/program``.
+- ``type``: The available Middleware Types are: ``before_request``, ``before_response``.
 - ``route_match``: Optional. If not set or set as ``*`` then all Requests will
   be processed for the given Middleware. For filtering only desired requests,
   set the value as a Regular Expression, for example ``foo/[a-z]{1,}`` which will
