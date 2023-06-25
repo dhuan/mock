@@ -57,9 +57,9 @@ configuration files:
    $ mock serve \
      --route foo/bar
      --response "Hello world!"
-  +  --middleware-before-request path/to/some/script.sh
+  +  --middleware-before-request "sh path/to/some/script.sh"
   +  --route-match 'foo/bar'
-  +  --middleware-before-response path/to/another/script.sh
+  +  --middleware-before-response "sh path/to/another/script.sh"
 
 Examples of Middlewares
 ~~~~~~~~~~~~~~~~~~~~~~~
