@@ -67,7 +67,7 @@ func startingNewMiddleware(arg string) bool {
 func assignMiddlewareType(middlewareConfig *types.MiddlewareConfig, middlewareType types.MiddlewareType) func(scriptPath string) {
 	return func(scriptPath string) {
 		middlewareConfig.Type = middlewareType
-		middlewareConfig.ScriptPath = scriptPath
+		middlewareConfig.Exec = scriptPath
 	}
 }
 

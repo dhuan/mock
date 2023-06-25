@@ -311,14 +311,14 @@ func Test_ParseMiddlewares_WithOneMiddleware_WithoutRouteMatch(t *testing.T) {
 		t,
 		[]types.MiddlewareConfig{
 			{
-				ScriptPath: "/path/to/some/script.sh",
+				Exec:       "sh /path/to/some/script.sh",
 				Type:       types.MiddlewareType_BeforeResponse,
 				RouteMatch: "*",
 			},
 		},
 		args2config.ParseMiddlewares([]string{
 			"--middleware-before-response",
-			"/path/to/some/script.sh",
+			"sh /path/to/some/script.sh",
 		}),
 	)
 }
@@ -328,14 +328,14 @@ func Test_ParseMiddlewares_WithOneMiddleware_WithRouteMatch(t *testing.T) {
 		t,
 		[]types.MiddlewareConfig{
 			{
-				ScriptPath: "/path/to/some/script.sh",
+				Exec:       "sh /path/to/some/script.sh",
 				Type:       types.MiddlewareType_BeforeResponse,
 				RouteMatch: "foobar",
 			},
 		},
 		args2config.ParseMiddlewares([]string{
 			"--middleware-before-response",
-			"/path/to/some/script.sh",
+			"sh /path/to/some/script.sh",
 			"--route-match",
 			"foobar",
 		}),
@@ -347,21 +347,21 @@ func Test_ParseMiddlewares_WithMultipleMiddlewares(t *testing.T) {
 		t,
 		[]types.MiddlewareConfig{
 			{
-				ScriptPath: "/path/to/some/script.sh",
+				Exec:       "sh /path/to/some/script.sh",
 				Type:       types.MiddlewareType_BeforeResponse,
 				RouteMatch: "*",
 			},
 			{
-				ScriptPath: "/path/to/another/script.sh",
+				Exec:       "sh /path/to/another/script.sh",
 				Type:       types.MiddlewareType_BeforeRequest,
 				RouteMatch: "some_regex",
 			},
 		},
 		args2config.ParseMiddlewares([]string{
 			"--middleware-before-response",
-			"/path/to/some/script.sh",
+			"sh /path/to/some/script.sh",
 			"--middleware-before-request",
-			"/path/to/another/script.sh",
+			"sh /path/to/another/script.sh",
 			"--route-match",
 			"some_regex",
 		}),

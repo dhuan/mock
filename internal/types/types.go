@@ -32,7 +32,7 @@ type EndpointConfig struct {
 }
 
 type MiddlewareConfig struct {
-	ScriptPath string         `json:"script_path"`
+	Exec       string         `json:"exec"`
 	Type       MiddlewareType `json:"type"`
 	RouteMatch string         `json:"route_match"`
 }
@@ -133,4 +133,3 @@ var Middleware_type_code_encoding_map = map[MiddlewareType]string{
 }
 
 type ReadFileFunc = func(filePath string) ([]byte, error)
-

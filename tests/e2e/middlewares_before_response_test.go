@@ -27,7 +27,7 @@ func Test_Middlewares_BeforeResponse_ModifyBody_WithCmdParams(t *testing.T) {
 		[]string{
 			"--route middleware/before_response/modify_body",
 			"--response 'Text: foo.'",
-			"--middleware-before-response data/config_with_middlewares/middleware_replace_foo_with_bar.sh",
+			"--middleware-before-response 'sh data/config_with_middlewares/middleware_replace_foo_with_bar.sh'",
 		},
 		"GET",
 		"middleware/before_response/modify_body",
@@ -44,14 +44,12 @@ func Test_Middlewares_BeforeResponse_ModifyBody_WithAbsoluteScriptPath_WithCmdPa
 		panic(err)
 	}
 
-	scriptPath := fmt.Sprintf("%s/data/config_with_middlewares/middleware_replace_foo_with_bar.sh", pwd)
-
 	RunTestWithNoConfigAndWithArgs(
 		t,
 		[]string{
 			"--route middleware/before_response/modify_body",
 			"--response 'Text: foo.'",
-			fmt.Sprintf("--middleware-before-response %s", scriptPath),
+			fmt.Sprintf("--middleware-before-response 'sh %s/data/config_with_middlewares/middleware_replace_foo_with_bar.sh'", pwd),
 		},
 		"GET",
 		"middleware/before_response/modify_body",

@@ -33,7 +33,7 @@ type execMock struct {
 	testifymock.Mock
 }
 
-func (this *execMock) Exec(command string, headers map[string]string) (*mock.ExecResult, error) {
+func (this *execMock) Exec(command string, options *mock.ExecOptions) (*mock.ExecResult, error) {
 	return &mock.ExecResult{}, nil
 }
 
@@ -463,7 +463,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		&endpointConfig,
 		map[string]string{},
 		map[string]string{},
-        &types.RequestRecord{Querystring: "hello=world"},
+		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 	)
 

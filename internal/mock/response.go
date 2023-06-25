@@ -12,7 +12,12 @@ import (
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
-type ExecFunc = func(command string, env map[string]string) (*ExecResult, error)
+type ExecOptions struct {
+	Env        map[string]string
+	WorkingDir string
+}
+
+type ExecFunc = func(command string, options *ExecOptions) (*ExecResult, error)
 
 type Response struct {
 	Body                []byte
@@ -240,7 +245,12 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		execResult, err := exec(fmt.Sprintf("sh %s", scriptFilePath), requestVariables)
+		execResult, err := exec(
+			fmt.Sprintf("sh %s", scriptFilePath),
+			&ExecOptions{
+				Env: requestVariables,
+			},
+		)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -309,7 +319,9 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), requestVariables)
+		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
+			Env: requestVariables,
+		})
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/dhuan/mock/internal/mock"
@@ -24,11 +23,6 @@ func RunMiddleware(
 	}
 
 	for i := range middlewareConfigs {
-		scriptPath := fmt.Sprintf("%s/%s", configPath, middlewareConfigs[i].ScriptPath)
-		if utils.BeginsWith(middlewareConfigs[i].ScriptPath, "/") {
-			scriptPath = middlewareConfigs[i].ScriptPath
-		}
-
 		responseBodyFile, err := utils.CreateTempFile(resultResponseBody)
 		if err != nil {
 			return responseBody, err
@@ -38,7 +32,13 @@ func RunMiddleware(
 			"MOCK_RESPONSE_BODY": responseBodyFile,
 		}
 
-		_, err = exec(fmt.Sprintf("sh %s", scriptPath), envVars)
+		_, err = exec(
+			middlewareConfigs[i].Exec,
+			&mock.ExecOptions{
+				Env: envVars,
+                WorkingDir: configPath,
+			},
+		)
 		if err != nil {
 			return responseBody, err
 		}

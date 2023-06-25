@@ -55,7 +55,7 @@ var serveCmd = &cobra.Command{
 		config.Endpoints = allEndpoints
 
 		middlewaresFromCommandLine := args2config.ParseMiddlewares(os.Args)
-        mergeMiddlewares(config, middlewaresFromCommandLine)
+		mergeMiddlewares(config, middlewaresFromCommandLine)
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
@@ -203,12 +203,17 @@ func readFile(name string) ([]byte, error) {
 	return os.ReadFile(name)
 }
 
-func execute(command string, env map[string]string) (*mock.ExecResult, error) {
+func execute(command string, options *mock.ExecOptions) (*mock.ExecResult, error) {
 	commandStrings := utils.ToCommandStrings(command)
 	commandName, commandParams := utils.ToCommandParams(commandStrings)
 	cmd := exec.Command(commandName, commandParams...)
 	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, utils.ParseEnv(env)...)
+	cmd.Env = append(cmd.Env, utils.ParseEnv(options.Env)...)
+
+	if options.WorkingDir != "" {
+		cmd.Dir = options.WorkingDir
+	}
+
 	out, err := cmd.CombinedOutput()
 	hasOutput := len(out) > 0
 	if err != nil && !hasOutput {
@@ -497,7 +502,7 @@ func mergeEndpoints(a, b []types.EndpointConfig) ([]types.EndpointConfig, []endp
 }
 
 func mergeMiddlewares(config *MockConfig, middlewares []types.MiddlewareConfig) {
-    config.Middlewares = append(config.Middlewares, middlewares...)
+	config.Middlewares = append(config.Middlewares, middlewares...)
 }
 
 type endpointMergeError struct {

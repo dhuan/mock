@@ -1,12 +1,12 @@
 {
   "middlewares": [
     {
-      "script_path": "middleware_replace_foo_with_bar.sh",
+      "exec": "sh middleware_replace_foo_with_bar.sh",
       "type": "before_response",
       "route_match": "*"
     },
     {
-      "script_path": "middleware_duplicate_body.sh",
+      "exec": "sh middleware_duplicate_body.sh",
       "type": "before_response",
       "route_match": "filtered_routes"
     }
