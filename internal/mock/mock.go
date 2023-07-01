@@ -141,3 +141,27 @@ func getRequestRecordMatchingRoute(mockFs types.MockFs, route string) ([]types.R
 
 	return requestRecords, nil
 }
+
+func BuildVars(
+	state *types.State,
+	responseStatusCode int,
+	requestRecord *types.RequestRecord,
+	requestBody []byte,
+) (map[string]string, error) {
+	endpoint := requestRecord.Route
+	mockHost := fmt.Sprintf("localhost:%s", state.ListenPort)
+	querystring := requestRecord.Querystring
+	protocol := "http://"
+	if requestRecord.Https {
+		protocol = "https://"
+	}
+
+	return map[string]string{
+		"MOCK_HOST":                mockHost,
+		"MOCK_REQUEST_HOST":        requestRecord.Host,
+		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
+		"MOCK_REQUEST_ENDPOINT":    endpoint,
+		"MOCK_REQUEST_METHOD":      requestRecord.Method,
+		"MOCK_REQUEST_QUERYSTRING": querystring,
+	}, nil
+}

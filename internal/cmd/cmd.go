@@ -10,7 +10,8 @@ import (
 )
 
 type MockConfig struct {
-	Endpoints []types.EndpointConfig `json:"endpoints"`
+	Endpoints   []types.EndpointConfig   `json:"endpoints"`
+	Middlewares []types.MiddlewareConfig `json:"middlewares"`
 }
 
 type MockApiResponse struct {
@@ -34,6 +35,7 @@ var (
 	flagHeader             *[]string
 	flagExec               *[]string
 	flagResponseExec       *[]string
+	flagMiddleware         *[]string
 )
 
 var rootCmd = &cobra.Command{
@@ -60,6 +62,7 @@ func Execute() {
 	flagHeader = serveCmd.PersistentFlags().StringArray("header", []string{}, "endpoint response header")
 	flagExec = serveCmd.PersistentFlags().StringArray("exec", []string{}, "endpoint response exec")
 	flagResponseExec = serveCmd.PersistentFlags().StringArray("response-exec", []string{}, "endpoint response exec")
+	flagMiddleware = serveCmd.PersistentFlags().StringArray("middleware", []string{}, "middleware")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

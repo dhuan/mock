@@ -12,9 +12,12 @@ import (
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
-type ReadFileFunc = func(name string) ([]byte, error)
+type ExecOptions struct {
+	Env        map[string]string
+	WorkingDir string
+}
 
-type ExecFunc = func(command string, env map[string]string) (*ExecResult, error)
+type ExecFunc = func(command string, options *ExecOptions) (*ExecResult, error)
 
 type Response struct {
 	Body                []byte
@@ -28,7 +31,7 @@ type ExecResult struct {
 }
 
 func ResolveEndpointResponse(
-	readFile ReadFileFunc,
+	readFile types.ReadFileFunc,
 	exec ExecFunc,
 	requestBody []byte,
 	state *types.State,
@@ -140,7 +143,7 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 func resolveEndpointResponseInternal(
 	requestRecord *types.RequestRecord,
 	requestBody []byte,
-	readFile ReadFileFunc,
+	readFile types.ReadFileFunc,
 	exec ExecFunc,
 	state *types.State,
 	response types.EndpointConfigResponse,
@@ -173,9 +176,8 @@ func resolveEndpointResponseInternal(
 		return &Response{[]byte(utils.Unquote(responseStr)), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
 
-	requestVariables, err := buildVars(
+	requestVariables, err := BuildVars(
 		state,
-		endpointConfigContentType,
 		responseStatusCode,
 		requestRecord,
 		requestBody,
@@ -213,22 +215,22 @@ func resolveEndpointResponseInternal(
 			addUrlParamsToRequestVariables(requestVariables, endpointParams)
 		}
 
-		bodyFile, err := utils.CreateTempFile(string(requestBody))
+		bodyFile, err := utils.CreateTempFile(requestBody)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		responseStatusCodeFile, err := utils.CreateTempFile("")
+		responseStatusCodeFile, err := utils.CreateTempFile([]byte(""))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		responseHeadersFile, err := utils.CreateTempFile("")
+		responseHeadersFile, err := utils.CreateTempFile([]byte(""))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		headersFile, err := utils.CreateTempFile(utils.ToHeadersText(requestRecord.Headers))
+		headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -242,7 +244,12 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		execResult, err := exec(fmt.Sprintf("sh %s", scriptFilePath), requestVariables)
+		execResult, err := exec(
+			fmt.Sprintf("sh %s", scriptFilePath),
+			&ExecOptions{
+				Env: requestVariables,
+			},
+		)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -273,7 +280,7 @@ func resolveEndpointResponseInternal(
 
 	if endpointConfigContentType == types.Endpoint_content_type_exec {
 		execCommand := strings.Replace(responseStr, "exec:", "", -1)
-		tempShellScriptFile, err := utils.CreateTempFile(execCommand)
+		tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -282,22 +289,22 @@ func resolveEndpointResponseInternal(
 			addUrlParamsToRequestVariables(requestVariables, endpointParams)
 		}
 
-		bodyFile, err := utils.CreateTempFile(string(requestBody))
+		bodyFile, err := utils.CreateTempFile(requestBody)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		responseStatusCodeFile, err := utils.CreateTempFile("")
+		responseStatusCodeFile, err := utils.CreateTempFile([]byte(""))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		responseHeadersFile, err := utils.CreateTempFile("")
+		responseHeadersFile, err := utils.CreateTempFile([]byte(""))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		headersFile, err := utils.CreateTempFile(utils.ToHeadersText(requestRecord.Headers))
+		headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -311,7 +318,9 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), requestVariables)
+		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
+			Env: requestVariables,
+		})
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
@@ -420,7 +429,7 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 	return types.Endpoint_content_type_plaintext
 }
 
-func extractHeadersFromFile(filePath string, readFile ReadFileFunc) (map[string]string, error) {
+func extractHeadersFromFile(filePath string, readFile types.ReadFileFunc) (map[string]string, error) {
 	headers := make(map[string]string)
 
 	fileContent, err := readFile(filePath)
@@ -449,7 +458,7 @@ func extractHeadersFromFile(filePath string, readFile ReadFileFunc) (map[string]
 	return headers, nil
 }
 
-func extractStatusCodeFromFile(filePath string, readFile ReadFileFunc) (int, error) {
+func extractStatusCodeFromFile(filePath string, readFile types.ReadFileFunc) (int, error) {
 	fileContent, err := readFile(filePath)
 
 	if err != nil {
@@ -488,29 +497,4 @@ func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]
 
 		requestVariables[keyTransformed] = endpointParams[key]
 	}
-}
-
-func buildVars(
-	state *types.State,
-	endpointConfigContentType types.Endpoint_content_type,
-	responseStatusCode int,
-	requestRecord *types.RequestRecord,
-	requestBody []byte,
-) (map[string]string, error) {
-	endpoint := requestRecord.Route
-	mockHost := fmt.Sprintf("localhost:%s", state.ListenPort)
-	querystring := requestRecord.Querystring
-	protocol := "http://"
-	if requestRecord.Https {
-		protocol = "https://"
-	}
-
-	return map[string]string{
-		"MOCK_HOST":                mockHost,
-		"MOCK_REQUEST_HOST":        requestRecord.Host,
-		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
-		"MOCK_REQUEST_ENDPOINT":    endpoint,
-		"MOCK_REQUEST_METHOD":      requestRecord.Method,
-		"MOCK_REQUEST_QUERYSTRING": querystring,
-	}, nil
 }

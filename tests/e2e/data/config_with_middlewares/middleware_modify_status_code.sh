@@ -1,0 +1,4 @@
+TMP=$(mktemp)
+cat $MOCK_RESPONSE_STATUS_CODE > $TMP
+NUM=$(cat $TMP)
+printf $((NUM+1)) > $MOCK_RESPONSE_STATUS_CODE

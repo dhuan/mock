@@ -124,3 +124,4 @@ The above can also be accomplished with
    status_codes
    conditional_responses
    env_vars
+   middlewares

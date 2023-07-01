@@ -102,6 +102,18 @@ func JoinMap[K comparable, V comparable](mapDst map[K]V, mapSrc map[K]V) {
 	}
 }
 
+func MapGetKeyByValue[K comparable, V comparable](m map[K]V, search V, fallback K) K {
+	keys := GetKeys(m)
+
+	for _, key := range keys {
+		if m[key] == search {
+			return key
+		}
+	}
+
+	return fallback
+}
+
 func MapContains[K comparable, V comparable](m map[K]V, key K, value V) bool {
 	valueExtracted, ok := m[key]
 	if !ok {
@@ -237,14 +249,14 @@ func ToHeadersText(headers http.Header) string {
 	return strings.Join(textLines, "\n")
 }
 
-func CreateTempFile(content string) (string, error) {
+func CreateTempFile(content []byte) (string, error) {
 	mktempResult, err := exec.Command("mktemp").Output()
 	if err != nil {
 		return "", err
 	}
 	fileName := strings.TrimSuffix(string(mktempResult), "\n")
 
-	if err = os.WriteFile(fileName, []byte(content), 0644); err != nil {
+	if err = os.WriteFile(fileName, content, 0644); err != nil {
 		return "", err
 	}
 
@@ -377,4 +389,47 @@ var number_chars = "012346789"
 
 func charIsNumber(char string) bool {
 	return strings.Index(number_chars, char) > -1
+}
+
+func RegexTest(regex string, subject string) bool {
+	match, err := regexp.MatchString(regex, subject)
+
+	if err != nil {
+		return false
+	}
+
+	return match
+}
+
+func parseHeaderLine(text string) (string, string, bool) {
+	splitResult := strings.Split(text, ":")
+
+	if len(splitResult) < 2 {
+		return "", "", false
+	}
+
+	return splitResult[0], strings.Join(splitResult[1:], ":"), true
+}
+
+func ExtractHeadersFromText(fileContent []byte) map[string]string {
+	headers := make(map[string]string)
+
+	fileContentText := RemoveEmptyLines(string(fileContent))
+
+	if fileContentText == "" {
+		return headers
+	}
+
+	headerLines := strings.Split(fileContentText, "\n")
+
+	for i := range headerLines {
+		headerKey, headerValue, ok := parseHeaderLine(headerLines[i])
+		if !ok {
+			continue
+		}
+
+		headers[headerKey] = headerValue
+	}
+
+	return headers
 }

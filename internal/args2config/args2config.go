@@ -6,12 +6,12 @@ import "fmt"
 import "log"
 import "strings"
 
-func Parse(args []string) []types.EndpointConfig {
+func ParseEndpoints(args []string) []types.EndpointConfig {
 	endpoints := make([]types.EndpointConfig, 0)
 	endpointCurrent := -1
 
 	for i, arg := range args {
-		if startingNew(arg) {
+		if startingNewEndpoint(arg) {
 			endpoints = append(endpoints, types.EndpointConfig{})
 			endpointCurrent = endpointCurrent + 1
 		}
@@ -34,8 +34,46 @@ func Parse(args []string) []types.EndpointConfig {
 	return endpoints
 }
 
-func startingNew(arg string) bool {
+func ParseMiddlewares(args []string) []types.MiddlewareConfig {
+	middlewares := make([]types.MiddlewareConfig, 0)
+	middlewareCurrent := -1
+
+	for i, arg := range args {
+		if startingNewMiddleware(arg) {
+			middlewares = append(middlewares, types.MiddlewareConfig{RouteMatch: "*"})
+			middlewareCurrent = middlewareCurrent + 1
+		}
+
+		if middlewareCurrent == -1 {
+			continue
+		}
+
+		parseParam([]string{"--middleware"}, arg, args, i, assignMiddlewareType(&middlewares[middlewareCurrent], types.MiddlewareType_BeforeResponse))
+		parseParam([]string{"--route-match"}, arg, args, i, assignMiddlewareRouteMatch(&middlewares[middlewareCurrent]))
+	}
+
+	return middlewares
+}
+
+func startingNewEndpoint(arg string) bool {
 	return arg == "--route"
+}
+
+func startingNewMiddleware(arg string) bool {
+	return arg == "--middleware"
+}
+
+func assignMiddlewareType(middlewareConfig *types.MiddlewareConfig, middlewareType types.MiddlewareType) func(scriptPath string) {
+	return func(scriptPath string) {
+		middlewareConfig.Type = middlewareType
+		middlewareConfig.Exec = scriptPath
+	}
+}
+
+func assignMiddlewareRouteMatch(middlewareConfig *types.MiddlewareConfig) func(routeMatch string) {
+	return func(routeMatch string) {
+		middlewareConfig.RouteMatch = routeMatch
+	}
 }
 
 func assignRoute(endpointConfig *types.EndpointConfig) func(route string) {

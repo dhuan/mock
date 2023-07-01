@@ -1,0 +1,3 @@
+TMP=$(mktemp)
+cat $MOCK_RESPONSE_BODY > $TMP
+cat $TMP >> $MOCK_RESPONSE_BODY

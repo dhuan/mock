@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- Middlewares support
+
 ## 0.8.1
 
 ADDED

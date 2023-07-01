@@ -31,6 +31,12 @@ type EndpointConfig struct {
 	HeadersBase        map[string]string      `json:"response_headers_base"`
 }
 
+type MiddlewareConfig struct {
+	Exec       string         `json:"exec"`
+	Type       MiddlewareType `json:"type"`
+	RouteMatch string         `json:"route_match"`
+}
+
 type RequestRecord struct {
 	Route       string            `json:"route"`
 	Querystring string            `json:"querystring"`
@@ -97,3 +103,31 @@ const (
 	Endpoint_content_type_plaintext
 	Endpoint_content_type_unknown
 )
+
+type MiddlewareType int
+
+const (
+	MiddlewareType_Unknown MiddlewareType = iota
+	MiddlewareType_BeforeResponse
+)
+
+func (this *MiddlewareType) UnmarshalJSON(data []byte) (err error) {
+	text := utils.Unquote(string(data))
+
+	if text == "before_response" {
+		*this = MiddlewareType_BeforeResponse
+
+		return
+	}
+
+	*this = MiddlewareType_BeforeResponse
+
+	return nil
+}
+
+var Middleware_type_code_encoding_map = map[MiddlewareType]string{
+	MiddlewareType_Unknown:        "unknown",
+	MiddlewareType_BeforeResponse: "before_response",
+}
+
+type ReadFileFunc = func(filePath string) ([]byte, error)
