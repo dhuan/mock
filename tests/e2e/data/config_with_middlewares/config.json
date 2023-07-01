@@ -30,7 +30,7 @@
     },
     {
       "exec": "sh middleware_print_env_var_request_nth.sh",
-      "route_match": "print_env_var"
+      "route_match": "print_env_var\/"
     }
   ],
   "endpoints": [

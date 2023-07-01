@@ -421,11 +421,12 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 		LineRegexMatches(4, `MOCK_REQUEST_HEADERS=.*`),
 		LineEquals(5, fmt.Sprintf(`MOCK_REQUEST_HOST=localhost:%s`, GetTestPort())),
 		LineEquals(6, `MOCK_REQUEST_METHOD=get`),
-		LineEquals(7, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
-		LineEquals(8, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
-		LineRegexMatches(9, `MOCK_RESPONSE_HEADERS=.*`),
-		LineRegexMatches(10, `MOCK_RESPONSE_STATUS_CODE=.*`),
-		LineEquals(11, `MOCK_ROUTE_PARAM_FOO=bar`),
+		LineEquals(7, `MOCK_REQUEST_NTH=1`),
+		LineEquals(8, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
+		LineEquals(9, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
+		LineRegexMatches(10, `MOCK_RESPONSE_HEADERS=.*`),
+		LineRegexMatches(11, `MOCK_RESPONSE_STATUS_CODE=.*`),
+		LineEquals(12, `MOCK_ROUTE_PARAM_FOO=bar`),
 	)
 }
 
