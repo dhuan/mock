@@ -2,53 +2,46 @@
   "middlewares": [
     {
       "exec": "sh middleware_replace_foo_with_bar.sh",
-      "type": "before_response",
       "route_match": "*"
     },
     {
       "exec": "sh middleware_duplicate_body.sh",
-      "type": "before_response",
       "route_match": "filtered_routes"
     },
     {
       "exec": "sh middleware_add_new_headers.sh",
-      "type": "before_response",
       "route_match": "*"
     },
     {
       "exec": "sh middleware_remove_headers.sh",
-      "type": "before_response",
       "route_match": "remove_headers"
     },
     {
       "exec": "sh middleware_modify_status_code.sh",
-      "type": "before_response",
       "route_match": "modify_status_code"
     },
     {
       "exec": "sh middleware_print_route_params.sh",
-      "type": "before_response",
       "route_match": "print_route_params"
     },
     {
       "exec": "sh middleware_print_env_vars.sh",
-      "type": "before_response",
       "route_match": "print_env_vars"
     }
   ],
   "endpoints": [
     {
-      "route": "middleware/before_response/modify_body",
+      "route": "middleware/modify_body",
       "method": "GET",
       "response": "Text: foo."
     },
     {
-      "route": "middleware/before_response/modify_body/filtered_routes",
+      "route": "middleware/modify_body/filtered_routes",
       "method": "GET",
       "response": "Hello world!"
     },
     {
-      "route": "middleware/before_response/modify_headers",
+      "route": "middleware/modify_headers",
       "method": "GET",
       "response": "Hello world!",
       "response_headers": {
@@ -56,7 +49,7 @@
       }
     },
     {
-      "route": "middleware/before_response/remove_headers",
+      "route": "middleware/remove_headers",
       "method": "GET",
       "response": "Hello world!",
       "response_headers": {
@@ -65,19 +58,19 @@
       }
     },
     {
-      "route": "middleware/before_response/modify_status_code",
+      "route": "middleware/modify_status_code",
       "method": "GET",
       "response": "Hello world!",
       "response_status_code": 201
     },
     {
-      "route": "middleware/before_response/print_route_params/{one}/{two}",
+      "route": "middleware/print_route_params/{one}/{two}",
       "method": "GET",
       "response": "Hello world!",
       "response_status_code": 201
     },
     {
-      "route": "middleware/before_response/print_env_vars/{one}/{two}",
+      "route": "middleware/print_env_vars/{one}/{two}",
       "method": "GET",
       "response": "Hello world!"
     }
