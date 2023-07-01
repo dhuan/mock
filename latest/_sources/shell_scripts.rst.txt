@@ -105,6 +105,10 @@ variables avaiable:
 -  ``MOCK_REQUEST_QUERYSTRING``: The Request’s Querystring if it exists.
    (ex: ``some_key=some_value&another_key=another_value``)
 -  ``MOCK_REQUEST_METHOD``: A string indicating the Request’s Method.
+-  ``MOCK_REQUEST_NTH``: A number indicating Request’s position in the request
+   history. For example, if two requests have been made to the ``foo/bar``
+   endpoint ever since *mock* started, this being the 2nd request, the number in
+   this variable will be 2.
 
 The following environment variables provide other general information
 not related to the current request:

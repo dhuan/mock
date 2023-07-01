@@ -309,6 +309,10 @@ one exists, otherwise this will be an empty file.)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING</span></code>: The Request’s Querystring if it exists.
 (ex: <code class="docutils literal notranslate"><span class="pre">some_key=some_value&amp;another_key=another_value</span></code>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_METHOD</span></code>: A string indicating the Request’s Method.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_NTH</span></code>: A number indicating Request’s position in the request
+history. For example, if two requests have been made to the <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
+endpoint ever since <em>mock</em> started, this being the 2nd request, the number in
+this variable will be 2.</p></li>
 </ul>
 <p>The following environment variables provide other general information
 not related to the current request:</p>
