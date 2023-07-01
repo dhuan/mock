@@ -301,7 +301,7 @@ func newEndpointHandler(
 		middlewareConfigs := mockMiddleware.GetMiddlewareForRequest(middlewareConfigs, r)
 		hasMiddleware := len(middlewareConfigs) > 0
 
-		vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestBody)
+		vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody)
 		if err != nil {
 			panic(err)
 		}

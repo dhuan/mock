@@ -53,6 +53,7 @@ func ResolveEndpointResponse(
 	if hasResponseIf {
 		return resolveEndpointResponseInternal(
 			requestRecord,
+			requestRecords,
 			requestBody,
 			readFile,
 			exec,
@@ -69,6 +70,7 @@ func ResolveEndpointResponse(
 
 	return resolveEndpointResponseInternal(
 		requestRecord,
+		requestRecords,
 		requestBody,
 		readFile,
 		exec,
@@ -142,6 +144,7 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 
 func resolveEndpointResponseInternal(
 	requestRecord *types.RequestRecord,
+	requestRecords []types.RequestRecord,
 	requestBody []byte,
 	readFile types.ReadFileFunc,
 	exec ExecFunc,
@@ -180,6 +183,7 @@ func resolveEndpointResponseInternal(
 		state,
 		responseStatusCode,
 		requestRecord,
+		requestRecords,
 		requestBody,
 	)
 	if err != nil {

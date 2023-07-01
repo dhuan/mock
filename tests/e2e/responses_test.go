@@ -429,6 +429,28 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_Exec_PrintingRequestNth(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_script_responses/config.json",
+		"GET",
+		"print_request_nth",
+		nil,
+		strings.NewReader(""),
+		LineEquals(1, `MOCK_REQUEST_NTH=1`),
+	)
+
+	RunTestWithMultipleRequests(
+		t,
+		"config_with_script_responses/config.json",
+		[]TestRequest{
+			*NewGetTestRequest("print_request_nth"),
+			*NewGetTestRequest("print_request_nth"),
+		},
+		LineEquals(1, `MOCK_REQUEST_NTH=2`),
+	)
+}
+
 func Test_E2E_Response_Exec_WithCmdParams(t *testing.T) {
 	flagVariations := []string{
 		`--exec 'printf "cexe hguorht detareneg saw txet siht" | rev'`,

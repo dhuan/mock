@@ -148,3 +148,25 @@ func Test_Middlewares_PrintEnvironmentVariables(t *testing.T) {
 		LineEquals(8, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/middleware/print_env_vars/some_param/another_param`, GetTestPort())),
 	)
 }
+
+func Test_Middlewares_PrintEnvironmentVariables_RequestNth(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_middlewares/config.json",
+		"GET",
+		"middleware/print_env_var/request_nth",
+		nil,
+		strings.NewReader(""),
+		LineEquals(1, `MOCK_REQUEST_NTH=1`),
+	)
+
+	RunTestWithMultipleRequests(
+		t,
+		"config_with_middlewares/config.json",
+		[]TestRequest{
+			*NewGetTestRequest("middleware/print_env_var/request_nth"),
+			*NewGetTestRequest("middleware/print_env_var/request_nth"),
+		},
+		LineEquals(1, `MOCK_REQUEST_NTH=2`),
+	)
+}

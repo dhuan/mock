@@ -4,7 +4,8 @@
 
 ADDED
 
-- Middlewares support
+- Middlewares support;
+- New environment variable for Request/Middleware Handlers: `MOCK_REQUEST_NTH`;
 
 ## 0.8.1
 

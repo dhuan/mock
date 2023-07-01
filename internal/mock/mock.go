@@ -146,6 +146,7 @@ func BuildVars(
 	state *types.State,
 	responseStatusCode int,
 	requestRecord *types.RequestRecord,
+	requestRecords []types.RequestRecord,
 	requestBody []byte,
 ) (map[string]string, error) {
 	endpoint := requestRecord.Route
@@ -156,6 +157,13 @@ func BuildVars(
 		protocol = "https://"
 	}
 
+	nth := 1
+	for i := range requestRecords {
+		if requestRecords[i].Route == requestRecord.Route && requestRecords[i].Method == requestRecord.Method {
+			nth = nth + 1
+		}
+	}
+
 	return map[string]string{
 		"MOCK_HOST":                mockHost,
 		"MOCK_REQUEST_HOST":        requestRecord.Host,
@@ -163,5 +171,6 @@ func BuildVars(
 		"MOCK_REQUEST_ENDPOINT":    endpoint,
 		"MOCK_REQUEST_METHOD":      requestRecord.Method,
 		"MOCK_REQUEST_QUERYSTRING": querystring,
+		"MOCK_REQUEST_NTH":         fmt.Sprintf("%d", nth),
 	}, nil
 }

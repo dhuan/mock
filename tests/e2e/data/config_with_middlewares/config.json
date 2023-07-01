@@ -27,6 +27,10 @@
     {
       "exec": "sh middleware_print_env_vars.sh",
       "route_match": "print_env_vars"
+    },
+    {
+      "exec": "sh middleware_print_env_var_request_nth.sh",
+      "route_match": "print_env_var"
     }
   ],
   "endpoints": [
@@ -71,6 +75,11 @@
     },
     {
       "route": "middleware/print_env_vars/{one}/{two}",
+      "method": "GET",
+      "response": "Hello world!"
+    },
+    {
+      "route": "middleware/print_env_var/request_nth",
       "method": "GET",
       "response": "Hello world!"
     }
