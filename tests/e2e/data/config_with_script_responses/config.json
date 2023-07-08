@@ -38,22 +38,22 @@
     {
       "route": "with/exec",
       "method": "GET",
-      "response": "exec:printf 'Hello world!'"
+      "response": "exec:printf 'Hello world!' > $MOCK_RESPONSE_BODY"
     },
     {
       "route": "with/exec/with/pipe",
       "method": "GET",
-      "response": "exec:printf '!dlrow olleH' | rev"
+      "response": "exec:printf '!dlrow olleH' | rev > $MOCK_RESPONSE_BODY"
     },
     {
       "route": "with/exec/with/env/var",
       "method": "GET",
-      "response": "exec:printf 'foo: %s' $FOO"
+      "response": "exec:printf 'foo: %s' $FOO > $MOCK_RESPONSE_BODY"
     },
     {
       "route": "with/exec/print/env/with/param/{foo}",
       "method": "GET",
-      "response": "exec:env | grep -i ^mock | sort"
+      "response": "exec:env | grep -i ^mock | sort > $MOCK_RESPONSE_BODY"
     },
     {
       "route": "print_request_nth",

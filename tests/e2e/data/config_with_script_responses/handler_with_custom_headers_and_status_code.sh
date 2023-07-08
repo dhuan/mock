@@ -1,4 +1,4 @@
-printf "Hello world!"
+printf "Hello world!" > $MOCK_RESPONSE_BODY
 
 cat <<EOF > $MOCK_RESPONSE_HEADERS
 Some-Header-Key: Some Header Value

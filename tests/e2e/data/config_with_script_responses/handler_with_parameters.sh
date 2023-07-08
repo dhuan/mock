@@ -1,1 +1,1 @@
-printf "Parameter: $1"
+printf "Parameter: $1" > $MOCK_RESPONSE_BODY

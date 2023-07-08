@@ -242,7 +242,12 @@ func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
 		nil,
 		strings.NewReader("This is the request payload."),
 		LineEquals(1, `Hello world!`),
-		LineRegexMatches(2, `tests/e2e/data/config_with_script_responses/handler_with_command_that_fails.sh:.*3: please_fail:.* not found$`),
+		ApplicationOutputHasLines([]string{
+			"Executing shell script located in {{WD}}/data/config_with_script_responses/handler_with_command_that_fails.sh",
+			"Output from program execution:",
+			"",
+			"{{WD}}/data/config_with_script_responses/handler_with_command_that_fails.sh: line 3: please_fail: command not found",
+		}),
 	)
 }
 
@@ -424,9 +429,10 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 		LineEquals(7, `MOCK_REQUEST_NTH=1`),
 		LineEquals(8, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
 		LineEquals(9, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
-		LineRegexMatches(10, `MOCK_RESPONSE_HEADERS=.*`),
-		LineRegexMatches(11, `MOCK_RESPONSE_STATUS_CODE=.*`),
-		LineEquals(12, `MOCK_ROUTE_PARAM_FOO=bar`),
+		LineRegexMatches(10, `MOCK_RESPONSE_BODY=.*`),
+		LineRegexMatches(11, `MOCK_RESPONSE_HEADERS=.*`),
+		LineRegexMatches(12, `MOCK_RESPONSE_STATUS_CODE=.*`),
+		LineEquals(13, `MOCK_ROUTE_PARAM_FOO=bar`),
 	)
 }
 
@@ -454,9 +460,9 @@ func Test_E2E_Response_Exec_PrintingRequestNth(t *testing.T) {
 
 func Test_E2E_Response_Exec_WithCmdParams(t *testing.T) {
 	flagVariations := []string{
-		`--exec 'printf "cexe hguorht detareneg saw txet siht" | rev'`,
-		`--response-exec 'printf "cexe hguorht detareneg saw txet siht" | rev'`,
-		`--response 'exec:printf "cexe hguorht detareneg saw txet siht" | rev'`,
+		`--exec 'printf "cexe hguorht detareneg saw txet siht" | rev > $MOCK_RESPONSE_BODY'`,
+		`--response-exec 'printf "cexe hguorht detareneg saw txet siht" | rev > $MOCK_RESPONSE_BODY'`,
+		`--response 'exec:printf "cexe hguorht detareneg saw txet siht" | rev > $MOCK_RESPONSE_BODY'`,
 	}
 
 	for _, flagVariation := range flagVariations {

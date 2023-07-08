@@ -180,9 +180,15 @@ func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.B
 }
 
 func replaceVars(command *string) {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
 	vars := map[string]string{
 		"TEST_DATA_PATH": fmt.Sprintf("%s/tests/e2e/data", pwd()),
 		"TEST_E2E_PORT":  GetTestPort(),
+		"WD":             wd,
 	}
 
 	for key, value := range vars {
@@ -273,7 +279,7 @@ func RunTest(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -289,7 +295,7 @@ func RunTestWithMultipleRequests(
 	t *testing.T,
 	configurationFilePath string,
 	requests []TestRequest,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	RunTestBase(t, configurationFilePath, "", requests, nil, assertionFunc...)
 }
@@ -302,7 +308,7 @@ func RunTestWithEnv(
 	headers map[string]string,
 	body io.Reader,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -322,7 +328,7 @@ func RunTestWithArgs(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -341,7 +347,7 @@ func RunTestWithNoConfigAndWithArgs(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -361,7 +367,7 @@ func RunTestWithAndWithArgsAndWithEnv(
 	headers map[string]string,
 	body io.Reader,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -397,7 +403,7 @@ func RunTestBase(
 	extraArgs string,
 	requests []TestRequest,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
 ) {
 	command := resolveCommand(configurationFilePath)
 	if extraArgs != "" {
@@ -415,28 +421,72 @@ func RunTestBase(
 	}
 
 	for i := range assertionFunc {
-		assertionFunc[i](t, response)
+		assertionFunc[i](t, response, output.Bytes())
 	}
 }
 
-func StringMatches(expected string) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func StringMatches(expected string) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		replaceVars(&expected)
 
 		assert.Equal(t, expected, string(response.Body))
 	}
 }
 
-func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		replaceVars(&expectedLine)
 
 		assert.Equal(t, expectedLine, getLineFromString(lineNumber-1, string(response.Body)))
 	}
 }
 
-func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
+		if len(expectedLines) == 0 {
+			return
+		}
+
+		serverOutputLines := breakLines(string(serverOutput))
+		lineMatch := -1
+
+		for i := range expectedLines {
+			replaceVars(&expectedLines[i])
+		}
+
+		for i := range serverOutputLines {
+			serverOutputLines[i] = removeLogDatePrefix(serverOutputLines[i])
+
+			if serverOutputLines[i] == expectedLines[0] {
+				lineMatch = i
+			}
+		}
+
+		if lineMatch == -1 {
+			t.Fatal(fmt.Sprintf("There is no line matching: %s", expectedLines[0]))
+		}
+
+		i := 0
+		for {
+			expectedLine := expectedLines[i]
+
+			if expectedLine != serverOutputLines[lineMatch] {
+				fmt.Println(fmt.Sprintf("Line expected: %s\nLine actual:   %s", expectedLine, serverOutputLines[lineMatch]))
+				t.Fail()
+			}
+
+			lineMatch = lineMatch + 1
+			i = i + 1
+
+			if i > len(expectedLines)-1 {
+				break
+			}
+		}
+	}
+}
+
+func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		assert.Regexp(
 			t,
 			regexp.MustCompile(regex),
@@ -445,14 +495,14 @@ func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response 
 	}
 }
 
-func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		assert.Equal(t, expectedStatusCode, response.StatusCode)
 	}
 }
 
-func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		expectedHeadersKeys := getSortedKeys(expectedHeaders)
 
 		for _, expectedHeaderKey := range expectedHeadersKeys {
@@ -484,8 +534,8 @@ func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Res
 	}
 }
 
-func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		jsonEncodedA, err := json.Marshal(expectedJson)
 		if err != nil {
 			t.Fatal("Failed to parse JSON from expected input!")
@@ -604,4 +654,12 @@ func BuildFormPayload(data map[string]string) io.Reader {
 	}
 
 	return strings.NewReader(url.Values(dataParsed).Encode())
+}
+
+func breakLines(text string) []string {
+	return strings.Split(text, "\n")
+}
+
+func removeLogDatePrefix(text string) string {
+	return replaceRegex(text, []string{`^[0-9/]{1,} [0-9\:]{1,} `}, "")
 }

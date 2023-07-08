@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
@@ -234,6 +235,11 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
+		responseBodyFile, err := utils.CreateTempFile([]byte(""))
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
 		headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
@@ -242,11 +248,14 @@ func resolveEndpointResponseInternal(
 		fileVars := map[string]string{
 			"MOCK_REQUEST_HEADERS":      headersFile,
 			"MOCK_REQUEST_BODY":         bodyFile,
+			"MOCK_RESPONSE_BODY":        responseBodyFile,
 			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
 			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
 		}
 
 		utils.JoinMap(requestVariables, fileVars)
+
+		log.Println(fmt.Sprintf("Executing shell script located in %s", scriptFilePath))
 
 		execResult, err := exec(
 			fmt.Sprintf("sh %s", scriptFilePath),
@@ -257,6 +266,8 @@ func resolveEndpointResponseInternal(
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
+
+		printOutExecOutputIfNecessary(execResult)
 
 		extraHeaders, err := extractHeadersFromFile(responseHeadersFile, readFile)
 		if err != nil {
@@ -273,7 +284,12 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		response := &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}
+		bodyContent, err := readFile(responseBodyFile)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		response := &Response{bodyContent, endpointConfigContentType, responseStatusCode, headers}
 
 		if statusCode != -1 {
 			response.StatusCode = statusCode
@@ -303,6 +319,11 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
+		responseBodyFile, err := utils.CreateTempFile([]byte(""))
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
 		responseHeadersFile, err := utils.CreateTempFile([]byte(""))
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
@@ -316,11 +337,14 @@ func resolveEndpointResponseInternal(
 		fileVars := map[string]string{
 			"MOCK_REQUEST_HEADERS":      headersFile,
 			"MOCK_REQUEST_BODY":         bodyFile,
+			"MOCK_RESPONSE_BODY":        responseBodyFile,
 			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
 			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
 		}
 
 		utils.JoinMap(requestVariables, fileVars)
+
+		log.Println(fmt.Sprintf("Executing command: %s", execCommand))
 
 		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
 			Env: requestVariables,
@@ -328,6 +352,8 @@ func resolveEndpointResponseInternal(
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
+
+		printOutExecOutputIfNecessary(execResult)
 
 		extraHeaders, err := extractHeadersFromFile(responseHeadersFile, readFile)
 		if err != nil {
@@ -344,7 +370,12 @@ func resolveEndpointResponseInternal(
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
 		}
 
-		response := &Response{execResult.Output, endpointConfigContentType, responseStatusCode, headers}
+		bodyContent, err := readFile(responseBodyFile)
+		if err != nil {
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		}
+
+		response := &Response{bodyContent, endpointConfigContentType, responseStatusCode, headers}
 
 		if statusCode != -1 {
 			response.StatusCode = statusCode
@@ -501,4 +532,14 @@ func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]
 
 		requestVariables[keyTransformed] = endpointParams[key]
 	}
+}
+
+func printOutExecOutputIfNecessary(execResult *ExecResult) {
+	output := string(execResult.Output)
+
+	if strings.TrimSpace(output) == "" {
+		return
+	}
+
+	log.Println(fmt.Sprintf("Output from program execution:\n\n%s", output))
 }

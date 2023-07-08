@@ -2,6 +2,12 @@
 
 ## Unreleased yet
 
+BREAKING CHANGES
+
+Request Handlers (shell scripts and executables) now need to write to the
+`$MOCK_RESPONSE_BODY` environment variable in order to write an HTTP Response's
+body instead of outputting to stdout.
+
 ADDED
 
 - Middlewares support;
