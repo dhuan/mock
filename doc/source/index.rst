@@ -14,16 +14,16 @@ mock - Language-agnostic API mocking and testing utility
 .. code:: sh
 
    $ mock serve --port 3000 \
-     --route 'time_in/{country}' \
+     --route 'say_hi/{name}' \
      --method GET \
-     --exec 'zdump ${country}' \
-     --route 'whois/{domain}' \
+     --response 'Hello world! My name is ${name}.' \
+     --route "what_time_is_it" \
      --method GET \
-     --exec 'whois ${domain}'
+     --exec 'printf "Now it is %s" $(date +"%H:%M") > $MOCK_RESPONSE_BODY'
 
 Run the example command the above and try these URLs in your browser or
-any preferred HTTP client: ``http://localhost:3000/time_in/Japan`` and
-``http://localhost:3000/whois/google.com``
+any preferred HTTP client: ``http://localhost:3000/say_hi/mock`` and
+``http://localhost:3000/what_time_is_it``
 
 Quick links
 -----------
