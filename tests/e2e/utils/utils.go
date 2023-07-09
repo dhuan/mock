@@ -520,8 +520,8 @@ func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response
 	}
 }
 
-func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Response) {
-	return func(t *testing.T, response *Response) {
+func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Response, serverOutput []byte) {
+	return func(t *testing.T, response *Response, serverOutput []byte) {
 		for _, headerKey := range headerKeys {
 			_, exists := response.Headers[headerKey]
 
