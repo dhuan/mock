@@ -220,8 +220,7 @@
           <section id="responses-from-shell-scripts">
 <h1>Responses from Shell scripts<a class="headerlink" href="#responses-from-shell-scripts" title="Permalink to this heading">#</a></h1>
 <p>You can write shell scripts that will act as “handlers” for your API’s
-Requests (or Controllers if you like to think in terms of the MVC
-pattern.)</p>
+Requests.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
@@ -233,9 +232,12 @@ pattern.)</p>
 </pre></div>
 </div>
 <p>In the example above, any request to <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/foo/bar</span></code> will result in
-<em>mock</em> executing the <code class="docutils literal notranslate"><span class="pre">my_shell_script.sh</span></code>. Any output produced from
-that script execution will result in the HTTP Response returned by your
-API.</p>
+<em>mock</em> executing the <code class="docutils literal notranslate"><span class="pre">my_shell_script.sh</span></code>. Scripts can manipulate the HTTP
+Response by writing to a file assigned to the <code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_BODY</span></code> environment
+variable. Following is a script that defines the HTTP Response as <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
+</pre></div>
+</div>
 <p>To further customize your script handlers, you may also pass parameters,
 just like you can normally pass parameters in a shell command:</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
@@ -263,7 +265,7 @@ current folder (<code class="docutils literal notranslate"><span class="pre">ls<
 <span class="w"> </span>  &quot;endpoints&quot;: [
 <span class="w"> </span>    {
 <span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;exec:ls -la&quot;</span>
+<span class="gi">+      &quot;response&quot;: &quot;exec:ls -la &gt; $MOCK_RESPONSE_BODY&quot;</span>
 <span class="w"> </span>    }
 <span class="w"> </span>  ]
 <span class="w"> </span>}
@@ -276,7 +278,7 @@ on the home folder:</p>
 <span class="w"> </span>  &quot;endpoints&quot;: [
 <span class="w"> </span>    {
 <span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;exec:ls ~ | wc -l&quot;</span>
+<span class="gi">+      &quot;response&quot;: &quot;exec:ls ~ | wc -l &gt; $MOCK_RESPONSE_BODY&quot;</span>
 <span class="w"> </span>    }
 <span class="w"> </span>  ]
 <span class="w"> </span>}
@@ -285,7 +287,7 @@ on the home folder:</p>
 <p>The same can be accomplished through command-line parameters:</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
 <span class="gi">+  --route &quot;foo/bar&quot; \</span>
-<span class="gi">+  --exec &#39;ls | sort&#39;</span>
+<span class="gi">+  --exec &#39;ls | sort &gt; $MOCK_RESPONSE_BODY&#39;</span>
 </pre></div>
 </div>
 <section id="environment-variables-for-request-handlers">
@@ -334,10 +336,12 @@ variable.</p>
 about the Request that’s being currently handled. The following
 environment variables enable you to further define the HTTP Response:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_STATUS_CODE</span></code>: A file that your handler can write to,
-to define the HTTP Status Code.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_HEADERS</span></code>: A file that your handler can write to, to
-define the HTTP Headers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_BODY</span></code>: A file that can be written to in order to set the
+HTTP Response.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_STATUS_CODE</span></code>: A file that can be written to in order to
+define the HTTP Status Code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_HEADERS</span></code>: A file that can be written to in order to define
+the HTTP Headers.</p></li>
 </ul>
 <p>In the following example, we’ll see what a Handler looks like, which
 responds with a simple <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code> body content, a <code class="docutils literal notranslate"><span class="pre">201</span></code> Status

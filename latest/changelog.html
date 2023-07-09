@@ -221,6 +221,10 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h1>
 <section id="unreleased-yet">
 <h2>Unreleased yet<a class="headerlink" href="#unreleased-yet" title="Permalink to this heading">#</a></h2>
+<p>BREAKING CHANGES</p>
+<p>Request Handlers (shell scripts and executables) now need to write to
+the <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code> environment variable in order to write an
+HTTP Response’s body instead of outputting to stdout.</p>
 <p>ADDED</p>
 <ul class="simple">
 <li><p>Middlewares support;</p></li>

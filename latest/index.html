@@ -232,17 +232,17 @@
 </li>
 </ul>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;time_in/{country}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;say_hi/{name}&#39;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;zdump ${country}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;whois/{domain}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world! My name is ${name}.&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;what_time_is_it&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;whois ${domain}&#39;</span>
+<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Now it is %s&quot; $(date +&quot;%H:%M&quot;) &gt; $MOCK_RESPONSE_BODY&#39;</span>
 </pre></div>
 </div>
 <p>Run the example command the above and try these URLs in your browser or
-any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/time_in/Japan</span></code> and
-<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/whois/google.com</span></code></p>
+any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/say_hi/mock</span></code> and
+<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/what_time_is_it</span></code></p>
 <section id="quick-links">
 <h2>Quick links<a class="headerlink" href="#quick-links" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
