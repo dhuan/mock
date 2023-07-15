@@ -663,3 +663,9 @@ func breakLines(text string) []string {
 func removeLogDatePrefix(text string) string {
 	return replaceRegex(text, []string{`^[0-9/]{1,} [0-9\:]{1,} `}, "")
 }
+
+func EnvVarExists(varName string) bool {
+	_, exists := os.LookupEnv(varName)
+
+	return exists
+}

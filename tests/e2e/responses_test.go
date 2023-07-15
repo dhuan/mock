@@ -234,6 +234,12 @@ func Test_E2E_Response_ShellScript_WithParameter(t *testing.T) {
 }
 
 func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
+	runningInGithubCi := EnvVarExists("CI")
+	expectedFailureLine := "{{WD}}/data/config_with_script_responses/handler_with_command_that_fails.sh: line 3: please_fail: command not found"
+	if runningInGithubCi {
+		expectedFailureLine = "{{WD}}/data/config_with_script_responses/handler_with_command_that_fails.sh: 3: please_fail: not found"
+	}
+
 	RunTest(
 		t,
 		"config_with_script_responses/config.json",
@@ -246,7 +252,7 @@ func Test_E2E_Response_ShellScript_CommandFailing(t *testing.T) {
 			"Executing shell script located in {{WD}}/data/config_with_script_responses/handler_with_command_that_fails.sh",
 			"Output from program execution:",
 			"",
-			"{{WD}}/data/config_with_script_responses/handler_with_command_that_fails.sh: line 3: please_fail: command not found",
+			expectedFailureLine,
 		}),
 	)
 }
