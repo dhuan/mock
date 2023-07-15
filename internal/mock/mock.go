@@ -9,20 +9,20 @@ import (
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
-func ParseAssertRequest(req *http.Request) (*AssertConfig, error) {
-	var assertConfig AssertConfig
+func ParseAssertRequest(req *http.Request) (*AssertOptions, error) {
+	var assertOptions AssertOptions
 	decoder := json.NewDecoder(req.Body)
-	err := decoder.Decode(&assertConfig)
+	err := decoder.Decode(&assertOptions)
 
-	return &assertConfig, err
+	return &assertOptions, err
 }
 
 func Validate(
 	mockFs types.MockFs,
-	assertConfig *AssertConfig,
+	assertOptions *AssertOptions,
 ) (*[]ValidationError, error) {
 	validationErrors := make([]ValidationError, 0)
-	requestRecords, err := getRequestRecordMatchingRoute(mockFs, assertConfig.Route)
+	requestRecords, err := getRequestRecordMatchingRoute(mockFs, assertOptions.Route)
 	if err != nil {
 		return &validationErrors, err
 	}
@@ -38,7 +38,7 @@ func Validate(
 		return &validationErrors, nil
 	}
 
-	nth := assertConfig.Nth
+	nth := assertOptions.Nth
 	if nth == 0 {
 		nth = 1
 	}
@@ -57,7 +57,7 @@ func Validate(
 
 	requestRecord := requestRecords[nth-1]
 
-	return validate(&requestRecord, assertConfig.Assert, requestRecords)
+	return validate(&requestRecord, assertOptions.Condition, requestRecords)
 }
 
 func validate(requestRecord *types.RequestRecord, assert *Condition, requestRecords []types.RequestRecord) (*[]ValidationError, error) {

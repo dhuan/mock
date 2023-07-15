@@ -339,7 +339,7 @@ func newEndpointHandler(
 
 func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		assertConfig, err := mock.ParseAssertRequest(r)
+		assertOptions, err := mock.ParseAssertRequest(r)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(400)
@@ -347,7 +347,7 @@ func mockApiHandler(mockFs types.MockFs, state *types.State, config *MockConfig)
 			return
 		}
 
-		validationErrors, err := mock.Validate(mockFs, assertConfig)
+		validationErrors, err := mock.Validate(mockFs, assertOptions)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(500)

@@ -4,9 +4,12 @@
 
 BREAKING CHANGES
 
-Request Handlers (shell scripts and executables) now need to write to the
-`$MOCK_RESPONSE_BODY` environment variable in order to write an HTTP Response's
-body instead of outputting to stdout.
+- Request Handlers (shell scripts and executables) now need to write to the
+  `$MOCK_RESPONSE_BODY` environment variable in order to write an HTTP
+  Response's body instead of outputting to stdout.
+- Interfaces for assertions have changed for better readability: `assert` field
+  has been renamed to `condition`. Check the documentation on the assertion
+  sections before upgrading.
 
 ADDED
 

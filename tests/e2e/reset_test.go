@@ -19,9 +19,9 @@ func Test_E2E_Resetting(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type: mocklib.ConditionType_JsonBodyMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",
@@ -33,9 +33,9 @@ func Test_E2E_Resetting(t *testing.T) {
 
 	e2eutils.RequestApiReset(mockConfig)
 
-	validationErrors = e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors = e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type: mocklib.ConditionType_JsonBodyMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",

@@ -92,9 +92,9 @@ func RunMockBg(state *E2eState, command string, env map[string]string) (KillMock
 	}, buf, mocklib.Init(fmt.Sprintf("localhost:%s", GetTestPort()))
 }
 
-func MockAssert(assertConfig *mocklib.AssertConfig, serverOutput *bytes.Buffer) []mocklib.ValidationError {
+func MockAssert(assertOptions *mocklib.AssertOptions, serverOutput *bytes.Buffer) []mocklib.ValidationError {
 	mockConfig := mocklib.Init(fmt.Sprintf("localhost:%s", GetTestPort()))
-	validationErrors, err := mocklib.Assert(mockConfig, assertConfig)
+	validationErrors, err := mocklib.Assert(mockConfig, assertOptions)
 	if err != nil {
 		log.Println("An error occurred. Here's the server output:")
 		fmt.Println(serverOutput)

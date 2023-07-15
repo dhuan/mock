@@ -41,9 +41,9 @@ look like in Go?
    func Test_FooBarShouldBeRequested(t *testing.T) {
        mockConfig := &mock.MockConfig{Url: "localhost:4000"}
 
-       validationErrors, err := mock.Assert(mockConfig, &mock.AssertConfig{
+       validationErrors, err := mock.Assert(mockConfig, &mock.AssertOptions{
            Route: "foo/bar",
-           Assert: &mock.Condition{
+           Condition: &mock.Condition{
                Type:  mock.ConditionType_MethodMatch,
                Value: "post",
            },
@@ -89,9 +89,9 @@ of assertion, using *Assertion Chaining*:
 
 .. code:: diff
 
-    validationErrors, err := mock.Assert(mockConfig, &mock.AssertConfig{
+    validationErrors, err := mock.Assert(mockConfig, &mock.AssertOptions{
         Route: "foo/bar",
-        Assert: &mock.Condition{
+        Condition: &mock.Condition{
             Type:  mock.ConditionType_MethodMatch,
             Value: "post",
    +        And: &mock.Condition{

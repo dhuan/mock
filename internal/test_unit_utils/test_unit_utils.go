@@ -90,12 +90,12 @@ func AddToMockedRequestRecords(state *unitTestState, fullRoute, method string, h
 
 func Validate(route string, assertOptions *Condition) TestOperationFunc {
 	return func(t *testing.T, state *unitTestState) {
-		assertConfig := AssertConfig{
+		assertOptions := AssertOptions{
 			Route:  route,
-			Assert: assertOptions,
+			Condition: assertOptions,
 		}
 
-		newValidationErrors, err := mock.Validate(mockMockFs{state}, &assertConfig)
+		newValidationErrors, err := mock.Validate(mockMockFs{state}, &assertOptions)
 		if err != nil {
 			fmt.Println(err)
 			t.Fail()
@@ -107,13 +107,13 @@ func Validate(route string, assertOptions *Condition) TestOperationFunc {
 
 func ValidateNth(nth int, route string, assertOptions *Condition) TestOperationFunc {
 	return func(t *testing.T, state *unitTestState) {
-		assertConfig := AssertConfig{
+		assertOptions := AssertOptions{
 			Nth:    nth,
 			Route:  route,
-			Assert: assertOptions,
+			Condition: assertOptions,
 		}
 
-		newValidationErrors, err := mock.Validate(mockMockFs{state}, &assertConfig)
+		newValidationErrors, err := mock.Validate(mockMockFs{state}, &assertOptions)
 		if err != nil {
 			fmt.Println(err)
 			t.Fail()

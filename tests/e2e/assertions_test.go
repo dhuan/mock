@@ -18,9 +18,9 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 
 	defer killMock()
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 		},
@@ -45,9 +45,9 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "put",
 		},
@@ -79,10 +79,10 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"not_bar"}`), e2eutils.ContentTypeJsonHeaders)
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
 		Nth:   2,
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type: mocklib.ConditionType_JsonBodyMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",
@@ -108,10 +108,10 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"not_bar"}`), e2eutils.ContentTypeJsonHeaders)
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
 		Nth:   1,
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type: mocklib.ConditionType_JsonBodyMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",
@@ -144,10 +144,10 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
 		Nth:   2,
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type: mocklib.ConditionType_JsonBodyMatch,
 			KeyValues: map[string]interface{}{
 				"foo": "bar",
@@ -177,9 +177,9 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 		},
@@ -202,9 +202,9 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 			And: &mocklib.Condition{
@@ -242,9 +242,9 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 		"some_header_key": "some_header_value",
 	})
 
-	validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
-		Assert: &mocklib.Condition{
+		Condition: &mocklib.Condition{
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 			And: &mocklib.Condition{
@@ -277,9 +277,9 @@ func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
 		e2eutils.RequestApiReset(mockConfig)
 		e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
 
-		validationErrors := e2eutils.MockAssert(&mocklib.AssertConfig{
+		validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 			Route: "foo/bar",
-			Assert: &mocklib.Condition{
+			Condition: &mocklib.Condition{
 				Type:  mocklib.ConditionType_MethodMatch,
 				Value: mocklib.ConditionValue(assertMethod),
 			},

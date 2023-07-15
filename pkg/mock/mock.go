@@ -32,10 +32,10 @@ var validation_error_code_encoding_map = map[ValidationErrorCode]string{
 
 type AssertHeader map[string][]string
 
-type AssertConfig struct {
-	Route  string     `json:"route"`
-	Nth    int        `json:"nth"`
-	Assert *Condition `json:"assert"`
+type AssertOptions struct {
+	Route     string     `json:"route"`
+	Nth       int        `json:"nth"`
+	Condition *Condition `json:"condition"`
 }
 
 type ValidationError struct {
@@ -101,8 +101,8 @@ type AssertResponse struct {
 	ValidationErrors []ValidationError `json:"validation_errors"`
 }
 
-func Assert(config *MockConfig, assertConfig *AssertConfig) ([]ValidationError, error) {
-	bodyJson, err := json.Marshal(assertConfig)
+func Assert(config *MockConfig, assertOptions *AssertOptions) ([]ValidationError, error) {
+	bodyJson, err := json.Marshal(assertOptions)
 	if err != nil {
 		return make([]ValidationError, 0, 0), err
 	}
