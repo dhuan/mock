@@ -227,7 +227,7 @@ make assertions on how your endpoints were called.</p>
 let’s see what a very simple assertion looks like:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello/world&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;assert&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;condition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;method_match&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;put&quot;</span>
 <span class="w">  </span><span class="p">}</span>
@@ -283,7 +283,7 @@ want to assert against a Request other than the first, you’ll use the
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
 <span class="w"> </span>  &quot;route&quot;: &quot;foo/bar&quot;,
 <span class="gi">+  &quot;nth&quot;: 2,</span>
-<span class="w"> </span>  &quot;assert&quot;: {
+<span class="w"> </span>  &quot;condition&quot;: {
 <span class="w"> </span>    &quot;type&quot;: &quot;method_match&quot;,
 <span class="w"> </span>    &quot;value&quot;: &quot;post&quot;
 <span class="w"> </span>  }

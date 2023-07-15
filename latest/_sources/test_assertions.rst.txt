@@ -14,7 +14,7 @@ let’s see what a very simple assertion looks like:
 
    {
      "route": "hello/world",
-     "assert": {
+     "condition": {
        "type": "method_match",
        "value": "put"
      }
@@ -80,7 +80,7 @@ want to assert against a Request other than the first, you’ll use the
     {
       "route": "foo/bar",
    +  "nth": 2,
-      "assert": {
+      "condition": {
         "type": "method_match",
         "value": "post"
       }

@@ -253,9 +253,9 @@ look like in Go?</p>
 <span class="kd">func</span><span class="w"> </span><span class="nx">Test_FooBarShouldBeRequested</span><span class="p">(</span><span class="nx">t</span><span class="w"> </span><span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">mockConfig</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">MockConfig</span><span class="p">{</span><span class="nx">Url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;localhost:4000&quot;</span><span class="p">}</span>
 
-<span class="w">    </span><span class="nx">validationErrors</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">mock</span><span class="p">.</span><span class="nx">Assert</span><span class="p">(</span><span class="nx">mockConfig</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">AssertConfig</span><span class="p">{</span>
+<span class="w">    </span><span class="nx">validationErrors</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">mock</span><span class="p">.</span><span class="nx">Assert</span><span class="p">(</span><span class="nx">mockConfig</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">AssertOptions</span><span class="p">{</span>
 <span class="w">        </span><span class="nx">Route</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo/bar&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nx">Assert</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">Condition</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">Condition</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mock</span><span class="p">.</span><span class="nx">Condition</span><span class="p">{</span>
 <span class="w">            </span><span class="nx">Type</span><span class="p">:</span><span class="w">  </span><span class="nx">mock</span><span class="p">.</span><span class="nx">ConditionType_MethodMatch</span><span class="p">,</span>
 <span class="w">            </span><span class="nx">Value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;post&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="p">},</span>
@@ -298,9 +298,9 @@ your assertion passed successfully.</p></li>
 </ul>
 <p>With that we covered basic assertions. Let’s see now a more complex kind
 of assertion, using <em>Assertion Chaining</em>:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>validationErrors, err := mock.Assert(mockConfig, &amp;mock.AssertConfig{
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>validationErrors, err := mock.Assert(mockConfig, &amp;mock.AssertOptions{
 <span class="w"> </span>    Route: &quot;foo/bar&quot;,
-<span class="w"> </span>    Assert: &amp;mock.Condition{
+<span class="w"> </span>    Condition: &amp;mock.Condition{
 <span class="w"> </span>        Type:  mock.ConditionType_MethodMatch,
 <span class="w"> </span>        Value: &quot;post&quot;,
 <span class="gi">+        And: &amp;mock.Condition{</span>

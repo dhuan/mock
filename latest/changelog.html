@@ -222,9 +222,14 @@
 <section id="unreleased-yet">
 <h2>Unreleased yet<a class="headerlink" href="#unreleased-yet" title="Permalink to this heading">#</a></h2>
 <p>BREAKING CHANGES</p>
-<p>Request Handlers (shell scripts and executables) now need to write to
+<ul class="simple">
+<li><p>Request Handlers (shell scripts and executables) now need to write to
 the <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code> environment variable in order to write an
-HTTP Response’s body instead of outputting to stdout.</p>
+HTTP Response’s body instead of outputting to stdout.</p></li>
+<li><p>Interfaces for assertions have changed for better readability:
+<code class="docutils literal notranslate"><span class="pre">assert</span></code> field has been renamed to <code class="docutils literal notranslate"><span class="pre">condition</span></code>. Check the
+documentation on the assertion sections before upgrading.</p></li>
+</ul>
 <p>ADDED</p>
 <ul class="simple">
 <li><p>Middlewares support;</p></li>
