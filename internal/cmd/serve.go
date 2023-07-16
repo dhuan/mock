@@ -307,10 +307,8 @@ func newEndpointHandler(
 		}
 
 		responseTransformed := response.Body
-		responseHeadersTransformed := response.Headers
-		responseStatusCodeTransformed := response.StatusCode
 		if hasMiddleware {
-			responseTransformed, responseHeadersTransformed, responseStatusCodeTransformed, err = mockMiddleware.RunMiddleware(
+			middlewareRunResult, err := mockMiddleware.RunMiddleware(
 				execute,
 				readFile,
 				state.ConfigFolderPath,
@@ -326,8 +324,9 @@ func newEndpointHandler(
 				panic(err)
 			}
 
-			response.Headers = responseHeadersTransformed
-			response.StatusCode = responseStatusCodeTransformed
+			responseTransformed = middlewareRunResult.Body
+			response.Headers = middlewareRunResult.Headers
+			response.StatusCode = middlewareRunResult.StatusCode
 		}
 
 		addHeaders(w, response)

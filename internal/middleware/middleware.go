@@ -11,6 +11,12 @@ import (
 	"github.com/dhuan/mock/internal/utils"
 )
 
+type MiddlewareRunResult struct {
+	Body       []byte
+	Headers    map[string]string
+	StatusCode int
+}
+
 func RunMiddleware(
 	exec mock.ExecFunc,
 	readFile types.ReadFileFunc,
@@ -22,39 +28,26 @@ func RunMiddleware(
 	request *http.Request,
 	endpointParams map[string]string,
 	vars map[string]string,
-) ([]byte, map[string]string, int, error) {
-	headersParsed := make(map[string]string)
-	resultResponseBody := make([]byte, len(responseBody))
-	copy(resultResponseBody, responseBody)
-
-	resultResponseHeaders := []byte(utils.ToHeadersText(toHttpHeaders(responseHeaders)) + "\n")
-
-	resultResponseStatusCode := []byte(fmt.Sprintf("%d", responseStatusCode))
+) (*MiddlewareRunResult, error) {
+	result := &MiddlewareRunResult{}
+	result.Body = responseBody
+	result.Headers = make(map[string]string)
+	result.StatusCode = responseStatusCode
 
 	if len(middlewareConfigs) == 0 {
-		return responseBody, headersParsed, responseStatusCode, nil
+		return result, nil
+	}
+
+	responseFiles, err := buildResponseFiles(responseBody, responseHeaders, responseStatusCode)
+	if err != nil {
+		return result, err
 	}
 
 	for i := range middlewareConfigs {
-		responseBodyFile, err := utils.CreateTempFile(resultResponseBody)
-		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
-		}
-
-		responseHeadersFile, err := utils.CreateTempFile(resultResponseHeaders)
-		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
-		}
-
-		responseStatusCodeFile, err := utils.CreateTempFile(resultResponseStatusCode)
-		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
-		}
-
 		envVars := map[string]string{
-			"MOCK_RESPONSE_BODY":        responseBodyFile,
-			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
-			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
+			"MOCK_RESPONSE_BODY":        responseFiles.body,
+			"MOCK_RESPONSE_HEADERS":     responseFiles.headers,
+			"MOCK_RESPONSE_STATUS_CODE": responseFiles.statusCode,
 		}
 
 		for key := range endpointParams {
@@ -75,30 +68,42 @@ func RunMiddleware(
 			},
 		)
 		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
+			return result, err
 		}
 
-		resultResponseBody, err = readFile(responseBodyFile)
-		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
-		}
-
-		resultResponseHeaders, err = readFile(responseHeadersFile)
-		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
-		}
-
-		resultResponseStatusCode, err = readFile(responseStatusCodeFile)
-		if err != nil {
-			return responseBody, headersParsed, responseStatusCode, err
-		}
 	}
 
-	headersParsed = utils.ExtractHeadersFromText(resultResponseHeaders)
+	return readResponseFiles(responseFiles, readFile)
+}
 
-	responseStatusCodeParsed := bytesToInt(resultResponseStatusCode, responseStatusCode)
+func readResponseFiles(
+	rf *responseFiles,
+	readFile types.ReadFileFunc,
+) (*MiddlewareRunResult, error) {
+	result := &MiddlewareRunResult{}
 
-	return resultResponseBody, headersParsed, responseStatusCodeParsed, nil
+	resultResponseBody, err := readFile(rf.body)
+	if err != nil {
+		return result, err
+	}
+
+	resultResponseHeaders, err := readFile(rf.headers)
+	if err != nil {
+		return result, err
+	}
+
+	resultResponseStatusCode, err := readFile(rf.statusCode)
+	if err != nil {
+		return result, err
+	}
+
+	responseStatusCodeParsed := bytesToInt(resultResponseStatusCode, 200)
+
+	result.Body = resultResponseBody
+	result.StatusCode = responseStatusCodeParsed
+	result.Headers = utils.ExtractHeadersFromText(resultResponseHeaders)
+
+	return result, nil
 }
 
 func bytesToInt(data []byte, fallback int) int {
@@ -140,4 +145,43 @@ func routeMatch(r *http.Request, middlewareConfig *types.MiddlewareConfig) bool 
 	requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
 
 	return utils.RegexTest(middlewareConfig.RouteMatch, requestRoute)
+}
+
+type responseFiles struct {
+	body       string
+	headers    string
+	statusCode string
+}
+
+func buildResponseFiles(
+	responseBody []byte,
+	responseHeaders map[string]string,
+	responseStatusCode int,
+) (*responseFiles, error) {
+	result := &responseFiles{}
+	resultResponseHeaders := []byte(utils.ToHeadersText(toHttpHeaders(responseHeaders)) + "\n")
+	resultResponseBody := make([]byte, len(responseBody))
+	copy(resultResponseBody, responseBody)
+	resultResponseStatusCode := []byte(fmt.Sprintf("%d", responseStatusCode))
+
+	responseBodyFile, err := utils.CreateTempFile(resultResponseBody)
+	if err != nil {
+		return result, err
+	}
+
+	responseHeadersFile, err := utils.CreateTempFile(resultResponseHeaders)
+	if err != nil {
+		return result, err
+	}
+
+	responseStatusCodeFile, err := utils.CreateTempFile(resultResponseStatusCode)
+	if err != nil {
+		return result, err
+	}
+
+	result.body = responseBodyFile
+	result.headers = responseHeadersFile
+	result.statusCode = responseStatusCodeFile
+
+	return result, nil
 }
