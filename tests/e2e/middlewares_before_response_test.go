@@ -170,3 +170,20 @@ func Test_Middlewares_PrintEnvironmentVariables_RequestNth(t *testing.T) {
 		LineEquals(1, `MOCK_REQUEST_NTH=2`),
 	)
 }
+
+func Test_Middlewares_Multiple_Middlewares_Modifying_Response(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_middlewares/config.json",
+		"GET",
+		"middleware/route_with_multiple_middlewares",
+		nil,
+		strings.NewReader(""),
+		StringMatches("OneTwoThree"),
+		StatusCodeMatches(303),
+		HeadersMatch(map[string]string{
+			"New-Header-One": "Value one",
+			"New-Header-Two": "Value two",
+		}),
+	)
+}

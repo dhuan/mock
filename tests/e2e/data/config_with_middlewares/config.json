@@ -31,6 +31,14 @@
     {
       "exec": "sh middleware_print_env_var_request_nth.sh",
       "route_match": "print_env_var\/"
+    },
+    {
+      "exec": "sh middleware_add_two.sh",
+      "route_match": "route_with_multiple_middlewares"
+    },
+    {
+      "exec": "sh middleware_add_three.sh",
+      "route_match": "route_with_multiple_middlewares"
     }
   ],
   "endpoints": [
@@ -82,6 +90,12 @@
       "route": "middleware/print_env_var/request_nth",
       "method": "GET",
       "response": "Hello world!"
+    },
+    {
+      "route": "middleware/route_with_multiple_middlewares",
+      "method": "GET",
+      "response": "One",
+      "response_status_code": 300
     }
   ]
 }
