@@ -168,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -218,8 +219,108 @@
         <article role="main">
           <section id="command-line-options-reference">
 <h1>Command-line Options Reference<a class="headerlink" href="#command-line-options-reference" title="Permalink to this heading">#</a></h1>
+<p>Use the table of contents to navigate and see all available command-line
+options.</p>
+<section id="standard-options">
+<h2>Standard options<a class="headerlink" href="#standard-options" title="Permalink to this heading">#</a></h2>
+<section id="c-or-config">
+<h3><code class="docutils literal notranslate"><span class="pre">-c</span></code> or <code class="docutils literal notranslate"><span class="pre">--config</span></code><a class="headerlink" href="#c-or-config" title="Permalink to this heading">#</a></h3>
+<p>Path to a configuration file with specs of an API to be run. This is optional,
+as you may instead provide an API’s specs through command-line arguments.</p>
+</section>
+<section id="p-or-port">
+<h3><code class="docutils literal notranslate"><span class="pre">-p</span></code> or <code class="docutils literal notranslate"><span class="pre">--port</span></code><a class="headerlink" href="#p-or-port" title="Permalink to this heading">#</a></h3>
+<p>Defines the port through which <cite>mock</cite> will serve your API. Defaults to <code class="docutils literal notranslate"><span class="pre">3000</span></code>
+if not provided.</p>
+</section>
+</section>
+<section id="options-for-specifying-apis">
+<h2>Options for specifying APIs<a class="headerlink" href="#options-for-specifying-apis" title="Permalink to this heading">#</a></h2>
+<p>APIs can be specified through configuration files or command-line options. This
+section cover all the available command-line options for customizing an API.
+See the example below:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;say_hi/{name}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world! My name is ${name}.&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;what_time_is_it&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Now it is %s&quot; $(date +&quot;%H:%M&quot;) &gt; $MOCK_RESPONSE_BODY&#39;</span>
+</pre></div>
+</div>
+<p>Find below all the available options that enable you to specify an API:</p>
+<section id="route">
+<h3><code class="docutils literal notranslate"><span class="pre">--route</span></code><a class="headerlink" href="#route" title="Permalink to this heading">#</a></h3>
+<p>Starts defining a new endpoint. The value for this option is the endpoint’s
+route.</p>
+</section>
+<section id="method">
+<h3><code class="docutils literal notranslate"><span class="pre">--method</span></code><a class="headerlink" href="#method" title="Permalink to this heading">#</a></h3>
+<p>Sets the HTTP Method.</p>
+</section>
+<section id="response">
+<h3><code class="docutils literal notranslate"><span class="pre">--response</span></code><a class="headerlink" href="#response" title="Permalink to this heading">#</a></h3>
+<p>Sets the HTTP Response Body. Receives a string as value which will be resulting
+response.</p>
+</section>
+<section id="response-file">
+<h3><code class="docutils literal notranslate"><span class="pre">--response-file</span></code><a class="headerlink" href="#response-file" title="Permalink to this heading">#</a></h3>
+<p>Sets the HTTP Response Body to be the contents of a file.</p>
+</section>
+<section id="response-sh-or-shell-script">
+<h3><code class="docutils literal notranslate"><span class="pre">--response-sh</span></code> or <code class="docutils literal notranslate"><span class="pre">--shell-script</span></code><a class="headerlink" href="#response-sh-or-shell-script" title="Permalink to this heading">#</a></h3>
+<p>Sets a shell script file to be executed for defining the HTTP Response Body.
+The value must be a path to a shell script file such as
+<code class="docutils literal notranslate"><span class="pre">/path/to/some/script.sh</span></code>.</p>
+</section>
+<section id="exec-response-exec">
+<h3><code class="docutils literal notranslate"><span class="pre">--exec</span></code>, <code class="docutils literal notranslate"><span class="pre">--response-exec</span></code><a class="headerlink" href="#exec-response-exec" title="Permalink to this heading">#</a></h3>
+<p>Sets a shell command to be executed for generating the HTTP Response Body.</p>
+</section>
+<section id="file-server-response-file-server">
+<h3><code class="docutils literal notranslate"><span class="pre">--file-server</span></code>, <code class="docutils literal notranslate"><span class="pre">--response-file-server</span></code><a class="headerlink" href="#file-server-response-file-server" title="Permalink to this heading">#</a></h3>
+<p>Sets the HTTP Response to be a server of static files from a given directory.
+The value must be a directory location, either relative or absolute. <a class="reference external" href="static_files.html">Check
+here for more details.</a></p>
+</section>
+<section id="header">
+<h3><code class="docutils literal notranslate"><span class="pre">--header</span></code><a class="headerlink" href="#header" title="Permalink to this heading">#</a></h3>
+<p>Sets a new HTTP Response Header. The value must be formatted as such:
+<code class="docutils literal notranslate"><span class="pre">Some-Header-Key:</span> <span class="pre">Some</span> <span class="pre">header</span> <span class="pre">value</span></code>.</p>
+</section>
+<section id="status-code">
+<h3><code class="docutils literal notranslate"><span class="pre">--status-code</span></code><a class="headerlink" href="#status-code" title="Permalink to this heading">#</a></h3>
+<p>Sets the HTTP Status Code. Only numbers are valid for this option.</p>
+</section>
+</section>
+<section id="options-for-middlewares">
+<h2>Options for Middlewares<a class="headerlink" href="#options-for-middlewares" title="Permalink to this heading">#</a></h2>
+<p><a class="reference external" href="middlewares.html">Jump to the Middlewares documentation page to learn about it.</a> Below is an example of running <cite>mock</cite> using Middlewares
+defined through command-line parameters.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span>foo/bar
+<span class="w">  </span>--response<span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
+<span class="w">  </span>--middleware<span class="w"> </span><span class="s2">&quot;sh path/to/some/script.sh&quot;</span>
+<span class="w">  </span>--route-match<span class="w"> </span><span class="s1">&#39;foo/bar&#39;</span>
+<span class="w">  </span>--middleware<span class="w"> </span><span class="s2">&quot;sh path/to/another/script.sh&quot;</span>
+</pre></div>
+</div>
+<section id="middleware">
+<h3><code class="docutils literal notranslate"><span class="pre">--middleware</span></code><a class="headerlink" href="#middleware" title="Permalink to this heading">#</a></h3>
+<p>Sets a new Middleware. The value must be a shell command that will be executed
+acting as the Middleware Handler.</p>
+</section>
+<section id="route-match">
+<h3><code class="docutils literal notranslate"><span class="pre">--route-match</span></code><a class="headerlink" href="#route-match" title="Permalink to this heading">#</a></h3>
+<p>Sets a regular expression for matching against routes for filtering a
+Middleware. You may define Middlewares without using this option, thus setting
+the Middleware to be executed for all requests.</p>
+</section>
+</section>
+<section id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this heading">#</a></h2>
 <section id="cors">
-<h2><code class="docutils literal notranslate"><span class="pre">--cors</span></code><a class="headerlink" href="#cors" title="Permalink to this heading">#</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">--cors</span></code><a class="headerlink" href="#cors" title="Permalink to this heading">#</a></h3>
 <p>With <code class="docutils literal notranslate"><span class="pre">--cors</span></code> all HTTP Responses will include the necessary headers so
 that your browser does not complain about cross-origin requests.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mock serve -c /path/to/config.json --cors
@@ -227,7 +328,7 @@ that your browser does not complain about cross-origin requests.</p>
 </div>
 </section>
 <section id="d-or-delay">
-<h2><code class="docutils literal notranslate"><span class="pre">-d</span></code> or <code class="docutils literal notranslate"><span class="pre">--delay</span></code><a class="headerlink" href="#d-or-delay" title="Permalink to this heading">#</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">-d</span></code> or <code class="docutils literal notranslate"><span class="pre">--delay</span></code><a class="headerlink" href="#d-or-delay" title="Permalink to this heading">#</a></h3>
 <p>Sets the amount of milliseconds that each request will wait before
 receiving a response. When not set, requests receive responses
 immediately.</p>
@@ -236,6 +337,7 @@ seconds:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mock serve -c /path/to/config.json --delay 3000
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
@@ -295,8 +397,33 @@ seconds:</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Command-line Options Reference</a><ul>
+<li><a class="reference internal" href="#standard-options">Standard options</a><ul>
+<li><a class="reference internal" href="#c-or-config"><code class="docutils literal notranslate"><span class="pre">-c</span></code> or <code class="docutils literal notranslate"><span class="pre">--config</span></code></a></li>
+<li><a class="reference internal" href="#p-or-port"><code class="docutils literal notranslate"><span class="pre">-p</span></code> or <code class="docutils literal notranslate"><span class="pre">--port</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#options-for-specifying-apis">Options for specifying APIs</a><ul>
+<li><a class="reference internal" href="#route"><code class="docutils literal notranslate"><span class="pre">--route</span></code></a></li>
+<li><a class="reference internal" href="#method"><code class="docutils literal notranslate"><span class="pre">--method</span></code></a></li>
+<li><a class="reference internal" href="#response"><code class="docutils literal notranslate"><span class="pre">--response</span></code></a></li>
+<li><a class="reference internal" href="#response-file"><code class="docutils literal notranslate"><span class="pre">--response-file</span></code></a></li>
+<li><a class="reference internal" href="#response-sh-or-shell-script"><code class="docutils literal notranslate"><span class="pre">--response-sh</span></code> or <code class="docutils literal notranslate"><span class="pre">--shell-script</span></code></a></li>
+<li><a class="reference internal" href="#exec-response-exec"><code class="docutils literal notranslate"><span class="pre">--exec</span></code>, <code class="docutils literal notranslate"><span class="pre">--response-exec</span></code></a></li>
+<li><a class="reference internal" href="#file-server-response-file-server"><code class="docutils literal notranslate"><span class="pre">--file-server</span></code>, <code class="docutils literal notranslate"><span class="pre">--response-file-server</span></code></a></li>
+<li><a class="reference internal" href="#header"><code class="docutils literal notranslate"><span class="pre">--header</span></code></a></li>
+<li><a class="reference internal" href="#status-code"><code class="docutils literal notranslate"><span class="pre">--status-code</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#options-for-middlewares">Options for Middlewares</a><ul>
+<li><a class="reference internal" href="#middleware"><code class="docutils literal notranslate"><span class="pre">--middleware</span></code></a></li>
+<li><a class="reference internal" href="#route-match"><code class="docutils literal notranslate"><span class="pre">--route-match</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a><ul>
 <li><a class="reference internal" href="#cors"><code class="docutils literal notranslate"><span class="pre">--cors</span></code></a></li>
 <li><a class="reference internal" href="#d-or-delay"><code class="docutils literal notranslate"><span class="pre">-d</span></code> or <code class="docutils literal notranslate"><span class="pre">--delay</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

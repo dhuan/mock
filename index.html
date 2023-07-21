@@ -168,6 +168,7 @@
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -216,8 +217,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="welcome-to-mocks-documentation">
-<h1>Welcome to mock’s documentation!<a class="headerlink" href="#welcome-to-mocks-documentation" title="Permalink to this heading">#</a></h1>
+          <section id="mock-language-agnostic-api-mocking-and-testing-utility">
+<h1>mock - Language-agnostic API mocking and testing utility<a class="headerlink" href="#mock-language-agnostic-api-mocking-and-testing-utility" title="Permalink to this heading">#</a></h1>
 <p><em>mock</em> enables you to quickly set up HTTP servers for end-to-end tests.</p>
 <ul class="simple">
 <li><p>Define endpoints and their respective responses through easy syntax;</p></li>
@@ -231,17 +232,17 @@
 </li>
 </ul>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;time_in/{country}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;say_hi/{name}&#39;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;zdump ${country}&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;whois/{domain}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world! My name is ${name}.&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;what_time_is_it&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;whois ${domain}&#39;</span>
+<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Now it is %s&quot; $(date +&quot;%H:%M&quot;) &gt; $MOCK_RESPONSE_BODY&#39;</span>
 </pre></div>
 </div>
 <p>Run the example command the above and try these URLs in your browser or
-any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/time_in/Japan</span></code> and
-<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/whois/google.com</span></code></p>
+any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/say_hi/mock</span></code> and
+<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/what_time_is_it</span></code></p>
 <section id="quick-links">
 <h2>Quick links<a class="headerlink" href="#quick-links" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
@@ -260,6 +261,8 @@ respective sections. Read further to learn:</p>
 <li><p><a class="reference external" href="apis.html">Creating APIs</a></p></li>
 <li><p><a class="reference external" href="test_assertions.html">Test Assertions</a></p></li>
 </ul>
+<hr class="docutils" />
+<p><em>Why “language-agnostic”???</em> - similar tools exist out there but they somehow require you to write in some programming-language when setting up fake APIs for testing. <em>mock</em> on the other hand enables you to set things up easily by just writing configuration files.</p>
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this heading">#</a></h2>
@@ -319,7 +322,7 @@ file.</a></p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Welcome to mock’s documentation!</a><ul>
+<li><a class="reference internal" href="#">mock - Language-agnostic API mocking and testing utility</a><ul>
 <li><a class="reference internal" href="#quick-links">Quick links</a></li>
 <li><a class="reference internal" href="#read-further">Read further…</a></li>
 <li><a class="reference internal" href="#license">License</a><ul>

@@ -2,8 +2,7 @@ Responses from Shell scripts
 ============================
 
 You can write shell scripts that will act as “handlers” for your API’s
-Requests (or Controllers if you like to think in terms of the MVC
-pattern.)
+Requests.
 
 .. code:: json
 
@@ -17,9 +16,13 @@ pattern.)
    }
 
 In the example above, any request to ``POST /foo/bar`` will result in
-*mock* executing the ``my_shell_script.sh``. Any output produced from
-that script execution will result in the HTTP Response returned by your
-API.
+*mock* executing the ``my_shell_script.sh``. Scripts can manipulate the HTTP
+Response by writing to a file assigned to the ``MOCK_RESPONSE_BODY`` environment
+variable. Following is a script that defines the HTTP Response as ``Hello world!``:
+
+.. code:: sh
+
+    echo "Hello world!" > $MOCK_RESPONSE_BODY
 
 To further customize your script handlers, you may also pass parameters,
 just like you can normally pass parameters in a shell command:
@@ -55,7 +58,7 @@ current folder (``ls -la``):
       "endpoints": [
         {
           "route": "foo/bar",
-   +      "response": "exec:ls -la"
+   +      "response": "exec:ls -la > $MOCK_RESPONSE_BODY"
         }
       ]
     }
@@ -70,7 +73,7 @@ on the home folder:
       "endpoints": [
         {
           "route": "foo/bar",
-   +      "response": "exec:ls ~ | wc -l"
+   +      "response": "exec:ls ~ | wc -l > $MOCK_RESPONSE_BODY"
         }
       ]
     }
@@ -81,7 +84,7 @@ The same can be accomplished through command-line parameters:
 
     $ mock serve \
    +  --route "foo/bar" \
-   +  --exec 'ls | sort'
+   +  --exec 'ls | sort > $MOCK_RESPONSE_BODY'
 
 Environment Variables for Request Handlers
 ------------------------------------------
@@ -105,6 +108,10 @@ variables avaiable:
 -  ``MOCK_REQUEST_QUERYSTRING``: The Request’s Querystring if it exists.
    (ex: ``some_key=some_value&another_key=another_value``)
 -  ``MOCK_REQUEST_METHOD``: A string indicating the Request’s Method.
+-  ``MOCK_REQUEST_NTH``: A number indicating Request’s position in the request
+   history. For example, if two requests have been made to the ``foo/bar``
+   endpoint ever since *mock* started, this being the 2nd request, the number in
+   this variable will be 2.
 
 The following environment variables provide other general information
 not related to the current request:
@@ -127,10 +134,12 @@ So far we’ve seen environment variables that provide us with information
 about the Request that’s being currently handled. The following
 environment variables enable you to further define the HTTP Response:
 
--  ``MOCK_RESPONSE_STATUS_CODE``: A file that your handler can write to,
-   to define the HTTP Status Code.
--  ``MOCK_RESPONSE_HEADERS``: A file that your handler can write to, to
-   define the HTTP Headers.
+-  ``MOCK_RESPONSE_BODY``: A file that can be written to in order to set the
+   HTTP Response.
+-  ``MOCK_RESPONSE_STATUS_CODE``: A file that can be written to in order to
+   define the HTTP Status Code.
+-  ``MOCK_RESPONSE_HEADERS``: A file that can be written to in order to define
+   the HTTP Headers.
 
 In the following example, we’ll see what a Handler looks like, which
 responds with a simple ``Hello world!`` body content, a ``201`` Status

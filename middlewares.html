@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Route Parameters" href="route_params.html" /><link rel="prev" title="Creating APIs" href="apis.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Test Assertions" href="test_assertions.html" /><link rel="prev" title="Reading Environment Variables" href="env_vars.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>Response with headers - mock documentation</title>
+        <title>Middlewares - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -161,14 +161,14 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Response with headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Middlewares</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -211,42 +211,120 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="response-with-headers">
-<h1>Response with headers<a class="headerlink" href="#response-with-headers" title="Permalink to this heading">#</a></h1>
-<p>The optional <code class="docutils literal notranslate"><span class="pre">response_headers</span></code> endpoint parameter will add headers to
-a endpoint’s response:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="w"> </span>      &quot;method&quot;: &quot;POST&quot;,
-<span class="w"> </span>      &quot;response&quot;: {
-<span class="w"> </span>        &quot;foo&quot;: &quot;bar&quot;
-<span class="w"> </span>      },
-<span class="gi">+      &quot;response_headers&quot;: {</span>
-<span class="gi">+        &quot;Some-Header-Key&quot;: &quot;Some header value&quot;,</span>
-<span class="gi">+        &quot;Another-Header-Key&quot;: &quot;Another header value&quot;</span>
-<span class="gi">+      }</span>
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-}
+          <section id="middlewares">
+<h1>Middlewares<a class="headerlink" href="#middlewares" title="Permalink to this heading">#</a></h1>
+<p>Middlewares enable you to execute any kind of program logic before responses
+are sent out to clients. Any program that’s executable from shells can be a
+middleware. All properties of a response can be manipulated by middlewares,
+such as its body, headers, status code, etc.</p>
+<section id="setting-up-middlewares">
+<h2>Setting up Middlewares<a class="headerlink" href="#setting-up-middlewares" title="Permalink to this heading">#</a></h2>
+<p>Following is a <em>mock</em> configuration file containing middlewares:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w"> </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">     </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;exec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sh /path/to/middleware/script.sh&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;route_match&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w"> </span><span class="p">],</span>
+<span class="w"> </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w"> </span><span class="p">]</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>To add response headers to an endpoint using command-line parameters:</p>
+<p>Let’s go over each the fields shown in the <code class="docutils literal notranslate"><span class="pre">middleware</span></code> objects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">exec</span></code>: A shell command that will be executed which can perform a
+middleware operation, such as changing request/response. Anything that’s
+valid in the shell will be valid here, such as <code class="docutils literal notranslate"><span class="pre">sh</span> <span class="pre">path/to/some/script.sh</span></code>
+or <code class="docutils literal notranslate"><span class="pre">/path/to/some/program</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">route_match</span></code>: Optional. If not set or set as <code class="docutils literal notranslate"><span class="pre">*</span></code> then all Requests will
+be processed for the given Middleware. For filtering only desired requests,
+set the value as a Regular Expression, for example <code class="docutils literal notranslate"><span class="pre">foo/[a-z]{1,}</span></code> which will
+match against requests such as <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>.</p></li>
+</ul>
+<p>Middlewares can also be set from command-line parameters as an alternative to
+configuration files:</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
-<span class="w"> </span>  --route &quot;foo/bar&quot; \
-<span class="w"> </span>  --method &quot;POST&quot; \
-<span class="w"> </span>  --response &#39;{&quot;foo&quot;:&quot;bar&quot;}&#39; \
-<span class="gi">+  --header &quot;Some-Header-Key: Some header value&quot; \</span>
-<span class="gi">+  --header &quot;Another-Header-Key: Another header value&quot;</span>
+<span class="w"> </span>  --route foo/bar
+<span class="w"> </span>  --response &quot;Hello world!&quot;
+<span class="gi">+  --middleware &quot;sh path/to/some/script.sh&quot;</span>
+<span class="gi">+  --route-match &#39;foo/bar&#39;</span>
+<span class="gi">+  --middleware &quot;sh path/to/another/script.sh&quot;</span>
 </pre></div>
 </div>
+</section>
+<section id="examples-of-middlewares">
+<h2>Examples of Middlewares<a class="headerlink" href="#examples-of-middlewares" title="Permalink to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The examples below are provided as shell scripts programs. But remember that
+middlewares are not limited to being shell scripts only. Any executable
+program at all can be used as a middleware.</p>
+</div>
+<section id="modify-response-body">
+<h3>Modify Response Body<a class="headerlink" href="#modify-response-body" title="Permalink to this heading">#</a></h3>
+<p>The following Middleware Script replaces all occurrences of <code class="docutils literal notranslate"><span class="pre">foo</span></code> with <code class="docutils literal notranslate"><span class="pre">bar</span></code>
+in the response body:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/foo/bar/g&#39;</span><span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
+</pre></div>
+</div>
+</section>
+<section id="adding-new-headers-before-sending-response-to-client">
+<h3>Adding new headers before sending response to client<a class="headerlink" href="#adding-new-headers-before-sending-response-to-client" title="Permalink to this heading">#</a></h3>
+<p>The following Middleware Script adds two header fields to the response:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Header-One: Value for header one&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Header-Two: Value for header two&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Observe that the script is <em>appeding</em> new headers to the headers file
+instead of overwriting it, which is indicated by the “&gt;&gt;” shell operator
+which appends to file. If you overwrite the file with “&gt;”, all headers
+previously set by the response handler will be overwritten.</p>
+</div>
+</section>
+<section id="removing-headers-from-the-response">
+<h3>Removing headers from the response<a class="headerlink" href="#removing-headers-from-the-response" title="Permalink to this heading">#</a></h3>
+<p>The following Middleware Script removes all Headers that have the word
+<code class="docutils literal notranslate"><span class="pre">foobar</span></code> in their names or values.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">TMP</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+cat<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span>foobar<span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$TMP</span>
+cat<span class="w"> </span><span class="nv">$TMP</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="environment-variables-for-middlewares">
+<h2>Environment Variables for Middlewares<a class="headerlink" href="#environment-variables-for-middlewares" title="Permalink to this heading">#</a></h2>
+<p>Middleware Handlers are provided with a set of environment variables with
+useful information about the request being processed, and also files that can
+be written to to customize your API behavior.</p>
+<p>The following variables hold file paths that can be written to in order to
+customise responses:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_BODY</span></code>: A file that can be written to in order to modify the
+HTTP Response before handing it to the client. This file already contains the
+response body defined by your API configuration for the given endpoint.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_HEADERS</span></code>: A file that can be written to in order to modify
+the HTTP Headers. The headers defined in your configuration’s endpoint are
+included in this file at the moment the middleware is executed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_STATUS_CODE</span></code>: A file that can be written to in order to
+modify the HTTP Status code.</p></li>
+</ul>
+<p>Route Parameters can also be read. For example if an endpoint exists with its
+route set as <code class="docutils literal notranslate"><span class="pre">foo/bar/{some_param}</span></code>, middlewares can read them through
+environment variables such as <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_SOME_PARAM</span></code></p>
+<p>For a complete list of all environment variables that can be read from
+middleware handlers, <a class="reference external" href="shell_scripts.html#environment-variables-for-request-handlers">consult this section.</a></p>
+</section>
 </section>
 
         </article>
@@ -254,23 +332,23 @@ a endpoint’s response:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="route_params.html">
+          <a class="next-page" href="test_assertions.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Route Parameters</div>
+                <div class="title">Test Assertions</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="apis.html">
+          <a class="prev-page" href="env_vars.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Creating APIs</div>
+                <div class="title">Reading Environment Variables</div>
                 
               </div>
             </a>
@@ -292,8 +370,34 @@ a endpoint’s response:</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Middlewares</a><ul>
+<li><a class="reference internal" href="#setting-up-middlewares">Setting up Middlewares</a></li>
+<li><a class="reference internal" href="#examples-of-middlewares">Examples of Middlewares</a><ul>
+<li><a class="reference internal" href="#modify-response-body">Modify Response Body</a></li>
+<li><a class="reference internal" href="#adding-new-headers-before-sending-response-to-client">Adding new headers before sending response to client</a></li>
+<li><a class="reference internal" href="#removing-headers-from-the-response">Removing headers from the response</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#environment-variables-for-middlewares">Environment Variables for Middlewares</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
