@@ -187,3 +187,18 @@ func Test_Middlewares_Multiple_Middlewares_Modifying_Response(t *testing.T) {
 		}),
 	)
 }
+
+func Test_Middlewares_Console_Output(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_middlewares/config.json",
+		"GET",
+		"middleware/console_output",
+		nil,
+		strings.NewReader(""),
+		ApplicationOutputHasLines([]string{
+			"Text to stdout.",
+			"Text to stderr.",
+		}),
+	)
+}

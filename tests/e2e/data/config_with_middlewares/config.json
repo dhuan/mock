@@ -39,6 +39,10 @@
     {
       "exec": "sh middleware_add_three.sh",
       "route_match": "route_with_multiple_middlewares"
+    },
+    {
+      "exec": "sh console_output.sh",
+      "route_match": "console_output"
     }
   ],
   "endpoints": [
@@ -96,6 +100,11 @@
       "method": "GET",
       "response": "One",
       "response_status_code": 300
+    },
+    {
+      "route": "middleware/console_output",
+      "method": "GET",
+      "response": "Hello world."
     }
   ]
 }

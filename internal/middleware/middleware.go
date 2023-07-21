@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -60,17 +61,21 @@ func RunMiddleware(
 			envVars[key] = vars[key]
 		}
 
-		_, err = exec(
+		execResult, err := exec(
 			middlewareConfigs[i].Exec,
 			&mock.ExecOptions{
 				Env:        envVars,
 				WorkingDir: configPath,
 			},
 		)
+
+		if len(execResult.Output) > 0 {
+			log.Printf("Middleware execution output:\n%s", string(execResult.Output))
+		}
+
 		if err != nil {
 			return result, err
 		}
-
 	}
 
 	return readResponseFiles(responseFiles, readFile)

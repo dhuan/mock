@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -214,14 +215,13 @@ func execute(command string, options *mock.ExecOptions) (*mock.ExecResult, error
 		cmd.Dir = options.WorkingDir
 	}
 
-	out, err := cmd.CombinedOutput()
-	hasOutput := len(out) > 0
-	if err != nil && !hasOutput {
-		return &mock.ExecResult{}, err
-	}
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	cmd.Run()
 
 	return &mock.ExecResult{
-		Output: out,
+		Output: out.Bytes(),
 	}, nil
 }
 
