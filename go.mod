@@ -3,7 +3,7 @@ module github.com/dhuan/mock
 go 1.18
 
 require (
-	github.com/go-chi/chi/v5 v5.0.8
+	github.com/go-chi/chi/v5 v5.0.10
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 )
