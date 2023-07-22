@@ -8,8 +8,9 @@ import (
 	"strings"
 
 	"github.com/dhuan/mock/internal/mock"
-	"github.com/dhuan/mock/internal/types"
+	. "github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
+	. "github.com/dhuan/mock/pkg/mock"
 )
 
 type MiddlewareRunResult struct {
@@ -20,9 +21,9 @@ type MiddlewareRunResult struct {
 
 func RunMiddleware(
 	exec mock.ExecFunc,
-	readFile types.ReadFileFunc,
+	readFile ReadFileFunc,
 	configPath string,
-	middlewareConfigs []types.MiddlewareConfig,
+	middlewareConfigs []MiddlewareConfig,
 	responseBody []byte,
 	responseHeaders map[string]string,
 	responseStatusCode int,
@@ -83,7 +84,7 @@ func RunMiddleware(
 
 func readResponseFiles(
 	rf *responseFiles,
-	readFile types.ReadFileFunc,
+	readFile ReadFileFunc,
 ) (*MiddlewareRunResult, error) {
 	result := &MiddlewareRunResult{}
 
@@ -130,10 +131,20 @@ func toHttpHeaders(m map[string]string) http.Header {
 	return result
 }
 
-func GetMiddlewareForRequest(middlewareConfigs []types.MiddlewareConfig, r *http.Request) []types.MiddlewareConfig {
-	middlewares := make([]types.MiddlewareConfig, 0)
+func GetMiddlewareForRequest(
+	middlewareConfigs []MiddlewareConfig,
+	r *http.Request,
+	requestRecord *RequestRecord,
+	requestRecords []RequestRecord,
+	verifyCondition func(requestRecord *RequestRecord, condition *Condition, requestRecords []RequestRecord) bool,
+) []MiddlewareConfig {
+	middlewares := make([]MiddlewareConfig, 0)
 
 	for i := range middlewareConfigs {
+		if middlewareConfigs[i].Condition != nil && !verifyCondition(requestRecord, middlewareConfigs[i].Condition, requestRecords) {
+			continue
+		}
+
 		if routeMatch(r, &middlewareConfigs[i]) {
 			middlewares = append(middlewares, middlewareConfigs[i])
 		}
@@ -142,7 +153,7 @@ func GetMiddlewareForRequest(middlewareConfigs []types.MiddlewareConfig, r *http
 	return middlewares
 }
 
-func routeMatch(r *http.Request, middlewareConfig *types.MiddlewareConfig) bool {
+func routeMatch(r *http.Request, middlewareConfig *MiddlewareConfig) bool {
 	if middlewareConfig.RouteMatch == "*" || middlewareConfig.RouteMatch == "" {
 		return true
 	}

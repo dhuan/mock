@@ -43,6 +43,14 @@
     {
       "exec": "sh console_output.sh",
       "route_match": "console_output"
+    },
+    {
+      "exec": "sh middleware_filter_with_condition.sh",
+      "condition": {
+          "type": "querystring_match",
+          "key": "foo",
+          "value": "bar"
+      }
     }
   ],
   "endpoints": [
@@ -103,6 +111,11 @@
     },
     {
       "route": "middleware/console_output",
+      "method": "GET",
+      "response": "Hello world."
+    },
+    {
+      "route": "middleware/with_conditions",
       "method": "GET",
       "response": "Hello world."
     }

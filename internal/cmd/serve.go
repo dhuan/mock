@@ -298,7 +298,7 @@ func newEndpointHandler(
 			time.Sleep(time.Duration(delay) * time.Millisecond)
 		}
 
-		middlewareConfigs := mockMiddleware.GetMiddlewareForRequest(middlewareConfigs, r)
+		middlewareConfigs := mockMiddleware.GetMiddlewareForRequest(middlewareConfigs, r, requestRecord, requestRecords, mock.VerifyCondition)
 		hasMiddleware := len(middlewareConfigs) > 0
 
 		vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody)

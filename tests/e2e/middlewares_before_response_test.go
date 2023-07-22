@@ -202,3 +202,15 @@ func Test_Middlewares_Console_Output(t *testing.T) {
 		}),
 	)
 }
+
+func Test_Middlewares_WithConditions(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_middlewares/config.json",
+		"GET",
+		"middleware/with_conditions?foo=bar",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Filtered by middleware with conditions!"),
+	)
+}

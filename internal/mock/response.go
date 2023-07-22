@@ -99,7 +99,7 @@ func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types
 
 	for responseIfKey := range endpointConfig.ResponseIf {
 		responseIf := endpointConfig.ResponseIf[responseIfKey]
-		matches := resolveSingleResponseIf(requestRecord, responseIf.Condition, requestRecords)
+		matches := VerifyCondition(requestRecord, responseIf.Condition, requestRecords)
 
 		if matches {
 			matchingResponseIfs = append(matchingResponseIfs, responseIfKey)
@@ -113,7 +113,7 @@ func resolveResponseIf(requestRecord *types.RequestRecord, endpointConfig *types
 	return &endpointConfig.ResponseIf[matchingResponseIfs[0]], true
 }
 
-func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Condition, requestRecords []types.RequestRecord) bool {
+func VerifyCondition(requestRecord *types.RequestRecord, condition *Condition, requestRecords []types.RequestRecord) bool {
 	conditionFunction := resolveAssertTypeFunc(condition.Type, requestRecords)
 	validationErrors, err := conditionFunction(requestRecord, requestRecords, condition)
 	if err != nil {
@@ -129,11 +129,11 @@ func resolveSingleResponseIf(requestRecord *types.RequestRecord, condition *Cond
 	}
 
 	if result && hasAnd {
-		return resolveSingleResponseIf(requestRecord, condition.And, requestRecords)
+		return VerifyCondition(requestRecord, condition.And, requestRecords)
 	}
 
 	if !result && hasOr {
-		return resolveSingleResponseIf(requestRecord, condition.Or, requestRecords)
+		return VerifyCondition(requestRecord, condition.Or, requestRecords)
 	}
 
 	if !result && !hasOr {

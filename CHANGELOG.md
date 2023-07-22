@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- Add support for "conditions" for Middlewares.
+
 ## 1.0.0
 
 BREAKING CHANGES

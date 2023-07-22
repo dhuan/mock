@@ -35,6 +35,7 @@ type MiddlewareConfig struct {
 	Exec       string         `json:"exec"`
 	Type       MiddlewareType `json:"type"`
 	RouteMatch string         `json:"route_match"`
+	Condition  *Condition     `json:"condition"`
 }
 
 type RequestRecord struct {

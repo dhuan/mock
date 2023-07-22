@@ -21,6 +21,7 @@ Following is a *mock* configuration file containing middlewares:
         }
     ],
     "endpoints": [
+        // ...
     ]
    }
 
@@ -124,3 +125,36 @@ environment variables such as ``MOCK_ROUTE_PARAM_SOME_PARAM``
 For a complete list of all environment variables that can be read from
 middleware handlers, `consult this section.
 <shell_scripts.html#environment-variables-for-request-handlers>`_
+
+Conditions for Middlewares
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Middlewares can use conditions, such as the ones `specified in the Conditions
+Reference <conditions_reference.html>`__, in order to make custom filters. Read
+further to learn more.
+
+So far we've seen that Middlewares can use the ``route_match`` configuration
+parameter in order to execute Middlewares for certain routes, but that's a very
+simple kind of filter. By using the "conditions" mechanism you can define more
+complex kinds of filters. For example, following is a Middleware that is only
+executed when a request is made to a route that does not exist - in order
+words, we're making a custom 404 page for our API:
+
+.. code:: json
+
+   {
+    "middlewares": [
+        {
+            "exec": "echo 404 > $MOCK_RESPONSE_STATUS_CODE && echo 'This page does not exist!' > $MOCK_RESPONSE_BODY",
+            "condition": {
+                "type": "route_invalid"
+            }
+        }
+    ],
+    "endpoints": [
+        // ...
+    ]
+   }
+
+Now just visit any page that there isn't an endpoint route for, and the ``This
+page does not exist!`` should be displayed on the screen.
