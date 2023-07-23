@@ -208,7 +208,7 @@ func Test_Middlewares_WithConditions(t *testing.T) {
 		t,
 		"config_with_middlewares/config.json",
 		"GET",
-		"middleware/with_conditions?foo=bar",
+		"middleware/with_conditions?some_key=some_value",
 		nil,
 		strings.NewReader(""),
 		StringMatches("Filtered by middleware with conditions!"),

@@ -48,8 +48,8 @@
       "exec": "sh middleware_filter_with_condition.sh",
       "condition": {
           "type": "querystring_match",
-          "key": "foo",
-          "value": "bar"
+          "key": "some_key",
+          "value": "some_value"
       }
     }
   ],
