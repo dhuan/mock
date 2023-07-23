@@ -214,3 +214,15 @@ func Test_Middlewares_WithConditions(t *testing.T) {
 		StringMatches("Filtered by middleware with conditions!"),
 	)
 }
+
+func Test_Middlewares_WithShellOperatorsInsideExec(t *testing.T) {
+	RunTest(
+		t,
+		"config_with_middlewares/config.json",
+		"GET",
+		"middleware/with_shell_operators_inside_exec",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Hello WORLD!"),
+	)
+}

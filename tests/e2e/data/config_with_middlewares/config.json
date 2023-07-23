@@ -51,6 +51,10 @@
           "key": "some_key",
           "value": "some_value"
       }
+    },
+    {
+      "exec": "printf 'Hello world!' | sed 's/world/WORLD/g' > $MOCK_RESPONSE_BODY",
+      "route_match": "with_shell_operators_inside_exec"
     }
   ],
   "endpoints": [
@@ -118,6 +122,11 @@
       "route": "middleware/with_conditions",
       "method": "GET",
       "response": "Hello world."
+    },
+    {
+      "route": "middleware/with_shell_operators_inside_exec",
+      "method": "GET",
+      "response": "hello world!"
     }
   ]
 }

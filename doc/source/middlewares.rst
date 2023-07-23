@@ -30,7 +30,8 @@ Let's go over each the fields shown in the ``middleware`` objects:
 - ``exec``: A shell command that will be executed which can perform a
   middleware operation, such as changing request/response. Anything that's
   valid in the shell will be valid here, such as ``sh path/to/some/script.sh``
-  or ``/path/to/some/program``.
+  or ``/path/to/some/program``. Shell operators can also be used here such as
+  pipes and output redirection.
 - ``route_match``: Optional. If not set or set as ``*`` then all Requests will
   be processed for the given Middleware. For filtering only desired requests,
   set the value as a Regular Expression, for example ``foo/[a-z]{1,}`` which will

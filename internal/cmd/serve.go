@@ -319,6 +319,7 @@ func newEndpointHandler(
 				r,
 				endpointParams,
 				vars,
+				utils.CreateTempFile,
 			)
 			if err != nil {
 				panic(err)

@@ -5,6 +5,8 @@
 ADDED
 
 - Add support for "conditions" for Middlewares.
+- Enable Middlewares' `exec` commands to include any shell operators like
+  pipes, output redirection, etc.
 
 ## 1.0.0
 

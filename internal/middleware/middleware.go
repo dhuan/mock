@@ -30,6 +30,7 @@ func RunMiddleware(
 	request *http.Request,
 	endpointParams map[string]string,
 	vars map[string]string,
+	createTempFile func([]byte) (string, error),
 ) (*MiddlewareRunResult, error) {
 	result := &MiddlewareRunResult{}
 	result.Body = responseBody
@@ -62,8 +63,13 @@ func RunMiddleware(
 			envVars[key] = vars[key]
 		}
 
+		tempScriptFilePath, err := createTempFile([]byte(middlewareConfigs[i].Exec))
+		if err != nil {
+			return result, err
+		}
+
 		execResult, err := exec(
-			middlewareConfigs[i].Exec,
+			fmt.Sprintf("sh %s", tempScriptFilePath),
 			&mock.ExecOptions{
 				Env:        envVars,
 				WorkingDir: configPath,
