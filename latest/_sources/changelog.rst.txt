@@ -9,6 +9,7 @@ ADDED
 -  Add support for “conditions” for Middlewares.
 -  Enable Middlewares’ ``exec`` commands to include any shell operators
    like pipes, output redirection, etc.
+-  New condition option added: ``querystring_match_regex``.
 
 1.0.0
 -----

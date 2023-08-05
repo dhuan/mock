@@ -35,6 +35,32 @@ You can also use ``key_values`` and set multiple pairs:
      }
    }
 
+``querystring_match_regex``
+---------------------------
+
+Like ``querystring_match``, but the values match as Regular Expressions instead
+of plain string comparison.
+
+.. code:: json
+
+   {
+     "type": "querystring_match_regex",
+     "key": "foo",
+     "value": "^[a-z]{1,}$"
+   }
+
+You can also use ``key_values`` and set multiple pairs:
+
+.. code:: json
+
+   {
+     "type": "querystring_match",
+     "key_values": {
+       "some_key": "^[a-z]{1,}$",
+       "another_key": "[0-9]{3}"
+     }
+   }
+
 ``querystring_exact_match``
 ---------------------------
 
