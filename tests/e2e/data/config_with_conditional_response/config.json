@@ -215,6 +215,21 @@
       ]
     },
     {
+      "route": "conditional_response/querystring_exact_match_regex",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Querystring Exact Match Regex resolved.",
+          "condition": {
+            "type": "querystring_exact_match_regex",
+            "key_values": {
+                "foo": "^[a-z]{3}$"
+            }
+          }
+        }
+      ]
+    },
+    {
       "route": "conditional_response/json_body_match",
       "response": "Default response",
       "response_if": [

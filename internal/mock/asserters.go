@@ -344,55 +344,61 @@ func parseForm(requestBody string) (map[string]string, error) {
 	return formValues, nil
 }
 
-func assertQuerystringExactMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
-	validationErrors, err := assertQuerystringMatch(requestRecord, requestRecords, assert)
-	if err != nil {
-		return validationErrors, err
-	}
+var assertQuerystringExactMatch asserterFunc = assertQuerystringExactMatchBase(assertQuerystringMatch)
 
-	parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
-	if err != nil {
-		return validationErrors, err
-	}
+var assertQuerystringExactMatchRegex asserterFunc = assertQuerystringExactMatchBase(assertQuerystringMatchRegex)
 
-	if len(validationErrors) > 0 {
+func assertQuerystringExactMatchBase(match asserterFunc) asserterFunc {
+	return func(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+		validationErrors, err := match(requestRecord, requestRecords, assert)
+		if err != nil {
+			return validationErrors, err
+		}
+
+		parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
+		if err != nil {
+			return validationErrors, err
+		}
+
+		if len(validationErrors) > 0 {
+			return validationErrors, nil
+		}
+
+		missingKeys := make([]string, 0)
+		expectedKeys := make([]string, 0)
+		requestedKeys := make([]string, 0)
+
+		if assert.Key != "" {
+			expectedKeys = append(expectedKeys, assert.Key)
+		}
+
+		for key := range assert.KeyValues {
+			expectedKeys = append(expectedKeys, key)
+		}
+
+		for key := range parsedQuery {
+			requestedKeys = append(requestedKeys, key)
+
+			if utils.IndexOf(expectedKeys, key) == -1 {
+				missingKeys = append(missingKeys, key)
+			}
+		}
+
+		sort.Strings(expectedKeys)
+		sort.Strings(requestedKeys)
+
+		if len(missingKeys) > 0 {
+			validationErrors = append(
+				validationErrors,
+				ValidationError{Code: ValidationErrorCode_QuerystringMismatch, Metadata: map[string]string{
+					"querystring_keys_expected":  strings.Join(expectedKeys, ","),
+					"querystring_keys_requested": strings.Join(requestedKeys, ","),
+				}},
+			)
+		}
+
 		return validationErrors, nil
 	}
-
-	missingKeys := make([]string, 0)
-	expectedKeys := make([]string, 0)
-	requestedKeys := make([]string, 0)
-
-	if assert.Key != "" {
-		expectedKeys = append(expectedKeys, assert.Key)
-	}
-
-	for key := range assert.KeyValues {
-		expectedKeys = append(expectedKeys, key)
-	}
-
-	for key := range parsedQuery {
-		requestedKeys = append(requestedKeys, key)
-
-		if utils.IndexOf(expectedKeys, key) == -1 {
-			missingKeys = append(missingKeys, key)
-		}
-	}
-
-	sort.Strings(expectedKeys)
-	sort.Strings(requestedKeys)
-
-	if len(missingKeys) > 0 {
-		validationErrors = append(
-			validationErrors,
-			ValidationError{Code: ValidationErrorCode_QuerystringMismatch, Metadata: map[string]string{
-				"querystring_keys_expected":  strings.Join(expectedKeys, ","),
-				"querystring_keys_requested": strings.Join(requestedKeys, ","),
-			}},
-		)
-	}
-
-	return validationErrors, nil
 }
 
 func getKeyValuePairsFromAssertionOptions(assert *Condition) map[string]interface{} {

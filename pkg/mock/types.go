@@ -8,16 +8,17 @@ import (
 )
 
 var condition_type_code_encoding_map = map[ConditionType]string{
-	ConditionType_None:                  "none",
-	ConditionType_HeaderMatch:           "header_match",
-	ConditionType_MethodMatch:           "method_match",
-	ConditionType_JsonBodyMatch:         "json_body_match",
-	ConditionType_FormMatch:             "form_match",
-	ConditionType_QuerystringMatch:      "querystring_match",
-	ConditionType_QuerystringMatchRegex: "querystring_match_regex",
-	ConditionType_QuerystringExactMatch: "querystring_exact_match",
-	ConditionType_Nth:                   "nth",
-	ConditionType_RouteParamMatch:       "route_param_match",
+	ConditionType_None:                       "none",
+	ConditionType_HeaderMatch:                "header_match",
+	ConditionType_MethodMatch:                "method_match",
+	ConditionType_JsonBodyMatch:              "json_body_match",
+	ConditionType_FormMatch:                  "form_match",
+	ConditionType_QuerystringMatch:           "querystring_match",
+	ConditionType_QuerystringMatchRegex:      "querystring_match_regex",
+	ConditionType_QuerystringExactMatch:      "querystring_exact_match",
+	ConditionType_QuerystringExactMatchRegex: "querystring_exact_match_regex",
+	ConditionType_Nth:                        "nth",
+	ConditionType_RouteParamMatch:            "route_param_match",
 }
 
 type ConditionType int
@@ -31,6 +32,7 @@ const (
 	ConditionType_QuerystringMatch
 	ConditionType_QuerystringMatchRegex
 	ConditionType_QuerystringExactMatch
+	ConditionType_QuerystringExactMatchRegex
 	ConditionType_Nth
 	ConditionType_RouteParamMatch
 )
@@ -76,6 +78,12 @@ func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
 
 	if conditionTypeText == "querystring_exact_match" {
 		*this = ConditionType_QuerystringExactMatch
+
+		return nil
+	}
+
+	if conditionTypeText == "querystring_exact_match_regex" {
+		*this = ConditionType_QuerystringExactMatchRegex
 
 		return nil
 	}

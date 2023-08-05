@@ -107,15 +107,16 @@ func validate(requestRecord *types.RequestRecord, assert *Condition, requestReco
 type asserterFunc = func(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error)
 
 var asserters_map map[ConditionType]asserterFunc = map[ConditionType]asserterFunc{
-	ConditionType_HeaderMatch:           assertHeaderMatch,
-	ConditionType_MethodMatch:           assertMethodMatch,
-	ConditionType_JsonBodyMatch:         assertJsonBodyMatch,
-	ConditionType_FormMatch:             assertFormMatch,
-	ConditionType_QuerystringMatch:      assertQuerystringMatch,
-	ConditionType_QuerystringMatchRegex: assertQuerystringMatchRegex,
-	ConditionType_QuerystringExactMatch: assertQuerystringExactMatch,
-	ConditionType_Nth:                   assertNth,
-	ConditionType_RouteParamMatch:       assertRouteParamMatch,
+	ConditionType_HeaderMatch:                assertHeaderMatch,
+	ConditionType_MethodMatch:                assertMethodMatch,
+	ConditionType_JsonBodyMatch:              assertJsonBodyMatch,
+	ConditionType_FormMatch:                  assertFormMatch,
+	ConditionType_QuerystringMatch:           assertQuerystringMatch,
+	ConditionType_QuerystringMatchRegex:      assertQuerystringMatchRegex,
+	ConditionType_QuerystringExactMatch:      assertQuerystringExactMatch,
+	ConditionType_QuerystringExactMatchRegex: assertQuerystringExactMatchRegex,
+	ConditionType_Nth:                        assertNth,
+	ConditionType_RouteParamMatch:            assertRouteParamMatch,
 }
 
 func resolveAssertTypeFunc(

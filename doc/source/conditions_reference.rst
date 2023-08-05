@@ -72,10 +72,8 @@ contains only the specified Querystrings and no other.
 
    {
      "type": "querystring_exact_match",
-     "key_values": {
-       "some_key": "some value",
-       "another_key": "another value"
-     }
+     "key": "some_key",
+     "value": "value value"
    }
 
 It’s also possible to have multiple key/value pairs in the same
@@ -88,6 +86,34 @@ condition. You will use the ``key_values`` field instead:
      "key_values": {
        "some_key": "some value",
        "another_key": "another value"
+     }
+   }
+
+``querystring_exact_match_regex``
+---------------------------------
+
+Like ``querystring_exact_match``, but the values match as Regular Expressions
+instead of plain string comparison.
+
+
+.. code:: json
+
+   {
+     "type": "querystring_exact_match_regex",
+     "key": "foo",
+     "value": "^[a-z]{3}$"
+   }
+
+It’s also possible to have multiple key/value pairs in the same
+condition. You will use the ``key_values`` field instead:
+
+.. code:: json
+
+   {
+     "type": "querystring_exact_match_regex",
+     "key_values": {
+       "some_key": "^[a-z]{1,}$",
+       "another_key": "[0-9]{3}"
      }
    }
 
