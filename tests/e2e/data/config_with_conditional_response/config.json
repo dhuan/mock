@@ -185,6 +185,21 @@
       ]
     },
     {
+      "route": "conditional_response/querystring_match_regex",
+      "response": "Default response",
+      "response_if": [
+        {
+          "response": "Conditional response with Querystring Match Regex resolved.",
+          "condition": {
+            "type": "querystring_match_regex",
+            "key_values": {
+                "foo": "^[a-z]{3}$"
+            }
+          }
+        }
+      ]
+    },
+    {
       "route": "conditional_response/querystring_exact_match",
       "response": "Default response",
       "response_if": [
@@ -265,3 +280,4 @@
     }
   ]
 }
+

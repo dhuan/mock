@@ -207,55 +207,65 @@ func assertFormMatch(requestRecord *types.RequestRecord, requestRecords []types.
 	return validationErrors, nil
 }
 
-func assertQuerystringMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
-	validationErrors := make([]ValidationError, 0)
+var assertQuerystringMatch asserterFunc = assertQuerystringMatchBase(func(valueCompare interface{}, querystringValue string) bool {
+	return valueCompare == querystringValue
+})
 
-	if requestRecord.Querystring == "" {
-		return []ValidationError{{
-			Code:     ValidationErrorCode_RequestHasNoQuerystring,
-			Metadata: map[string]string{},
-		}}, nil
-	}
+var assertQuerystringMatchRegex asserterFunc = assertQuerystringMatchBase(func(valueCompare interface{}, querystringValue string) bool {
+	return utils.RegexTest(valueCompare.(string), querystringValue)
+})
 
-	parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
-	if err != nil {
-		return validationErrors, err
-	}
+func assertQuerystringMatchBase(match func(interface{}, string) bool) asserterFunc {
+	return func(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {
+		validationErrors := make([]ValidationError, 0)
 
-	expectedKeyValuePairs := getKeyValuePairsFromAssertionOptions(assert)
-
-	for _, key := range utils.GetSortedKeys(expectedKeyValuePairs) {
-		_, ok := parsedQuery[key]
-		if !ok {
-			validationErrors = append(
-				validationErrors,
-				ValidationError{
-					Code: ValidationErrorCode_QuerystringKeyNotSet,
-					Metadata: map[string]string{
-						"querystring_key": key,
-					},
-				},
-			)
-
-			continue
+		if requestRecord.Querystring == "" {
+			return []ValidationError{{
+				Code:     ValidationErrorCode_RequestHasNoQuerystring,
+				Metadata: map[string]string{},
+			}}, nil
 		}
 
-		if expectedKeyValuePairs[key] != parsedQuery[key][0] {
-			validationErrors = append(
-				validationErrors,
-				ValidationError{
-					Code: ValidationErrorCode_QuerystringMismatch,
-					Metadata: map[string]string{
-						"querystring_key":             key,
-						"querystring_value_expected":  expectedKeyValuePairs[key].(string),
-						"querystring_value_requested": parsedQuery[key][0],
-					},
-				},
-			)
+		parsedQuery, err := url.ParseQuery(requestRecord.Querystring)
+		if err != nil {
+			return validationErrors, err
 		}
-	}
 
-	return validationErrors, nil
+		expectedKeyValuePairs := getKeyValuePairsFromAssertionOptions(assert)
+
+		for _, key := range utils.GetSortedKeys(expectedKeyValuePairs) {
+			_, ok := parsedQuery[key]
+			if !ok {
+				validationErrors = append(
+					validationErrors,
+					ValidationError{
+						Code: ValidationErrorCode_QuerystringKeyNotSet,
+						Metadata: map[string]string{
+							"querystring_key": key,
+						},
+					},
+				)
+
+				continue
+			}
+
+			if !match(expectedKeyValuePairs[key], parsedQuery[key][0]) {
+				validationErrors = append(
+					validationErrors,
+					ValidationError{
+						Code: ValidationErrorCode_QuerystringMismatch,
+						Metadata: map[string]string{
+							"querystring_key":             key,
+							"querystring_value_expected":  expectedKeyValuePairs[key].(string),
+							"querystring_value_requested": parsedQuery[key][0],
+						},
+					},
+				)
+			}
+		}
+
+		return validationErrors, nil
+	}
 }
 
 func assertJsonBodyMatch(requestRecord *types.RequestRecord, requestRecords []types.RequestRecord, assert *Condition) ([]ValidationError, error) {

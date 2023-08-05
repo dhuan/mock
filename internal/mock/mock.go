@@ -112,6 +112,7 @@ var asserters_map map[ConditionType]asserterFunc = map[ConditionType]asserterFun
 	ConditionType_JsonBodyMatch:         assertJsonBodyMatch,
 	ConditionType_FormMatch:             assertFormMatch,
 	ConditionType_QuerystringMatch:      assertQuerystringMatch,
+	ConditionType_QuerystringMatchRegex: assertQuerystringMatchRegex,
 	ConditionType_QuerystringExactMatch: assertQuerystringExactMatch,
 	ConditionType_Nth:                   assertNth,
 	ConditionType_RouteParamMatch:       assertRouteParamMatch,
