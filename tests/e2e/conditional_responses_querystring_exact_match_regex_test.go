@@ -29,8 +29,8 @@ func Test_E2E_ConditionalResponses_QuerystringExactMatchRegex_DefaultResponse(t 
 
 func Test_E2E_ConditionalResponses_QuerystringExactMatchRegex_ConditionalResponseMatch(t *testing.T) {
 	requestsThatWillNotMatch := []string{
-		"conditional_response/querystring_exact_match?foo=bar",
-		"conditional_response/querystring_exact_match?foo=abc",
+		"conditional_response/querystring_exact_match_regex?foo=bar",
+		"conditional_response/querystring_exact_match_regex?foo=abc",
 	}
 
 	for i := range requestsThatWillNotMatch {
@@ -41,7 +41,7 @@ func Test_E2E_ConditionalResponses_QuerystringExactMatchRegex_ConditionalRespons
 			requestsThatWillNotMatch[i],
 			nil,
 			strings.NewReader(""),
-			StringMatches("Conditional response with Querystring Exact Match resolved."),
+			StringMatches("Conditional response with Querystring Exact Match Regex resolved."),
 		)
 	}
 }
