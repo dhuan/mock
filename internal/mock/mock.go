@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/dhuan/mock/internal/types"
 	. "github.com/dhuan/mock/pkg/mock"
@@ -166,7 +167,7 @@ func BuildVars(
 		}
 	}
 
-	return map[string]string{
+	result := map[string]string{
 		"MOCK_HOST":                mockHost,
 		"MOCK_REQUEST_HOST":        requestRecord.Host,
 		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
@@ -174,5 +175,15 @@ func BuildVars(
 		"MOCK_REQUEST_METHOD":      requestRecord.Method,
 		"MOCK_REQUEST_QUERYSTRING": querystring,
 		"MOCK_REQUEST_NTH":         fmt.Sprintf("%d", nth),
-	}, nil
+	}
+
+	addQuerystringParams(result, requestRecord)
+
+	return result, nil
+}
+
+func addQuerystringParams(m map[string]string, requestRecord *types.RequestRecord) {
+	for key := range requestRecord.QuerystringParsed {
+		m[fmt.Sprintf("MOCK_REQUEST_QUERYSTRING_%s", strings.ToUpper(key))] = requestRecord.QuerystringParsed[key]
+	}
 }

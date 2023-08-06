@@ -13,9 +13,10 @@ func BuildRequestRecord(r *http.Request, requestBody []byte, routeParams map[str
 	headers := buildHeadersForRequestRecord(&r.Header)
 	routeParsed, querystring := parseRoute(route)
 	requestRecord := &types.RequestRecord{
-		Route:       routeParsed,
-		Querystring: querystring,
-		Headers:     *headers,
+		Route:             routeParsed,
+		Querystring:       querystring,
+		QuerystringParsed: parseQuerystring(r),
+		Headers:           *headers,
 	}
 
 	requestRecord.Body = &requestBody
@@ -33,6 +34,17 @@ func BuildRequestRecord(r *http.Request, requestBody []byte, routeParams map[str
 	requestRecord.RouteParams = routeParams
 
 	return requestRecord, nil
+}
+
+func parseQuerystring(r *http.Request) map[string]string {
+	result := make(map[string]string)
+	query := r.URL.Query()
+
+	for key := range query {
+		result[key] = query[key][0]
+	}
+
+	return result
 }
 
 func parseRoute(route string) (string, string) {

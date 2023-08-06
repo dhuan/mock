@@ -106,7 +106,10 @@ Below is the list of available environment variables provided by `mock`:
 -  **MOCK_REQUEST_BODY**: A file path containing the Request’s Body (if
    one exists, otherwise this will be an empty file.)
 -  **MOCK_REQUEST_QUERYSTRING**: The Request’s Querystring if it exists.
-   (ex: ``some_key=some_value&another_key=another_value``)
+-  **MOCK_REQUEST_QUERYSTRING_KEY_NAME**: A variable holding an individual
+   querystring value named `KEY_NAME`. If a request was made with the
+   ``?foo=bar``, you can capture the "foo" parameter by reading the variable
+   ``MOCK_REQUEST_QUERYSTRING_FOO``.
 -  **MOCK_REQUEST_METHOD**: A string indicating the Request’s Method.
 -  **MOCK_REQUEST_NTH**: A number indicating Request’s position in the request
    history. For example, if two requests have been made to the ``foo/bar``

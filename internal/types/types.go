@@ -39,14 +39,15 @@ type MiddlewareConfig struct {
 }
 
 type RequestRecord struct {
-	Route       string            `json:"route"`
-	Querystring string            `json:"querystring"`
-	Method      string            `json:"method"`
-	Host        string            `json:"host"`
-	Https       bool              `json:"https"`
-	Headers     http.Header       `json:"headers"`
-	Body        *[]byte           `json:"body"`
-	RouteParams map[string]string `json:"route_params"`
+	Route             string            `json:"route"`
+	Querystring       string            `json:"querystring"`
+	QuerystringParsed map[string]string `json:"querystring_parsed"`
+	Method            string            `json:"method"`
+	Host              string            `json:"host"`
+	Https             bool              `json:"https"`
+	Headers           http.Header       `json:"headers"`
+	Body              *[]byte           `json:"body"`
+	RouteParams       map[string]string `json:"route_params"`
 }
 
 type MockFs interface {

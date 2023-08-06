@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- New environment variable for capturing individual querystring parameters:
+  `$MOCK_REQUEST_QUERYSTRING_FOOBAR`
+
 ## 1.1.0
 
 ADDED

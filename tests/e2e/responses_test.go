@@ -275,16 +275,18 @@ func Test_E2E_Response_Json_UsingVariables(t *testing.T) {
 		t,
 		"config_responses_using_variables/config.json",
 		"GET",
-		"response_json_using_variables",
+		"response_json_using_variables?param_one=value_one&param_two=value_two",
 		nil,
 		strings.NewReader(""),
 		JsonMatches(map[string]interface{}{
-			"MOCK_HOST":                fmt.Sprintf("localhost:%s", GetTestPort()),
-			"MOCK_REQUEST_HOST":        fmt.Sprintf("localhost:%s", GetTestPort()),
-			"MOCK_REQUEST_URL":         fmt.Sprintf("http://localhost:%s/response_json_using_variables", GetTestPort()),
-			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables",
-			"MOCK_REQUEST_METHOD":      "get",
-			"MOCK_REQUEST_QUERYSTRING": "",
+			"MOCK_HOST":                          fmt.Sprintf("localhost:%s", GetTestPort()),
+			"MOCK_REQUEST_HOST":                  fmt.Sprintf("localhost:%s", GetTestPort()),
+			"MOCK_REQUEST_URL":                   fmt.Sprintf("http://localhost:%s/response_json_using_variables", GetTestPort()),
+			"MOCK_REQUEST_ENDPOINT":              "response_json_using_variables",
+			"MOCK_REQUEST_METHOD":                "get",
+			"MOCK_REQUEST_QUERYSTRING":           "param_one=value_one&param_two=value_two",
+			"MOCK_REQUEST_QUERYSTRING_PARAM_ONE": "value_one",
+			"MOCK_REQUEST_QUERYSTRING_PARAM_TWO": "value_two",
 		}),
 	)
 }
@@ -294,7 +296,7 @@ func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 		t,
 		"config_responses_using_variables/config.json",
 		"GET",
-		"response_json_using_variables/with_file",
+		"response_json_using_variables/with_file?param_one=value_one&param_two=value_two",
 		nil,
 		strings.NewReader(""),
 		JsonMatches(map[string]interface{}{
@@ -303,7 +305,9 @@ func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 			"MOCK_REQUEST_URL":         "http://localhost:4000/response_json_using_variables/with_file",
 			"MOCK_REQUEST_ENDPOINT":    "response_json_using_variables/with_file",
 			"MOCK_REQUEST_METHOD":      "get",
-			"MOCK_REQUEST_QUERYSTRING": "",
+			"MOCK_REQUEST_QUERYSTRING": "param_one=value_one&param_two=value_two",
+			"MOCK_REQUEST_QUERYSTRING_PARAM_ONE": "value_one",
+			"MOCK_REQUEST_QUERYSTRING_PARAM_TWO": "value_two",
 		}),
 	)
 }
@@ -434,11 +438,12 @@ func Test_E2E_Response_Exec_PrintingEnv(t *testing.T) {
 		LineEquals(6, `MOCK_REQUEST_METHOD=get`),
 		LineEquals(7, `MOCK_REQUEST_NTH=1`),
 		LineEquals(8, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
-		LineEquals(9, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
-		LineRegexMatches(10, `MOCK_RESPONSE_BODY=.*`),
-		LineRegexMatches(11, `MOCK_RESPONSE_HEADERS=.*`),
-		LineRegexMatches(12, `MOCK_RESPONSE_STATUS_CODE=.*`),
-		LineEquals(13, `MOCK_ROUTE_PARAM_FOO=bar`),
+		LineEquals(9, `MOCK_REQUEST_QUERYSTRING_FOO=bar`),
+		LineEquals(10, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/with/exec/print/env/with/param/bar`, GetTestPort())),
+		LineRegexMatches(11, `MOCK_RESPONSE_BODY=.*`),
+		LineRegexMatches(12, `MOCK_RESPONSE_HEADERS=.*`),
+		LineRegexMatches(13, `MOCK_RESPONSE_STATUS_CODE=.*`),
+		LineEquals(14, `MOCK_ROUTE_PARAM_FOO=bar`),
 	)
 }
 
