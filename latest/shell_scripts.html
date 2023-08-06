@@ -298,19 +298,22 @@ statically, like JSON, are also able to read varibles using the following
 format: <code class="docutils literal notranslate"><span class="pre">${VARIABLE_NAME}</span></code>.</p>
 <p>Below is the list of available environment variables provided by <cite>mock</cite>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_URL</span></code>: The full URL. (ex:
+<li><p><strong>MOCK_REQUEST_URL</strong>: The full URL. (ex:
 <code class="docutils literal notranslate"><span class="pre">http://localhost/foo/bar</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_ENDPOINT</span></code>: The endpoint extracted from the URL. (ex:
+<li><p><strong>MOCK_REQUEST_ENDPOINT</strong>: The endpoint extracted from the URL. (ex:
 <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_HOST</span></code>: The hostname + port combination that the
+<li><p><strong>MOCK_REQUEST_HOST</strong>: The hostname + port combination that the
 request was sent to. (ex: <code class="docutils literal notranslate"><span class="pre">example.com:3000</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_HEADERS</span></code>: A file path containing all HTTP Headers.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_BODY</span></code>: A file path containing the Request’s Body (if
+<li><p><strong>MOCK_REQUEST_HEADERS</strong>: A file path containing all HTTP Headers.</p></li>
+<li><p><strong>MOCK_REQUEST_BODY</strong>: A file path containing the Request’s Body (if
 one exists, otherwise this will be an empty file.)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING</span></code>: The Request’s Querystring if it exists.
-(ex: <code class="docutils literal notranslate"><span class="pre">some_key=some_value&amp;another_key=another_value</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_METHOD</span></code>: A string indicating the Request’s Method.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_NTH</span></code>: A number indicating Request’s position in the request
+<li><p><strong>MOCK_REQUEST_QUERYSTRING</strong>: The Request’s Querystring if it exists.</p></li>
+<li><p><strong>MOCK_REQUEST_QUERYSTRING_KEY_NAME</strong>: A variable holding an individual
+querystring value named <cite>KEY_NAME</cite>. If a request was made with the
+<code class="docutils literal notranslate"><span class="pre">?foo=bar</span></code>, you can capture the “foo” parameter by reading the variable
+<code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING_FOO</span></code>.</p></li>
+<li><p><strong>MOCK_REQUEST_METHOD</strong>: A string indicating the Request’s Method.</p></li>
+<li><p><strong>MOCK_REQUEST_NTH</strong>: A number indicating Request’s position in the request
 history. For example, if two requests have been made to the <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
 endpoint ever since <em>mock</em> started, this being the 2nd request, the number in
 this variable will be 2.</p></li>
@@ -318,7 +321,7 @@ this variable will be 2.</p></li>
 <p>The following environment variables provide other general information
 not related to the current request:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_HOST</span></code>: The hostname + port combination to which Mock is
+<li><p><strong>MOCK_HOST</strong>: The hostname + port combination to which Mock is
 currently listening. (ex: <code class="docutils literal notranslate"><span class="pre">localhost:3000</span></code>)</p></li>
 </ul>
 </section>
@@ -335,11 +338,11 @@ variable.</p>
 about the Request that’s being currently handled. The following
 environment variables enable you to further define the HTTP Response:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_BODY</span></code>: A file that can be written to in order to set the
+<li><p><strong>MOCK_RESPONSE_BODY</strong>: A file that can be written to in order to set the
 HTTP Response.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_STATUS_CODE</span></code>: A file that can be written to in order to
+<li><p><strong>MOCK_RESPONSE_STATUS_CODE</strong>: A file that can be written to in order to
 define the HTTP Status Code.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_HEADERS</span></code>: A file that can be written to in order to define
+<li><p><strong>MOCK_RESPONSE_HEADERS</strong>: A file that can be written to in order to define
 the HTTP Headers.</p></li>
 </ul>
 <p>In the following example, we’ll see what a Handler looks like, which
