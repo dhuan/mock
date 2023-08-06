@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
         <title>Responses from Shell scripts - mock documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
     
@@ -292,12 +292,11 @@ on the home folder:</p>
 </div>
 <section id="environment-variables-for-request-handlers">
 <h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Permalink to this heading">#</a></h2>
-<p>A set of environment variables can be read from in response shell
-scripts in order to obtain useful information about the current request.
-Static responses (such as JSON) also have access to the same variables.
-Reading them is done through writing the variable name prefixed with a
-“<span class="math notranslate nohighlight">\(&quot; - for example `\)</span>MOCK_REQUEST_URL`. The following are the
-variables avaiable:</p>
+<p>A set of environment variables can be read from in response shell scripts in
+order to obtain useful information about the current request. Responses defined
+statically, like JSON, are also able to read varibles using the following
+format: <code class="docutils literal notranslate"><span class="pre">${VARIABLE_NAME}</span></code>.</p>
+<p>Below is the list of available environment variables provided by <cite>mock</cite>:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_URL</span></code>: The full URL. (ex:
 <code class="docutils literal notranslate"><span class="pre">http://localhost/foo/bar</span></code>)</p></li>
@@ -433,6 +432,5 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
