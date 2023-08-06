@@ -96,19 +96,19 @@ format: ``${VARIABLE_NAME}``.
 
 Below is the list of available environment variables provided by `mock`:
 
--  ``MOCK_REQUEST_URL``: The full URL. (ex:
+-  **MOCK_REQUEST_URL**: The full URL. (ex:
    ``http://localhost/foo/bar``)
--  ``MOCK_REQUEST_ENDPOINT``: The endpoint extracted from the URL. (ex:
+-  **MOCK_REQUEST_ENDPOINT**: The endpoint extracted from the URL. (ex:
    ``foo/bar``)
--  ``MOCK_REQUEST_HOST``: The hostname + port combination that the
+-  **MOCK_REQUEST_HOST**: The hostname + port combination that the
    request was sent to. (ex: ``example.com:3000``)
--  ``MOCK_REQUEST_HEADERS``: A file path containing all HTTP Headers.
--  ``MOCK_REQUEST_BODY``: A file path containing the Request’s Body (if
+-  **MOCK_REQUEST_HEADERS**: A file path containing all HTTP Headers.
+-  **MOCK_REQUEST_BODY**: A file path containing the Request’s Body (if
    one exists, otherwise this will be an empty file.)
--  ``MOCK_REQUEST_QUERYSTRING``: The Request’s Querystring if it exists.
+-  **MOCK_REQUEST_QUERYSTRING**: The Request’s Querystring if it exists.
    (ex: ``some_key=some_value&another_key=another_value``)
--  ``MOCK_REQUEST_METHOD``: A string indicating the Request’s Method.
--  ``MOCK_REQUEST_NTH``: A number indicating Request’s position in the request
+-  **MOCK_REQUEST_METHOD**: A string indicating the Request’s Method.
+-  **MOCK_REQUEST_NTH**: A number indicating Request’s position in the request
    history. For example, if two requests have been made to the ``foo/bar``
    endpoint ever since *mock* started, this being the 2nd request, the number in
    this variable will be 2.
@@ -116,7 +116,7 @@ Below is the list of available environment variables provided by `mock`:
 The following environment variables provide other general information
 not related to the current request:
 
--  ``MOCK_HOST``: The hostname + port combination to which Mock is
+-  **MOCK_HOST**: The hostname + port combination to which Mock is
    currently listening. (ex: ``localhost:3000``)
 
 Route Parameters - Reading from Shell Scripts
@@ -134,11 +134,11 @@ So far we’ve seen environment variables that provide us with information
 about the Request that’s being currently handled. The following
 environment variables enable you to further define the HTTP Response:
 
--  ``MOCK_RESPONSE_BODY``: A file that can be written to in order to set the
+-  **MOCK_RESPONSE_BODY**: A file that can be written to in order to set the
    HTTP Response.
--  ``MOCK_RESPONSE_STATUS_CODE``: A file that can be written to in order to
+-  **MOCK_RESPONSE_STATUS_CODE**: A file that can be written to in order to
    define the HTTP Status Code.
--  ``MOCK_RESPONSE_HEADERS``: A file that can be written to in order to define
+-  **MOCK_RESPONSE_HEADERS**: A file that can be written to in order to define
    the HTTP Headers.
 
 In the following example, we’ll see what a Handler looks like, which
