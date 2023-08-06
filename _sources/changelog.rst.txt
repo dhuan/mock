@@ -1,6 +1,19 @@
 Changelog
 =========
 
+1.1.0
+-----
+
+ADDED
+
+-  Add support for “conditions” for Middlewares.
+-  Enable Middlewares’ ``exec`` commands to include any shell operators
+   like pipes, output redirection, etc.
+-  New condition options added: ``querystring_match_regex``,
+   ``querystring_exact_match_regex``.
+
+.. _section-1:
+
 1.0.0
 -----
 
@@ -19,7 +32,7 @@ ADDED
 -  New environment variable for Request/Middleware Handlers:
    ``MOCK_REQUEST_NTH``;
 
-.. _section-1:
+.. _section-2:
 
 0.8.1
 -----
@@ -28,7 +41,7 @@ ADDED
 
 -  New condition option: ``route_param_match``
 
-.. _section-2:
+.. _section-3:
 
 0.8.0
 -----
@@ -38,7 +51,7 @@ ADDED
 -  ``nth`` condition option: Conditional responses can be set based on
    their position in the request history.
 
-.. _section-3:
+.. _section-4:
 
 0.7.0
 -----
@@ -60,7 +73,7 @@ FIXED
 -  Defining responses referenced through files with absolute path fails.
    (with relative file paths no issues, only absolute);
 
-.. _section-4:
+.. _section-5:
 
 0.6.0
 -----
@@ -74,7 +87,7 @@ ADDED
 -  New variable added to read current request’s host
    ``MOCK_REQUEST_HOST``.
 
-.. _section-5:
+.. _section-6:
 
 0.5.0
 -----
@@ -113,7 +126,7 @@ Features & enhancements
 -  Endpoints can be configured without any HTTP Method - it will default
    to ``GET``;
 
-.. _section-6:
+.. _section-7:
 
 0.4.0
 -----
@@ -130,7 +143,7 @@ Bugs fixed:
 -  Trying to assert with “Json Body” on a Request that didn’t have any
    payload would result in 500 Status Code API Error;
 
-.. _section-7:
+.. _section-8:
 
 0.3.0
 -----
@@ -140,7 +153,7 @@ Bugs fixed:
    ``"response": "sh:./my_shell_script.sh some_param another_param"``;
 -  ``--delay`` option added enabling you to simulate slow APIs;
 
-.. _section-8:
+.. _section-9:
 
 0.2.0
 -----
@@ -154,7 +167,7 @@ Minor stuff:
 -  When trying to reference response files that do not exist, *mock* now
    prevents starting and shows error, failing gracefully.
 
-.. _section-9:
+.. _section-10:
 
 0.1.4
 -----
@@ -173,21 +186,21 @@ Minor stuff:
 -  Fail gracefully if given configuration file does not exist or/and not
    readable.
 
-.. _section-10:
+.. _section-11:
 
 0.1.3
 -----
 
 This release fixes a bug in the ``json_body_match`` condition option.
 
-.. _section-11:
+.. _section-12:
 
 0.1.2
 -----
 
 This release doesn’t have significant changes.
 
-.. _section-12:
+.. _section-13:
 
 0.1.1
 -----
@@ -196,7 +209,7 @@ Features:
 
 -  ``querystring_exact_match`` Assertion Matcher added;
 
-.. _section-13:
+.. _section-14:
 
 0.1.0
 -----

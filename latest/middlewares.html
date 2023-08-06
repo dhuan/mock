@@ -339,22 +339,23 @@ complex kinds of filters. For example, following is a Middleware that is only
 executed when a request is made to a route that does not exist - in order
 words, we’re making a custom 404 page for our API:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w"> </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">     </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;exec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;echo 404 &gt; $MOCK_RESPONSE_STATUS_CODE &amp;&amp; echo &#39;This page does not exist!&#39; &gt; $MOCK_RESPONSE_BODY&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;condition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">             </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;route_invalid&quot;</span>
-<span class="w">         </span><span class="p">}</span>
-<span class="w">     </span><span class="p">}</span>
-<span class="w"> </span><span class="p">],</span>
-<span class="w"> </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">     </span><span class="c1">// ...</span>
-<span class="w"> </span><span class="p">]</span>
+<span class="w">  </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;exec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;echo &#39;New response body!&#39; &gt; $MOCK_RESPONSE_BODY&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;condition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;querystring_match&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;key_values&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;foo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bar&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Now just visit any page that there isn’t an endpoint route for, and the <code class="docutils literal notranslate"><span class="pre">This</span>
-<span class="pre">page</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">exist!</span></code> should be displayed on the screen.</p>
+<p>The middleware above modifies all requests that have the <code class="docutils literal notranslate"><span class="pre">foo=bar</span></code>
+querystring.</p>
 </section>
 </section>
 

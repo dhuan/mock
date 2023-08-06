@@ -143,19 +143,20 @@ words, we're making a custom 404 page for our API:
 
 .. code:: json
 
-   {
-    "middlewares": [
+    {
+      "middlewares": [
         {
-            "exec": "echo 404 > $MOCK_RESPONSE_STATUS_CODE && echo 'This page does not exist!' > $MOCK_RESPONSE_BODY",
-            "condition": {
-                "type": "route_invalid"
+          "exec": "echo 'New response body!' > $MOCK_RESPONSE_BODY",
+          "condition": {
+            "type": "querystring_match",
+            "key_values": {
+              "foo": "bar"
             }
+          }
         }
-    ],
-    "endpoints": [
-        // ...
-    ]
-   }
+      ],
+      "endpoints": []
+    }
 
-Now just visit any page that there isn't an endpoint route for, and the ``This
-page does not exist!`` should be displayed on the screen.
+The middleware above modifies all requests that have the ``foo=bar``
+querystring.
