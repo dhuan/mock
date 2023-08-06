@@ -89,12 +89,12 @@ The same can be accomplished through command-line parameters:
 Environment Variables for Request Handlers
 ------------------------------------------
 
-A set of environment variables can be read from in response shell
-scripts in order to obtain useful information about the current request.
-Static responses (such as JSON) also have access to the same variables.
-Reading them is done through writing the variable name prefixed with a
-“\ :math:`" - for example ``\ MOCK_REQUEST_URL`. The following are the
-variables avaiable:
+A set of environment variables can be read from in response shell scripts in
+order to obtain useful information about the current request. Responses defined
+statically, like JSON, are also able to read varibles using the following
+format: ``${VARIABLE_NAME}``.
+
+Below is the list of available environment variables provided by `mock`:
 
 -  ``MOCK_REQUEST_URL``: The full URL. (ex:
    ``http://localhost/foo/bar``)
