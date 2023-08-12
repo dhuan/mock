@@ -58,10 +58,12 @@ var serveCmd = &cobra.Command{
 		middlewaresFromCommandLine := args2config.ParseMiddlewares(os.Args)
 		mergeMiddlewares(config, middlewaresFromCommandLine)
 
+		hasBaseApi, baseApi := resolveBaseApi(flagBaseApi)
+
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
 		router.Use(handleOptions(flagCors))
-		router.NotFound(onNotFound(flagCors))
+		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi))
 		router.MethodNotAllowed(onMethodNotAllowed(flagCors))
 
 		prepareConfig(config)
@@ -433,17 +435,86 @@ func exitWithError(errorMessage string) {
 	os.Exit(1)
 }
 
-func onNotFound(corsEnabled bool) http.HandlerFunc {
+func onNotFound(corsEnabled, hasBaseApi bool, baseApi string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !corsEnabled {
+		if corsEnabled {
+			setCorsHeaders(w)
+		}
+
+		if !hasBaseApi {
 			w.WriteHeader(404)
 
 			return
 		}
 
-		setCorsHeaders(w)
+		response, err := sendRequestForBaseApi(baseApi, r)
+		if err != nil {
+			panic(err)
+		}
 
-		w.WriteHeader(404)
+		forwardResponse(response, w)
+	}
+}
+
+func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, error) {
+	client := &http.Client{}
+
+	route := r.URL.Path
+	protocol, host := parseBaseApi(r.TLS != nil, baseApi)
+	url := fmt.Sprintf("%s://%s%s", protocol, host, route)
+
+	requestCloned, err := http.NewRequest(r.Method, url, bytes.NewBuffer([]byte("ok")))
+	if err != nil {
+		panic(err)
+	}
+
+	return client.Do(requestCloned)
+}
+
+func parseBaseApi(currentRequestIsHttps bool, baseApi string) (string, string) {
+	currentRequestProtocol := "http"
+	if currentRequestIsHttps {
+		currentRequestProtocol = "https"
+	}
+
+	if !utils.RegexTest("^http", baseApi) {
+		return currentRequestProtocol, baseApi
+	}
+
+	protocol := "http"
+	if utils.RegexTest("^https", baseApi) {
+		protocol = "https"
+	}
+
+	domain := extractDomain(baseApi)
+
+	return protocol, domain
+}
+
+func extractDomain(url string) string {
+	split := strings.Split(url, "//")
+
+	if len(split) < 2 {
+		panic("Something went wrong while extracting domain.")
+	}
+
+	return split[1]
+}
+
+func forwardResponse(response *http.Response, w http.ResponseWriter) {
+	w.WriteHeader(response.StatusCode)
+
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(responseBody) > 0 {
+		w.Write(responseBody)
+	}
+
+	for key := range response.Header {
+		w.Header().Add(key, response.Header[key][0])
 	}
 }
 
@@ -530,3 +601,11 @@ type endpointMergeErrorCode int
 const (
 	endpointMergeErrorCode_none endpointMergeErrorCode = iota
 )
+
+func resolveBaseApi(flagBaseApi string) (bool, string) {
+	if flagBaseApi == "" {
+		return false, ""
+	}
+
+	return true, flagBaseApi
+}

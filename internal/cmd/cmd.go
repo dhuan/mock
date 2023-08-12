@@ -36,6 +36,7 @@ var (
 	flagExec               *[]string
 	flagResponseExec       *[]string
 	flagMiddleware         *[]string
+	flagBaseApi            string
 )
 
 var rootCmd = &cobra.Command{
@@ -63,6 +64,7 @@ func Execute() {
 	flagExec = serveCmd.PersistentFlags().StringArray("exec", []string{}, "endpoint response exec")
 	flagResponseExec = serveCmd.PersistentFlags().StringArray("response-exec", []string{}, "endpoint response exec")
 	flagMiddleware = serveCmd.PersistentFlags().StringArray("middleware", []string{}, "middleware")
+	serveCmd.PersistentFlags().StringVarP(&flagBaseApi, "base", "b", "", "base API")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
