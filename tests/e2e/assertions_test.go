@@ -10,8 +10,9 @@ import (
 )
 
 func Test_E2E_Assertion_NoCalls(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, _ := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -24,7 +25,7 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -36,8 +37,9 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 }
 
 func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -51,7 +53,7 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "put",
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -69,8 +71,9 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_WithNth(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -88,7 +91,7 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 				"foo": "bar",
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -98,8 +101,10 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 }
 
 func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
+	state := e2eutils.NewState()
+
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -117,7 +122,7 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 				"foo": "bar",
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -135,8 +140,9 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 }
 
 func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -153,7 +159,7 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 				"foo": "bar",
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -168,8 +174,9 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 }
 
 func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -183,7 +190,7 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 			Type:  mocklib.ConditionType_MethodMatch,
 			Value: "post",
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -193,8 +200,9 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -214,7 +222,7 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 				},
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -231,8 +239,9 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -254,7 +263,7 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 				},
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,
@@ -264,8 +273,9 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 }
 
 func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -283,7 +293,7 @@ func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
 				Type:  mocklib.ConditionType_MethodMatch,
 				Value: mocklib.ConditionValue(assertMethod),
 			},
-		}, serverOutput)
+		}, serverOutput, state)
 
 		assert.Equal(t, 0, len(validationErrors))
 	}

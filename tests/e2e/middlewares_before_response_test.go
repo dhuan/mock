@@ -138,14 +138,14 @@ func Test_Middlewares_PrintEnvironmentVariables(t *testing.T) {
 		"middleware/print_env_vars/some_param/another_param?foo=bar",
 		nil,
 		strings.NewReader(""),
-		LineEquals(1, fmt.Sprintf(`MOCK_HOST=localhost:%s`, GetTestPort())),
+		LineEquals(1, `MOCK_HOST=localhost:{{TEST_E2E_PORT}}`),
 		LineRegexMatches(2, `MOCK_REQUEST_BODY=.*`),
 		LineEquals(3, `MOCK_REQUEST_ENDPOINT=middleware/print_env_vars/some_param/another_param`),
 		LineRegexMatches(4, `MOCK_REQUEST_HEADERS=.*`),
-		LineEquals(5, fmt.Sprintf(`MOCK_REQUEST_HOST=localhost:%s`, GetTestPort())),
+		LineEquals(5, `MOCK_REQUEST_HOST=localhost:{{TEST_E2E_PORT}}`),
 		LineEquals(6, `MOCK_REQUEST_METHOD=get`),
 		LineEquals(7, `MOCK_REQUEST_QUERYSTRING=foo=bar`),
-		LineEquals(8, fmt.Sprintf(`MOCK_REQUEST_URL=http://localhost:%s/middleware/print_env_vars/some_param/another_param`, GetTestPort())),
+		LineEquals(8, `MOCK_REQUEST_URL=http://localhost:{{TEST_E2E_PORT}}/middleware/print_env_vars/some_param/another_param`),
 	)
 }
 

@@ -10,8 +10,9 @@ import (
 )
 
 func Test_E2E_Resetting(t *testing.T) {
+	state := e2eutils.NewState()
 	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
-		e2eutils.NewState(),
+		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
@@ -27,7 +28,7 @@ func Test_E2E_Resetting(t *testing.T) {
 				"foo": "bar",
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(t, 0, len(validationErrors))
 
@@ -41,7 +42,7 @@ func Test_E2E_Resetting(t *testing.T) {
 				"foo": "bar",
 			},
 		},
-	}, serverOutput)
+	}, serverOutput, state)
 
 	assert.Equal(
 		t,

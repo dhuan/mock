@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -24,6 +25,7 @@ import (
 
 type E2eState struct {
 	BinaryPath string
+	Port       int
 }
 
 type Response struct {
@@ -32,25 +34,27 @@ type Response struct {
 	StatusCode int
 }
 
-func GetTestPort() string {
-	port := os.Getenv("MOCK_TEST_PORT")
-	if port == "" {
-		port = "4000"
+func getFreePort() int {
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
 	}
+	listener.Close()
 
-	return port
+	return listener.Addr().(*net.TCPAddr).Port
 }
 
 func NewState() *E2eState {
 	state := &E2eState{
 		BinaryPath: fmt.Sprintf("%s/bin/mock", pwd()),
+		Port:       getFreePort(),
 	}
 
 	return state
 }
 
 func RunMock(state *E2eState, command string) ([]byte, error) {
-	replaceVars(&command)
+	replaceVars(&command, state)
 	commandParameters := command_parse.ToCommandParameters(command)
 
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
@@ -65,7 +69,7 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 type KillMockFunc func()
 
 func RunMockBg(state *E2eState, command string, env map[string]string) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig) {
-	replaceVars(&command)
+	replaceVars(&command, state)
 	commandParameters := command_parse.ToCommandParameters(command)
 
 	cmd := exec.Command(state.BinaryPath, commandParameters...)
@@ -89,11 +93,11 @@ func RunMockBg(state *E2eState, command string, env map[string]string) (KillMock
 		if err != nil {
 			panic(err)
 		}
-	}, buf, mocklib.Init(fmt.Sprintf("localhost:%s", GetTestPort()))
+	}, buf, mocklib.Init(fmt.Sprintf("localhost:%d", state.Port))
 }
 
-func MockAssert(assertOptions *mocklib.AssertOptions, serverOutput *bytes.Buffer) []mocklib.ValidationError {
-	mockConfig := mocklib.Init(fmt.Sprintf("localhost:%s", GetTestPort()))
+func MockAssert(assertOptions *mocklib.AssertOptions, serverOutput *bytes.Buffer, state *E2eState) []mocklib.ValidationError {
+	mockConfig := mocklib.Init(fmt.Sprintf("localhost:%d", state.Port))
 	validationErrors, err := mocklib.Assert(mockConfig, assertOptions)
 	if err != nil {
 		log.Println("An error occurred. Here's the server output:")
@@ -179,7 +183,7 @@ func waitForOutputInCommand(expectedOutput string, attempts int, buffer *bytes.B
 	return false
 }
 
-func replaceVars(command *string) {
+func replaceVars(command *string, state *E2eState) {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -187,7 +191,7 @@ func replaceVars(command *string) {
 
 	vars := map[string]string{
 		"TEST_DATA_PATH": fmt.Sprintf("%s/tests/e2e/data", pwd()),
-		"TEST_E2E_PORT":  GetTestPort(),
+		"TEST_E2E_PORT":  fmt.Sprint(state.Port),
 		"WD":             wd,
 	}
 
@@ -279,7 +283,7 @@ func RunTest(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -295,7 +299,7 @@ func RunTestWithMultipleRequests(
 	t *testing.T,
 	configurationFilePath string,
 	requests []TestRequest,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	RunTestBase(t, configurationFilePath, "", requests, nil, assertionFunc...)
 }
@@ -308,7 +312,7 @@ func RunTestWithEnv(
 	headers map[string]string,
 	body io.Reader,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -328,7 +332,7 @@ func RunTestWithArgs(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -347,7 +351,7 @@ func RunTestWithNoConfigAndWithArgs(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -367,7 +371,7 @@ func RunTestWithAndWithArgsAndWithEnv(
 	headers map[string]string,
 	body io.Reader,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -403,14 +407,15 @@ func RunTestBase(
 	extraArgs string,
 	requests []TestRequest,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte),
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
 	command := resolveCommand(configurationFilePath)
 	if extraArgs != "" {
 		command = fmt.Sprintf("%s %s", command, extraArgs)
 	}
 
-	killMock, output, mockConfig := RunMockBg(NewState(), command, env)
+	state := NewState()
+	killMock, output, mockConfig := RunMockBg(state, command, env)
 	defer killMock()
 	defer afterTest(t, output)
 
@@ -421,28 +426,28 @@ func RunTestBase(
 	}
 
 	for i := range assertionFunc {
-		assertionFunc[i](t, response, output.Bytes())
+		assertionFunc[i](t, response, output.Bytes(), state)
 	}
 }
 
-func StringMatches(expected string) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
-		replaceVars(&expected)
+func StringMatches(expected string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		replaceVars(&expected, state)
 
 		assert.Equal(t, expected, string(response.Body))
 	}
 }
 
-func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
-		replaceVars(&expectedLine)
+func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		replaceVars(&expectedLine, state)
 
 		assert.Equal(t, expectedLine, getLineFromString(lineNumber-1, string(response.Body)))
 	}
 }
 
-func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
+func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		if len(expectedLines) == 0 {
 			return
 		}
@@ -451,7 +456,7 @@ func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, respon
 		lineMatch := -1
 
 		for i := range expectedLines {
-			replaceVars(&expectedLines[i])
+			replaceVars(&expectedLines[i], state)
 		}
 
 		for i := range serverOutputLines {
@@ -485,8 +490,8 @@ func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, respon
 	}
 }
 
-func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
+func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		assert.Regexp(
 			t,
 			regexp.MustCompile(regex),
@@ -495,14 +500,14 @@ func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response 
 	}
 }
 
-func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
+func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		assert.Equal(t, expectedStatusCode, response.StatusCode)
 	}
 }
 
-func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
+func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		expectedHeadersKeys := getSortedKeys(expectedHeaders)
 
 		for _, expectedHeaderKey := range expectedHeadersKeys {
@@ -520,8 +525,8 @@ func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response
 	}
 }
 
-func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
+func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		for _, headerKey := range headerKeys {
 			_, exists := response.Headers[headerKey]
 
@@ -534,8 +539,8 @@ func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Res
 	}
 }
 
-func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response, serverOutput []byte) {
-	return func(t *testing.T, response *Response, serverOutput []byte) {
+func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		jsonEncodedA, err := json.Marshal(expectedJson)
 		if err != nil {
 			t.Fatal("Failed to parse JSON from expected input!")
@@ -546,7 +551,13 @@ func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, respons
 			t.Fatal("Failed to parse JSON from response!")
 		}
 
-		assert.Equal(t, string(jsonEncodedA), string(jsonEncodedB))
+		jsonA := string(jsonEncodedA)
+		jsonB := string(jsonEncodedB)
+
+		replaceVars(&jsonA, state)
+		replaceVars(&jsonB, state)
+
+		assert.Equal(t, jsonA, jsonB)
 	}
 }
 
