@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Serving static files" href="static_files.html" /><link rel="prev" title="Route Parameters" href="route_params.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Test Assertions" href="test_assertions.html" /><link rel="prev" title="Middlewares" href="middlewares.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
-        <title>Responses from Shell scripts - mock documentation</title>
+        <title>Base APIs - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -163,13 +163,13 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Responses from Shell scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
-<li class="toctree-l2"><a class="reference internal" href="base_apis.html">Base APIs</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Base APIs</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -218,147 +218,82 @@
           </label>
         </div>
         <article role="main">
-          <section id="responses-from-shell-scripts">
-<h1>Responses from Shell scripts<a class="headerlink" href="#responses-from-shell-scripts" title="Permalink to this heading">#</a></h1>
-<p>You can write shell scripts that will act as “handlers” for your API’s
-Requests.</p>
+          <section id="base-apis">
+<h1>Base APIs<a class="headerlink" href="#base-apis" title="Permalink to this heading">#</a></h1>
+<p>A <cite>mock</cite> server can be configured to have a Base API, which results in all
+requests received to be forwaded to the API that it’s set to be based from.
+When an endpoint route was configured for the requesting route, it takes
+priority over the Base API. Let’s see a simple example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--base<span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;hello/world&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world!&#39;</span>
+</pre></div>
+</div>
+<p>Alternatively you may use the <code class="docutils literal notranslate"><span class="pre">base</span></code> configuration option for achieving the
+same:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;base&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">  </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;foo/bar&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sh:my_shell_script.sh&quot;</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">     </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello/world&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
+<span class="w">     </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In the example above, any request to <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/foo/bar</span></code> will result in
-<em>mock</em> executing the <code class="docutils literal notranslate"><span class="pre">my_shell_script.sh</span></code>. Scripts can manipulate the HTTP
-Response by writing to a file assigned to the <code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_BODY</span></code> environment
-variable. Following is a script that defines the HTTP Response as <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
+<p>Above we’ve set up an API that uses <code class="docutils literal notranslate"><span class="pre">example.com</span></code> as its Base API,
+furthermore an endpoint was set routed as <code class="docutils literal notranslate"><span class="pre">hello/world</span></code>. If a request is made
+to <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">hello/world</span></code>, the server will act normally responding with the
+response which was set - <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>. However if a request is made to an
+endpoint that was not configured, then the request will be forwaded to the
+domain that we’ve set as the Base API. In other words, a request to <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
+will result in a proxy request to <code class="docutils literal notranslate"><span class="pre">example.com/foo/bar</span></code>.</p>
+<section id="intercepting-responses">
+<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Permalink to this heading">#</a></h2>
+<p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
+Middlewares documentation section for learning all about them.</a> In fact Middlewares make no distinction of whether the
+current request is meant for a <cite>mock</cite> endpoint or an actual Base API when
+executing its handler - but on your Middleware handler you can find out whether
+the current Middleware execution is for a Base API request or not by reading
+the <code class="docutils literal notranslate"><span class="pre">$MOCK_BASE_API_RESPONSE</span></code> environment variable. The middleware below adds
+a header <code class="docutils literal notranslate"><span class="pre">Foo:</span> <span class="pre">bar</span></code> to all responses proxied to a Base API:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MOCK_BASE_API_RESPONSE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]</span><span class="p">;</span>
+<span class="k">then</span>
+<span class="w">  </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Foo: bar&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+<span class="k">fi</span>
 </pre></div>
 </div>
-<p>To further customize your script handlers, you may also pass parameters,
-just like you can normally pass parameters in a shell command:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;sh:my_shell_script.sh some_param another_param&quot;</span>
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
-</pre></div>
-</div>
-<p>To define responses with shell scripts using command-line parameters,
-use the following:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
-<span class="gi">+  --route &quot;foo/bar&quot; \</span>
-<span class="gi">+  --shell-script my_shell_script.sh</span>
-</pre></div>
-</div>
-<p>Alternatively, shell commands can be set as one-liners with <code class="docutils literal notranslate"><span class="pre">exec</span></code>
-instead of <code class="docutils literal notranslate"><span class="pre">sh</span></code>, not requiring you to create a shell script file. As
-an example, the endpoint below responds with a list of files of the
-current folder (<code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-la</span></code>):</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;exec:ls -la &gt; $MOCK_RESPONSE_BODY&quot;</span>
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
-</pre></div>
-</div>
-<p>You can use more advanced shell functionalities within <code class="docutils literal notranslate"><span class="pre">exec</span></code>, such as
-pipes. Let’s set an endpoint that returns the amount of files that exist
-on the home folder:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;exec:ls ~ | wc -l &gt; $MOCK_RESPONSE_BODY&quot;</span>
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
-</pre></div>
-</div>
-<p>The same can be accomplished through command-line parameters:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
-<span class="gi">+  --route &quot;foo/bar&quot; \</span>
-<span class="gi">+  --exec &#39;ls | sort &gt; $MOCK_RESPONSE_BODY&#39;</span>
-</pre></div>
-</div>
-<section id="environment-variables-for-request-handlers">
-<h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Permalink to this heading">#</a></h2>
-<p>A set of environment variables can be read from in response shell scripts in
-order to obtain useful information about the current request. Responses defined
-statically, like JSON, are also able to read varibles using the following
-format: <code class="docutils literal notranslate"><span class="pre">${VARIABLE_NAME}</span></code>.</p>
-<p>Below is the list of available environment variables provided by <cite>mock</cite>:</p>
+<p>Alternatively you can just use the <code class="docutils literal notranslate"><span class="pre">route_match</span></code> middleware option in order
+to filter the requests which you want to manipulate, targetting the route
+patterns that are meant for your Base API of choice. Then again, the middleware
+documentation section covers the subject in more details.</p>
+</section>
+<section id="intercepting-requests">
+<h2>Intercepting requests<a class="headerlink" href="#intercepting-requests" title="Permalink to this heading">#</a></h2>
+<p>Requests sent to Base APIs are sent exactly as defined by the HTTP client who’s
+requesting to <cite>mock</cite> - all the headers, payload etc, everything unmodified. It’s
+possible however to modify the request object - any of its properties such as
+its headers, payload - through Middlewares.</p>
+<p>Set the Middleware with its type as <code class="docutils literal notranslate"><span class="pre">on_request_to_base_api</span></code> to achieve it.
+The middleware handler script is able to modify the request by writing to the
+files assigned to the following environment variables:</p>
 <ul class="simple">
-<li><p><strong>MOCK_REQUEST_URL</strong>: The full URL. (ex:
-<code class="docutils literal notranslate"><span class="pre">http://localhost/foo/bar</span></code>)</p></li>
-<li><p><strong>MOCK_REQUEST_ENDPOINT</strong>: The endpoint extracted from the URL. (ex:
-<code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>)</p></li>
-<li><p><strong>MOCK_REQUEST_HOST</strong>: The hostname + port combination that the
-request was sent to. (ex: <code class="docutils literal notranslate"><span class="pre">example.com:3000</span></code>)</p></li>
-<li><p><strong>MOCK_REQUEST_HEADERS</strong>: A file path containing all HTTP Headers.</p></li>
-<li><p><strong>MOCK_REQUEST_BODY</strong>: A file path containing the Request’s Body (if
-one exists, otherwise this will be an empty file.)</p></li>
-<li><p><strong>MOCK_REQUEST_QUERYSTRING</strong>: The Request’s Querystring if it exists.</p></li>
-<li><p><strong>MOCK_REQUEST_QUERYSTRING_KEY_NAME</strong>: A variable holding an individual
-querystring value named <cite>KEY_NAME</cite>. If a request was made with the
-<code class="docutils literal notranslate"><span class="pre">?foo=bar</span></code>, you can capture the “foo” parameter by reading the variable
-<code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING_FOO</span></code>.</p></li>
-<li><p><strong>MOCK_REQUEST_METHOD</strong>: A string indicating the Request’s Method.</p></li>
-<li><p><strong>MOCK_REQUEST_NTH</strong>: A number indicating Request’s position in the request
-history. For example, if two requests have been made to the <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
-endpoint ever since <em>mock</em> started, this being the 2nd request, the number in
-this variable will be 2.</p></li>
-</ul>
-<p>The following environment variables provide other general information
-not related to the current request:</p>
-<ul class="simple">
-<li><p><strong>MOCK_HOST</strong>: The hostname + port combination to which Mock is
-currently listening. (ex: <code class="docutils literal notranslate"><span class="pre">localhost:3000</span></code>)</p></li>
+<li><p><strong>MOCK_REQUEST_BODY</strong>: Write to this file to modify the request payload.
+It contains the payload sent by the requesting client.</p></li>
+<li><p><strong>MOCK_REQUEST_HEADERS</strong>: Write to this file to modify the request headers.
+It contains the headers sent by the requesting client.</p></li>
 </ul>
 </section>
-<section id="route-parameters-reading-from-shell-scripts">
-<h2>Route Parameters - Reading from Shell Scripts<a class="headerlink" href="#route-parameters-reading-from-shell-scripts" title="Permalink to this heading">#</a></h2>
-<p>Route Parameters can be read from shell scripts. Suppose an endpoint
-exists as such: <code class="docutils literal notranslate"><span class="pre">user/{user_id}</span></code>. We could then retrieve the User ID
-parameter by reading the <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_USER_ID</span></code> environment
-variable.</p>
-</section>
-<section id="response-files-that-can-be-written-to-by-shell-scripts">
-<h2>Response Files that can be written to by shell scripts<a class="headerlink" href="#response-files-that-can-be-written-to-by-shell-scripts" title="Permalink to this heading">#</a></h2>
-<p>So far we’ve seen environment variables that provide us with information
-about the Request that’s being currently handled. The following
-environment variables enable you to further define the HTTP Response:</p>
-<ul class="simple">
-<li><p><strong>MOCK_RESPONSE_BODY</strong>: A file that can be written to in order to set the
-HTTP Response.</p></li>
-<li><p><strong>MOCK_RESPONSE_STATUS_CODE</strong>: A file that can be written to in order to
-define the HTTP Status Code.</p></li>
-<li><p><strong>MOCK_RESPONSE_HEADERS</strong>: A file that can be written to in order to define
-the HTTP Headers.</p></li>
-</ul>
-<p>In the following example, we’ll see what a Handler looks like, which
-responds with a simple <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code> body content, a <code class="docutils literal notranslate"><span class="pre">201</span></code> Status
-Code and a few custom HTTP Headers.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span>Hello<span class="w"> </span>world!
-
-cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADERS</span>
-<span class="s">Some-Header-Key: Some Header Value</span>
-<span class="s">Another-Header-Key: Another Header Value</span>
-<span class="s">EOF</span>
-
-<span class="nb">echo</span><span class="w"> </span><span class="m">201</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_STATUS_CODE</span>
-</pre></div>
-</div>
+<section id="base-apis-and-tls">
+<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Permalink to this heading">#</a></h2>
+<p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
+a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
+how the different methods differ:</p>
+<p>Domain only: todo</p>
+<p>Protocol + domain combo: todo</p>
 </section>
 </section>
 
@@ -367,23 +302,23 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="static_files.html">
+          <a class="next-page" href="test_assertions.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Serving static files</div>
+                <div class="title">Test Assertions</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="route_params.html">
+          <a class="prev-page" href="middlewares.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Route Parameters</div>
+                <div class="title">Middlewares</div>
                 
               </div>
             </a>
@@ -417,10 +352,10 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Responses from Shell scripts</a><ul>
-<li><a class="reference internal" href="#environment-variables-for-request-handlers">Environment Variables for Request Handlers</a></li>
-<li><a class="reference internal" href="#route-parameters-reading-from-shell-scripts">Route Parameters - Reading from Shell Scripts</a></li>
-<li><a class="reference internal" href="#response-files-that-can-be-written-to-by-shell-scripts">Response Files that can be written to by shell scripts</a></li>
+<li><a class="reference internal" href="#">Base APIs</a><ul>
+<li><a class="reference internal" href="#intercepting-responses">Intercepting responses</a></li>
+<li><a class="reference internal" href="#intercepting-requests">Intercepting requests</a></li>
+<li><a class="reference internal" href="#base-apis-and-tls">Base APIs and TLS</a></li>
 </ul>
 </li>
 </ul>
