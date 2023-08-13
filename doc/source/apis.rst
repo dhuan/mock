@@ -119,6 +119,7 @@ The above can also be accomplished with
 
    headers
    route_params
+   mock_vars
    shell_scripts
    static_files
    status_codes

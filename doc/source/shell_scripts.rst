@@ -89,38 +89,14 @@ The same can be accomplished through command-line parameters:
 Environment Variables for Request Handlers
 ------------------------------------------
 
-A set of environment variables can be read from in response shell scripts in
-order to obtain useful information about the current request. Responses defined
-statically, like JSON, are also able to read varibles using the following
-format: ``${VARIABLE_NAME}``.
+As with any shell programs, environment variables can be read. Besides
+environment variables provided the operating system environment, there are also
+variables provided by `mock` which give you useful information about the
+current request being handled.
 
-Below is the list of available environment variables provided by `mock`:
+These variables `are documented in detail in the Mock Variables
+<mock_vars.html>`_ page.
 
--  **MOCK_REQUEST_URL**: The full URL. (ex:
-   ``http://localhost/foo/bar``)
--  **MOCK_REQUEST_ENDPOINT**: The endpoint extracted from the URL. (ex:
-   ``foo/bar``)
--  **MOCK_REQUEST_HOST**: The hostname + port combination that the
-   request was sent to. (ex: ``example.com:3000``)
--  **MOCK_REQUEST_HEADERS**: A file path containing all HTTP Headers.
--  **MOCK_REQUEST_BODY**: A file path containing the Request’s Body (if
-   one exists, otherwise this will be an empty file.)
--  **MOCK_REQUEST_QUERYSTRING**: The Request’s Querystring if it exists.
--  **MOCK_REQUEST_QUERYSTRING_KEY_NAME**: A variable holding an individual
-   querystring value named `KEY_NAME`. If a request was made with the
-   ``?foo=bar``, you can capture the "foo" parameter by reading the variable
-   ``MOCK_REQUEST_QUERYSTRING_FOO``.
--  **MOCK_REQUEST_METHOD**: A string indicating the Request’s Method.
--  **MOCK_REQUEST_NTH**: A number indicating Request’s position in the request
-   history. For example, if two requests have been made to the ``foo/bar``
-   endpoint ever since *mock* started, this being the 2nd request, the number in
-   this variable will be 2.
-
-The following environment variables provide other general information
-not related to the current request:
-
--  **MOCK_HOST**: The hostname + port combination to which Mock is
-   currently listening. (ex: ``localhost:3000``)
 
 Route Parameters - Reading from Shell Scripts
 ---------------------------------------------
