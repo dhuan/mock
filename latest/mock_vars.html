@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Reading Environment Variables" href="env_vars.html" /><link rel="prev" title="Response Status Code" href="status_codes.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Responses from Shell scripts" href="shell_scripts.html" /><link rel="prev" title="Route Parameters" href="route_params.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
-        <title>Conditional Response - mock documentation</title>
+        <title>Mock Variables - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -163,11 +163,11 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Mock Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Conditional Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
 <li class="toctree-l2"><a class="reference internal" href="base_apis.html">Base APIs</a></li>
@@ -219,158 +219,73 @@
           </label>
         </div>
         <article role="main">
-          <section id="conditional-response">
-<h1>Conditional Response<a class="headerlink" href="#conditional-response" title="Permalink to this heading">#</a></h1>
-<p>You may want to define different responses for the same endpoint, based
-on certain conditions. The <code class="docutils literal notranslate"><span class="pre">response_if</span></code> parameter enables you to
-achieve that.</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="w"> </span>      &quot;method&quot;: &quot;GET&quot;,
-<span class="w"> </span>      &quot;response&quot;: &quot;Default response!&quot;,
-<span class="gi">+      &quot;response_if&quot;: [</span>
-<span class="gi">+        {</span>
-<span class="gi">+          &quot;response&quot;: &quot;Hello world!&quot;,</span>
-<span class="gi">+          &quot;condition&quot;: {</span>
-<span class="gi">+            &quot;type&quot;: &quot;querystring_match&quot;,</span>
-<span class="gi">+            &quot;key&quot;: &quot;foo&quot;,</span>
-<span class="gi">+            &quot;value&quot;: &quot;bar&quot;</span>
-<span class="gi">+          }</span>
-<span class="gi">+        }</span>
-<span class="gi">+      ]</span>
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
+          <section id="mock-variables">
+<h1>Mock Variables<a class="headerlink" href="#mock-variables" title="Permalink to this heading">#</a></h1>
+<p>When defining responses for endpoints, you’re provided with a set of variables
+containing useful information about the current request being handled. The
+syntax for printing out a variable is <code class="docutils literal notranslate"><span class="pre">${VARIABLE_NAME}</span></code>. Following is a
+simple example of an endpoint that prints out the request’s querystring:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;The querystring: ${MOCK_REQUEST_QUERYSTRING}&#39;</span>
 </pre></div>
 </div>
-<p>In the configuration sample above, we have a single endpoint,
-<code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>. There are two possible responses for this endpoint - if you
-call it with the <code class="docutils literal notranslate"><span class="pre">?foo=bar</span></code> querystring, the request response will be
-<code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>. If however you use the <code class="docutils literal notranslate"><span class="pre">?foo=not_bar</span></code> querystring,
-the response will be <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">galaxy!</span></code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In the example above, even though we added conditional responses, we still
-have a <code class="docutils literal notranslate"><span class="pre">response</span></code> like before - in the case where a request does not match
-any of the Response Conditions, the default <code class="docutils literal notranslate"><span class="pre">Default</span> <span class="pre">response!</span></code> response
-will be returned.</p>
-</div>
-<section id="condition-chaining">
-<h2>Condition Chaining<a class="headerlink" href="#condition-chaining" title="Permalink to this heading">#</a></h2>
-<p>In the previous example we defined a Response with a very simple
-querystring-based condition. Next we’ll look at how to define more
-complex conditions, with condition chaining, which is possible with the
-<code class="docutils literal notranslate"><span class="pre">and</span></code> and <code class="docutils literal notranslate"><span class="pre">or</span></code> combination options. We’ll extend the previous
-condition example: besides the <code class="docutils literal notranslate"><span class="pre">foo=bar</span></code> querystring value, it will
-also be necessary that the <code class="docutils literal notranslate"><span class="pre">hello=world</span></code> querystring is present in the
-request.</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="w"> </span>      &quot;method&quot;: &quot;GET&quot;,
-<span class="w"> </span>      &quot;response&quot;: &quot;Default response!&quot;,
-<span class="w"> </span>      &quot;response_if&quot;: [
-<span class="w"> </span>        {
-<span class="w"> </span>          &quot;response&quot;: &quot;Hello world!&quot;,
-<span class="w"> </span>          &quot;condition&quot;: {
-<span class="w"> </span>            &quot;type&quot;: &quot;querystring_match&quot;,
-<span class="w"> </span>            &quot;key&quot;: &quot;foo&quot;,
-<span class="w"> </span>            &quot;value&quot;: &quot;bar&quot;,
-<span class="gi">+            &quot;and&quot;: {</span>
-<span class="gi">+              &quot;type&quot;: &quot;querystring_match&quot;,</span>
-<span class="gi">+              &quot;key&quot;: &quot;hello&quot;,</span>
-<span class="gi">+              &quot;value&quot;: &quot;world&quot;</span>
-<span class="gi">+            }</span>
-<span class="w"> </span>          }
-<span class="w"> </span>        }
-<span class="w"> </span>      ]
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
-</pre></div>
-</div>
-<p>Now, the <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code> Response will only be returned if the request
-has the following querystring values: <code class="docutils literal notranslate"><span class="pre">foo=bar&amp;hello=world</span></code>.</p>
-<p>Besides the <code class="docutils literal notranslate"><span class="pre">and</span></code> option, you can also use <code class="docutils literal notranslate"><span class="pre">or</span></code>.</p>
-<p>There’s no limit to how deep you can nest a chain of conditions.</p>
+<p>Besides reading variables in responses as exemplified above, other places where
+variables can be used include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="shell_scripts.html">Response Shell Script Handlers</a></p></li>
+<li><p><a class="reference external" href="middlewares.html">Middleware Script Handlers</a></p></li>
+</ul>
+<section id="variable-reference">
+<h2>Variable Reference<a class="headerlink" href="#variable-reference" title="Permalink to this heading">#</a></h2>
+<p>Find below all available variables.</p>
+<section id="mock-host">
+<h3>MOCK_HOST<a class="headerlink" href="#mock-host" title="Permalink to this heading">#</a></h3>
+<p>The hostname + port combination to which Mock is currently listening. (ex:
+<code class="docutils literal notranslate"><span class="pre">localhost:3000</span></code>)</p>
 </section>
-<section id="headers-in-conditional-responses">
-<h2>Headers in Conditional Responses<a class="headerlink" href="#headers-in-conditional-responses" title="Permalink to this heading">#</a></h2>
-<p>Conditional Response Objects <em>can</em> have Headers set as well. Use the
-<code class="docutils literal notranslate"><span class="pre">response_headers</span></code> option:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="w"> </span>      &quot;method&quot;: &quot;GET&quot;,
-<span class="w"> </span>      &quot;response&quot;: &quot;Default response!&quot;,
-<span class="w"> </span>      &quot;response_headers&quot;: {
-<span class="w"> </span>        &quot;Header-Foo&quot;: &quot;Foobar!&quot;
-<span class="w"> </span>      },
-<span class="w"> </span>      &quot;response_if&quot;: [
-<span class="w"> </span>        {
-<span class="w"> </span>          &quot;response&quot;: &quot;Hello world!&quot;,
-<span class="gi">+          &quot;response_headers&quot;: {</span>
-<span class="gi">+            &quot;Some-Header-Key&quot;: &quot;Some header value&quot;</span>
-<span class="gi">+          },</span>
-<span class="w"> </span>          &quot;condition&quot;: {
-<span class="w"> </span>            /* ... */
-<span class="w"> </span>          }
-<span class="w"> </span>        }
-<span class="w"> </span>      ]
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
-</pre></div>
-</div>
-<p>If you don’t set a <code class="docutils literal notranslate"><span class="pre">response_header</span></code> to a Conditional Response, the
-response will not have any headers, even if a <code class="docutils literal notranslate"><span class="pre">response_headers</span></code> field
-exists in the main Response.</p>
-<p>If you’d like Conditional Responses to inherit the Headers from the main
-Response, use the <code class="docutils literal notranslate"><span class="pre">response_headers_base</span></code>:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;endpoints&quot;: [
-<span class="w"> </span>    {
-<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="w"> </span>      &quot;method&quot;: &quot;GET&quot;,
-<span class="w"> </span>      &quot;response&quot;: &quot;Default response!&quot;,
-<span class="w"> </span>      &quot;response_headers&quot;: {
-<span class="w"> </span>        &quot;Header-Foo&quot;: &quot;Foobar!&quot;
-<span class="w"> </span>      },
-<span class="gi">+      &quot;response_headers_base&quot;: {</span>
-<span class="gi">+        &quot;Some-base-header&quot;: &quot;Some value for the base header&quot;</span>
-<span class="gi">+      },</span>
-<span class="w"> </span>      &quot;response_if&quot;: [
-<span class="w"> </span>        {
-<span class="w"> </span>          &quot;response&quot;: &quot;Hello world!&quot;,
-<span class="w"> </span>          &quot;response_headers&quot;: {
-<span class="w"> </span>            &quot;Some-Header-Key&quot;: &quot;Some header value&quot;
-<span class="w"> </span>          },
-<span class="w"> </span>          &quot;condition&quot;: {
-<span class="w"> </span>            /* ... */
-<span class="w"> </span>          }
-<span class="w"> </span>        }
-<span class="w"> </span>      ]
-<span class="w"> </span>    }
-<span class="w"> </span>  ]
-<span class="w"> </span>}
-</pre></div>
-</div>
-<p>With the example configuration above, a Request resolving to the
-Conditional Response would result in having the following headers:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Some</span><span class="o">-</span><span class="n">base</span><span class="o">-</span><span class="n">header</span><span class="p">:</span> <span class="n">Some</span> <span class="n">value</span> <span class="k">for</span> <span class="n">the</span> <span class="n">base</span> <span class="n">header</span>
-<span class="n">Some</span><span class="o">-</span><span class="n">Header</span><span class="o">-</span><span class="n">Key</span><span class="p">:</span> <span class="n">Some</span> <span class="n">header</span> <span class="n">value</span>
-</pre></div>
-</div>
-<p>In the examples above, we’ve seen that we can set Responses to be
-returned if a certain querystring matched, with the
-<code class="docutils literal notranslate"><span class="pre">querystring_match</span></code> Condition Option. There are, however, other
-Condition Options at your disposal for customizing your API. <a class="reference external" href="conditions_reference.html">Read the
-Condition Reference for a list of all available
-Conditions.</a></p>
+<section id="mock-request-url">
+<h3>MOCK_REQUEST_URL<a class="headerlink" href="#mock-request-url" title="Permalink to this heading">#</a></h3>
+<p>The full URL. (ex: <code class="docutils literal notranslate"><span class="pre">http://localhost/foo/bar</span></code>)</p>
+</section>
+<section id="mock-request-endpoint">
+<h3>MOCK_REQUEST_ENDPOINT<a class="headerlink" href="#mock-request-endpoint" title="Permalink to this heading">#</a></h3>
+<p>The endpoint extracted from the URL. (ex: <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>)</p>
+</section>
+<section id="mock-request-host">
+<h3>MOCK_REQUEST_HOST<a class="headerlink" href="#mock-request-host" title="Permalink to this heading">#</a></h3>
+<p>The hostname + port combination that the request was sent to. (ex:
+<code class="docutils literal notranslate"><span class="pre">example.com:3000</span></code>)</p>
+</section>
+<section id="mock-request-headers">
+<h3>MOCK_REQUEST_HEADERS<a class="headerlink" href="#mock-request-headers" title="Permalink to this heading">#</a></h3>
+<p>A file path containing all HTTP Headers.</p>
+</section>
+<section id="mock-request-body">
+<h3>MOCK_REQUEST_BODY<a class="headerlink" href="#mock-request-body" title="Permalink to this heading">#</a></h3>
+<p>A file path containing the Request’s Body (if one exists, otherwise this will
+be an empty file.)</p>
+</section>
+<section id="mock-request-querystring">
+<h3>MOCK_REQUEST_QUERYSTRING<a class="headerlink" href="#mock-request-querystring" title="Permalink to this heading">#</a></h3>
+<p>The Request’s Querystring if it exists.</p>
+</section>
+<section id="mock-request-querystring-key-name">
+<h3>MOCK_REQUEST_QUERYSTRING_KEY_NAME<a class="headerlink" href="#mock-request-querystring-key-name" title="Permalink to this heading">#</a></h3>
+<p>A variable holding an individual querystring value named <cite>KEY_NAME</cite>. If a
+request was made with the <code class="docutils literal notranslate"><span class="pre">?foo=bar</span></code>, you can capture the “foo” parameter by
+reading the variable <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING_FOO</span></code>.</p>
+</section>
+<section id="mock-request-method">
+<h3>MOCK_REQUEST_METHOD<a class="headerlink" href="#mock-request-method" title="Permalink to this heading">#</a></h3>
+<p>A string indicating the Request’s Method.</p>
+</section>
+<section id="mock-request-nth">
+<h3>MOCK_REQUEST_NTH<a class="headerlink" href="#mock-request-nth" title="Permalink to this heading">#</a></h3>
+<p>A number indicating Request’s position in the request history. For example, if
+two requests have been made to the <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code> endpoint ever since <em>mock</em>
+started, this being the 2nd request, the number in this variable will be 2.</p>
+</section>
 </section>
 </section>
 
@@ -379,23 +294,23 @@ Conditions.</a></p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="env_vars.html">
+          <a class="next-page" href="shell_scripts.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Reading Environment Variables</div>
+                <div class="title">Responses from Shell scripts</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="status_codes.html">
+          <a class="prev-page" href="route_params.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Response Status Code</div>
+                <div class="title">Route Parameters</div>
                 
               </div>
             </a>
@@ -429,9 +344,20 @@ Conditions.</a></p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Conditional Response</a><ul>
-<li><a class="reference internal" href="#condition-chaining">Condition Chaining</a></li>
-<li><a class="reference internal" href="#headers-in-conditional-responses">Headers in Conditional Responses</a></li>
+<li><a class="reference internal" href="#">Mock Variables</a><ul>
+<li><a class="reference internal" href="#variable-reference">Variable Reference</a><ul>
+<li><a class="reference internal" href="#mock-host">MOCK_HOST</a></li>
+<li><a class="reference internal" href="#mock-request-url">MOCK_REQUEST_URL</a></li>
+<li><a class="reference internal" href="#mock-request-endpoint">MOCK_REQUEST_ENDPOINT</a></li>
+<li><a class="reference internal" href="#mock-request-host">MOCK_REQUEST_HOST</a></li>
+<li><a class="reference internal" href="#mock-request-headers">MOCK_REQUEST_HEADERS</a></li>
+<li><a class="reference internal" href="#mock-request-body">MOCK_REQUEST_BODY</a></li>
+<li><a class="reference internal" href="#mock-request-querystring">MOCK_REQUEST_QUERYSTRING</a></li>
+<li><a class="reference internal" href="#mock-request-querystring-key-name">MOCK_REQUEST_QUERYSTRING_KEY_NAME</a></li>
+<li><a class="reference internal" href="#mock-request-method">MOCK_REQUEST_METHOD</a></li>
+<li><a class="reference internal" href="#mock-request-nth">MOCK_REQUEST_NTH</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

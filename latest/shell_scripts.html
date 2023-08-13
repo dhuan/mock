@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Serving static files" href="static_files.html" /><link rel="prev" title="Route Parameters" href="route_params.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Serving static files" href="static_files.html" /><link rel="prev" title="Mock Variables" href="mock_vars.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
         <title>Responses from Shell scripts - mock documentation</title>
@@ -163,6 +163,7 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Responses from Shell scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
@@ -293,38 +294,11 @@ on the home folder:</p>
 </div>
 <section id="environment-variables-for-request-handlers">
 <h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Permalink to this heading">#</a></h2>
-<p>A set of environment variables can be read from in response shell scripts in
-order to obtain useful information about the current request. Responses defined
-statically, like JSON, are also able to read varibles using the following
-format: <code class="docutils literal notranslate"><span class="pre">${VARIABLE_NAME}</span></code>.</p>
-<p>Below is the list of available environment variables provided by <cite>mock</cite>:</p>
-<ul class="simple">
-<li><p><strong>MOCK_REQUEST_URL</strong>: The full URL. (ex:
-<code class="docutils literal notranslate"><span class="pre">http://localhost/foo/bar</span></code>)</p></li>
-<li><p><strong>MOCK_REQUEST_ENDPOINT</strong>: The endpoint extracted from the URL. (ex:
-<code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>)</p></li>
-<li><p><strong>MOCK_REQUEST_HOST</strong>: The hostname + port combination that the
-request was sent to. (ex: <code class="docutils literal notranslate"><span class="pre">example.com:3000</span></code>)</p></li>
-<li><p><strong>MOCK_REQUEST_HEADERS</strong>: A file path containing all HTTP Headers.</p></li>
-<li><p><strong>MOCK_REQUEST_BODY</strong>: A file path containing the Request’s Body (if
-one exists, otherwise this will be an empty file.)</p></li>
-<li><p><strong>MOCK_REQUEST_QUERYSTRING</strong>: The Request’s Querystring if it exists.</p></li>
-<li><p><strong>MOCK_REQUEST_QUERYSTRING_KEY_NAME</strong>: A variable holding an individual
-querystring value named <cite>KEY_NAME</cite>. If a request was made with the
-<code class="docutils literal notranslate"><span class="pre">?foo=bar</span></code>, you can capture the “foo” parameter by reading the variable
-<code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING_FOO</span></code>.</p></li>
-<li><p><strong>MOCK_REQUEST_METHOD</strong>: A string indicating the Request’s Method.</p></li>
-<li><p><strong>MOCK_REQUEST_NTH</strong>: A number indicating Request’s position in the request
-history. For example, if two requests have been made to the <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
-endpoint ever since <em>mock</em> started, this being the 2nd request, the number in
-this variable will be 2.</p></li>
-</ul>
-<p>The following environment variables provide other general information
-not related to the current request:</p>
-<ul class="simple">
-<li><p><strong>MOCK_HOST</strong>: The hostname + port combination to which Mock is
-currently listening. (ex: <code class="docutils literal notranslate"><span class="pre">localhost:3000</span></code>)</p></li>
-</ul>
+<p>As with any shell programs, environment variables can be read. Besides
+environment variables provided the operating system environment, there are also
+variables provided by <cite>mock</cite> which give you useful information about the
+current request being handled.</p>
+<p>These variables <a class="reference external" href="mock_vars.html">are documented in detail in the Mock Variables</a> page.</p>
 </section>
 <section id="route-parameters-reading-from-shell-scripts">
 <h2>Route Parameters - Reading from Shell Scripts<a class="headerlink" href="#route-parameters-reading-from-shell-scripts" title="Permalink to this heading">#</a></h2>
@@ -376,14 +350,14 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="route_params.html">
+          <a class="prev-page" href="mock_vars.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Route Parameters</div>
+                <div class="title">Mock Variables</div>
                 
               </div>
             </a>
