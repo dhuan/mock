@@ -225,7 +225,11 @@
 <ul class="simple">
 <li><p>New environment variable for capturing individual querystring
 parameters: <code class="docutils literal notranslate"><span class="pre">$MOCK_REQUEST_QUERYSTRING_FOOBAR</span></code></p></li>
+<li><p>Enable plaintext responses to use <em>mock</em> variables, such as:</p></li>
 </ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mock</span> <span class="n">serve</span> <span class="o">--</span><span class="n">route</span> <span class="n">foo</span><span class="o">/</span><span class="n">bar</span> <span class="o">--</span><span class="n">response</span> <span class="s1">&#39;Url: $</span><span class="si">{MOCK_REQUEST_URL}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
 </section>
 <section id="id1">
 <h2>1.1.0<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
