@@ -291,6 +291,41 @@ func Test_E2E_Response_Json_UsingVariables(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_PlainText_UsingVariables(t *testing.T) {
+	responseStr := strings.Join([]string{
+		"MOCK_HOST: ${MOCK_HOST}",
+		"MOCK_REQUEST_HOST: ${MOCK_REQUEST_HOST}",
+		"MOCK_REQUEST_URL: ${MOCK_REQUEST_URL}",
+		"MOCK_REQUEST_ENDPOINT: ${MOCK_REQUEST_ENDPOINT}",
+		"MOCK_REQUEST_METHOD: ${MOCK_REQUEST_METHOD}",
+		"MOCK_REQUEST_QUERYSTRING: ${MOCK_REQUEST_QUERYSTRING}",
+		"MOCK_REQUEST_QUERYSTRING_PARAM_ONE: ${MOCK_REQUEST_QUERYSTRING_PARAM_ONE}",
+		"MOCK_REQUEST_QUERYSTRING_PARAM_TWO: ${MOCK_REQUEST_QUERYSTRING_PARAM_TWO}",
+		"MOCK_ROUTE_PARAM_SOME_PARAM: ${MOCK_ROUTE_PARAM_SOME_PARAM}",
+	}, "\n")
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar/{some_param}",
+			fmt.Sprintf("--response '%s'", responseStr),
+		},
+		"GET",
+		"foo/bar/test?param_one=value_one&param_two=value_two",
+		nil,
+		strings.NewReader(""),
+		LineEquals(1, `MOCK_HOST: localhost:{{TEST_E2E_PORT}}`),
+		LineEquals(2, `MOCK_REQUEST_HOST: localhost:{{TEST_E2E_PORT}}`),
+		LineEquals(3, `MOCK_REQUEST_URL: http://localhost:{{TEST_E2E_PORT}}/foo/bar/test`),
+		LineEquals(4, `MOCK_REQUEST_ENDPOINT: foo/bar/test`),
+		LineEquals(5, `MOCK_REQUEST_METHOD: get`),
+		LineEquals(6, `MOCK_REQUEST_QUERYSTRING: param_one=value_one&param_two=value_two`),
+		LineEquals(7, `MOCK_REQUEST_QUERYSTRING_PARAM_ONE: value_one`),
+		LineEquals(8, `MOCK_REQUEST_QUERYSTRING_PARAM_TWO: value_two`),
+		LineEquals(9, `MOCK_ROUTE_PARAM_SOME_PARAM: test`),
+	)
+}
+
 func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 	RunTest(
 		t,

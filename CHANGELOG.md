@@ -6,6 +6,12 @@ ADDED
 
 - New environment variable for capturing individual querystring parameters:
   `$MOCK_REQUEST_QUERYSTRING_FOOBAR`
+- Enable plaintext responses to use *mock* variables, such as:
+
+```
+mock serve --route foo/bar --response 'Url: ${MOCK_REQUEST_URL}'
+```
+
 
 ## 1.1.0
 

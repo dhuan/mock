@@ -166,6 +166,17 @@ func resolveEndpointResponseInternal(
 	responseStr := utils.ReplaceVars(string(response), endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
 	responseStr = utils.ReplaceVars(responseStr, envVars, utils.ToDolarSignWithWrapVariablePlaceHolder)
 
+	requestVariables, err := BuildVars(
+		state,
+		responseStatusCode,
+		requestRecord,
+		requestRecords,
+		requestBody,
+	)
+	if err != nil {
+		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+	}
+
 	if hasResponseIf {
 		headers = make(map[string]string)
 		utils.JoinMap(headers, endpointConfig.HeadersBase)
@@ -177,18 +188,12 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
-		return &Response{[]byte(utils.Unquote(responseStr)), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
-	}
+		addUrlParamsToRequestVariables(requestVariables, endpointParams)
+		response := utils.Unquote(responseStr)
+		response = utils.ReplaceVars(response, requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
+		response = utils.ReplaceVars(response, endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
 
-	requestVariables, err := BuildVars(
-		state,
-		responseStatusCode,
-		requestRecord,
-		requestRecords,
-		requestBody,
-	)
-	if err != nil {
-		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		return &Response{[]byte(response), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
