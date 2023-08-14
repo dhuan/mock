@@ -506,19 +506,19 @@ func extractDomain(url string) string {
 }
 
 func forwardResponse(response *http.Response, w http.ResponseWriter) {
-	w.WriteHeader(response.StatusCode)
-
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		panic(err)
 	}
 
-	if len(responseBody) > 0 {
-		w.Write(responseBody)
-	}
-
 	for key := range response.Header {
 		w.Header().Add(key, response.Header[key][0])
+	}
+
+	w.WriteHeader(response.StatusCode)
+
+	if len(responseBody) > 0 {
+		w.Write(responseBody)
 	}
 }
 

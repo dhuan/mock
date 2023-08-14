@@ -78,7 +78,6 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 			"serve",
 			"-p {{TEST_E2E_PORT}}",
 			"--route 'foo/bar'",
-			"--status-code 205",
 			"--response 'Querystring: ${MOCK_REQUEST_QUERYSTRING}'",
 		}, " "),
 		nil,
@@ -96,7 +95,40 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 		"foo/bar?param_one=value_one&param_two=value_two",
 		nil,
 		strings.NewReader(""),
-		StatusCodeMatches(205),
 		StringMatches("Querystring: param_one=value_one&param_two=value_two"),
+	)
+}
+
+func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeaders(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--header 'Header-One: value one'",
+			"--header 'Header-Two: value two'",
+			"--response 'Hello world!'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--route hello/world",
+			"--response 'Hello world!'",
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		HeadersMatch(map[string]string{
+			"Header-One": "value one",
+			"Header-Two": "value two",
+		}),
 	)
 }
