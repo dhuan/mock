@@ -53,7 +53,7 @@
     {
       "route": "with/exec/print/env/with/param/{foo}",
       "method": "GET",
-      "response": "exec:env | grep -i ^mock | sort > $MOCK_RESPONSE_BODY"
+      "response": "exec:env | grep -i ^mock | grep -Ev 'ACCEPT_ENCODING|USER_AGENT' | sort > $MOCK_RESPONSE_BODY"
     },
     {
       "route": "print_request_nth",
