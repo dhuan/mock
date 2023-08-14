@@ -69,3 +69,34 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 		StringMatches("Hello world! This is the base API."),
 	)
 }
+
+func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--status-code 205",
+			"--response 'Querystring: ${MOCK_REQUEST_QUERYSTRING}'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--route hello/world",
+			"--response 'Hello world!'",
+		},
+		"GET",
+		"foo/bar?param_one=value_one&param_two=value_two",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(205),
+		StringMatches("Querystring: param_one=value_one&param_two=value_two"),
+	)
+}

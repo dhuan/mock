@@ -460,8 +460,12 @@ func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, err
 	client := &http.Client{}
 
 	route := r.URL.Path
+	querystring := ""
+	if r.URL.RawQuery != "" {
+		querystring = fmt.Sprintf("?%s", r.URL.RawQuery)
+	}
 	protocol, host := parseBaseApi(r.TLS != nil, baseApi)
-	url := fmt.Sprintf("%s://%s%s", protocol, host, route)
+	url := fmt.Sprintf("%s://%s%s%s", protocol, host, route, querystring)
 
 	requestCloned, err := http.NewRequest(r.Method, url, bytes.NewBuffer([]byte("ok")))
 	if err != nil {
