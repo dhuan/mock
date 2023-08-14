@@ -52,6 +52,17 @@ MOCK_REQUEST_HEADERS
 
 A file path containing all HTTP Headers.
 
+MOCK_REQUEST_HEADER_FOOBAR
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A variable holding an individual header value. For example, if a request is
+received with the header key/value as ``Foo: bar``, then this header value can
+be obtained by reading the ``MOCK_REQUEST_HEADER_FOO`` environment variable.
+
+Note that since environment variables cannot have dash characters (``-``),
+`mock` converts them to underscore (``_``), for example, a header key named
+`Some-header` is readable as ``MOCK_REQUEST_HEADER_SOME_HEADER``.
+
 MOCK_REQUEST_BODY
 ~~~~~~~~~~~~~~~~~
 

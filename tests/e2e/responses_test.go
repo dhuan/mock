@@ -301,6 +301,8 @@ func Test_E2E_Response_PlainText_UsingVariables(t *testing.T) {
 		"MOCK_REQUEST_QUERYSTRING: ${MOCK_REQUEST_QUERYSTRING}",
 		"MOCK_REQUEST_QUERYSTRING_PARAM_ONE: ${MOCK_REQUEST_QUERYSTRING_PARAM_ONE}",
 		"MOCK_REQUEST_QUERYSTRING_PARAM_TWO: ${MOCK_REQUEST_QUERYSTRING_PARAM_TWO}",
+		"MOCK_REQUEST_HEADER_SOME_HEADER_ONE: ${MOCK_REQUEST_HEADER_SOME_HEADER_ONE}",
+		"MOCK_REQUEST_HEADER_SOME_HEADER_TWO: ${MOCK_REQUEST_HEADER_SOME_HEADER_TWO}",
 		"MOCK_ROUTE_PARAM_SOME_PARAM: ${MOCK_ROUTE_PARAM_SOME_PARAM}",
 	}, "\n")
 
@@ -312,7 +314,10 @@ func Test_E2E_Response_PlainText_UsingVariables(t *testing.T) {
 		},
 		"GET",
 		"foo/bar/test?param_one=value_one&param_two=value_two",
-		nil,
+		map[string]string{
+			"Some-header-one": "header_value_one",
+			"Some-header-two": "header_value_two",
+		},
 		strings.NewReader(""),
 		LineEquals(1, `MOCK_HOST: localhost:{{TEST_E2E_PORT}}`),
 		LineEquals(2, `MOCK_REQUEST_HOST: localhost:{{TEST_E2E_PORT}}`),
@@ -322,7 +327,9 @@ func Test_E2E_Response_PlainText_UsingVariables(t *testing.T) {
 		LineEquals(6, `MOCK_REQUEST_QUERYSTRING: param_one=value_one&param_two=value_two`),
 		LineEquals(7, `MOCK_REQUEST_QUERYSTRING_PARAM_ONE: value_one`),
 		LineEquals(8, `MOCK_REQUEST_QUERYSTRING_PARAM_TWO: value_two`),
-		LineEquals(9, `MOCK_ROUTE_PARAM_SOME_PARAM: test`),
+		LineEquals(9, `MOCK_REQUEST_HEADER_SOME_HEADER_ONE: header_value_one`),
+		LineEquals(10, `MOCK_REQUEST_HEADER_SOME_HEADER_TWO: header_value_two`),
+		LineEquals(11, `MOCK_ROUTE_PARAM_SOME_PARAM: test`),
 	)
 }
 

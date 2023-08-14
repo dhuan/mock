@@ -11,6 +11,8 @@ ADDED
 ```
 mock serve --route foo/bar --response 'Url: ${MOCK_REQUEST_URL}'
 ```
+- Enable individual request headers to be read through environment variables
+  such has `MOCK_REQUEST_HEADER_FOO_BAR`
 
 
 ## 1.1.0

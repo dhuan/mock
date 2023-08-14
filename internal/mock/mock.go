@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/dhuan/mock/internal/types"
+	"github.com/dhuan/mock/internal/utils"
 	. "github.com/dhuan/mock/pkg/mock"
 )
 
@@ -168,8 +169,7 @@ func BuildVars(
 	}
 
 	result := map[string]string{
-		"MOCK_HOST":                mockHost,
-		"MOCK_REQUEST_HOST":        requestRecord.Host,
+		"MOCK_HOST": mockHost, "MOCK_REQUEST_HOST": requestRecord.Host,
 		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
 		"MOCK_REQUEST_ENDPOINT":    endpoint,
 		"MOCK_REQUEST_METHOD":      requestRecord.Method,
@@ -179,11 +179,21 @@ func BuildVars(
 
 	addQuerystringParams(result, requestRecord)
 
+	addHeaders(result, requestRecord)
+
 	return result, nil
 }
 
 func addQuerystringParams(m map[string]string, requestRecord *types.RequestRecord) {
 	for key := range requestRecord.QuerystringParsed {
 		m[fmt.Sprintf("MOCK_REQUEST_QUERYSTRING_%s", strings.ToUpper(key))] = requestRecord.QuerystringParsed[key]
+	}
+}
+
+func addHeaders(m map[string]string, requestRecord *types.RequestRecord) {
+	for key := range requestRecord.Headers {
+		headerKey := utils.ReplaceRegex(key, []string{"-"}, "_")
+
+		m[fmt.Sprintf("MOCK_REQUEST_HEADER_%s", strings.ToUpper(headerKey))] = requestRecord.Headers[key][0]
 	}
 }
