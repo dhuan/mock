@@ -225,37 +225,9 @@ func resolveEndpointResponseInternal(
 			addUrlParamsToRequestVariables(requestVariables, endpointParams)
 		}
 
-		bodyFile, err := utils.CreateTempFile(requestBody)
+		fileVars, hf, err := buildHandlerFiles(requestBody, requestRecord)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		responseStatusCodeFile, err := utils.CreateTempFile([]byte(""))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		responseHeadersFile, err := utils.CreateTempFile([]byte(""))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		responseBodyFile, err := utils.CreateTempFile([]byte(""))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		fileVars := map[string]string{
-			"MOCK_REQUEST_HEADERS":      headersFile,
-			"MOCK_REQUEST_BODY":         bodyFile,
-			"MOCK_RESPONSE_BODY":        responseBodyFile,
-			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
-			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
 		}
 
 		utils.JoinMap(requestVariables, fileVars)
@@ -274,30 +246,9 @@ func resolveEndpointResponseInternal(
 
 		printOutExecOutputIfNecessary(execResult)
 
-		extraHeaders, err := extractHeadersFromFile(responseHeadersFile, readFile)
+		response, err := extractModifiedResponse(hf, readFile, endpointConfigContentType, headers, responseStatusCode)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		extraHeadersKeys := utils.GetSortedKeys(extraHeaders)
-		for _, headerKey := range extraHeadersKeys {
-			headers[headerKey] = extraHeaders[headerKey]
-		}
-
-		statusCode, err := extractStatusCodeFromFile(responseStatusCodeFile, readFile)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		bodyContent, err := readFile(responseBodyFile)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		response := &Response{bodyContent, endpointConfigContentType, responseStatusCode, headers}
-
-		if statusCode != -1 {
-			response.StatusCode = statusCode
 		}
 
 		return response, nil, errorMetadata
@@ -314,37 +265,9 @@ func resolveEndpointResponseInternal(
 			addUrlParamsToRequestVariables(requestVariables, endpointParams)
 		}
 
-		bodyFile, err := utils.CreateTempFile(requestBody)
+		fileVars, hf, err := buildHandlerFiles(requestBody, requestRecord)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		responseStatusCodeFile, err := utils.CreateTempFile([]byte(""))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		responseBodyFile, err := utils.CreateTempFile([]byte(""))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		responseHeadersFile, err := utils.CreateTempFile([]byte(""))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		fileVars := map[string]string{
-			"MOCK_REQUEST_HEADERS":      headersFile,
-			"MOCK_REQUEST_BODY":         bodyFile,
-			"MOCK_RESPONSE_BODY":        responseBodyFile,
-			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
-			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
 		}
 
 		utils.JoinMap(requestVariables, fileVars)
@@ -360,30 +283,9 @@ func resolveEndpointResponseInternal(
 
 		printOutExecOutputIfNecessary(execResult)
 
-		extraHeaders, err := extractHeadersFromFile(responseHeadersFile, readFile)
+		response, err := extractModifiedResponse(hf, readFile, endpointConfigContentType, headers, responseStatusCode)
 		if err != nil {
 			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		extraHeadersKeys := utils.GetSortedKeys(extraHeaders)
-		for _, headerKey := range extraHeadersKeys {
-			headers[headerKey] = extraHeaders[headerKey]
-		}
-
-		statusCode, err := extractStatusCodeFromFile(responseStatusCodeFile, readFile)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		bodyContent, err := readFile(responseBodyFile)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
-		}
-
-		response := &Response{bodyContent, endpointConfigContentType, responseStatusCode, headers}
-
-		if statusCode != -1 {
-			response.StatusCode = statusCode
 		}
 
 		return response, nil, errorMetadata
@@ -547,4 +449,89 @@ func printOutExecOutputIfNecessary(execResult *ExecResult) {
 	}
 
 	log.Println(fmt.Sprintf("Output from program execution:\n\n%s", output))
+}
+
+type handlerFiles struct {
+	headers            string
+	body               string
+	responseBody       string
+	responseHeaders    string
+	responseStatusCode string
+}
+
+func buildHandlerFiles(requestBody []byte, requestRecord *types.RequestRecord) (map[string]string, *handlerFiles, error) {
+	bodyFile, err := utils.CreateTempFile(requestBody)
+	if err != nil {
+		return map[string]string{}, &handlerFiles{}, err
+	}
+
+	responseStatusCodeFile, err := utils.CreateTempFile([]byte(""))
+	if err != nil {
+		return map[string]string{}, &handlerFiles{}, err
+	}
+
+	responseHeadersFile, err := utils.CreateTempFile([]byte(""))
+	if err != nil {
+		return map[string]string{}, &handlerFiles{}, err
+	}
+
+	responseBodyFile, err := utils.CreateTempFile([]byte(""))
+	if err != nil {
+		return map[string]string{}, &handlerFiles{}, err
+	}
+
+	headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
+	if err != nil {
+		return map[string]string{}, &handlerFiles{}, err
+	}
+
+	return map[string]string{
+			"MOCK_REQUEST_HEADERS":      headersFile,
+			"MOCK_REQUEST_BODY":         bodyFile,
+			"MOCK_RESPONSE_BODY":        responseBodyFile,
+			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
+			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
+		}, &handlerFiles{
+			headersFile,
+			bodyFile,
+			responseBodyFile,
+			responseHeadersFile,
+			responseStatusCodeFile,
+		}, nil
+}
+
+func extractModifiedResponse(
+	hf *handlerFiles,
+	readFile types.ReadFileFunc,
+	endpointConfigContentType types.Endpoint_content_type,
+	headers map[string]string,
+	fallbackStatusCode int,
+) (*Response, error) {
+	extraHeaders, err := extractHeadersFromFile(hf.responseHeaders, readFile)
+	if err != nil {
+		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
+	}
+
+	extraHeadersKeys := utils.GetSortedKeys(extraHeaders)
+	for _, headerKey := range extraHeadersKeys {
+		headers[headerKey] = extraHeaders[headerKey]
+	}
+
+	statusCode, err := extractStatusCodeFromFile(hf.responseStatusCode, readFile)
+	if err != nil {
+		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
+	}
+
+	bodyContent, err := readFile(hf.responseBody)
+	if err != nil {
+		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
+	}
+
+	response := &Response{bodyContent, endpointConfigContentType, statusCode, headers}
+
+	if statusCode == -1 {
+		response.StatusCode = fallbackStatusCode
+	}
+
+	return response, nil
 }
