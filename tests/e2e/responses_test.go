@@ -333,6 +333,21 @@ func Test_E2E_Response_PlainText_UsingVariables(t *testing.T) {
 	)
 }
 
+func Test_E2E_Response_PlainText_ReadingRequestBody(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar",
+			"--response 'Request payload: ${MOCK_REQUEST_BODY}'",
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader("THIS IS THE REQUEST PAYLOAD."),
+		StringMatches("Request payload: THIS IS THE REQUEST PAYLOAD."),
+	)
+}
+
 func Test_E2E_Response_Json_UsingVariables_WithFile(t *testing.T) {
 	RunTest(
 		t,

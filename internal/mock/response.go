@@ -188,6 +188,10 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
+		mockVars := buildMockVariablesForPlainTextResponse(requestBody)
+
+		utils.JoinMap(requestVariables, mockVars)
+
 		addUrlParamsToRequestVariables(requestVariables, endpointParams)
 		response := utils.Unquote(responseStr)
 		response = utils.ReplaceVars(response, requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
@@ -457,6 +461,12 @@ type handlerFiles struct {
 	responseBody       string
 	responseHeaders    string
 	responseStatusCode string
+}
+
+func buildMockVariablesForPlainTextResponse(requestBody []byte) map[string]string {
+	return map[string]string{
+		"MOCK_REQUEST_BODY": string(requestBody),
+	}
 }
 
 func buildHandlerFiles(requestBody []byte, requestRecord *types.RequestRecord) (map[string]string, *handlerFiles, error) {
