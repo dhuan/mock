@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Serving static files" href="static_files.html" /><link rel="prev" title="Route Parameters" href="route_params.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
+    <!-- Generated with Sphinx 7.2.2 and Furo 2023.08.17 -->
         <title>Responses from Shell scripts - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -218,7 +218,7 @@
         </div>
         <article role="main">
           <section id="responses-from-shell-scripts">
-<h1>Responses from Shell scripts<a class="headerlink" href="#responses-from-shell-scripts" title="Permalink to this heading">#</a></h1>
+<h1>Responses from Shell scripts<a class="headerlink" href="#responses-from-shell-scripts" title="Link to this heading">#</a></h1>
 <p>You can write shell scripts that will act as “handlers” for your API’s
 Requests.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -291,7 +291,7 @@ on the home folder:</p>
 </pre></div>
 </div>
 <section id="environment-variables-for-request-handlers">
-<h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Permalink to this heading">#</a></h2>
+<h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Link to this heading">#</a></h2>
 <p>A set of environment variables can be read from in response shell
 scripts in order to obtain useful information about the current request.
 Static responses (such as JSON) also have access to the same variables.
@@ -324,14 +324,14 @@ currently listening. (ex: <code class="docutils literal notranslate"><span class
 </ul>
 </section>
 <section id="route-parameters-reading-from-shell-scripts">
-<h2>Route Parameters - Reading from Shell Scripts<a class="headerlink" href="#route-parameters-reading-from-shell-scripts" title="Permalink to this heading">#</a></h2>
+<h2>Route Parameters - Reading from Shell Scripts<a class="headerlink" href="#route-parameters-reading-from-shell-scripts" title="Link to this heading">#</a></h2>
 <p>Route Parameters can be read from shell scripts. Suppose an endpoint
 exists as such: <code class="docutils literal notranslate"><span class="pre">user/{user_id}</span></code>. We could then retrieve the User ID
 parameter by reading the <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_USER_ID</span></code> environment
 variable.</p>
 </section>
 <section id="response-files-that-can-be-written-to-by-shell-scripts">
-<h2>Response Files that can be written to by shell scripts<a class="headerlink" href="#response-files-that-can-be-written-to-by-shell-scripts" title="Permalink to this heading">#</a></h2>
+<h2>Response Files that can be written to by shell scripts<a class="headerlink" href="#response-files-that-can-be-written-to-by-shell-scripts" title="Link to this heading">#</a></h2>
 <p>So far we’ve seen environment variables that provide us with information
 about the Request that’s being currently handled. The following
 environment variables enable you to further define the HTTP Response:</p>
@@ -429,9 +429,9 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>

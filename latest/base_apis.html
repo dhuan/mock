@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Test Assertions" href="test_assertions.html" /><link rel="prev" title="Middlewares" href="middlewares.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
+    <!-- Generated with Sphinx 7.2.2 and Furo 2023.08.17 -->
         <title>Base APIs - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -220,7 +220,7 @@
         </div>
         <article role="main">
           <section id="base-apis">
-<h1>Base APIs<a class="headerlink" href="#base-apis" title="Permalink to this heading">#</a></h1>
+<h1>Base APIs<a class="headerlink" href="#base-apis" title="Link to this heading">#</a></h1>
 <p>A <cite>mock</cite> server can be configured to have a Base API, which results in all
 requests received to be forwaded to the API that it’s set to be based from.
 When an endpoint route was configured for the requesting route, it takes
@@ -253,7 +253,7 @@ endpoint that was not configured, then the request will be forwaded to the
 domain that we’ve set as the Base API. In other words, a request to <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
 will result in a proxy request to <code class="docutils literal notranslate"><span class="pre">example.com/foo/bar</span></code>.</p>
 <section id="intercepting-responses">
-<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Permalink to this heading">#</a></h2>
+<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">#</a></h2>
 <p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
 Middlewares documentation section for learning all about them.</a> In fact Middlewares make no distinction of whether the
 current request is meant for a <cite>mock</cite> endpoint or an actual Base API when
@@ -273,7 +273,7 @@ patterns that are meant for your Base API of choice. Then again, the middleware
 documentation section covers the subject in more details.</p>
 </section>
 <section id="intercepting-requests">
-<h2>Intercepting requests<a class="headerlink" href="#intercepting-requests" title="Permalink to this heading">#</a></h2>
+<h2>Intercepting requests<a class="headerlink" href="#intercepting-requests" title="Link to this heading">#</a></h2>
 <p>Requests sent to Base APIs are sent exactly as defined by the HTTP client who’s
 requesting to <cite>mock</cite> - all the headers, payload etc, everything unmodified. It’s
 possible however to modify the request object - any of its properties such as
@@ -289,7 +289,7 @@ It contains the headers sent by the requesting client.</p></li>
 </ul>
 </section>
 <section id="base-apis-and-tls">
-<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Permalink to this heading">#</a></h2>
+<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Link to this heading">#</a></h2>
 <p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
 a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
 how the different methods differ:</p>
@@ -368,9 +368,9 @@ how the different methods differ:</p>
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Base APIs" href="base_apis.html" /><link rel="prev" title="Reading Environment Variables" href="env_vars.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
+    <!-- Generated with Sphinx 7.2.2 and Furo 2023.08.17 -->
         <title>Middlewares - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -220,13 +220,13 @@
         </div>
         <article role="main">
           <section id="middlewares">
-<h1>Middlewares<a class="headerlink" href="#middlewares" title="Permalink to this heading">#</a></h1>
+<h1>Middlewares<a class="headerlink" href="#middlewares" title="Link to this heading">#</a></h1>
 <p>Middlewares enable you to execute any kind of program logic before responses
 are sent out to clients. Any program that’s executable from shells can be a
 middleware. All properties of a response can be manipulated by middlewares,
 such as its body, headers, status code, etc.</p>
 <section id="setting-up-middlewares">
-<h2>Setting up Middlewares<a class="headerlink" href="#setting-up-middlewares" title="Permalink to this heading">#</a></h2>
+<h2>Setting up Middlewares<a class="headerlink" href="#setting-up-middlewares" title="Link to this heading">#</a></h2>
 <p>Following is a <em>mock</em> configuration file containing middlewares:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w"> </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -265,7 +265,7 @@ configuration files:</p>
 </div>
 </section>
 <section id="examples-of-middlewares">
-<h2>Examples of Middlewares<a class="headerlink" href="#examples-of-middlewares" title="Permalink to this heading">#</a></h2>
+<h2>Examples of Middlewares<a class="headerlink" href="#examples-of-middlewares" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The examples below are provided as shell scripts programs. But remember that
@@ -273,7 +273,7 @@ middlewares are not limited to being shell scripts only. Any executable
 program at all can be used as a middleware.</p>
 </div>
 <section id="modify-response-body">
-<h3>Modify Response Body<a class="headerlink" href="#modify-response-body" title="Permalink to this heading">#</a></h3>
+<h3>Modify Response Body<a class="headerlink" href="#modify-response-body" title="Link to this heading">#</a></h3>
 <p>The following Middleware Script replaces all occurrences of <code class="docutils literal notranslate"><span class="pre">foo</span></code> with <code class="docutils literal notranslate"><span class="pre">bar</span></code>
 in the response body:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/foo/bar/g&#39;</span><span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
@@ -281,7 +281,7 @@ in the response body:</p>
 </div>
 </section>
 <section id="adding-new-headers-before-sending-response-to-client">
-<h3>Adding new headers before sending response to client<a class="headerlink" href="#adding-new-headers-before-sending-response-to-client" title="Permalink to this heading">#</a></h3>
+<h3>Adding new headers before sending response to client<a class="headerlink" href="#adding-new-headers-before-sending-response-to-client" title="Link to this heading">#</a></h3>
 <p>The following Middleware Script adds two header fields to the response:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Header-One: Value for header one&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Header-Two: Value for header two&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
@@ -296,7 +296,7 @@ previously set by the response handler will be overwritten.</p>
 </div>
 </section>
 <section id="removing-headers-from-the-response">
-<h3>Removing headers from the response<a class="headerlink" href="#removing-headers-from-the-response" title="Permalink to this heading">#</a></h3>
+<h3>Removing headers from the response<a class="headerlink" href="#removing-headers-from-the-response" title="Link to this heading">#</a></h3>
 <p>The following Middleware Script removes all Headers that have the word
 <code class="docutils literal notranslate"><span class="pre">foobar</span></code> in their names or values.</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">TMP</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
@@ -307,7 +307,7 @@ cat<span class="w"> </span><span class="nv">$TMP</span><span class="w"> </span>&
 </section>
 </section>
 <section id="environment-variables-for-middlewares">
-<h2>Environment Variables for Middlewares<a class="headerlink" href="#environment-variables-for-middlewares" title="Permalink to this heading">#</a></h2>
+<h2>Environment Variables for Middlewares<a class="headerlink" href="#environment-variables-for-middlewares" title="Link to this heading">#</a></h2>
 <p>Middleware Handlers are provided with a set of environment variables with
 useful information about the request being processed, and also files that can
 be written to to customize your API behavior.</p>
@@ -330,7 +330,7 @@ environment variables such as <code class="docutils literal notranslate"><span c
 middleware handlers, <a class="reference external" href="shell_scripts.html#environment-variables-for-request-handlers">consult this section.</a></p>
 </section>
 <section id="conditions-for-middlewares">
-<h2>Conditions for Middlewares<a class="headerlink" href="#conditions-for-middlewares" title="Permalink to this heading">#</a></h2>
+<h2>Conditions for Middlewares<a class="headerlink" href="#conditions-for-middlewares" title="Link to this heading">#</a></h2>
 <p>Middlewares can use conditions, such as the ones <a class="reference external" href="conditions_reference.html">specified in the Conditions
 Reference</a>, in order to make custom filters. Read
 further to learn more.</p>
@@ -437,9 +437,9 @@ querystring.</p>
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>
