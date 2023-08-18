@@ -272,8 +272,9 @@ be obtained by reading the <code class="docutils literal notranslate"><span clas
 </section>
 <section id="mock-request-body">
 <h3>MOCK_REQUEST_BODY<a class="headerlink" href="#mock-request-body" title="Link to this heading">#</a></h3>
-<p>A file path containing the Request’s Body (if one exists, otherwise this will
-be an empty file.)</p>
+<p>For <a class="reference external" href="shell_scripts.html">Response Script Handlers</a>, this variable is a file
+path, containing the Request’s Body. For static responses (such as JSON or
+plain text), this variable holds the actual request payload string.</p>
 </section>
 <section id="mock-request-querystring">
 <h3>MOCK_REQUEST_QUERYSTRING<a class="headerlink" href="#mock-request-querystring" title="Link to this heading">#</a></h3>

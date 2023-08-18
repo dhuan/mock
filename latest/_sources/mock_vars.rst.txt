@@ -66,8 +66,9 @@ Note that since environment variables cannot have dash characters (``-``),
 MOCK_REQUEST_BODY
 ~~~~~~~~~~~~~~~~~
 
-A file path containing the Request’s Body (if one exists, otherwise this will
-be an empty file.)
+For `Response Script Handlers <shell_scripts.html>`_, this variable is a file
+path, containing the Request’s Body. For static responses (such as JSON or
+plain text), this variable holds the actual request payload string.
 
 MOCK_REQUEST_QUERYSTRING
 ~~~~~~~~~~~~~~~~~~~~~~~~
