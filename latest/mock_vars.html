@@ -230,6 +230,14 @@ simple example of an endpoint that prints out the request’s querystring:</p>
 <span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;The querystring: ${MOCK_REQUEST_QUERYSTRING}&#39;</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note the usage of single quotes in the example above when defining the
+response! When using <cite>mock variables</cite> single quotes are necessary otherwise
+your shell will try to process these variables. The variables are supposed
+to be processed by <cite>mock</cite>, therefore single quotes must be used to avoid
+being replaced by your shell program.</p>
+</div>
 <p>Besides reading variables in responses as exemplified above, other places where
 variables can be used include:</p>
 <ul class="simple">
