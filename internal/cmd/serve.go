@@ -477,6 +477,8 @@ func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, err
 		panic(err)
 	}
 
+	requestCloned.Header = r.Header.Clone()
+
 	return client.Do(requestCloned)
 }
 

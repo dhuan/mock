@@ -162,3 +162,34 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestBodyIsForwarded(t *testin
 		StringMatches("Request body: This is a request payload."),
 	)
 }
+
+func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Request header foo: ${MOCK_REQUEST_HEADER_FOO}'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--route hello/world",
+			"--response 'Hello world!'",
+		},
+		"GET",
+		"foo/bar",
+		map[string]string{
+			"Foo": "bar",
+		},
+		strings.NewReader(""),
+		StringMatches("Request header foo: bar"),
+	)
+}
