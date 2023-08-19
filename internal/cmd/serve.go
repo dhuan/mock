@@ -457,6 +457,11 @@ func onNotFound(corsEnabled, hasBaseApi bool, baseApi string) http.HandlerFunc {
 }
 
 func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, error) {
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+
 	client := &http.Client{}
 
 	route := r.URL.Path
@@ -467,7 +472,7 @@ func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, err
 	protocol, host := parseBaseApi(r.TLS != nil, baseApi)
 	url := fmt.Sprintf("%s://%s%s%s", protocol, host, route, querystring)
 
-	requestCloned, err := http.NewRequest(r.Method, url, bytes.NewBuffer([]byte("ok")))
+	requestCloned, err := http.NewRequest(r.Method, url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		panic(err)
 	}
