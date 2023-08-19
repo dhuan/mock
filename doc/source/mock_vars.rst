@@ -12,6 +12,14 @@ simple example of an endpoint that prints out the request's querystring:
         --route foo/bar \
         --response 'The querystring: ${MOCK_REQUEST_QUERYSTRING}'
 
+.. note::
+
+   Note the usage of single quotes in the example above when defining the
+   response! When using `mock variables` single quotes are necessary otherwise
+   your shell will try to process these variables. The variables are supposed
+   to be processed by `mock`, therefore single quotes must be used to avoid
+   being replaced by your shell program.
+
 Besides reading variables in responses as exemplified above, other places where
 variables can be used include:
 
