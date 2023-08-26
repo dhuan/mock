@@ -480,7 +480,21 @@ func onNotFound(
 
 		mockResponse := buildResponse(response, responseBody)
 
-		mockResponse = handleMiddleware(state, r, mockResponse, endpointParams, config, requestRecord, requestRecords, requestBody)
+		middlewareHandlerExtraVars := map[string]string{
+			"MOCK_BASE_API_RESPONSE": "true",
+		}
+
+		mockResponse = handleMiddleware(
+			state,
+			r,
+			mockResponse,
+			endpointParams,
+			config,
+			requestRecord,
+			requestRecords,
+			requestBody,
+			middlewareHandlerExtraVars,
+		)
 
 		forwardResponse(mockResponse, w)
 	}
@@ -509,6 +523,7 @@ func handleMiddleware(
 	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
 	requestBody []byte,
+	extraVars map[string]string,
 ) *mock.Response {
 	middlewareConfigsForRequest := mockMiddleware.GetMiddlewareForRequest(config.Middlewares, r, requestRecord, requestRecords, mock.VerifyCondition)
 	hasMiddleware := len(middlewareConfigsForRequest) > 0
@@ -516,6 +531,10 @@ func handleMiddleware(
 	vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody)
 	if err != nil {
 		panic(err)
+	}
+
+	for key := range extraVars {
+		vars[key] = extraVars[key]
 	}
 
 	responseTransformed := response.Body

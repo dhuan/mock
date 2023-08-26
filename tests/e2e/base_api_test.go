@@ -226,6 +226,56 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 			"Some-Header-From-Base-Api": "some value",
 			"Foo":                       "bar",
 		}),
-        StringMatches("Base Api Response. Modified!"),
+		StringMatches("Base Api Response. Modified!"),
+	)
+}
+
+func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--header 'Some-Header-From-Base-Api: some value'",
+			"--response 'Base Api Response.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	middlewareScript := []string{
+		"if [ \"$MOCK_BASE_API_RESPONSE\" = true ];",
+		"then printf \" This response was proxied from a Base API.\" >> $MOCK_RESPONSE_BODY;",
+		"else printf \" This response was NOT proxied from a Base API.\" >> $MOCK_RESPONSE_BODY;",
+		"fi",
+	}
+
+	commandOptions := []string{
+		fmt.Sprintf("--base 'localhost:%d'", state.Port),
+		"--route hello/world",
+		"--response 'Hello world!'",
+		fmt.Sprintf("--middleware '%s'", strings.Join(middlewareScript, " ")),
+	}
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandOptions,
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Base Api Response. This response was proxied from a Base API."),
+	)
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		commandOptions,
+		"GET",
+		"hello/world",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Hello world! This response was NOT proxied from a Base API."),
 	)
 }
