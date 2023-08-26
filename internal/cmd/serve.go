@@ -63,7 +63,6 @@ var serveCmd = &cobra.Command{
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
 		router.Use(handleOptions(flagCors))
-		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi))
 		router.MethodNotAllowed(onMethodNotAllowed(flagCors))
 
 		prepareConfig(config)
@@ -96,6 +95,8 @@ var serveCmd = &cobra.Command{
 			ListenPort:                 flagPort,
 		}
 		mockFs := mockfs.MockFs{State: state}
+
+		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs))
 
 		for i := range config.Endpoints {
 			endpointConfig := config.Endpoints[i]
@@ -435,7 +436,14 @@ func exitWithError(errorMessage string) {
 	os.Exit(1)
 }
 
-func onNotFound(corsEnabled, hasBaseApi bool, baseApi string) http.HandlerFunc {
+func onNotFound(
+	corsEnabled,
+	hasBaseApi bool,
+	baseApi string,
+	state *types.State,
+	config *MockConfig,
+	mockFs types.MockFs,
+) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if corsEnabled {
 			setCorsHeaders(w)
@@ -447,16 +455,104 @@ func onNotFound(corsEnabled, hasBaseApi bool, baseApi string) http.HandlerFunc {
 			return
 		}
 
-		response, err := sendRequestForBaseApi(baseApi, r)
+		response, requestBody, err := sendRequestForBaseApi(baseApi, r)
 		if err != nil {
 			panic(err)
 		}
 
-		forwardResponse(response, w)
+		endpointParams := getEndpointParams(r)
+
+		requestRecord, err := record.BuildRequestRecord(r, requestBody, endpointParams)
+		if err != nil {
+			panic(err)
+		}
+
+		requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
+		requestRecords, err := mockFs.GetRecordsMatchingRoute(requestRoute)
+		if err != nil {
+			panic(err)
+		}
+
+		responseBody, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		mockResponse := buildResponse(response, responseBody)
+
+		mockResponse = handleMiddleware(state, r, mockResponse, endpointParams, config, requestRecord, requestRecords, requestBody)
+
+		forwardResponse(mockResponse, w)
 	}
 }
 
-func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, error) {
+func buildResponse(response *http.Response, responseBody []byte) *mock.Response {
+	headers := make(map[string]string)
+	for key := range response.Header {
+		headers[key] = strings.Join(response.Header[key], " ")
+	}
+
+	return &mock.Response{
+		Body:                responseBody,
+		EndpointContentType: types.Endpoint_content_type_unknown,
+		StatusCode:          response.StatusCode,
+		Headers:             headers,
+	}
+}
+
+func handleMiddleware(
+	state *types.State,
+	r *http.Request,
+	response *mock.Response,
+	endpointParams map[string]string,
+	config *MockConfig,
+	requestRecord *types.RequestRecord,
+	requestRecords []types.RequestRecord,
+	requestBody []byte,
+) *mock.Response {
+	middlewareConfigsForRequest := mockMiddleware.GetMiddlewareForRequest(config.Middlewares, r, requestRecord, requestRecords, mock.VerifyCondition)
+	hasMiddleware := len(middlewareConfigsForRequest) > 0
+
+	vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody)
+	if err != nil {
+		panic(err)
+	}
+
+	responseTransformed := response.Body
+	if hasMiddleware {
+		middlewareRunResult, err := mockMiddleware.RunMiddleware(
+			execute,
+			readFile,
+			state.ConfigFolderPath,
+			middlewareConfigsForRequest,
+			responseTransformed,
+			response.Headers,
+			response.StatusCode,
+			r,
+			endpointParams,
+			vars,
+			utils.CreateTempFile,
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		responseTransformed = middlewareRunResult.Body
+		response.Headers = middlewareRunResult.Headers
+		response.StatusCode = middlewareRunResult.StatusCode
+
+		return &mock.Response{
+			Body:                middlewareRunResult.Body,
+			EndpointContentType: types.Endpoint_content_type_unknown,
+			StatusCode:          middlewareRunResult.StatusCode,
+			Headers:             middlewareRunResult.Headers,
+		}
+	}
+
+	return response
+}
+
+func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, []byte, error) {
 	requestBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
@@ -479,7 +575,9 @@ func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, err
 
 	requestCloned.Header = r.Header.Clone()
 
-	return client.Do(requestCloned)
+	clientDoResult, err := client.Do(requestCloned)
+
+	return clientDoResult, requestBody, err
 }
 
 func parseBaseApi(currentRequestIsHttps bool, baseApi string) (string, string) {
@@ -512,20 +610,15 @@ func extractDomain(url string) string {
 	return split[1]
 }
 
-func forwardResponse(response *http.Response, w http.ResponseWriter) {
-	responseBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	for key := range response.Header {
-		w.Header().Add(key, response.Header[key][0])
+func forwardResponse(response *mock.Response, w http.ResponseWriter) {
+	for key := range response.Headers {
+		w.Header().Add(key, response.Headers[key])
 	}
 
 	w.WriteHeader(response.StatusCode)
 
-	if len(responseBody) > 0 {
-		w.Write(responseBody)
+	if len(response.Body) > 0 {
+		w.Write(response.Body)
 	}
 }
 

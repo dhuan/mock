@@ -193,3 +193,39 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *te
 		StringMatches("Request header foo: bar"),
 	)
 }
+
+func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--header 'Some-Header-From-Base-Api: some value'",
+			"--response 'Base Api Response.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--route hello/world",
+			"--response 'Hello world!'",
+			"--middleware 'printf \"Foo: bar\" >> $MOCK_RESPONSE_HEADERS'",
+			"--middleware 'printf \" Modified!\" >> $MOCK_RESPONSE_BODY'",
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		HeadersMatch(map[string]string{
+			"Some-Header-From-Base-Api": "some value",
+			"Foo":                       "bar",
+		}),
+        StringMatches("Base Api Response. Modified!"),
+	)
+}
