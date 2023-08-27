@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Middlewares" href="middlewares.html" /><link rel="prev" title="Conditional Response" href="conditional_responses.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Test Assertions" href="test_assertions.html" /><link rel="prev" title="Middlewares" href="middlewares.html" />
 
     <!-- Generated with Sphinx 7.2.3 and Furo 2023.08.19 -->
-        <title>Reading Environment Variables - mock documentation</title>
+        <title>Base APIs - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -168,9 +168,9 @@
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Reading Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
-<li class="toctree-l2"><a class="reference internal" href="base_apis.html">Base APIs</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Base APIs</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -213,43 +213,73 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="reading-environment-variables">
-<h1>Reading Environment Variables<a class="headerlink" href="#reading-environment-variables" title="Link to this heading">#</a></h1>
-<p>Responses can include any environment variable. The following example
-starts up <em>mock</em> with a custom environment variable and includes its
-variable in an endpoint’s response.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">FOO</span><span class="o">=</span>BAR<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-c<span class="w"> </span>path/to/config.json
+          <section id="base-apis">
+<h1>Base APIs<a class="headerlink" href="#base-apis" title="Link to this heading">#</a></h1>
+<p>A <cite>mock</cite> server can be configured to have a Base API, which results in all
+requests received to be forwaded to the API that it’s set to be based from.
+When an endpoint route was configured for the requesting route, it takes
+priority over the Base API. Let’s see a simple example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--base<span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;hello/world&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world!&#39;</span>
 </pre></div>
 </div>
-<p>And then the configuration file:</p>
+<p>Alternatively you may use the <code class="docutils literal notranslate"><span class="pre">base</span></code> configuration option for achieving the
+same:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;base&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">  </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;foo/bar&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The value of &#39;FOO&#39; is ${FOO}.&quot;</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">     </span><span class="p">{</span>
+<span class="w">       </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello/world&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
+<span class="w">     </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Let’s accomplish the same but now using command-line parameters instead
-of configuration file. Note here the usage of single-quotes around the
-response string, because we don’t want these variables to be processed
-by the shell program, but by <em>mock</em> instead:</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ export FOO=bar
-
-<span class="w"> </span>$ mock serve \
-<span class="gi">+  --route &#39;foo/bar&#39; \</span>
-<span class="gi">+  --response &#39;The value of FOO is ${FOO}.&#39;</span>
+<p>Above we’ve set up an API that uses <code class="docutils literal notranslate"><span class="pre">example.com</span></code> as its Base API,
+furthermore an endpoint was set routed as <code class="docutils literal notranslate"><span class="pre">hello/world</span></code>. If a request is made
+to <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">hello/world</span></code>, the server will act normally responding with the
+response which was set - <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>. However if a request is made to an
+endpoint that was not configured, then the request will be forwaded to the
+domain that we’ve set as the Base API. In other words, a request to <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
+will result in a proxy request to <code class="docutils literal notranslate"><span class="pre">example.com/foo/bar</span></code>.</p>
+<section id="intercepting-responses">
+<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">#</a></h2>
+<p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
+Middlewares documentation section for learning all about them.</a> In fact Middlewares make no distinction of whether the
+current request is meant for a <cite>mock</cite> endpoint or an actual Base API when
+executing its handler - but on your Middleware handler you can find out whether
+the current Middleware execution is for a Base API request or not by reading
+the <code class="docutils literal notranslate"><span class="pre">$MOCK_BASE_API_RESPONSE</span></code> environment variable. The middleware below adds
+a header <code class="docutils literal notranslate"><span class="pre">Foo:</span> <span class="pre">bar</span></code> to all responses proxied to a Base API:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MOCK_BASE_API_RESPONSE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]</span><span class="p">;</span>
+<span class="k">then</span>
+<span class="w">  </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Foo: bar&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+<span class="k">fi</span>
 </pre></div>
 </div>
+<p>Alternatively you can just use the <code class="docutils literal notranslate"><span class="pre">route_match</span></code> middleware option in order
+to filter the requests which you want to manipulate, targetting the route
+patterns that are meant for your Base API of choice. Then again, the middleware
+documentation section covers the subject in more details.</p>
+</section>
+<section id="base-apis-and-tls">
+<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Link to this heading">#</a></h2>
+<p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
+a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
+how the different methods differ:</p>
+<p>Domain only: todo</p>
+<p>Protocol + domain combo: todo</p>
+</section>
 </section>
 
         </article>
@@ -257,23 +287,23 @@ by the shell program, but by <em>mock</em> instead:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="middlewares.html">
+          <a class="next-page" href="test_assertions.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Middlewares</div>
+                <div class="title">Test Assertions</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="conditional_responses.html">
+          <a class="prev-page" href="middlewares.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Conditional Response</div>
+                <div class="title">Middlewares</div>
                 
               </div>
             </a>
@@ -295,8 +325,28 @@ by the shell program, but by <em>mock</em> instead:</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Base APIs</a><ul>
+<li><a class="reference internal" href="#intercepting-responses">Intercepting responses</a></li>
+<li><a class="reference internal" href="#base-apis-and-tls">Base APIs and TLS</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
