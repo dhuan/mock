@@ -61,23 +61,6 @@ to filter the requests which you want to manipulate, targetting the route
 patterns that are meant for your Base API of choice. Then again, the middleware
 documentation section covers the subject in more details.
 
-Intercepting requests
----------------------
-
-Requests sent to Base APIs are sent exactly as defined by the HTTP client who's
-requesting to `mock` - all the headers, payload etc, everything unmodified. It's
-possible however to modify the request object - any of its properties such as
-its headers, payload - through Middlewares.
-
-Set the Middleware with its type as ``on_request_to_base_api`` to achieve it.
-The middleware handler script is able to modify the request by writing to the
-files assigned to the following environment variables:
-
--  **MOCK_REQUEST_BODY**: Write to this file to modify the request payload.
-   It contains the payload sent by the requesting client.
--  **MOCK_REQUEST_HEADERS**: Write to this file to modify the request headers.
-   It contains the headers sent by the requesting client.
-
 Base APIs and TLS
 -----------------
 

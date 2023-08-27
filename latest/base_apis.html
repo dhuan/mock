@@ -272,22 +272,6 @@ to filter the requests which you want to manipulate, targetting the route
 patterns that are meant for your Base API of choice. Then again, the middleware
 documentation section covers the subject in more details.</p>
 </section>
-<section id="intercepting-requests">
-<h2>Intercepting requests<a class="headerlink" href="#intercepting-requests" title="Link to this heading">#</a></h2>
-<p>Requests sent to Base APIs are sent exactly as defined by the HTTP client who’s
-requesting to <cite>mock</cite> - all the headers, payload etc, everything unmodified. It’s
-possible however to modify the request object - any of its properties such as
-its headers, payload - through Middlewares.</p>
-<p>Set the Middleware with its type as <code class="docutils literal notranslate"><span class="pre">on_request_to_base_api</span></code> to achieve it.
-The middleware handler script is able to modify the request by writing to the
-files assigned to the following environment variables:</p>
-<ul class="simple">
-<li><p><strong>MOCK_REQUEST_BODY</strong>: Write to this file to modify the request payload.
-It contains the payload sent by the requesting client.</p></li>
-<li><p><strong>MOCK_REQUEST_HEADERS</strong>: Write to this file to modify the request headers.
-It contains the headers sent by the requesting client.</p></li>
-</ul>
-</section>
 <section id="base-apis-and-tls">
 <h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Link to this heading">#</a></h2>
 <p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
@@ -355,7 +339,6 @@ how the different methods differ:</p>
             <ul>
 <li><a class="reference internal" href="#">Base APIs</a><ul>
 <li><a class="reference internal" href="#intercepting-responses">Intercepting responses</a></li>
-<li><a class="reference internal" href="#intercepting-requests">Intercepting requests</a></li>
 <li><a class="reference internal" href="#base-apis-and-tls">Base APIs and TLS</a></li>
 </ul>
 </li>
