@@ -103,23 +103,23 @@ var serveCmd = &cobra.Command{
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
 			if endpointConfig.Method == "get" || endpointConfig.Method == "" {
-				router.Get(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
+				router.Get(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
 			}
 
 			if endpointConfig.Method == "post" {
-				router.Post(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
+				router.Post(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
 			}
 
 			if endpointConfig.Method == "patch" {
-				router.Patch(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
+				router.Patch(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
 			}
 
 			if endpointConfig.Method == "put" {
-				router.Put(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
+				router.Put(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
 			}
 
 			if endpointConfig.Method == "delete" {
-				router.Delete(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay))
+				router.Delete(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
 			}
 		}
 
@@ -234,6 +234,7 @@ func newEndpointHandler(
 	endpointConfig *types.EndpointConfig,
 	mockFs types.MockFs,
 	delay int64,
+	config *MockConfig,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		requestBody, err := ioutil.ReadAll(r.Body)
@@ -301,42 +302,22 @@ func newEndpointHandler(
 			time.Sleep(time.Duration(delay) * time.Millisecond)
 		}
 
-		middlewareConfigs := mockMiddleware.GetMiddlewareForRequest(middlewareConfigs, r, requestRecord, requestRecords, mock.VerifyCondition)
-		hasMiddleware := len(middlewareConfigs) > 0
-
-		vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody)
-		if err != nil {
-			panic(err)
-		}
-
-		responseTransformed := response.Body
-		if hasMiddleware {
-			middlewareRunResult, err := mockMiddleware.RunMiddleware(
-				execute,
-				readFile,
-				state.ConfigFolderPath,
-				middlewareConfigs,
-				responseTransformed,
-				response.Headers,
-				response.StatusCode,
-				r,
-				endpointParams,
-				vars,
-				utils.CreateTempFile,
-			)
-			if err != nil {
-				panic(err)
-			}
-
-			responseTransformed = middlewareRunResult.Body
-			response.Headers = middlewareRunResult.Headers
-			response.StatusCode = middlewareRunResult.StatusCode
-		}
+		response = handleMiddleware(
+			state,
+			r,
+			response,
+			endpointParams,
+			config,
+			requestRecord,
+			requestRecords,
+			requestBody,
+			map[string]string{},
+		)
 
 		addHeaders(w, response)
 
 		w.WriteHeader(response.StatusCode)
-		w.Write(responseTransformed)
+		w.Write(response.Body)
 	}
 }
 
