@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Creating APIs" href="apis.html" /><link rel="prev" title="Installation" href="install.html" />
 
-    <!-- Generated with Sphinx 7.2.3 and Furo 2023.08.19 -->
+    <!-- Generated with Sphinx 7.2.5 and Furo 2023.08.19 -->
         <title>Changelog - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -221,6 +221,16 @@
         <article role="main">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
+<section id="unreleased">
+<h2>Unreleased<a class="headerlink" href="#unreleased" title="Link to this heading">#</a></h2>
+<p>FIXED</p>
+<ul class="simple">
+<li><p>Base APIs could only be used through command-line flag (<code class="docutils literal notranslate"><span class="pre">--base</span></code>),
+although it was documented that the <code class="docutils literal notranslate"><span class="pre">base</span></code> json config parameter
+was supported as well. This has been fixed - the feature is now
+usable through cmd flag and json config.</p></li>
+</ul>
+</section>
 <section id="id1">
 <h2>1.2.0<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>ADDED</p>
@@ -494,6 +504,7 @@ the assert request indicating that the given <code class="docutils literal notra
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#unreleased">Unreleased</a></li>
 <li><a class="reference internal" href="#id1">1.2.0</a></li>
 <li><a class="reference internal" href="#section-1">1.1.0</a></li>
 <li><a class="reference internal" href="#section-2">1.0.0</a></li>

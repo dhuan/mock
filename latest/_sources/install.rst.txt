@@ -10,15 +10,15 @@ dependencies, so just choose one of the supported OSs and start using
 it, or check the releases page where you’ll find other download formats
 available:
 
--  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v1.1.0/mock_v1.1.0_linux-386.tar.gz>`__
--  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v1.1.0/mock_v1.1.0_darwin-amd64.tar.gz>`__
+-  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v1.2.0/mock_v1.2.0_linux-386.tar.gz>`__
+-  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v1.2.0/mock_v1.2.0_darwin-amd64.tar.gz>`__
 -  `Releases <https://github.com/dhuan/mock/releases>`__
 
 Or, here’s a few lines of shell for quickly installing it:
 
 .. code:: sh
 
-   $ wget -O mock.tgz https://github.com/dhuan/mock/releases/download/v1.1.0/mock_v1.1.0_linux-386.tar.gz
+   $ wget -O mock.tgz https://github.com/dhuan/mock/releases/download/v1.2.0/mock_v1.2.0_linux-386.tar.gz
    $ tar xzvf mock.tgz
    $ ./mock version
 

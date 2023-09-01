@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+FIXED
+
+-  Base APIs could only be used through command-line flag (``--base``),
+   although it was documented that the ``base`` json config parameter
+   was supported as well. This has been fixed - the feature is now
+   usable through cmd flag and json config.
+
 1.2.0
 -----
 
