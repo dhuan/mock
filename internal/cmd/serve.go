@@ -58,7 +58,7 @@ var serveCmd = &cobra.Command{
 		middlewaresFromCommandLine := args2config.ParseMiddlewares(os.Args)
 		mergeMiddlewares(config, middlewaresFromCommandLine)
 
-		hasBaseApi, baseApi := resolveBaseApi(flagBaseApi)
+		hasBaseApi, baseApi := resolveBaseApi(flagBaseApi, config)
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
@@ -706,10 +706,14 @@ const (
 	endpointMergeErrorCode_none endpointMergeErrorCode = iota
 )
 
-func resolveBaseApi(flagBaseApi string) (bool, string) {
-	if flagBaseApi == "" {
-		return false, ""
+func resolveBaseApi(flagBaseApi string, config *MockConfig) (bool, string) {
+	if flagBaseApi != "" {
+		return true, flagBaseApi
 	}
 
-	return true, flagBaseApi
+	if config.Base != "" {
+		return true, config.Base
+	}
+
+	return false, ""
 }

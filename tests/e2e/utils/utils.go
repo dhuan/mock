@@ -363,6 +363,27 @@ func RunTestWithNoConfigAndWithArgs(
 	RunTestBase(t, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
+func RunTestWithJsonConfig(
+	t *testing.T,
+	jsonStr string,
+	method,
+	route string,
+	headers map[string]string,
+	body io.Reader,
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+) {
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	configFile := mkTemp([]byte(jsonStr))
+
+	RunTestBase(t, configFile, "", []TestRequest{request}, map[string]string{}, assertionFunc...)
+}
+
 func RunTestWithArgsAndEnv(
 	t *testing.T,
 	args []string,
@@ -388,7 +409,12 @@ func resolveCommand(configurationFilePath string) string {
 		return "serve -p {{TEST_E2E_PORT}}"
 	}
 
-	return fmt.Sprintf("serve -c {{TEST_DATA_PATH}}/%s -p {{TEST_E2E_PORT}}", configurationFilePath)
+	configPath := fmt.Sprintf("{{TEST_DATA_PATH}}/%s", configurationFilePath)
+	if isAbsolutePath(configurationFilePath) {
+		configPath = configurationFilePath
+	}
+
+	return fmt.Sprintf("serve -c %s -p {{TEST_E2E_PORT}}", configPath)
 }
 
 func afterTest(t *testing.T, output *bytes.Buffer) {
@@ -679,4 +705,28 @@ func EnvVarExists(varName string) bool {
 	_, exists := os.LookupEnv(varName)
 
 	return exists
+}
+
+func mkTemp(content []byte) string {
+	result, err := exec.Command("mktemp").Output()
+	if err != nil {
+		panic(err)
+	}
+
+	filePath := strings.TrimSuffix(string(result), "\n")
+
+	err = os.WriteFile(filePath, content, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	return filePath
+}
+
+func beginsWith(subject, find string) bool {
+	return strings.Index(subject, find) == 0
+}
+
+func isAbsolutePath(path string) bool {
+	return beginsWith(path, "/")
 }

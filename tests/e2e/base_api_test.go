@@ -70,6 +70,41 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 	)
 }
 
+func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--status-code 205",
+			"--response 'Hello world! This is the base API.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithJsonConfig(
+		t,
+		fmt.Sprintf(`{
+    "base": "localhost:%d",
+    "endpoints": [
+        {
+            "route": "hello/world",
+            "response": "Hello world!"
+        }
+    ]
+}`, state.Port),
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(205),
+		StringMatches("Hello world! This is the base API."),
+	)
+}
+
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 	state := NewState()
 	killMockBase, _, _ := RunMockBg(

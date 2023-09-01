@@ -10,6 +10,7 @@ import (
 )
 
 type MockConfig struct {
+	Base        string                   `json:"base"`
 	Endpoints   []types.EndpointConfig   `json:"endpoints"`
 	Middlewares []types.MiddlewareConfig `json:"middlewares"`
 }
