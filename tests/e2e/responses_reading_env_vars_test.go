@@ -23,7 +23,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_TextResponse(t *testing.T) {
 }
 
 func Test_E2E_Response_ReadingEnvironmentVariable_TextResponse_WithCmdParams(t *testing.T) {
-	RunTestWithAndWithArgsAndWithEnv(
+	RunTestWithArgsAndEnv(
 		t,
 		[]string{
 			"--route reading/env/vars/text",

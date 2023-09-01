@@ -363,7 +363,7 @@ func RunTestWithNoConfigAndWithArgs(
 	RunTestBase(t, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
-func RunTestWithAndWithArgsAndWithEnv(
+func RunTestWithArgsAndEnv(
 	t *testing.T,
 	args []string,
 	method,
