@@ -37,6 +37,12 @@ endpoint that was not configured, then the request will be forwaded to the
 domain that we've set as the Base API. In other words, a request to ``foo/bar``
 will result in a proxy request to ``example.com/foo/bar``.
 
+.. note::
+
+   Base APIs defined through the command-line flag takes precedence over one
+   set through configuration file. There can only be one Base API for a running
+   `mock` instance.
+
 Intercepting responses
 ----------------------
 
