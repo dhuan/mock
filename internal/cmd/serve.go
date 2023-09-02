@@ -708,12 +708,16 @@ const (
 
 func resolveBaseApi(flagBaseApi string, config *MockConfig) (bool, string) {
 	if flagBaseApi != "" {
-		return true, flagBaseApi
+		return true, formatBaseApi(flagBaseApi)
 	}
 
 	if config.Base != "" {
-		return true, config.Base
+		return true, formatBaseApi(config.Base)
 	}
 
 	return false, ""
+}
+
+func formatBaseApi(baseApi string) string {
+	return utils.ReplaceRegex(baseApi, []string{"/$"}, "")
 }
