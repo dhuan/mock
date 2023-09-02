@@ -45,7 +45,7 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{}, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -79,8 +79,8 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"not_bar"}`), e2eutils.ContentTypeJsonHeaders)
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"not_bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -110,8 +110,8 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"not_bar"}`), e2eutils.ContentTypeJsonHeaders)
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"not_bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -148,7 +148,7 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -182,7 +182,7 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{}, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -208,7 +208,7 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{}, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -249,7 +249,7 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 
 	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{
 		"some_header_key": "some_header_value",
-	})
+	}, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",
@@ -285,7 +285,7 @@ func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
 
 	for _, assertMethod := range assertMethods {
 		e2eutils.RequestApiReset(mockConfig)
-		e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{})
+		e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), map[string]string{}, serverOutput)
 
 		validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 			Route: "foo/bar",

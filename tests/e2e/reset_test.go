@@ -18,7 +18,7 @@ func Test_E2E_Resetting(t *testing.T) {
 	)
 	defer killMock()
 
-	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
+	e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
 	validationErrors := e2eutils.MockAssert(&mocklib.AssertOptions{
 		Route: "foo/bar",

@@ -9,14 +9,14 @@ import (
 )
 
 func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
-	killMock, _, mockConfig := e2eutils.RunMockBg(
+	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
 		e2eutils.NewState(),
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}} --cors",
 		nil,
 	)
 	defer killMock()
 
-	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
+	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
 	e2eutils.AssertMapHasValues(t, response.Headers, map[string]string{
 		"Access-Control-Allow-Credentials": "true",
@@ -27,14 +27,14 @@ func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
 }
 
 func Test_E2E_Cors_HeadersAreNotSet(t *testing.T) {
-	killMock, _, mockConfig := e2eutils.RunMockBg(
+	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
 		e2eutils.NewState(),
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 	)
 	defer killMock()
 
-	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders)
+	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
 	headerKeys := e2eutils.GetKeys(response.Headers)
 
