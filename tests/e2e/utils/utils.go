@@ -109,10 +109,11 @@ func MockAssert(assertOptions *mocklib.AssertOptions, serverOutput *bytes.Buffer
 	return validationErrors
 }
 
-func Request(config *mocklib.MockConfig, method, route string, payload io.Reader, headers map[string]string) *Response {
+func Request(config *mocklib.MockConfig, method, route string, payload io.Reader, headers map[string]string, serverOutput *bytes.Buffer) *Response {
+	url := fmt.Sprintf("http://%s/%s", config.Url, route)
 	request, err := http.NewRequest(
 		method,
-		fmt.Sprintf("http://%s/%s", config.Url, route),
+		url,
 		payload,
 	)
 	if err != nil {
@@ -126,6 +127,8 @@ func Request(config *mocklib.MockConfig, method, route string, payload io.Reader
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
+		fmt.Println(serverOutput)
+		fmt.Printf("Request failed (%s).\n\nServer output:\n\n%s", url, serverOutput)
 		panic(err)
 	}
 
@@ -366,6 +369,7 @@ func RunTestWithNoConfigAndWithArgs(
 func RunTestWithJsonConfig(
 	t *testing.T,
 	jsonStr string,
+	args []string,
 	method,
 	route string,
 	headers map[string]string,
@@ -381,7 +385,7 @@ func RunTestWithJsonConfig(
 
 	configFile := mkTemp([]byte(jsonStr))
 
-	RunTestBase(t, configFile, "", []TestRequest{request}, map[string]string{}, assertionFunc...)
+	RunTestBase(t, configFile, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
 func RunTestWithArgsAndEnv(
@@ -448,7 +452,7 @@ func RunTestBase(
 	response := &Response{}
 
 	for i := range requests {
-		response = Request(mockConfig, requests[i].Method, requests[i].Route, requests[i].Body, requests[i].Headers)
+		response = Request(mockConfig, requests[i].Method, requests[i].Route, requests[i].Body, requests[i].Headers, output)
 	}
 
 	for i := range assertionFunc {

@@ -96,6 +96,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
         }
     ]
 }`, state.Port),
+		[]string{},
 		"GET",
 		"foo/bar",
 		nil,
@@ -313,4 +314,67 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t
 		strings.NewReader(""),
 		StringMatches("Hello world! This response was NOT proxied from a Base API."),
 	)
+}
+
+func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--status-code 205",
+			"--response 'Hello world! This is the base API 1.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	state2 := NewState()
+	killMockBase2, _, _ := RunMockBg(
+		state2,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--status-code 205",
+			"--response 'Hello world! This is the base API 2.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase2()
+
+	type testCase struct {
+		portBaseFlag     int
+		portBaseConfig   int
+		expectedResponse string
+	}
+
+	testCases := []testCase{
+		{portBaseFlag: state2.Port, portBaseConfig: state.Port, expectedResponse: "Hello world! This is the base API 2."},
+		{portBaseFlag: state.Port, portBaseConfig: state2.Port, expectedResponse: "Hello world! This is the base API 1."},
+	}
+
+	for _, testCase := range testCases {
+		RunTestWithJsonConfig(
+			t,
+			fmt.Sprintf(`{
+        "base": "localhost:%d",
+        "endpoints": [
+            {
+                "route": "hello/world",
+                "response": "Hello world!"
+            }
+        ]
+    }`, testCase.portBaseConfig),
+			[]string{fmt.Sprintf("--base localhost:%d", testCase.portBaseFlag)},
+			"GET",
+			"foo/bar",
+			nil,
+			strings.NewReader(""),
+			StatusCodeMatches(205),
+			StringMatches(testCase.expectedResponse),
+		)
+	}
 }
