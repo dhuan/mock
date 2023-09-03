@@ -289,8 +289,12 @@ documentation section covers the subject in more details.</p>
 <p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
 a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
 how the different methods differ:</p>
-<p>Domain only: todo</p>
-<p>Protocol + domain combo: todo</p>
+<p>Domain only: The protocol set by the requesting client will be respected. If a
+client requests <cite>mock</cite> using HTTPS, then <cite>mock</cite> will request the Base API using
+HTTPS as well.</p>
+<p>Protocol + domain combination: If a protocol is set in the Base API’s value,
+then <cite>mock</cite> will always use that protocol when forwarding the request,
+independent of the protocol chosen by requesting client.</p>
 </section>
 </section>
 
