@@ -235,6 +235,12 @@ as you may instead provide an API’s specs through command-line arguments.</p>
 <p>Defines the port through which <cite>mock</cite> will serve your API. Defaults to <code class="docutils literal notranslate"><span class="pre">3000</span></code>
 if not provided.</p>
 </section>
+<section id="b-or-base">
+<h3><code class="docutils literal notranslate"><span class="pre">-b</span></code> or <code class="docutils literal notranslate"><span class="pre">--base</span></code><a class="headerlink" href="#b-or-base" title="Link to this heading">#</a></h3>
+<p>A domain or URL that will act as a Base API. All requests will be forwarded to
+it unless the requested route exists for the running <cite>mock</cite> API. <a class="reference external" href="base_apis.html">Read more
+about Base APIs in its own section.</a></p>
+</section>
 </section>
 <section id="options-for-specifying-apis">
 <h2>Options for specifying APIs<a class="headerlink" href="#options-for-specifying-apis" title="Link to this heading">#</a></h2>
@@ -402,6 +408,7 @@ seconds:</p>
 <li><a class="reference internal" href="#standard-options">Standard options</a><ul>
 <li><a class="reference internal" href="#c-or-config"><code class="docutils literal notranslate"><span class="pre">-c</span></code> or <code class="docutils literal notranslate"><span class="pre">--config</span></code></a></li>
 <li><a class="reference internal" href="#p-or-port"><code class="docutils literal notranslate"><span class="pre">-p</span></code> or <code class="docutils literal notranslate"><span class="pre">--port</span></code></a></li>
+<li><a class="reference internal" href="#b-or-base"><code class="docutils literal notranslate"><span class="pre">-b</span></code> or <code class="docutils literal notranslate"><span class="pre">--base</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#options-for-specifying-apis">Options for specifying APIs</a><ul>

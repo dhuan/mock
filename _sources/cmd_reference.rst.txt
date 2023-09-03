@@ -19,6 +19,13 @@ as you may instead provide an API's specs through command-line arguments.
 Defines the port through which `mock` will serve your API. Defaults to ``3000``
 if not provided.
 
+``-b`` or ``--base``
+--------------------
+
+A domain or URL that will act as a Base API. All requests will be forwarded to
+it unless the requested route exists for the running `mock` API. `Read more
+about Base APIs in its own section. <base_apis.html>`__
+
 Options for specifying APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

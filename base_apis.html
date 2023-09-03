@@ -252,6 +252,18 @@ response which was set - <code class="docutils literal notranslate"><span class=
 endpoint that was not configured, then the request will be forwaded to the
 domain that we’ve set as the Base API. In other words, a request to <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>
 will result in a proxy request to <code class="docutils literal notranslate"><span class="pre">example.com/foo/bar</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Base APIs defined through the command-line flag takes precedence over one
+set through configuration file. There can only be one Base API for a running
+<cite>mock</cite> instance.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can use <cite>mock</cite> solely as a Base API if you want. Don’t define any
+endpoints and start up <cite>mock</cite> with only the Base API option. It will act as
+a proxy to some other service.</p>
+</div>
 <section id="intercepting-responses">
 <h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">#</a></h2>
 <p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
@@ -277,8 +289,12 @@ documentation section covers the subject in more details.</p>
 <p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
 a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
 how the different methods differ:</p>
-<p>Domain only: todo</p>
-<p>Protocol + domain combo: todo</p>
+<p>Domain only: The protocol set by the requesting client will be respected. If a
+client requests <cite>mock</cite> using HTTPS, then <cite>mock</cite> will request the Base API using
+HTTPS as well.</p>
+<p>Protocol + domain combination: If a protocol is set in the Base API’s value,
+then <cite>mock</cite> will always use that protocol when forwarding the request,
+independent of the protocol chosen by requesting client.</p>
 </section>
 </section>
 
