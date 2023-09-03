@@ -33,17 +33,15 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		endpointsFromCommandLine := args2config.ParseEndpoints(os.Args)
 
-		if flagConfig == "" && len(endpointsFromCommandLine) == 0 {
-			exitWithError(cmd.UsageString())
-		}
-
-		if flagConfig == "" && len(endpointsFromCommandLine) == 0 {
-			exitWithError(cmd.UsageString())
-		}
-
 		config, err := resolveConfig(flagConfig)
 		if err != nil {
 			exitWithError(err.Error())
+		}
+
+		hasBaseApi, baseApi := resolveBaseApi(flagBaseApi, config)
+
+		if flagConfig == "" && len(endpointsFromCommandLine) == 0 && !hasBaseApi {
+			exitWithError(cmd.UsageString())
 		}
 
 		allEndpoints, endpointMergeErrors := mergeEndpoints(config.Endpoints, endpointsFromCommandLine)
@@ -57,8 +55,6 @@ var serveCmd = &cobra.Command{
 
 		middlewaresFromCommandLine := args2config.ParseMiddlewares(os.Args)
 		mergeMiddlewares(config, middlewaresFromCommandLine)
-
-		hasBaseApi, baseApi := resolveBaseApi(flagBaseApi, config)
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)

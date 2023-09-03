@@ -378,3 +378,58 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 		)
 	}
 }
+
+func Test_E2E_BaseApi_WithoutAnyEndpoints(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Base Api Response.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Base Api Response."),
+	)
+}
+
+func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Base Api Response.'",
+		}, " "),
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithJsonConfig(
+		t,
+		fmt.Sprintf(`{
+    "base": "localhost:%d"
+}`, state.Port),
+		[]string{},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StringMatches("Base Api Response."),
+	)
+}

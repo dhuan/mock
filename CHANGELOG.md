@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+CHANGED
+
+- Allow mock to be started only with a Base API - no endpoints set, acting only
+  as a proxy.
+
 FIXED
 
 - Base APIs could only be used through command-line flag (`--base`), although
