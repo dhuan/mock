@@ -80,6 +80,10 @@ The Base API option can take a simple domain (``example.com``) as its value, or
 a protocol+domain combo (``https://example.com``). Read further to understand
 how the different methods differ:
 
-Domain only: todo
+Domain only: The protocol set by the requesting client will be respected. If a
+client requests `mock` using HTTPS, then `mock` will request the Base API using
+HTTPS as well.
 
-Protocol + domain combo: todo
+Protocol + domain combination: If a protocol is set in the Base API's value,
+then `mock` will always use that protocol when forwarding the request,
+independent of the protocol chosen by requesting client.
