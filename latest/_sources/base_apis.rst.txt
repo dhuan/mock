@@ -43,6 +43,12 @@ will result in a proxy request to ``example.com/foo/bar``.
    set through configuration file. There can only be one Base API for a running
    `mock` instance.
 
+.. note::
+
+   You can use `mock` solely as a Base API if you want. Don't define any
+   endpoints and start up `mock` with only the Base API option. It will act as
+   a proxy to some other service.
+
 Intercepting responses
 ----------------------
 

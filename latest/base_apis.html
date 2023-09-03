@@ -258,6 +258,12 @@ will result in a proxy request to <code class="docutils literal notranslate"><sp
 set through configuration file. There can only be one Base API for a running
 <cite>mock</cite> instance.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can use <cite>mock</cite> solely as a Base API if you want. Don’t define any
+endpoints and start up <cite>mock</cite> with only the Base API option. It will act as
+a proxy to some other service.</p>
+</div>
 <section id="intercepting-responses">
 <h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">#</a></h2>
 <p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
