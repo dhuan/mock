@@ -10,7 +10,7 @@ import (
 
 func Test_E2E_BaseApi_NormalRequest(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -20,6 +20,7 @@ func Test_E2E_BaseApi_NormalRequest(t *testing.T) {
 			"--response 'Hello world! This is the base API.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -41,7 +42,7 @@ func Test_E2E_BaseApi_NormalRequest(t *testing.T) {
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -51,6 +52,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 			"--response 'Hello world! This is the base API.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -72,7 +74,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -82,6 +84,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
 			"--response 'Hello world! This is the base API.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -108,7 +111,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -117,6 +120,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 			"--response 'Querystring: ${MOCK_REQUEST_QUERYSTRING}'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -137,7 +141,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -148,6 +152,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *te
 			"--response 'Hello world!'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -171,7 +176,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *te
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestBodyIsForwarded(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -181,6 +186,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestBodyIsForwarded(t *testin
 			"--response 'Request body: ${MOCK_REQUEST_BODY}'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -201,7 +207,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestBodyIsForwarded(t *testin
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -210,6 +216,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *te
 			"--response 'Request header foo: ${MOCK_REQUEST_HEADER_FOO}'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -232,7 +239,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *te
 
 func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -242,6 +249,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -268,7 +276,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 
 func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -278,6 +286,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -318,7 +327,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t
 
 func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -328,11 +337,12 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 			"--response 'Hello world! This is the base API 1.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
 	state2 := NewState()
-	killMockBase2, _, _ := RunMockBg(
+	killMockBase2, _, _, _ := RunMockBg(
 		state2,
 		strings.Join([]string{
 			"serve",
@@ -342,6 +352,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 			"--response 'Hello world! This is the base API 2.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase2()
 
@@ -381,7 +392,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 
 func Test_E2E_BaseApi_WithoutAnyEndpoints(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -390,6 +401,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints(t *testing.T) {
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 
@@ -408,7 +420,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints(t *testing.T) {
 
 func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
 	state := NewState()
-	killMockBase, _, _ := RunMockBg(
+	killMockBase, _, _, _ := RunMockBg(
 		state,
 		strings.Join([]string{
 			"serve",
@@ -417,6 +429,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
+        true,
 	)
 	defer killMockBase()
 

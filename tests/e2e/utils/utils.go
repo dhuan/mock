@@ -68,7 +68,7 @@ func RunMock(state *E2eState, command string) ([]byte, error) {
 
 type KillMockFunc func()
 
-func RunMockBg(state *E2eState, command string, env map[string]string) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig) {
+func RunMockBg(state *E2eState, command string, env map[string]string, panicIfServerDidNotStart bool) (KillMockFunc, *bytes.Buffer, *mocklib.MockConfig, bool) {
 	replaceVars(&command, state)
 	commandParameters := command_parse.ToCommandParameters(command)
 
@@ -84,8 +84,8 @@ func RunMockBg(state *E2eState, command string, env map[string]string) (KillMock
 	}
 
 	serverIsReady := waitForOutputInCommand("Starting server on port", 4, buf)
-	if !serverIsReady {
-		panic("Something went wrong while waiting for mock to start up.")
+	if !serverIsReady && panicIfServerDidNotStart {
+		panic(fmt.Sprintf("Something went wrong while waiting for mock to start up:\n\n%s", buf))
 	}
 
 	return func() {
@@ -93,7 +93,7 @@ func RunMockBg(state *E2eState, command string, env map[string]string) (KillMock
 		if err != nil {
 			panic(err)
 		}
-	}, buf, mocklib.Init(fmt.Sprintf("localhost:%d", state.Port))
+	}, buf, mocklib.Init(fmt.Sprintf("localhost:%d", state.Port)), serverIsReady
 }
 
 func MockAssert(assertOptions *mocklib.AssertOptions, serverOutput *bytes.Buffer, state *E2eState) []mocklib.ValidationError {
@@ -295,7 +295,7 @@ func RunTest(
 		Body:    body,
 	}
 
-	RunTestBase(t, configurationFilePath, "", []TestRequest{request}, nil, assertionFunc...)
+	RunTestBase(t, true, configurationFilePath, "", []TestRequest{request}, nil, assertionFunc...)
 }
 
 func RunTestWithMultipleRequests(
@@ -304,7 +304,7 @@ func RunTestWithMultipleRequests(
 	requests []TestRequest,
 	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
 ) {
-	RunTestBase(t, configurationFilePath, "", requests, nil, assertionFunc...)
+	RunTestBase(t, true, configurationFilePath, "", requests, nil, assertionFunc...)
 }
 
 func RunTestWithEnv(
@@ -324,7 +324,7 @@ func RunTestWithEnv(
 		Body:    body,
 	}
 
-	RunTestBase(t, configurationFilePath, "", []TestRequest{request}, env, assertionFunc...)
+	RunTestBase(t, true, configurationFilePath, "", []TestRequest{request}, env, assertionFunc...)
 }
 
 func RunTestWithArgs(
@@ -344,7 +344,7 @@ func RunTestWithArgs(
 		Body:    body,
 	}
 
-	RunTestBase(t, configurationFilePath, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
+	RunTestBase(t, true, configurationFilePath, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
 func RunTestWithNoConfigAndWithArgs(
@@ -363,7 +363,26 @@ func RunTestWithNoConfigAndWithArgs(
 		Body:    body,
 	}
 
-	RunTestBase(t, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
+	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
+}
+
+func RunTestWithNoConfigAndWithArgsFailing(
+	t *testing.T,
+	args []string,
+	method,
+	route string,
+	headers map[string]string,
+	body io.Reader,
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+) {
+	request := TestRequest{
+		Method:  method,
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
+
+	RunTestBase(t, false, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
 func RunTestWithJsonConfig(
@@ -385,7 +404,7 @@ func RunTestWithJsonConfig(
 
 	configFile := mkTemp([]byte(jsonStr))
 
-	RunTestBase(t, configFile, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
+	RunTestBase(t, true, configFile, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
 
 func RunTestWithArgsAndEnv(
@@ -405,7 +424,7 @@ func RunTestWithArgsAndEnv(
 		Body:    body,
 	}
 
-	RunTestBase(t, "", strings.Join(args, " "), []TestRequest{request}, env, assertionFunc...)
+	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{request}, env, assertionFunc...)
 }
 
 func resolveCommand(configurationFilePath string) string {
@@ -433,6 +452,7 @@ func afterTest(t *testing.T, output *bytes.Buffer) {
 
 func RunTestBase(
 	t *testing.T,
+	panicIfServerDidNotStart bool,
 	configurationFilePath,
 	extraArgs string,
 	requests []TestRequest,
@@ -445,14 +465,16 @@ func RunTestBase(
 	}
 
 	state := NewState()
-	killMock, output, mockConfig := RunMockBg(state, command, env)
+	killMock, output, mockConfig, started := RunMockBg(state, command, env, panicIfServerDidNotStart)
 	defer killMock()
 	defer afterTest(t, output)
 
 	response := &Response{}
 
-	for i := range requests {
-		response = Request(mockConfig, requests[i].Method, requests[i].Route, requests[i].Body, requests[i].Headers, output)
+	if started {
+		for i := range requests {
+			response = Request(mockConfig, requests[i].Method, requests[i].Route, requests[i].Body, requests[i].Headers, output)
+		}
 	}
 
 	for i := range assertionFunc {
@@ -511,6 +533,33 @@ func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, respon
 			}
 
 			lineMatch = lineMatch + 1
+			i = i + 1
+
+			if i > len(expectedLines)-1 {
+				break
+			}
+		}
+	}
+}
+
+func ApplicationOutputMatches(expectedLines []string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		if len(expectedLines) == 0 {
+			return
+		}
+
+		serverOutputLines := breakLines(string(serverOutput))
+
+		i := 0
+		for {
+			replaceVars(&expectedLines[i], state)
+			expectedLine := expectedLines[i]
+
+			if expectedLine != removeLogDatePrefix(serverOutputLines[i]) {
+				fmt.Println(fmt.Sprintf("Line expected: %s\nLine actual:   %s", expectedLine, serverOutputLines[i]))
+				t.Fail()
+			}
+
 			i = i + 1
 
 			if i > len(expectedLines)-1 {

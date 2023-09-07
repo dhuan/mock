@@ -9,10 +9,11 @@ import (
 )
 
 func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
-	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
+	killMock, serverOutput, mockConfig, _ := e2eutils.RunMockBg(
 		e2eutils.NewState(),
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}} --cors",
 		nil,
+        true,
 	)
 	defer killMock()
 
@@ -27,10 +28,11 @@ func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
 }
 
 func Test_E2E_Cors_HeadersAreNotSet(t *testing.T) {
-	killMock, serverOutput, mockConfig := e2eutils.RunMockBg(
+	killMock, serverOutput, mockConfig, _ := e2eutils.RunMockBg(
 		e2eutils.NewState(),
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
+        true,
 	)
 	defer killMock()
 

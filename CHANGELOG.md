@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+IMPROVEMENTS:
+
+- Add validation for "Base API" value. If you try to set it as an invalid
+  hostname or domain, *mock* will fail gracefully.
+
 ## 1.3.0
 
 CHANGED

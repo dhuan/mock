@@ -40,6 +40,10 @@ var serveCmd = &cobra.Command{
 
 		hasBaseApi, baseApi := resolveBaseApi(flagBaseApi, config)
 
+		if hasBaseApi && !baseApiIsValid(baseApi) {
+			exitWithError(fmt.Sprintf("Base API is not valid: %s\nSet it as a valid domain name such as google.com", baseApi))
+		}
+
 		if flagConfig == "" && len(endpointsFromCommandLine) == 0 && !hasBaseApi {
 			exitWithError(cmd.UsageString())
 		}
@@ -716,4 +720,28 @@ func resolveBaseApi(flagBaseApi string, config *MockConfig) (bool, string) {
 
 func formatBaseApi(baseApi string) string {
 	return utils.ReplaceRegex(baseApi, []string{"/$"}, "")
+}
+
+func baseApiIsValid(baseApi string) bool {
+	baseApi = removeWebProtocolAndPort(baseApi)
+
+	regexMustPass := []string{
+		"^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,}$",
+		"[a-zA-Z0-9]{1}$",
+	}
+
+	for _, regex := range regexMustPass {
+		if !utils.RegexTest(regex, baseApi) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func removeWebProtocolAndPort(url string) string {
+	return utils.ReplaceRegex(url, []string{
+		"^https?://",
+		":[0-9]{1,}$",
+	}, "")
 }
