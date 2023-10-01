@@ -4,6 +4,8 @@
 
 IMPROVEMENTS:
 
+- If started without specifying an http port, then a random available port will
+  be used, instead of trying port 3000.
 - Add validation for "Base API" value. If you try to set it as an invalid
   hostname or domain, *mock* will fail gracefully.
 

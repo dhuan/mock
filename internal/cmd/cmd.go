@@ -49,7 +49,7 @@ func Execute() {
 	rootCmd.AddCommand(versionCmd)
 
 	serveCmd.PersistentFlags().StringVarP(&flagConfig, "config", "c", "", "configuration file")
-	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "3000", "port to listen on")
+	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "UNSET", "port to listen on")
 	serveCmd.PersistentFlags().BoolVar(&flagCors, "cors", false, "enable CORS")
 	serveCmd.PersistentFlags().Int64VarP(&flagDelay, "delay", "d", 0, "configuration file")
 	flagRoute = serveCmd.PersistentFlags().StringArray("route", []string{}, "endpoint route")

@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -432,4 +433,25 @@ func ExtractHeadersFromText(fileContent []byte) map[string]string {
 	}
 
 	return headers
+}
+
+func IsPortFree(portNumber int) bool {
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", portNumber))
+	free := err == nil
+
+	if err == nil {
+		listener.Close()
+	}
+
+	return free
+}
+
+func GetFreePort() int {
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+	listener.Close()
+
+	return listener.Addr().(*net.TCPAddr).Port
 }

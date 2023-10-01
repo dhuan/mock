@@ -126,9 +126,14 @@ var serveCmd = &cobra.Command{
 		router.Post("/__mock__/assert", mockApiHandler(mockFs, state, config))
 		router.Post("/__mock__/reset", resetApiHandler(mockFs, state, config))
 
-		log.Println(fmt.Sprintf("Starting server on port %s.", flagPort))
+		port, errorMessage := resolvePort(flagPort)
+		if errorMessage != "" {
+			exitWithError(errorMessage)
+		}
 
-		listener, err := net.Listen("tcp", fmt.Sprintf(":%s", flagPort))
+		log.Println(fmt.Sprintf("Starting server on port %d.", port))
+
+		listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err != nil {
 			log.Println("An error occurred while starting up the server.")
 			log.Fatalln(err)
@@ -141,6 +146,31 @@ var serveCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 	},
+}
+
+func resolvePort(flagPort string) (int, string) {
+	portIsDefinedByUser := flagPort != "UNSET"
+
+	if !portIsDefinedByUser {
+		return utils.GetFreePort(), ""
+	}
+
+	port, err := strconv.Atoi(flagPort)
+	if err != nil {
+		return -1, fmt.Sprintf("Port %s is not valid!", flagPort)
+	}
+
+	portIsFree := utils.IsPortFree(port)
+
+	if !portIsFree {
+		return -1, fmt.Sprintf("Port %d is not available! Start mock without specifying a port number to get a random available port.", port)
+	}
+
+	if portIsFree {
+		return port, ""
+	}
+
+	return -1, "Failed to resolve port!"
 }
 
 func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigError) string {
