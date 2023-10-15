@@ -3,7 +3,7 @@ package mockfs
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -95,7 +95,7 @@ func routeNameToRequestRecordFileRouteName(route string) string {
 }
 
 func requestHasBody(req *http.Request) bool {
-	bodyContent, err := ioutil.ReadAll(req.Body)
+	bodyContent, err := io.ReadAll(req.Body)
 	if err != nil {
 		return false
 	}

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -267,7 +267,7 @@ func newEndpointHandler(
 	config *MockConfig,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		requestBody, err := ioutil.ReadAll(r.Body)
+		requestBody, err := io.ReadAll(r.Body)
 		if err != nil {
 			panic(err)
 		}
@@ -423,7 +423,7 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 
 	var mockConfig MockConfig
 
-	configFileContent, err := ioutil.ReadFile(configPath)
+	configFileContent, err := os.ReadFile(configPath)
 	if err != nil {
 		return &mockConfig, errors.New(fmt.Sprintf("Unable to read configuration file \"%s\". Make sure it exists and/or is readable, then try again.", configPath))
 	}
@@ -484,7 +484,7 @@ func onNotFound(
 			panic(err)
 		}
 
-		responseBody, err := ioutil.ReadAll(response.Body)
+		responseBody, err := io.ReadAll(response.Body)
 		if err != nil {
 			panic(err)
 		}
@@ -583,7 +583,7 @@ func handleMiddleware(
 }
 
 func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, []byte, error) {
-	requestBody, err := ioutil.ReadAll(r.Body)
+	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
 	}

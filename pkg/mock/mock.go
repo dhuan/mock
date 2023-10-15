@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -122,7 +122,7 @@ func Assert(config *MockConfig, assertOptions *AssertOptions) ([]ValidationError
 		return make([]ValidationError, 0, 0), err
 	}
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		return make([]ValidationError, 0, 0), err
 	}
