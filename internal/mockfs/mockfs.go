@@ -3,8 +3,6 @@ package mockfs
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,13 +15,13 @@ type MockFs struct {
 	State *types.State
 }
 
-func (this MockFs) StoreRequestRecord(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) error {
+func (mfs MockFs) StoreRequestRecord(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) error {
 	requestRecordJson, err := buildRequestRecordJson(requestRecord)
 	if err != nil {
 		return err
 	}
 	requestRecordFileName := fmt.Sprintf("%s_%s", nowStr(), buildEndpointId(endpointConfig))
-	requestRecordFilePath := fmt.Sprintf("%s/%s", this.State.RequestRecordDirectoryPath, requestRecordFileName)
+	requestRecordFilePath := fmt.Sprintf("%s/%s", mfs.State.RequestRecordDirectoryPath, requestRecordFileName)
 	if err = writeNewFile(requestRecordFilePath, requestRecordJson); err != nil {
 		return err
 	}
@@ -31,8 +29,8 @@ func (this MockFs) StoreRequestRecord(requestRecord *types.RequestRecord, endpoi
 	return nil
 }
 
-func (this MockFs) RemoveAllRequestRecords() error {
-	walkFrom := this.State.RequestRecordDirectoryPath
+func (mfs MockFs) RemoveAllRequestRecords() error {
+	walkFrom := mfs.State.RequestRecordDirectoryPath
 	err := filepath.Walk(walkFrom, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
@@ -48,23 +46,23 @@ func buildEndpointId(endpointConfig *types.EndpointConfig) string {
 	return strings.ReplaceAll(endpointConfig.Route, "/", "__")
 }
 
-func (this MockFs) GetRecordsMatchingRoute(route string) ([]types.RequestRecord, error) {
+func (mfs MockFs) GetRecordsMatchingRoute(route string) ([]types.RequestRecord, error) {
 	requestRecords := make([]types.RequestRecord, 0)
 
-	walkFrom := this.State.RequestRecordDirectoryPath
-	err := filepath.Walk(walkFrom, func(path string, info os.FileInfo, err error) error {
+	walkFrom := mfs.State.RequestRecordDirectoryPath
+	err := filepath.Walk(walkFrom, func(path string, info os.FileInfo, err2 error) error {
 		if info.IsDir() {
 			return nil
 		}
 
-		fileContent, err := os.ReadFile(path)
-		if err != nil {
-			return err
+		fileContent, err3 := os.ReadFile(path)
+		if err3 != nil {
+			return err3
 		}
 
-		requestRecord, err := parseRequestRecordFromFile(fileContent)
-		if err != nil {
-			return err
+		requestRecord, err3 := parseRequestRecordFromFile(fileContent)
+		if err3 != nil {
+			return err3
 		}
 
 		if requestRecord.Route == route {
@@ -88,19 +86,6 @@ func parseRequestRecordFromFile(requestRecordFileContent []byte) (*types.Request
 	}
 
 	return &requestRecord, nil
-}
-
-func routeNameToRequestRecordFileRouteName(route string) string {
-	return strings.ReplaceAll(route, "/", "__")
-}
-
-func requestHasBody(req *http.Request) bool {
-	bodyContent, err := io.ReadAll(req.Body)
-	if err != nil {
-		return false
-	}
-
-	return string(bodyContent) != ""
 }
 
 func buildRequestRecordJson(requestRecord *types.RequestRecord) ([]byte, error) {
@@ -129,16 +114,4 @@ func writeNewFile(filePath string, fileContent []byte) error {
 	}
 
 	return nil
-}
-
-func hasHeaderWithValue(headers *http.Header, headerKeyToSearch, headerValueToSearch string) bool {
-	for headerKey, headerValues := range *headers {
-		for _, headerValue := range headerValues {
-			if headerKey == headerKeyToSearch && headerValue == headerValueToSearch {
-				return true
-			}
-		}
-	}
-
-	return false
 }

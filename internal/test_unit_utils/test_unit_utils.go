@@ -217,14 +217,14 @@ type mockMockFs struct {
 	State *unitTestState
 }
 
-func (this mockMockFs) StoreRequestRecord(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) error {
+func (mfs mockMockFs) StoreRequestRecord(requestRecord *types.RequestRecord, endpointConfig *types.EndpointConfig) error {
 	return nil
 }
 
-func (this mockMockFs) GetRecordsMatchingRoute(route string) ([]types.RequestRecord, error) {
-	return this.State.requestRecords, nil
+func (mfs mockMockFs) GetRecordsMatchingRoute(route string) ([]types.RequestRecord, error) {
+	return mfs.State.requestRecords, nil
 }
 
-func (this mockMockFs) RemoveAllRequestRecords() error {
+func (mfs mockMockFs) RemoveAllRequestRecords() error {
 	return nil
 }

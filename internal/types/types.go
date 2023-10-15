@@ -58,38 +58,38 @@ type MockFs interface {
 
 type EndpointConfigResponse []byte
 
-func (this *EndpointConfigResponse) UnmarshalJSON(data []byte) (err error) {
+func (ecr *EndpointConfigResponse) UnmarshalJSON(data []byte) (err error) {
 	if utils.BeginsWith(string(data), `"file:`) {
-		*this = []byte(utils.Unquote(string(data)))
+		*ecr = []byte(utils.Unquote(string(data)))
 
 		return nil
 	}
 
 	if utils.BeginsWith(string(data), `"sh:`) {
-		*this = []byte(utils.Unquote(string(data)))
+		*ecr = []byte(utils.Unquote(string(data)))
 
 		return nil
 	}
 
 	if utils.BeginsWith(string(data), `"exec:`) {
-		*this = []byte(utils.Unquote(string(data)))
+		*ecr = []byte(utils.Unquote(string(data)))
 
 		return nil
 	}
 
 	if utils.BeginsWith(string(data), `"fs:`) {
-		*this = []byte(utils.Unquote(string(data)))
+		*ecr = []byte(utils.Unquote(string(data)))
 
 		return nil
 	}
 
 	if strings.Index(string(data), "{") == 0 {
-		*this = data
+		*ecr = data
 
 		return nil
 	}
 
-	*this = data
+	*ecr = data
 
 	return nil
 }
@@ -113,16 +113,16 @@ const (
 	MiddlewareType_BeforeResponse
 )
 
-func (this *MiddlewareType) UnmarshalJSON(data []byte) (err error) {
+func (mt *MiddlewareType) UnmarshalJSON(data []byte) (err error) {
 	text := utils.Unquote(string(data))
 
 	if text == "before_response" {
-		*this = MiddlewareType_BeforeResponse
+		*mt = MiddlewareType_BeforeResponse
 
 		return
 	}
 
-	*this = MiddlewareType_BeforeResponse
+	*mt = MiddlewareType_BeforeResponse
 
 	return nil
 }

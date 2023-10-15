@@ -68,7 +68,7 @@ func validateEndpointConfig(
 		fmt.Sprint(endpointConfigIndex),
 	)
 
-	duplicates := []int{}
+	var duplicates []int
 	if !shouldSkipDuplicateFind {
 		duplicates = findDuplicates(endpointConfig, endpointConfigIndex, endpointConfigs)
 		if len(duplicates) > 0 {

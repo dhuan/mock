@@ -10,8 +10,6 @@ import (
 	testifymock "github.com/stretchr/testify/mock"
 )
 
-var readFileMockReturn = []byte("")
-
 var requestBody = []byte("")
 
 var state types.State = types.State{
@@ -23,8 +21,8 @@ type osMock struct {
 	testifymock.Mock
 }
 
-func (this *osMock) ReadFile(name string) ([]byte, error) {
-	args := this.Called(name)
+func (osMock *osMock) ReadFile(name string) ([]byte, error) {
+	args := osMock.Called(name)
 
 	return args.Get(0).([]byte), nil
 }
@@ -33,7 +31,7 @@ type execMock struct {
 	testifymock.Mock
 }
 
-func (this *execMock) Exec(command string, options *mock.ExecOptions) (*mock.ExecResult, error) {
+func (osMock *execMock) Exec(command string, options *mock.ExecOptions) (*mock.ExecResult, error) {
 	return &mock.ExecResult{}, nil
 }
 

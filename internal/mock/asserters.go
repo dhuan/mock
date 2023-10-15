@@ -402,16 +402,13 @@ func assertQuerystringExactMatchBase(match asserterFunc) asserterFunc {
 }
 
 func getKeyValuePairsFromAssertionOptions(assert *Condition) map[string]interface{} {
-	keys := make([]string, 0)
 	keyValuePairs := make(map[string]interface{}, 0)
 
 	if assert.Key != "" {
-		keys = append(keys, assert.Key)
 		keyValuePairs[assert.Key] = string(assert.Value)
 	}
 
 	for key, value := range assert.KeyValues {
-		keys = append(keys, key)
 		keyValuePairs[key] = value
 	}
 

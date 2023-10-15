@@ -41,7 +41,7 @@ func ResolveEndpointResponse(
 	endpointParams map[string]string,
 	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
-) (*Response, error, map[string]string) {
+) (*Response, map[string]string, error) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
 
@@ -157,7 +157,7 @@ func resolveEndpointResponseInternal(
 	hasResponseIf bool,
 	envVars map[string]string,
 	endpointParams map[string]string,
-) (*Response, error, map[string]string) {
+) (*Response, map[string]string, error) {
 	errorMetadata := make(map[string]string)
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
 	headers := make(map[string]string)
@@ -174,7 +174,7 @@ func resolveEndpointResponseInternal(
 		requestBody,
 	)
 	if err != nil {
-		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 	}
 
 	if hasResponseIf {
@@ -184,7 +184,7 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {
-		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
@@ -197,7 +197,7 @@ func resolveEndpointResponseInternal(
 		response = utils.ReplaceVars(response, requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
 		response = utils.ReplaceVars(response, endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
 
-		return &Response{[]byte(response), endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		return &Response{[]byte(response), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
@@ -208,7 +208,7 @@ func resolveEndpointResponseInternal(
 			errorMetadata["file"] = responseFile
 		}
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		responseContent := utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
@@ -219,7 +219,7 @@ func resolveEndpointResponseInternal(
 			[]byte(responseContent),
 			endpointConfigContentType,
 			responseStatusCode,
-			headers}, nil, errorMetadata
+			headers}, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_shell {
@@ -231,7 +231,7 @@ func resolveEndpointResponseInternal(
 
 		fileVars, hf, err := buildHandlerFiles(requestBody, requestRecord)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		utils.JoinMap(requestVariables, fileVars)
@@ -245,24 +245,24 @@ func resolveEndpointResponseInternal(
 			},
 		)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		printOutExecOutputIfNecessary(execResult)
 
 		response, err := extractModifiedResponse(hf, readFile, endpointConfigContentType, headers, responseStatusCode)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
-		return response, nil, errorMetadata
+		return response, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_exec {
 		execCommand := strings.Replace(responseStr, "exec:", "", -1)
 		tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		if len(endpointParams) > 0 {
@@ -271,7 +271,7 @@ func resolveEndpointResponseInternal(
 
 		fileVars, hf, err := buildHandlerFiles(requestBody, requestRecord)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		utils.JoinMap(requestVariables, fileVars)
@@ -282,17 +282,17 @@ func resolveEndpointResponseInternal(
 			Env: requestVariables,
 		})
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		printOutExecOutputIfNecessary(execResult)
 
 		response, err := extractModifiedResponse(hf, readFile, endpointConfigContentType, headers, responseStatusCode)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
-		return response, nil, errorMetadata
+		return response, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_fileserver {
@@ -300,7 +300,7 @@ func resolveEndpointResponseInternal(
 
 		fileRequested, ok := endpointParams["*"]
 		if !ok {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errors.New("Failed to capture file name."), errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, errors.New("Failed to capture file name.")
 		}
 
 		filePath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)
@@ -309,30 +309,30 @@ func resolveEndpointResponseInternal(
 		if err != nil {
 			errorMetadata["file"] = fileRequested
 
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
-		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
 		var jsonParsed interface{}
 		err := json.Unmarshal([]byte(responseStr), &jsonParsed)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		jsonEncoded, err := json.Marshal(jsonParsed)
 		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, err, errorMetadata
+			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
 		}
 
 		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder))
 
-		return &Response{jsonEncodedModified, endpointConfigContentType, responseStatusCode, headers}, nil, errorMetadata
+		return &Response{jsonEncodedModified, endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
 	}
 
-	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, nil, errorMetadata
+	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, errorMetadata, nil
 }
 
 func extractFilePathFromResponseString(responseStr, configFolderPath string) string {

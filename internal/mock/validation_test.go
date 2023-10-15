@@ -15,8 +15,8 @@ type readFileMock struct {
 	testifymock.Mock
 }
 
-func (this *readFileMock) ReadFile(name string) ([]byte, error) {
-	args := this.Called(name)
+func (rfm *readFileMock) ReadFile(name string) ([]byte, error) {
+	args := rfm.Called(name)
 
 	return args.Get(0).([]byte), args.Get(1).(error)
 }

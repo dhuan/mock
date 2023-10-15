@@ -300,7 +300,7 @@ func ReplaceVars(
 	vars map[string]string,
 	toVarPlaceholder func(varName string) string,
 ) string {
-	result := fmt.Sprintf("%s", text)
+	result := text
 
 	for varName, varValue := range vars {
 		currentSearch := toVarPlaceholder(varName)
@@ -389,7 +389,7 @@ func ExtractNumbersFromString(str string) (int, error) {
 var number_chars = "012346789"
 
 func charIsNumber(char string) bool {
-	return strings.Index(number_chars, char) > -1
+	return strings.Contains(number_chars, char)
 }
 
 func RegexTest(regex string, subject string) bool {

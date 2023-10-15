@@ -195,9 +195,7 @@ func resolveEndpointErrorDescription(endpointConfigError *mock.EndpointConfigErr
 	}
 
 	if endpointConfigError.Code == mock.EndpointConfigErrorCode_RouteWithQuerystring {
-		return fmt.Sprintf(
-			"Routes cannot have querystrings. Read about \"response_if\" in the documentation to learn how to set Conditional Responses based on querystrings.",
-		)
+		return "Routes cannot have querystrings. Read about \"response_if\" in the documentation to learn how to set Conditional Responses based on querystrings."
 	}
 
 	if endpointConfigError.Code == mock.EndpointConfigErrorCode_FileUnreadable {
@@ -286,7 +284,7 @@ func newEndpointHandler(
 			panic(err)
 		}
 
-		response, err, errorMetadata := mock.ResolveEndpointResponse(
+		response, errorMetadata, err := mock.ResolveEndpointResponse(
 			readFile,
 			execute,
 			requestBody,
@@ -567,7 +565,6 @@ func handleMiddleware(
 			panic(err)
 		}
 
-		responseTransformed = middlewareRunResult.Body
 		response.Headers = middlewareRunResult.Headers
 		response.StatusCode = middlewareRunResult.StatusCode
 
