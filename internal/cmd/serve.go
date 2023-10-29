@@ -85,7 +85,7 @@ var serveCmd = &cobra.Command{
 		}
 
 		tempDir, err := utils.MktempDir()
-		log.Println(fmt.Sprintf("Temporary folder created for Request Records: %s", tempDir))
+		log.Printf("Temporary folder created for Request Records: %s", tempDir)
 		if err != nil {
 			panic(err)
 		}
@@ -131,7 +131,7 @@ var serveCmd = &cobra.Command{
 			exitWithError(errorMessage)
 		}
 
-		log.Println(fmt.Sprintf("Starting server on port %d.", port))
+		log.Printf("Starting server on port %d.", port)
 
 		listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 		if err != nil {
@@ -213,15 +213,13 @@ func displayEndpointConfigErrors(endpointConfigErrors []mock.EndpointConfigError
 		endpointRoute := endpointConfigs[endpointConfigError.EndpointIndex].Route
 		endpointMethod := endpointConfigs[endpointConfigError.EndpointIndex].Method
 
-		log.Println(
-			fmt.Sprintf(
-				"%d: Endpoint #%d (%s %s):\n%s\n",
-				i+1,
-				endpointConfigError.EndpointIndex+1,
-				endpointMethod,
-				endpointRoute,
-				resolveEndpointErrorDescription(&endpointConfigError),
-			),
+		log.Printf(
+			"%d: Endpoint #%d (%s %s):\n%s\n\n",
+			i+1,
+			endpointConfigError.EndpointIndex+1,
+			endpointMethod,
+			endpointRoute,
+			resolveEndpointErrorDescription(&endpointConfigError),
 		)
 	}
 }
@@ -296,7 +294,7 @@ func newEndpointHandler(
 			requestRecords,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
-			log.Println(fmt.Sprintf("Tried to read file that does not exist: %s", errorMetadata["file"]))
+			log.Printf("Tried to read file that does not exist: %s", errorMetadata["file"])
 			w.WriteHeader(404)
 			w.Write([]byte(fmt.Sprintf(
 				"File does not exist: %s",
@@ -309,7 +307,7 @@ func newEndpointHandler(
 			panic(err)
 		}
 		if response.EndpointContentType == types.Endpoint_content_type_unknown {
-			log.Println(fmt.Sprintf("Failed to resolve endpoint content type for route %s", endpointConfig.Route))
+			log.Printf("Failed to resolve endpoint content type for route %s", endpointConfig.Route)
 
 			return
 		}
@@ -423,7 +421,7 @@ func resolveConfig(configPath string) (*MockConfig, error) {
 
 	configFileContent, err := os.ReadFile(configPath)
 	if err != nil {
-		return &mockConfig, errors.New(fmt.Sprintf("Unable to read configuration file \"%s\". Make sure it exists and/or is readable, then try again.", configPath))
+		return &mockConfig, fmt.Errorf("Unable to read configuration file \"%s\". Make sure it exists and/or is readable, then try again.", configPath)
 	}
 
 	if err = json.Unmarshal(configFileContent, &mockConfig); err != nil {

@@ -519,7 +519,7 @@ func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, respon
 		}
 
 		if lineMatch == -1 {
-			t.Fatal(fmt.Sprintf("There is no line matching: %s", expectedLines[0]))
+			t.Fatalf("There is no line matching: %s", expectedLines[0])
 		}
 
 		i := 0
@@ -527,7 +527,7 @@ func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, respon
 			expectedLine := expectedLines[i]
 
 			if expectedLine != serverOutputLines[lineMatch] {
-				fmt.Println(fmt.Sprintf("Line expected: %s\nLine actual:   %s", expectedLine, serverOutputLines[lineMatch]))
+				fmt.Printf("Line expected: %s\nLine actual:   %s\n", expectedLine, serverOutputLines[lineMatch])
 				t.Fail()
 			}
 
@@ -555,7 +555,7 @@ func ApplicationOutputMatches(expectedLines []string) func(t *testing.T, respons
 			expectedLine := expectedLines[i]
 
 			if expectedLine != removeLogDatePrefix(serverOutputLines[i]) {
-				fmt.Println(fmt.Sprintf("Line expected: %s\nLine actual:   %s", expectedLine, serverOutputLines[i]))
+				fmt.Printf("Line expected: %s\nLine actual:   %s\n", expectedLine, serverOutputLines[i])
 				t.Fail()
 			}
 
@@ -591,9 +591,7 @@ func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response
 		for _, expectedHeaderKey := range expectedHeadersKeys {
 			headerValue, ok := response.Headers[expectedHeaderKey]
 			if !ok {
-				t.Error(
-					fmt.Sprintf("Header key does not exist in the resulting request: %s", expectedHeaderKey),
-				)
+				t.Errorf("Header key does not exist in the resulting request: %s", expectedHeaderKey)
 
 				return
 			}
@@ -609,8 +607,8 @@ func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Res
 			_, exists := response.Headers[headerKey]
 
 			if exists {
-				t.Error(
-					fmt.Sprintf("Expected header key to not exist, but it does: %s", headerKey),
+				t.Errorf(
+					"Expected header key to not exist, but it does: %s", headerKey,
 				)
 			}
 		}
@@ -679,7 +677,7 @@ func AssertMapHasValues[T_Key comparable, T_Value comparable](
 		valueb, ok := subject[key]
 
 		if !ok {
-			t.Error(fmt.Sprintf("Key '%+v' does not exist in given map.", key))
+			t.Errorf("Key '%+v' does not exist in given map.", key)
 		}
 
 		assert.Equal(t, value, valueb)

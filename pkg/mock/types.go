@@ -1,7 +1,6 @@
 package mock
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/dhuan/mock/internal/utils"
@@ -37,73 +36,73 @@ const (
 	ConditionType_RouteParamMatch
 )
 
-func (this *ConditionType) UnmarshalJSON(data []byte) (err error) {
+func (ct *ConditionType) UnmarshalJSON(data []byte) (err error) {
 	conditionTypeText := utils.Unquote(string(data))
 
 	if conditionTypeText == "header_match" {
-		*this = ConditionType_HeaderMatch
+		*ct = ConditionType_HeaderMatch
 
 		return nil
 	}
 
 	if conditionTypeText == "method_match" {
-		*this = ConditionType_MethodMatch
+		*ct = ConditionType_MethodMatch
 
 		return nil
 	}
 
 	if conditionTypeText == "json_body_match" {
-		*this = ConditionType_JsonBodyMatch
+		*ct = ConditionType_JsonBodyMatch
 
 		return nil
 	}
 
 	if conditionTypeText == "form_match" {
-		*this = ConditionType_FormMatch
+		*ct = ConditionType_FormMatch
 
 		return nil
 	}
 
 	if conditionTypeText == "querystring_match" {
-		*this = ConditionType_QuerystringMatch
+		*ct = ConditionType_QuerystringMatch
 
 		return nil
 	}
 
 	if conditionTypeText == "querystring_match_regex" {
-		*this = ConditionType_QuerystringMatchRegex
+		*ct = ConditionType_QuerystringMatchRegex
 
 		return nil
 	}
 
 	if conditionTypeText == "querystring_exact_match" {
-		*this = ConditionType_QuerystringExactMatch
+		*ct = ConditionType_QuerystringExactMatch
 
 		return nil
 	}
 
 	if conditionTypeText == "querystring_exact_match_regex" {
-		*this = ConditionType_QuerystringExactMatchRegex
+		*ct = ConditionType_QuerystringExactMatchRegex
 
 		return nil
 	}
 
 	if conditionTypeText == "nth" {
-		*this = ConditionType_Nth
+		*ct = ConditionType_Nth
 
 		return nil
 	}
 
 	if conditionTypeText == "route_param_match" {
-		*this = ConditionType_RouteParamMatch
+		*ct = ConditionType_RouteParamMatch
 
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("Failed to parse Condition Type: %s", conditionTypeText))
+	return fmt.Errorf("Failed to parse Condition Type: %s", conditionTypeText)
 }
 
-func (this *ConditionType) MarshalJSON() ([]byte, error) {
+func (ct *ConditionType) MarshalJSON() ([]byte, error) {
 	encodingMapPrepared := utils.MapMapValueOnly(
 		condition_type_code_encoding_map,
 		utils.WrapIn(`"`),
@@ -112,17 +111,17 @@ func (this *ConditionType) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJsonHelper(
 		encodingMapPrepared,
 		"Failed to parse Condition Type Code: %d",
-		this,
+		ct,
 	)
 }
 
 type ConditionValue string
 
-func (this *ConditionValue) UnmarshalJSON(data []byte) (err error) {
+func (cv *ConditionValue) UnmarshalJSON(data []byte) (err error) {
 	conditionTypeText := utils.Unquote(string(data))
 	var valueStringified ConditionValue = ConditionValue(conditionTypeText)
 
-	*this = valueStringified
+	*cv = valueStringified
 
 	return nil
 }

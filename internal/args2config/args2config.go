@@ -98,7 +98,7 @@ func assignStatusCode(endpointConfig *types.EndpointConfig) func(statusCode stri
 	return func(statusCode string) {
 		statusCodeParsed, err := strconv.Atoi(statusCode)
 		if err != nil {
-			log.Fatalln(fmt.Sprintf("Failed to parse %s", statusCode))
+			log.Fatalf("Failed to parse %s", statusCode)
 
 			return
 		}

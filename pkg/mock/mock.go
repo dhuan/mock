@@ -65,7 +65,7 @@ const (
 	ValidationErrorCode_RouteParamDoesNotExistInEndpoint
 )
 
-func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {
+func (vec *ValidationErrorCode) MarshalJSON() ([]byte, error) {
 	encodingMapPrepared := utils.MapMapValueOnly(
 		validation_error_code_encoding_map,
 		utils.WrapIn(`"`),
@@ -74,13 +74,13 @@ func (this *ValidationErrorCode) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJsonHelper(
 		encodingMapPrepared,
 		"Failed to parse Validation Error Code: %d",
-		this,
+		vec,
 	)
 }
 
-func (this *ValidationErrorCode) UnmarshalJSON(data []byte) error {
+func (vec *ValidationErrorCode) UnmarshalJSON(data []byte) error {
 	return utils.UnmarshalJsonHelper(
-		this,
+		vec,
 		validation_error_code_encoding_map,
 		data,
 		"Failed to parse Validation Error Code: %s",
