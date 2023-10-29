@@ -104,7 +104,7 @@ type AssertResponse struct {
 func Assert(config *MockConfig, assertOptions *AssertOptions) ([]ValidationError, error) {
 	bodyJson, err := json.Marshal(assertOptions)
 	if err != nil {
-		return make([]ValidationError, 0, 0), err
+		return make([]ValidationError, 0), err
 	}
 
 	request, err := http.NewRequest(
@@ -113,24 +113,24 @@ func Assert(config *MockConfig, assertOptions *AssertOptions) ([]ValidationError
 		bytes.NewBuffer([]byte(bodyJson)),
 	)
 	if err != nil {
-		return make([]ValidationError, 0, 0), err
+		return make([]ValidationError, 0), err
 	}
 
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		return make([]ValidationError, 0, 0), err
+		return make([]ValidationError, 0), err
 	}
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
-		return make([]ValidationError, 0, 0), err
+		return make([]ValidationError, 0), err
 	}
 
 	var responseParsed AssertResponse
 	err = json.Unmarshal(responseBody, &responseParsed)
 	if err != nil {
-		return make([]ValidationError, 0, 0), err
+		return make([]ValidationError, 0), err
 	}
 
 	return responseParsed.ValidationErrors, nil

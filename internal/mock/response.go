@@ -236,7 +236,7 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		log.Println(fmt.Sprintf("Executing shell script located in %s", scriptFilePath))
+		log.Printf("Executing shell script located in %s", scriptFilePath)
 
 		execResult, err := exec(
 			fmt.Sprintf("sh %s", scriptFilePath),
@@ -276,7 +276,7 @@ func resolveEndpointResponseInternal(
 
 		utils.JoinMap(requestVariables, fileVars)
 
-		log.Println(fmt.Sprintf("Executing command: %s", execCommand))
+		log.Printf("Executing command: %s", execCommand)
 
 		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
 			Env: requestVariables,

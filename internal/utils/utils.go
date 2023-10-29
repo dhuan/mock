@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -158,7 +157,7 @@ func MarshalJsonHelper[T comparable](
 		}
 	}
 
-	return []byte(""), errors.New(fmt.Sprintf(errorMessage, *value))
+	return []byte(""), fmt.Errorf(errorMessage, *value)
 }
 
 func UnmarshalJsonHelper[T comparable](
@@ -177,7 +176,7 @@ func UnmarshalJsonHelper[T comparable](
 		}
 	}
 
-	return errors.New(fmt.Sprintf(errorMessage, assertTypeText))
+	return fmt.Errorf(errorMessage, assertTypeText)
 }
 
 func MapMapValueOnly[T_Key comparable, T_Value comparable, T_ValueB interface{}](
