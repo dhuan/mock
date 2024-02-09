@@ -2,6 +2,9 @@
 
 *[Language-agnostic API mocking and testing utility](https://dhuan.github.io/mock)*
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/dhuan/mock.svg)](https://pkg.go.dev/github.com/dhuan/mock)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dhuan/mock)](https://goreportcard.com/report/github.com/dhuan/mock)
+
 **mock** enables you to quickly setup a HTTP server for end-to-end tests.
 
 - Define endpoints and their respective responses;
