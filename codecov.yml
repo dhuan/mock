@@ -1,0 +1,27 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 1
+  round: down
+  range: "70...100"
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 0.5%
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+
+ignore:
+  # command-line logic is tested in e2e 
+  - "internal/cmd/"
+  # middleware logic is tested in e2e
+  - "internal/middleware/"
+  # utilities for unit tests
+  - "internal/test_unit_utils/"
+  # type definitions, no need to test
+  - "internal/types/"
