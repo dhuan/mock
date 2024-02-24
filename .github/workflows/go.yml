@@ -33,7 +33,7 @@ jobs:
 
     - name: Test Unit
       run: |
-          make test_unit
+          make test_unit_with_coverage
 
     - name: Test E2E
       run: |
