@@ -91,7 +91,7 @@ func AddToMockedRequestRecords(state *unitTestState, fullRoute, method string, h
 func Validate(route string, assertOptions *Condition) TestOperationFunc {
 	return func(t *testing.T, state *unitTestState) {
 		assertOptions := AssertOptions{
-			Route:  route,
+			Route:     route,
 			Condition: assertOptions,
 		}
 
@@ -108,8 +108,8 @@ func Validate(route string, assertOptions *Condition) TestOperationFunc {
 func ValidateNth(nth int, route string, assertOptions *Condition) TestOperationFunc {
 	return func(t *testing.T, state *unitTestState) {
 		assertOptions := AssertOptions{
-			Nth:    nth,
-			Route:  route,
+			Nth:       nth,
+			Route:     route,
 			Condition: assertOptions,
 		}
 

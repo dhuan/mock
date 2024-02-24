@@ -20,7 +20,7 @@ func Test_E2E_BaseApi_NormalRequest(t *testing.T) {
 			"--response 'Hello world! This is the base API.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -52,7 +52,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 			"--response 'Hello world! This is the base API.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -84,7 +84,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
 			"--response 'Hello world! This is the base API.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -120,7 +120,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 			"--response 'Querystring: ${MOCK_REQUEST_QUERYSTRING}'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -152,7 +152,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *te
 			"--response 'Hello world!'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -186,7 +186,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestBodyIsForwarded(t *testin
 			"--response 'Request body: ${MOCK_REQUEST_BODY}'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -216,7 +216,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *te
 			"--response 'Request header foo: ${MOCK_REQUEST_HEADER_FOO}'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -249,7 +249,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -286,7 +286,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -337,7 +337,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 			"--response 'Hello world! This is the base API 1.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -352,7 +352,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 			"--response 'Hello world! This is the base API 2.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase2()
 
@@ -401,7 +401,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints(t *testing.T) {
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 
@@ -429,7 +429,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
 			"--response 'Base Api Response.'",
 		}, " "),
 		nil,
-        true,
+		true,
 	)
 	defer killMockBase()
 

@@ -13,7 +13,7 @@ func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
 		e2eutils.NewState(),
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}} --cors",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -32,7 +32,7 @@ func Test_E2E_Cors_HeadersAreNotSet(t *testing.T) {
 		e2eutils.NewState(),
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 

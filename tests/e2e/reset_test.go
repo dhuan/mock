@@ -15,7 +15,7 @@ func Test_E2E_Resetting(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 

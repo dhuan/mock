@@ -15,7 +15,7 @@ func Test_E2E_Assertion_NoCalls(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 
 	defer killMock()
@@ -43,7 +43,7 @@ func Test_E2E_Assertion_BasicAssertion_WithValidationErrors(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -78,7 +78,7 @@ func Test_E2E_Assertion_WithNth(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -110,7 +110,7 @@ func Test_E2E_Assertion_WithNth_Failing(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -149,7 +149,7 @@ func Test_E2E_Assertion_WithNth_OutOfRange(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -184,7 +184,7 @@ func Test_E2E_Assertion_BasicAssertion_WithoutValidationErrors(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -211,7 +211,7 @@ func Test_E2E_Assertion_Chaining_WithValidationErrors(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -251,7 +251,7 @@ func Test_E2E_Assertion_Chaining_WithoutValidationErrors(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
@@ -286,7 +286,7 @@ func Test_E2E_Assertion_MethodMatchingIsCaseInsensitive(t *testing.T) {
 		state,
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
-        true,
+		true,
 	)
 	defer killMock()
 
