@@ -1,6 +1,7 @@
 package tests_e2e
 
 import (
+	"net/http"
 	"strings"
 	"testing"
 
@@ -19,11 +20,11 @@ func Test_E2E_Cors_HeadersAreSet(t *testing.T) {
 
 	response := e2eutils.Request(mockConfig, "POST", "foo/bar", strings.NewReader(`{"foo":"bar"}`), e2eutils.ContentTypeJsonHeaders, serverOutput)
 
-	e2eutils.AssertMapHasValues(t, response.Headers, map[string]string{
-		"Access-Control-Allow-Credentials": "true",
-		"Access-Control-Allow-Headers":     "*",
-		"Access-Control-Allow-Methods":     "POST, GET, OPTIONS, PUT, DELETE",
-		"Access-Control-Allow-Origin":      "*",
+	e2eutils.AssertMapHasValues(t, response.Headers, http.Header{
+		"Access-Control-Allow-Credentials": []string{"true"},
+		"Access-Control-Allow-Headers":     []string{"*"},
+		"Access-Control-Allow-Methods":     []string{"POST, GET, OPTIONS, PUT, DELETE"},
+		"Access-Control-Allow-Origin":      []string{"*"},
 	})
 }
 

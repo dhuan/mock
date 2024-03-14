@@ -80,10 +80,10 @@ func Test_Middlewares_ModifyHeaders(t *testing.T) {
 		"middleware/modify_headers",
 		nil,
 		strings.NewReader(""),
-		HeadersMatch(map[string]string{
-			"Foo":        "bar",
-			"Header-One": "Value for header one",
-			"Header-Two": "Value for header two",
+		HeadersMatch(map[string][]string{
+			"Foo":        []string{"bar"},
+			"Header-One": []string{"Value for header one"},
+			"Header-Two": []string{"Value for header two"},
 		}),
 	)
 }
@@ -99,8 +99,8 @@ func Test_Middlewares_RemoveHeaders(t *testing.T) {
 		HeaderKeysNotIncluded([]string{
 			"Header-One",
 		}),
-		HeadersMatch(map[string]string{
-			"Header-Two": "Value for header two",
+		HeadersMatch(map[string][]string{
+			"Header-Two": []string{"Value for header two"},
 		}),
 	)
 }
@@ -181,9 +181,9 @@ func Test_Middlewares_Multiple_Middlewares_Modifying_Response(t *testing.T) {
 		strings.NewReader(""),
 		StringMatches("OneTwoThree"),
 		StatusCodeMatches(303),
-		HeadersMatch(map[string]string{
-			"New-Header-One": "Value one",
-			"New-Header-Two": "Value two",
+		HeadersMatch(map[string][]string{
+			"New-Header-One": []string{"Value one"},
+			"New-Header-Two": []string{"Value two"},
 		}),
 	)
 }

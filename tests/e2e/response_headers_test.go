@@ -15,9 +15,9 @@ func Test_E2E_ResponseWithHeaders(t *testing.T) {
 		"with/headers",
 		nil,
 		strings.NewReader(""),
-		HeadersMatch(map[string]string{
-			"Some-Header-Key":    "Some header value",
-			"Another-Header-Key": "Another header value",
+		HeadersMatch(map[string][]string{
+			"Some-Header-Key":    []string{"Some header value"},
+			"Another-Header-Key": []string{"Another header value"},
 		}),
 	)
 }
@@ -30,11 +30,11 @@ func Test_E2E_ResponseWithHeaders_AndBaseHeaders(t *testing.T) {
 		"with/headers/and/base/headers",
 		nil,
 		strings.NewReader(""),
-		HeadersMatch(map[string]string{
-			"Base-Header-One":    "A base header",
-			"Base-Header-Two":    "Another base header",
-			"Some-Header-Key":    "Some header value",
-			"Another-Header-Key": "Another header value",
+		HeadersMatch(map[string][]string{
+			"Base-Header-One":    []string{"A base header"},
+			"Base-Header-Two":    []string{"Another base header"},
+			"Some-Header-Key":    []string{"Some header value"},
+			"Another-Header-Key": []string{"Another header value"},
 		}),
 	)
 }
@@ -47,11 +47,11 @@ func Test_E2E_ResponseWithHeaders_WithConditionalResponse(t *testing.T) {
 		"with/conditional/responses/and/base/headers?some_key=some_value",
 		nil,
 		strings.NewReader(""),
-		HeadersMatch(map[string]string{
-			"Base-Header-One":                     "A base header",
-			"Base-Header-Two":                     "Another base header",
-			"Header-For-Conditional-Response-One": "Some header value",
-			"Header-For-Conditional-Response-Two": "Another header value",
+		HeadersMatch(map[string][]string{
+			"Base-Header-One":                     []string{"A base header"},
+			"Base-Header-Two":                     []string{"Another base header"},
+			"Header-For-Conditional-Response-One": []string{"Some header value"},
+			"Header-For-Conditional-Response-Two": []string{"Another header value"},
 		}),
 		HeaderKeysNotIncluded([]string{
 			"Some-Header-Key",

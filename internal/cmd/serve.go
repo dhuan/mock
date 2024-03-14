@@ -487,6 +487,16 @@ func onNotFound(
 
 		mockResponse := buildResponse(response, responseBody)
 
+		if corsEnabled {
+			for key := range mockResponse.Headers {
+				corsHeaderKeys := utils.GetKeys(corsHeaders)
+
+				if utils.IndexOf(corsHeaderKeys, key) > -1 {
+					delete(mockResponse.Headers, key)
+				}
+			}
+		}
+
 		middlewareHandlerExtraVars := map[string]string{
 			"MOCK_BASE_API_RESPONSE": "true",
 		}
@@ -600,9 +610,9 @@ func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, []b
 
 	requestCloned.Header = r.Header.Clone()
 
-	clientDoResult, err := client.Do(requestCloned)
+	response, err := client.Do(requestCloned)
 
-	return clientDoResult, requestBody, err
+	return response, requestBody, err
 }
 
 func parseBaseApi(currentRequestIsHttps bool, baseApi string) (string, string) {
@@ -676,11 +686,17 @@ func handleOptions(corsEnabled bool) func(next http.Handler) http.Handler {
 	}
 }
 
+var corsHeaders map[string]string = map[string]string{
+	"Access-Control-Allow-Origin":      "*",
+	"Access-Control-Allow-Credentials": "true",
+	"Access-Control-Allow-Headers":     "*",
+	"Access-Control-Allow-Methods":     "POST, GET, OPTIONS, PUT, DELETE",
+}
+
 func setCorsHeaders(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Access-Control-Allow-Credentials", "true")
-	w.Header().Add("Access-Control-Allow-Headers", "*")
-	w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	for key, value := range corsHeaders {
+		w.Header().Set(key, value)
+	}
 }
 
 func getEndpointParams(r *http.Request) map[string]string {

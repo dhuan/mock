@@ -167,9 +167,9 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *te
 		"foo/bar",
 		nil,
 		strings.NewReader(""),
-		HeadersMatch(map[string]string{
-			"Header-One": "value one",
-			"Header-Two": "value two",
+		HeadersMatch(map[string][]string{
+			"Header-One": []string{"value one"},
+			"Header-Two": []string{"value two"},
 		}),
 	)
 }
@@ -266,9 +266,9 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 		"foo/bar",
 		nil,
 		strings.NewReader(""),
-		HeadersMatch(map[string]string{
-			"Some-Header-From-Base-Api": "some value",
-			"Foo":                       "bar",
+		HeadersMatch(map[string][]string{
+			"Some-Header-From-Base-Api": []string{"some value"},
+			"Foo":                       []string{"bar"},
 		}),
 		StringMatches("Base Api Response. Modified!"),
 	)
@@ -444,5 +444,44 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		StringMatches("Base Api Response."),
+	)
+}
+
+func Test_E2E_BaseApi_CorsFlagOverwritesCorsHeadersFromBaseApi(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Hello world! This is the base API.'",
+			"--header 'Access-Control-Allow-Origin: some_origin'",
+			"--header 'Access-Control-Allow-Credentials: false'",
+			"--header 'Access-Control-Allow-Headers: some-header'",
+			"--header 'Access-Control-Allow-Methods: GET'",
+		}, " "),
+		nil,
+		true,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--cors",
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(200),
+		HeadersMatch(map[string][]string{
+			"Access-Control-Allow-Origin":      []string{"*"},
+			"Access-Control-Allow-Credentials": []string{"true"},
+			"Access-Control-Allow-Headers":     []string{"*"},
+			"Access-Control-Allow-Methods":     []string{"POST, GET, OPTIONS, PUT, DELETE"},
+		}),
 	)
 }

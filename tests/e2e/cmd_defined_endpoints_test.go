@@ -136,9 +136,9 @@ func Test_E2E_CommandLineDefinedEndpoints_WithHeaders(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		StringMatches("Second endpoint."),
-		HeadersMatch(map[string]string{
-			"Header-One": "1st header",
-			"Header-Two": "2nd header",
+		HeadersMatch(map[string][]string{
+			"Header-One": []string{"1st header"},
+			"Header-Two": []string{"2nd header"},
 		}),
 	)
 
@@ -150,8 +150,8 @@ func Test_E2E_CommandLineDefinedEndpoints_WithHeaders(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		StringMatches("Third endpoint."),
-		HeadersMatch(map[string]string{
-			"Header-Three": "3rd header",
+		HeadersMatch(map[string][]string{
+			"Header-Three": []string{"3rd header"},
 		}),
 	)
 }

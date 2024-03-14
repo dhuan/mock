@@ -213,9 +213,9 @@ func Test_E2E_Response_ShellScript_CustomHeadersAndStatusCode(t *testing.T) {
 		nil,
 		strings.NewReader("This is the request payload."),
 		StringMatches(`Hello world!`),
-		HeadersMatch(map[string]string{
-			"Some-Header-Key":    "Some Header Value",
-			"Another-Header-Key": "Another Header Value",
+		HeadersMatch(map[string][]string{
+			"Some-Header-Key":    []string{"Some Header Value"},
+			"Another-Header-Key": []string{"Another Header Value"},
 		}),
 		StatusCodeMatches(201),
 	)

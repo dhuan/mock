@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+IMPROVEMENTS
+
+- Update CORS logic to prevent duplicated headers. If mock was running with a base api set which includes cors headers, then mock would respond with duplicated cors headers. Now mock overwrites any cors headers which were set by the Base API if executed with the `--cors` flag.
+
 ## 1.3.1
 
 IMPROVEMENTS:

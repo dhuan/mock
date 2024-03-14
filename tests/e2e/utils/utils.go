@@ -29,7 +29,7 @@ type E2eState struct {
 
 type Response struct {
 	Body       []byte
-	Headers    map[string]string
+	Headers    http.Header
 	StatusCode int
 }
 
@@ -138,20 +138,9 @@ func Request(config *mocklib.MockConfig, method, route string, payload io.Reader
 
 	return &Response{
 		Body:       responseBody,
-		Headers:    parseHeaders(response.Header),
+		Headers:    response.Header,
 		StatusCode: response.StatusCode,
 	}
-}
-
-func parseHeaders(headers http.Header) map[string]string {
-	parsedHeaders := make(map[string]string)
-	sortedKeys := getSortedKeys(headers)
-
-	for _, key := range sortedKeys {
-		parsedHeaders[key] = strings.Join(headers[key], ",")
-	}
-
-	return parsedHeaders
 }
 
 func RequestApiReset(config *mocklib.MockConfig) {
@@ -584,7 +573,12 @@ func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Resp
 	}
 }
 
-func HeadersMatch(expectedHeaders map[string]string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func Foobar() func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	}
+}
+
+func HeadersMatch(expectedHeaders http.Header) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		expectedHeadersKeys := getSortedKeys(expectedHeaders)
 
@@ -668,7 +662,7 @@ func GetKeys[T_Key comparable, T_Value interface{}](subject map[T_Key]T_Value) [
 	return keys
 }
 
-func AssertMapHasValues[T_Key comparable, T_Value comparable](
+func AssertMapHasValues[T_Key comparable, T_Value interface{}](
 	t *testing.T,
 	subject map[T_Key]T_Value,
 	values map[T_Key]T_Value,
