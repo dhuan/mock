@@ -573,11 +573,6 @@ func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Resp
 	}
 }
 
-func Foobar() func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
-	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
-	}
-}
-
 func HeadersMatch(expectedHeaders http.Header) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		expectedHeadersKeys := getSortedKeys(expectedHeaders)
