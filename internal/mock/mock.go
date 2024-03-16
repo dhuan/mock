@@ -152,6 +152,7 @@ func BuildVars(
 	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
 	requestBody []byte,
+	baseApi string,
 ) (map[string]string, error) {
 	endpoint := requestRecord.Route
 	mockHost := fmt.Sprintf("localhost:%s", state.ListenPort)
@@ -175,6 +176,7 @@ func BuildVars(
 		"MOCK_REQUEST_METHOD":      requestRecord.Method,
 		"MOCK_REQUEST_QUERYSTRING": querystring,
 		"MOCK_REQUEST_NTH":         fmt.Sprintf("%d", nth),
+		"MOCK_BASE_API":            baseApi,
 	}
 
 	addQuerystringParams(result, requestRecord)

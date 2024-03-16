@@ -52,6 +52,26 @@ will result in a proxy request to ``example.com/foo/bar``.
 Intercepting responses
 ----------------------
 
+Endpoints defined for a `mock API` overwrite the ones from a Base API. In other
+words, when both your API *and* Base API offer the same endpoint, then your
+API's endpoint takes precedence, therefore the Base API's endpoint does not
+even get requested in that scenario. But that is the default behavior only, we
+can set things to behave differently if desired.
+
+`Through response shell scripts <shell_scripts.html>`__ we can forward the
+current request to the Base API, and then the HTTP Response from Base API will
+be available in the ``$MOCK_RESPONSE_BODY`` environment variable, enabling us
+to tweak the response if desired, before sending to the client. This is
+accomplished by issuing the following shell command, executed from your
+endpoint's shell script:
+
+.. code:: sh
+
+    $ mock forward
+
+Intercepting responses through middlewares
+------------------------------------------
+
 Middlewares can be used to manipulate responses given by a Base API. `Check the
 Middlewares documentation section for learning all about them.
 <middlewares.html>`__ In fact Middlewares make no distinction of whether the
