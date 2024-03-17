@@ -25,12 +25,15 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, error) {
 	var endpoint string
 	var querystring string
 
-	validateEnv(map[string]foo{
+    envValid := validateEnv(map[string]foo{
 		"MOCK_REQUEST_HEADERS":     pointsToFile(&headersPlainText),
 		"MOCK_REQUEST_METHOD":      isStringAny(&method, validHttpMethods),
 		"MOCK_REQUEST_ENDPOINT":    isStringWithText(&endpoint),
 		"MOCK_REQUEST_QUERYSTRING": optionalString(&querystring),
 	})
+    if !envValid {
+        return nil, false, nil
+    }
 
     request, err := http.NewRequest(method)
     if err != nil {
