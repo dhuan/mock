@@ -3,6 +3,7 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -198,4 +199,32 @@ func addHeaders(m map[string]string, requestRecord *types.RequestRecord) {
 
 		m[fmt.Sprintf("MOCK_REQUEST_HEADER_%s", strings.ToUpper(headerKey))] = requestRecord.Headers[key][0]
 	}
+}
+
+func BuildResponseVars(response *http.Response) (map[string]string, error) {
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBodyFile, err := utils.CreateTempFile([]byte(responseBody))
+	if err != nil {
+		return nil, err
+	}
+
+	responseStatusCodeFile, err := utils.CreateTempFile([]byte(fmt.Sprintf("%d", response.StatusCode)))
+	if err != nil {
+		return nil, err
+	}
+
+	responseHeadersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(toHttpHeaders(responseHeaders)) + "\n"))
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]string{
+		"MOCK_RESPONSE_BODY":        responseBodyFile,
+		"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
+		"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
+	}, nil
 }
