@@ -380,7 +380,7 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 	return types.Endpoint_content_type_plaintext
 }
 
-func extractHeadersFromFile(filePath string, readFile types.ReadFileFunc) (map[string]string, error) {
+func ExtractHeadersFromFile(filePath string, readFile types.ReadFileFunc) (map[string]string, error) {
 	headers := make(map[string]string)
 
 	fileContent, err := readFile(filePath)
@@ -522,7 +522,7 @@ func extractModifiedResponse(
 	headers map[string]string,
 	fallbackStatusCode int,
 ) (*Response, error) {
-	extraHeaders, err := extractHeadersFromFile(hf.responseHeaders, readFile)
+	extraHeaders, err := ExtractHeadersFromFile(hf.responseHeaders, readFile)
 	if err != nil {
 		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
 	}

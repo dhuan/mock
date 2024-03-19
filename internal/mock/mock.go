@@ -217,7 +217,7 @@ func BuildResponseVars(response *http.Response) (map[string]string, error) {
 		return nil, err
 	}
 
-	responseHeadersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(toHttpHeaders(responseHeaders)) + "\n"))
+	responseHeadersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(response.Header) + "\n"))
 	if err != nil {
 		return nil, err
 	}
