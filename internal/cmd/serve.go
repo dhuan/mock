@@ -750,7 +750,11 @@ const (
 
 func resolveBaseApi(flagBaseApi string, config *MockConfig) (bool, string) {
 	if flagBaseApi != "" {
-		return true, formatBaseApi(flagBaseApi)
+		baseApi := formatBaseApi(flagBaseApi)
+
+		config.Base = baseApi
+
+		return true, baseApi
 	}
 
 	if config.Base != "" {
