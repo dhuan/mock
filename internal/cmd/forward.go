@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +17,11 @@ import (
 var forwardCmd = &cobra.Command{
 	Use: "forward",
 	Run: func(cmd *cobra.Command, args []string) {
-		request, valid, err, envValidationErrors := buildRequestFromMockEnvVars()
+		request,
+			valid,
+			err,
+			envValidationErrors,
+			rf := buildRequestFromMockEnvVars()
 		if !valid {
 			fmt.Println(strings.Join(envValidationErrors, "\n"))
 
@@ -38,16 +43,27 @@ var forwardCmd = &cobra.Command{
 
 		log.Printf("Got response from Base API: %d\n", response.StatusCode)
 
-		responseVars, err := mock.BuildResponseVars(response)
+		responseBody, err := io.ReadAll(response.Body)
 		if err != nil {
 			panic(err)
 		}
 
-		responseVarKeys := utils.GetSortedKeys(responseVars)
-		for _, key := range responseVarKeys {
-			fmt.Printf("%s=%s\n", key, responseVars[key])
+		if err = writeFile(rf.body, responseBody); err != nil {
+			panic(err)
+		}
+
+		if err = writeFile(rf.statusCode, []byte(fmt.Sprintf("%d", response.StatusCode))); err != nil {
+			panic(err)
+		}
+
+		if err = writeFile(rf.headers, []byte(utils.ToHeadersText(response.Header))); err != nil {
+			panic(err)
 		}
 	},
+}
+
+func writeFile(filePath string, data []byte) error {
+	return os.WriteFile(filePath, data, 0644)
 }
 
 var validHttpMethods []string = []string{
@@ -59,22 +75,34 @@ var validHttpMethods []string = []string{
 	"options",
 }
 
-func buildRequestFromMockEnvVars() (*http.Request, bool, error, []string) {
+type responseFiles struct {
+	headers    string
+	statusCode string
+	body       string
+}
+
+func buildRequestFromMockEnvVars() (*http.Request, bool, error, []string, *responseFiles) {
 	var baseApiUrl string
 	var headersPlainText string
 	var method string
 	var endpoint string
 	var querystring string
+	var responseFileHeaders string
+	var responseFileBody string
+	var responseFileStatusCode string
 
 	envValid, errorMessages := validateEnv(map[string]*envValidationConfig{
-		"MOCK_BASE_API":            {variable: &baseApiUrl, f: isStringWithText},
-		"MOCK_REQUEST_HEADERS":     {variable: &headersPlainText, f: pointsToFile},
-		"MOCK_REQUEST_METHOD":      {variable: &method, f: isStringAny(validHttpMethods)},
-		"MOCK_REQUEST_ENDPOINT":    {variable: &endpoint, f: isStringWithText},
-		"MOCK_REQUEST_QUERYSTRING": {variable: &querystring, f: optionalString},
+		"MOCK_BASE_API":             {variable: &baseApiUrl, f: isStringWithText},
+		"MOCK_REQUEST_HEADERS":      {variable: &headersPlainText, f: pointsToFile},
+		"MOCK_REQUEST_METHOD":       {variable: &method, f: isStringAny(validHttpMethods)},
+		"MOCK_REQUEST_ENDPOINT":     {variable: &endpoint, f: isStringWithText},
+		"MOCK_REQUEST_QUERYSTRING":  {variable: &querystring, f: optionalString},
+		"MOCK_RESPONSE_HEADERS":     {variable: &responseFileHeaders, f: pointsToFile},
+		"MOCK_RESPONSE_BODY":        {variable: &responseFileBody, f: pointsToFile},
+		"MOCK_RESPONSE_STATUS_CODE": {variable: &responseFileStatusCode, f: pointsToFile},
 	})
 	if !envValid {
-		return nil, false, nil, errorMessages
+		return nil, false, nil, errorMessages, nil
 	}
 
 	method = strings.ToUpper(method)
@@ -85,18 +113,22 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, error, []string) {
 
 	request, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		return nil, true, err, []string{}
+		return nil, true, err, []string{}, nil
 	}
 
 	headers, err := mock.ExtractHeadersFromFile(os.Getenv("MOCK_REQUEST_HEADERS"), readFile)
 	if err != nil {
-		return nil, true, err, []string{}
+		return nil, true, err, []string{}, nil
 	}
 	for headerKey, headerValue := range headers {
 		request.Header.Add(headerKey, headerValue)
 	}
 
-	return request, true, nil, []string{}
+	return request, true, nil, []string{}, &responseFiles{
+		headers:    os.Getenv("MOCK_RESPONSE_HEADERS"),
+		statusCode: os.Getenv("MOCK_RESPONSE_STATUS_CODE"),
+		body:       os.Getenv("MOCK_RESPONSE_BODY"),
+	}
 }
 
 type envValidationConfig struct {
