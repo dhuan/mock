@@ -28,7 +28,7 @@ func Test_E2E_Forward(t *testing.T) {
 		[]string{
 			fmt.Sprintf("--base 'http://localhost:%d'", state.Port),
 			"--route foo/bar",
-			"--exec '/home/work/work/mock/bin/mock forward; printf \" Modified!\" >> $MOCK_RESPONSE_BODY'",
+			"--exec '{{MOCK_EXECUTABLE}} forward; printf \" Modified!\" >> $MOCK_RESPONSE_BODY'",
 		},
 		"GET",
 		"foo/bar",
