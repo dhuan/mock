@@ -17,6 +17,7 @@ func Test_E2E_Forward(t *testing.T) {
 			"-p {{TEST_E2E_PORT}}",
 			"--route 'foo/bar'",
 			"--response 'Hello world.'",
+			"--status-code 206",
 		}, " "),
 		nil,
 		true,
@@ -28,12 +29,18 @@ func Test_E2E_Forward(t *testing.T) {
 		[]string{
 			fmt.Sprintf("--base 'http://localhost:%d'", state.Port),
 			"--route foo/bar",
-			"--exec '{{MOCK_EXECUTABLE}} forward; printf \" Modified!\" >> $MOCK_RESPONSE_BODY'",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				"{{MOCK_EXECUTABLE}} forward",
+				"printf \" Modified!\" >> $MOCK_RESPONSE_BODY",
+				"STATUS_CODE=$(cat $MOCK_RESPONSE_STATUS_CODE)",
+				"echo $((STATUS_CODE+1)) > $MOCK_RESPONSE_STATUS_CODE",
+			}, ";")),
 		},
 		"GET",
 		"foo/bar",
 		nil,
 		nil,
 		StringMatches("Hello world. Modified!"),
+		StatusCodeMatches(207),
 	)
 }
