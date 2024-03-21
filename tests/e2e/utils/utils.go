@@ -181,9 +181,10 @@ func replaceVars(command *string, state *E2eState) {
 	}
 
 	vars := map[string]string{
-		"TEST_DATA_PATH": fmt.Sprintf("%s/tests/e2e/data", pwd()),
-		"TEST_E2E_PORT":  fmt.Sprint(state.Port),
-		"WD":             wd,
+		"TEST_DATA_PATH":  fmt.Sprintf("%s/tests/e2e/data", pwd()),
+		"TEST_E2E_PORT":   fmt.Sprint(state.Port),
+		"WD":              wd,
+		"MOCK_EXECUTABLE": fmt.Sprintf("%s/bin/mock", pwd()),
 	}
 
 	for key, value := range vars {

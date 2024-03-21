@@ -41,6 +41,7 @@ func ResolveEndpointResponse(
 	endpointParams map[string]string,
 	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
+	baseApi string,
 ) (*Response, map[string]string, error) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
@@ -66,6 +67,7 @@ func ResolveEndpointResponse(
 			hasResponseIf,
 			envVars,
 			endpointParams,
+			baseApi,
 		)
 	}
 
@@ -83,6 +85,7 @@ func ResolveEndpointResponse(
 		hasResponseIf,
 		envVars,
 		endpointParams,
+		baseApi,
 	)
 }
 
@@ -157,6 +160,7 @@ func resolveEndpointResponseInternal(
 	hasResponseIf bool,
 	envVars map[string]string,
 	endpointParams map[string]string,
+	baseApi string,
 ) (*Response, map[string]string, error) {
 	errorMetadata := make(map[string]string)
 	endpointConfigContentType := resolveEndpointConfigContentType(response)
@@ -172,6 +176,7 @@ func resolveEndpointResponseInternal(
 		requestRecord,
 		requestRecords,
 		requestBody,
+		baseApi,
 	)
 	if err != nil {
 		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
@@ -375,7 +380,7 @@ func resolveEndpointConfigContentType(response types.EndpointConfigResponse) typ
 	return types.Endpoint_content_type_plaintext
 }
 
-func extractHeadersFromFile(filePath string, readFile types.ReadFileFunc) (map[string]string, error) {
+func ExtractHeadersFromFile(filePath string, readFile types.ReadFileFunc) (map[string]string, error) {
 	headers := make(map[string]string)
 
 	fileContent, err := readFile(filePath)
@@ -517,7 +522,7 @@ func extractModifiedResponse(
 	headers map[string]string,
 	fallbackStatusCode int,
 ) (*Response, error) {
-	extraHeaders, err := extractHeadersFromFile(hf.responseHeaders, readFile)
+	extraHeaders, err := ExtractHeadersFromFile(hf.responseHeaders, readFile)
 	if err != nil {
 		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
 	}

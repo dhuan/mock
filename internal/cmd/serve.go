@@ -292,6 +292,7 @@ func newEndpointHandler(
 			endpointParams,
 			requestRecord,
 			requestRecords,
+			config.Base,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Printf("Tried to read file that does not exist: %s", errorMetadata["file"])
@@ -545,7 +546,7 @@ func handleMiddleware(
 	middlewareConfigsForRequest := mockMiddleware.GetMiddlewareForRequest(config.Middlewares, r, requestRecord, requestRecords, mock.VerifyCondition)
 	hasMiddleware := len(middlewareConfigsForRequest) > 0
 
-	vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody)
+	vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody, config.Base)
 	if err != nil {
 		panic(err)
 	}
@@ -749,7 +750,11 @@ const (
 
 func resolveBaseApi(flagBaseApi string, config *MockConfig) (bool, string) {
 	if flagBaseApi != "" {
-		return true, formatBaseApi(flagBaseApi)
+		baseApi := formatBaseApi(flagBaseApi)
+
+		config.Base = baseApi
+
+		return true, baseApi
 	}
 
 	if config.Base != "" {
