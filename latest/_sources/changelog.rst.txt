@@ -12,6 +12,11 @@ IMPROVEMENTS
    headers which were set by the Base API if executed with the
    ``--cors`` flag.
 
+-  Add ``forward`` command enabling Response Shell-Scripts to “forward”
+   the current request to a Base API, and then modify the Base API’s
+   Response if desired. Check the “Base-API” section in the manual for
+   more details.
+
 1.3.1
 -----
 
