@@ -4,7 +4,14 @@
 
 IMPROVEMENTS
 
-- Update CORS logic to prevent duplicated headers. If mock was running with a base api set which includes cors headers, then mock would respond with duplicated cors headers. Now mock overwrites any cors headers which were set by the Base API if executed with the `--cors` flag.
+- Update CORS logic to prevent duplicated headers. If mock was running with a
+  base api set which includes cors headers, then mock would respond with
+  duplicated cors headers. Now mock overwrites any cors headers which were set
+  by the Base API if executed with the `--cors` flag.
+
+- Add `forward` command enabling Response Shell-Scripts to "forward" the
+  current request to a Base API, and then modify the Base API's Response if
+  desired. Check the "Base-API" section in the manual for more details.
 
 ## 1.3.1
 
