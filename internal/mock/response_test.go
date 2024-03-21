@@ -55,6 +55,7 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -90,6 +91,7 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -127,6 +129,7 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -162,6 +165,7 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(t, 200, response.StatusCode)
@@ -188,6 +192,7 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(t, 201, response.StatusCode)
@@ -233,6 +238,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -288,6 +294,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=WORLD"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -347,6 +354,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -406,6 +414,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -463,6 +472,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -527,6 +537,7 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -577,6 +588,7 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -614,6 +626,7 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -650,6 +663,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -700,6 +714,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 		map[string]string{},
 		&types.RequestRecord{Querystring: "foo=bar"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -750,6 +765,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 		map[string]string{},
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
@@ -803,6 +819,7 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		map[string]string{},
 		&types.RequestRecord{Method: "post", Querystring: "hello=world", Body: &body},
 		[]types.RequestRecord{},
+        "",
 	)
 
 	assert.Equal(
