@@ -19,9 +19,9 @@ var forwardCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		request,
 			valid,
-			err,
 			envValidationErrors,
-			rf := buildRequestFromMockEnvVars()
+			rf,
+			err := buildRequestFromMockEnvVars()
 		if !valid {
 			fmt.Println(strings.Join(envValidationErrors, "\n"))
 
@@ -81,7 +81,7 @@ type responseFiles struct {
 	body       string
 }
 
-func buildRequestFromMockEnvVars() (*http.Request, bool, error, []string, *responseFiles) {
+func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFiles, error) {
 	var baseApiUrl string
 	var headersPlainText string
 	var method string
@@ -102,7 +102,7 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, error, []string, *respo
 		"MOCK_RESPONSE_STATUS_CODE": {variable: &responseFileStatusCode, f: pointsToFile},
 	})
 	if !envValid {
-		return nil, false, nil, errorMessages, nil
+		return nil, false, errorMessages, nil, nil
 	}
 
 	method = strings.ToUpper(method)
@@ -113,22 +113,22 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, error, []string, *respo
 
 	request, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		return nil, true, err, []string{}, nil
+		return nil, true, []string{}, nil, err
 	}
 
 	headers, err := mock.ExtractHeadersFromFile(os.Getenv("MOCK_REQUEST_HEADERS"), readFile)
 	if err != nil {
-		return nil, true, err, []string{}, nil
+		return nil, true, []string{}, nil, err
 	}
 	for headerKey, headerValue := range headers {
 		request.Header.Add(headerKey, headerValue)
 	}
 
-	return request, true, nil, []string{}, &responseFiles{
+	return request, true, []string{}, &responseFiles{
 		headers:    os.Getenv("MOCK_RESPONSE_HEADERS"),
 		statusCode: os.Getenv("MOCK_RESPONSE_STATUS_CODE"),
 		body:       os.Getenv("MOCK_RESPONSE_BODY"),
-	}
+	}, nil
 }
 
 type envValidationConfig struct {

@@ -20,24 +20,11 @@ type MockApiResponse struct {
 }
 
 var (
-	flagConfig             string
-	flagPort               string
-	flagCors               bool
-	flagDelay              int64
-	flagRoute              *[]string
-	flagMethod             *[]string
-	flagStatusCode         *[]int
-	flagResponse           *[]string
-	flagResponseFile       *[]string
-	flagResponseFileServer *[]string
-	flagFileServer         *[]string
-	flagResponseSh         *[]string
-	flagShellScript        *[]string
-	flagHeader             *[]string
-	flagExec               *[]string
-	flagResponseExec       *[]string
-	flagMiddleware         *[]string
-	flagBaseApi            string
+	flagConfig  string
+	flagPort    string
+	flagCors    bool
+	flagDelay   int64
+	flagBaseApi string
 )
 
 var rootCmd = &cobra.Command{
@@ -53,19 +40,19 @@ func Execute() {
 	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "UNSET", "port to listen on")
 	serveCmd.PersistentFlags().BoolVar(&flagCors, "cors", false, "enable CORS")
 	serveCmd.PersistentFlags().Int64VarP(&flagDelay, "delay", "d", 0, "configuration file")
-	flagRoute = serveCmd.PersistentFlags().StringArray("route", []string{}, "endpoint route")
-	flagMethod = serveCmd.PersistentFlags().StringArray("method", []string{}, "endpoint method")
-	flagStatusCode = serveCmd.PersistentFlags().IntSlice("status-code", []int{}, "endpoint response's status code")
-	flagResponse = serveCmd.PersistentFlags().StringArray("response", []string{}, "endpoint response")
-	flagResponseFile = serveCmd.PersistentFlags().StringArray("response-file", []string{}, "endpoint response file")
-	flagResponseFileServer = serveCmd.PersistentFlags().StringArray("response-file-server", []string{}, "endpoint response file server")
-	flagFileServer = serveCmd.PersistentFlags().StringArray("file-server", []string{}, "endpoint response file server")
-	flagResponseSh = serveCmd.PersistentFlags().StringArray("response-sh", []string{}, "endpoint response script")
-	flagShellScript = serveCmd.PersistentFlags().StringArray("shell-script", []string{}, "endpoint response script")
-	flagHeader = serveCmd.PersistentFlags().StringArray("header", []string{}, "endpoint response header")
-	flagExec = serveCmd.PersistentFlags().StringArray("exec", []string{}, "endpoint response exec")
-	flagResponseExec = serveCmd.PersistentFlags().StringArray("response-exec", []string{}, "endpoint response exec")
-	flagMiddleware = serveCmd.PersistentFlags().StringArray("middleware", []string{}, "middleware")
+	serveCmd.PersistentFlags().StringArray("route", []string{}, "endpoint route")
+	serveCmd.PersistentFlags().StringArray("method", []string{}, "endpoint method")
+	serveCmd.PersistentFlags().IntSlice("status-code", []int{}, "endpoint response's status code")
+	serveCmd.PersistentFlags().StringArray("response", []string{}, "endpoint response")
+	serveCmd.PersistentFlags().StringArray("response-file", []string{}, "endpoint response file")
+	serveCmd.PersistentFlags().StringArray("response-file-server", []string{}, "endpoint response file server")
+	serveCmd.PersistentFlags().StringArray("file-server", []string{}, "endpoint response file server")
+	serveCmd.PersistentFlags().StringArray("response-sh", []string{}, "endpoint response script")
+	serveCmd.PersistentFlags().StringArray("shell-script", []string{}, "endpoint response script")
+	serveCmd.PersistentFlags().StringArray("header", []string{}, "endpoint response header")
+	serveCmd.PersistentFlags().StringArray("exec", []string{}, "endpoint response exec")
+	serveCmd.PersistentFlags().StringArray("response-exec", []string{}, "endpoint response exec")
+	serveCmd.PersistentFlags().StringArray("middleware", []string{}, "middleware")
 	serveCmd.PersistentFlags().StringVarP(&flagBaseApi, "base", "b", "", "base API")
 
 	if err := rootCmd.Execute(); err != nil {
