@@ -48,12 +48,7 @@ var serveCmd = &cobra.Command{
 			exitWithError(cmd.UsageString())
 		}
 
-		allEndpoints, endpointMergeErrors := mergeEndpoints(config.Endpoints, endpointsFromCommandLine)
-		if len(endpointMergeErrors) > 0 {
-			fmt.Println("failed")
-
-			os.Exit(1)
-		}
+		allEndpoints := mergeEndpoints(config.Endpoints, endpointsFromCommandLine)
 
 		config.Endpoints = allEndpoints
 
@@ -729,24 +724,13 @@ func getAllEnvVars() map[string]string {
 	return result
 }
 
-func mergeEndpoints(a, b []types.EndpointConfig) ([]types.EndpointConfig, []endpointMergeError) {
-	return append(a, b...), []endpointMergeError{}
+func mergeEndpoints(a, b []types.EndpointConfig) []types.EndpointConfig {
+	return append(a, b...)
 }
 
 func mergeMiddlewares(config *MockConfig, middlewares []types.MiddlewareConfig) {
 	config.Middlewares = append(config.Middlewares, middlewares...)
 }
-
-type endpointMergeError struct {
-	code  endpointMergeErrorCode
-	index int
-}
-
-type endpointMergeErrorCode int
-
-const (
-	endpointMergeErrorCode_none endpointMergeErrorCode = iota
-)
 
 func resolveBaseApi(flagBaseApi string, config *MockConfig) (bool, string) {
 	if flagBaseApi != "" {
