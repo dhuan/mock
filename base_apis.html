@@ -266,6 +266,23 @@ a proxy to some other service.</p>
 </div>
 <section id="intercepting-responses">
 <h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">#</a></h2>
+<p>Endpoints defined for a <cite>mock API</cite> overwrite the ones from a Base API. In other
+words, when both your API <em>and</em> Base API offer the same endpoint, then your
+API’s endpoint takes precedence, therefore the Base API’s endpoint does not
+even get requested in that scenario. But that is the default behavior only, we
+can set things to behave differently if desired.</p>
+<p><a class="reference external" href="shell_scripts.html">Through response shell scripts</a> we can forward the
+current request to the Base API, and then the HTTP Response from Base API will
+be available in the <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code> environment variable, enabling us
+to tweak the response if desired, before sending to the client. This is
+accomplished by issuing the following shell command, executed from your
+endpoint’s shell script:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>forward
+</pre></div>
+</div>
+</section>
+<section id="intercepting-responses-through-middlewares">
+<h2>Intercepting responses through middlewares<a class="headerlink" href="#intercepting-responses-through-middlewares" title="Link to this heading">#</a></h2>
 <p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
 Middlewares documentation section for learning all about them.</a> In fact Middlewares make no distinction of whether the
 current request is meant for a <cite>mock</cite> endpoint or an actual Base API when
@@ -355,6 +372,7 @@ independent of the protocol chosen by requesting client.</p>
             <ul>
 <li><a class="reference internal" href="#">Base APIs</a><ul>
 <li><a class="reference internal" href="#intercepting-responses">Intercepting responses</a></li>
+<li><a class="reference internal" href="#intercepting-responses-through-middlewares">Intercepting responses through middlewares</a></li>
 <li><a class="reference internal" href="#base-apis-and-tls">Base APIs and TLS</a></li>
 </ul>
 </li>
