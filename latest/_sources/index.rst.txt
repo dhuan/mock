@@ -28,8 +28,8 @@ any preferred HTTP client: ``http://localhost:3000/say_hi/mock`` and
 Quick links
 -----------
 
--  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v1.3.1/mock_v1.3.1_linux-386.tar.gz>`__
--  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v1.3.1/mock_v1.3.1_darwin-amd64.tar.gz>`__
+-  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v1.4.0/mock_v1.4.0_linux-386.tar.gz>`__
+-  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v1.4.0/mock_v1.4.0_darwin-amd64.tar.gz>`__
 -  `Releases <https://github.com/dhuan/mock/releases>`__
 -  `mock\ ’s source code <https://github.com/dhuan/mock>`__
 -  `Report bugs <https://github.com/dhuan/mock/issues>`__
