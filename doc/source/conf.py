@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'mock'
-copyright = '2023, Dhuan Oliveira'
+copyright = '2024, Dhuan Oliveira'
 author = 'Dhuan Oliveira'
 
 # -- General configuration ---------------------------------------------------
