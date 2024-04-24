@@ -163,7 +163,7 @@ func resolveEndpointResponseInternal(
 	baseApi string,
 ) (*Response, map[string]string, error) {
 	errorMetadata := make(map[string]string)
-	endpointConfigContentType := resolveEndpointConfigContentType(response)
+	endpointConfigContentType := resolveEndpointConfigContentType(string(response))
 	headers := make(map[string]string)
 	utils.JoinMap(headers, endpointConfig.Headers)
 	utils.JoinMap(headers, endpointConfig.HeadersBase)
@@ -356,24 +356,24 @@ func extractFilePathFromResponseString(responseStr, configFolderPath string) str
 	return fmt.Sprintf("%s/%s", configFolderPath, filePath)
 }
 
-func resolveEndpointConfigContentType(response types.EndpointConfigResponse) types.Endpoint_content_type {
-	if utils.BeginsWith(string(response), "file:") {
+func resolveEndpointConfigContentType(response string) types.Endpoint_content_type {
+	if utils.BeginsWith(response, "file:") {
 		return types.Endpoint_content_type_file
 	}
 
-	if utils.BeginsWith(string(response), "sh:") {
+	if utils.BeginsWith(response, "sh:") {
 		return types.Endpoint_content_type_shell
 	}
 
-	if utils.BeginsWith(string(response), "exec:") {
+	if utils.BeginsWith(response, "exec:") {
 		return types.Endpoint_content_type_exec
 	}
 
-	if utils.BeginsWith(string(response), "fs:") {
+	if utils.BeginsWith(response, "fs:") {
 		return types.Endpoint_content_type_fileserver
 	}
 
-	if utils.BeginsWith(string(response), "{") {
+	if utils.BeginsWith(response, "{") {
 		return types.Endpoint_content_type_json
 	}
 
