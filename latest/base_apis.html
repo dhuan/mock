@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Test Assertions" href="test_assertions.html" /><link rel="prev" title="Middlewares" href="middlewares.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.01.29 -->
         <title>Base APIs - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -220,7 +220,7 @@
         </div>
         <article role="main">
           <section id="base-apis">
-<h1>Base APIs<a class="headerlink" href="#base-apis" title="Link to this heading">#</a></h1>
+<h1>Base APIs<a class="headerlink" href="#base-apis" title="Link to this heading">¶</a></h1>
 <p>A <cite>mock</cite> server can be configured to have a Base API, which results in all
 requests received to be forwaded to the API that it’s set to be based from.
 When an endpoint route was configured for the requesting route, it takes
@@ -265,7 +265,7 @@ endpoints and start up <cite>mock</cite> with only the Base API option. It will 
 a proxy to some other service.</p>
 </div>
 <section id="intercepting-responses">
-<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">#</a></h2>
+<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">¶</a></h2>
 <p>Endpoints defined for a <cite>mock API</cite> overwrite the ones from a Base API. In other
 words, when both your API <em>and</em> Base API offer the same endpoint, then your
 API’s endpoint takes precedence, therefore the Base API’s endpoint does not
@@ -282,7 +282,7 @@ endpoint’s shell script:</p>
 </div>
 </section>
 <section id="intercepting-responses-through-middlewares">
-<h2>Intercepting responses through middlewares<a class="headerlink" href="#intercepting-responses-through-middlewares" title="Link to this heading">#</a></h2>
+<h2>Intercepting responses through middlewares<a class="headerlink" href="#intercepting-responses-through-middlewares" title="Link to this heading">¶</a></h2>
 <p>Middlewares can be used to manipulate responses given by a Base API. <a class="reference external" href="middlewares.html">Check the
 Middlewares documentation section for learning all about them.</a> In fact Middlewares make no distinction of whether the
 current request is meant for a <cite>mock</cite> endpoint or an actual Base API when
@@ -302,7 +302,7 @@ patterns that are meant for your Base API of choice. Then again, the middleware
 documentation section covers the subject in more details.</p>
 </section>
 <section id="base-apis-and-tls">
-<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Link to this heading">#</a></h2>
+<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Link to this heading">¶</a></h2>
 <p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
 a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
 how the different methods differ:</p>
@@ -386,7 +386,7 @@ independent of the protocol chosen by requesting client.</p>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     </body>

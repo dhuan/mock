@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Responses from Shell scripts" href="shell_scripts.html" /><link rel="prev" title="Route Parameters" href="route_params.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.01.29 -->
         <title>Mock Variables - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -220,7 +220,7 @@
         </div>
         <article role="main">
           <section id="mock-variables">
-<h1>Mock Variables<a class="headerlink" href="#mock-variables" title="Link to this heading">#</a></h1>
+<h1>Mock Variables<a class="headerlink" href="#mock-variables" title="Link to this heading">¶</a></h1>
 <p>When defining responses for endpoints, you’re provided with a set of variables
 containing useful information about the current request being handled. The
 syntax for printing out a variable is <code class="docutils literal notranslate"><span class="pre">${VARIABLE_NAME}</span></code>. Following is a
@@ -245,32 +245,32 @@ variables can be used include:</p>
 <li><p><a class="reference external" href="middlewares.html">Middleware Script Handlers</a></p></li>
 </ul>
 <section id="variable-reference">
-<h2>Variable Reference<a class="headerlink" href="#variable-reference" title="Link to this heading">#</a></h2>
+<h2>Variable Reference<a class="headerlink" href="#variable-reference" title="Link to this heading">¶</a></h2>
 <p>Find below all available variables.</p>
 <section id="mock-host">
-<h3>MOCK_HOST<a class="headerlink" href="#mock-host" title="Link to this heading">#</a></h3>
+<h3>MOCK_HOST<a class="headerlink" href="#mock-host" title="Link to this heading">¶</a></h3>
 <p>The hostname + port combination to which Mock is currently listening. (ex:
 <code class="docutils literal notranslate"><span class="pre">localhost:3000</span></code>)</p>
 </section>
 <section id="mock-request-url">
-<h3>MOCK_REQUEST_URL<a class="headerlink" href="#mock-request-url" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_URL<a class="headerlink" href="#mock-request-url" title="Link to this heading">¶</a></h3>
 <p>The full URL. (ex: <code class="docutils literal notranslate"><span class="pre">http://localhost/foo/bar</span></code>)</p>
 </section>
 <section id="mock-request-endpoint">
-<h3>MOCK_REQUEST_ENDPOINT<a class="headerlink" href="#mock-request-endpoint" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_ENDPOINT<a class="headerlink" href="#mock-request-endpoint" title="Link to this heading">¶</a></h3>
 <p>The endpoint extracted from the URL. (ex: <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code>)</p>
 </section>
 <section id="mock-request-host">
-<h3>MOCK_REQUEST_HOST<a class="headerlink" href="#mock-request-host" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_HOST<a class="headerlink" href="#mock-request-host" title="Link to this heading">¶</a></h3>
 <p>The hostname + port combination that the request was sent to. (ex:
 <code class="docutils literal notranslate"><span class="pre">example.com:3000</span></code>)</p>
 </section>
 <section id="mock-request-headers">
-<h3>MOCK_REQUEST_HEADERS<a class="headerlink" href="#mock-request-headers" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_HEADERS<a class="headerlink" href="#mock-request-headers" title="Link to this heading">¶</a></h3>
 <p>A file path containing all HTTP Headers.</p>
 </section>
 <section id="mock-request-header-foobar">
-<h3>MOCK_REQUEST_HEADER_FOOBAR<a class="headerlink" href="#mock-request-header-foobar" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_HEADER_FOOBAR<a class="headerlink" href="#mock-request-header-foobar" title="Link to this heading">¶</a></h3>
 <p>A variable holding an individual header value. For example, if a request is
 received with the header key/value as <code class="docutils literal notranslate"><span class="pre">Foo:</span> <span class="pre">bar</span></code>, then this header value can
 be obtained by reading the <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_HEADER_FOO</span></code> environment variable.</p>
@@ -279,27 +279,27 @@ be obtained by reading the <code class="docutils literal notranslate"><span clas
 <cite>Some-header</cite> is readable as <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_HEADER_SOME_HEADER</span></code>.</p>
 </section>
 <section id="mock-request-body">
-<h3>MOCK_REQUEST_BODY<a class="headerlink" href="#mock-request-body" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_BODY<a class="headerlink" href="#mock-request-body" title="Link to this heading">¶</a></h3>
 <p>For <a class="reference external" href="shell_scripts.html">Response Script Handlers</a>, this variable is a file
 path, containing the Request’s Body. For static responses (such as JSON or
 plain text), this variable holds the actual request payload string.</p>
 </section>
 <section id="mock-request-querystring">
-<h3>MOCK_REQUEST_QUERYSTRING<a class="headerlink" href="#mock-request-querystring" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_QUERYSTRING<a class="headerlink" href="#mock-request-querystring" title="Link to this heading">¶</a></h3>
 <p>The Request’s Querystring if it exists.</p>
 </section>
 <section id="mock-request-querystring-key-name">
-<h3>MOCK_REQUEST_QUERYSTRING_KEY_NAME<a class="headerlink" href="#mock-request-querystring-key-name" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_QUERYSTRING_KEY_NAME<a class="headerlink" href="#mock-request-querystring-key-name" title="Link to this heading">¶</a></h3>
 <p>A variable holding an individual querystring value named <cite>KEY_NAME</cite>. If a
 request was made with the <code class="docutils literal notranslate"><span class="pre">?foo=bar</span></code>, you can capture the “foo” parameter by
 reading the variable <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_QUERYSTRING_FOO</span></code>.</p>
 </section>
 <section id="mock-request-method">
-<h3>MOCK_REQUEST_METHOD<a class="headerlink" href="#mock-request-method" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_METHOD<a class="headerlink" href="#mock-request-method" title="Link to this heading">¶</a></h3>
 <p>A string indicating the Request’s Method.</p>
 </section>
 <section id="mock-request-nth">
-<h3>MOCK_REQUEST_NTH<a class="headerlink" href="#mock-request-nth" title="Link to this heading">#</a></h3>
+<h3>MOCK_REQUEST_NTH<a class="headerlink" href="#mock-request-nth" title="Link to this heading">¶</a></h3>
 <p>A number indicating Request’s position in the request history. For example, if
 two requests have been made to the <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code> endpoint ever since <em>mock</em>
 started, this being the 2nd request, the number in this variable will be 2.</p>
@@ -389,7 +389,7 @@ started, this being the 2nd request, the number in this variable will be 2.</p>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     </body>

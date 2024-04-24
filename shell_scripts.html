@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Serving static files" href="static_files.html" /><link rel="prev" title="Mock Variables" href="mock_vars.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.01.29 -->
         <title>Responses from Shell scripts - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -220,7 +220,7 @@
         </div>
         <article role="main">
           <section id="responses-from-shell-scripts">
-<h1>Responses from Shell scripts<a class="headerlink" href="#responses-from-shell-scripts" title="Link to this heading">#</a></h1>
+<h1>Responses from Shell scripts<a class="headerlink" href="#responses-from-shell-scripts" title="Link to this heading">¶</a></h1>
 <p>You can write shell scripts that will act as “handlers” for your API’s
 Requests.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -293,7 +293,7 @@ on the home folder:</p>
 </pre></div>
 </div>
 <section id="environment-variables-for-request-handlers">
-<h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Link to this heading">#</a></h2>
+<h2>Environment Variables for Request Handlers<a class="headerlink" href="#environment-variables-for-request-handlers" title="Link to this heading">¶</a></h2>
 <p>As with any shell programs, environment variables can be read. Besides
 environment variables provided the operating system environment, there are also
 variables provided by <cite>mock</cite> which give you useful information about the
@@ -301,14 +301,14 @@ current request being handled.</p>
 <p>These variables <a class="reference external" href="mock_vars.html">are documented in detail in the Mock Variables</a> page.</p>
 </section>
 <section id="route-parameters-reading-from-shell-scripts">
-<h2>Route Parameters - Reading from Shell Scripts<a class="headerlink" href="#route-parameters-reading-from-shell-scripts" title="Link to this heading">#</a></h2>
+<h2>Route Parameters - Reading from Shell Scripts<a class="headerlink" href="#route-parameters-reading-from-shell-scripts" title="Link to this heading">¶</a></h2>
 <p>Route Parameters can be read from shell scripts. Suppose an endpoint
 exists as such: <code class="docutils literal notranslate"><span class="pre">user/{user_id}</span></code>. We could then retrieve the User ID
 parameter by reading the <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_USER_ID</span></code> environment
 variable.</p>
 </section>
 <section id="response-files-that-can-be-written-to-by-shell-scripts">
-<h2>Response Files that can be written to by shell scripts<a class="headerlink" href="#response-files-that-can-be-written-to-by-shell-scripts" title="Link to this heading">#</a></h2>
+<h2>Response Files that can be written to by shell scripts<a class="headerlink" href="#response-files-that-can-be-written-to-by-shell-scripts" title="Link to this heading">¶</a></h2>
 <p>So far we’ve seen environment variables that provide us with information
 about the Request that’s being currently handled. The following
 environment variables enable you to further define the HTTP Response:</p>
@@ -407,7 +407,7 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
