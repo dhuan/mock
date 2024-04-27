@@ -501,53 +501,48 @@ func fileResponse(
 		data.headers}, data.errorMetadata, nil
 }
 
-func shellResponse(
-	data *responseResolverData,
-	readFile types.ReadFileFunc,
-	exec ExecFunc,
-) (*Response, map[string]string, error) {
-	scriptFilePath := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
-
-	if len(data.endpointParams) > 0 {
-		addUrlParamsToRequestVariables(data.requestVariables, data.endpointParams)
-	}
-
-	fileVars, hf, err := buildHandlerFiles(data.requestBody, data.requestRecord)
-	if err != nil {
-		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
-	}
-
-	utils.JoinMap(data.requestVariables, fileVars)
-
-	log.Printf("Executing shell script located in %s", scriptFilePath)
-
-	execResult, err := exec(
-		fmt.Sprintf("sh %s", scriptFilePath),
-		&ExecOptions{
-			Env: data.requestVariables,
-		},
-	)
-	if err != nil {
-		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
-	}
-
-	printOutExecOutputIfNecessary(execResult)
-
-	response, err := extractModifiedResponse(hf, readFile, data.endpointConfigContentType, data.headers, data.responseStatusCode)
-	if err != nil {
-		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
-	}
-
-	return response, data.errorMetadata, nil
-}
-
 func execResponse(
 	data *responseResolverData,
 	readFile types.ReadFileFunc,
 	exec ExecFunc,
 ) (*Response, map[string]string, error) {
-	execCommand := strings.Replace(data.responseStr, "exec:", "", -1)
-	tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
+	return execWrapper(data, readFile, exec, func() (string, error) {
+		execCommand := strings.Replace(data.responseStr, "exec:", "", -1)
+
+		tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
+		if err != nil {
+			return "", err
+		}
+
+		command := fmt.Sprintf("sh %s", tempShellScriptFile)
+
+		log.Printf("Executing command: %s", command)
+
+		return command, nil
+	})
+}
+
+func shellResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	return execWrapper(data, readFile, exec, func() (string, error) {
+		scriptFilePath := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+
+		log.Printf("Executing shell script located in %s", scriptFilePath)
+
+		return fmt.Sprintf("sh %s", scriptFilePath), nil
+	})
+}
+
+func execWrapper(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+	f func() (string, error),
+) (*Response, map[string]string, error) {
+	command, err := f()
 	if err != nil {
 		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
 	}
@@ -563,11 +558,7 @@ func execResponse(
 
 	utils.JoinMap(data.requestVariables, fileVars)
 
-	log.Printf("Executing command: %s", execCommand)
-
-	execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
-		Env: data.requestVariables,
-	})
+	execResult, err := exec(command, &ExecOptions{Env: data.requestVariables})
 	if err != nil {
 		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
 	}
