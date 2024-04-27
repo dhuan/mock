@@ -31,6 +31,20 @@ type ExecResult struct {
 	Output []byte
 }
 
+type responseResolverData struct {
+	state                     *types.State
+	envVars                   map[string]string
+	requestBody               []byte
+	responseStr               string
+	requestVariables          map[string]string
+	endpointParams            map[string]string
+	endpointConfigContentType types.Endpoint_content_type
+	responseStatusCode        int
+	headers                   map[string]string
+	errorMetadata             map[string]string
+	requestRecord             *types.RequestRecord
+}
+
 func ResolveEndpointResponse(
 	readFile types.ReadFileFunc,
 	exec ExecFunc,
@@ -188,153 +202,46 @@ func resolveEndpointResponseInternal(
 		utils.JoinMap(headers, responseIf.Headers)
 	}
 
+	rrd := &responseResolverData{
+		state,
+		envVars,
+		requestBody,
+		responseStr,
+		requestVariables,
+		endpointParams,
+		endpointConfigContentType,
+		responseStatusCode,
+		headers,
+		errorMetadata,
+		requestRecord,
+	}
+
 	if endpointConfigContentType == types.Endpoint_content_type_unknown {
 		return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_plaintext {
-		mockVars := buildMockVariablesForPlainTextResponse(requestBody)
-
-		utils.JoinMap(requestVariables, mockVars)
-
-		addUrlParamsToRequestVariables(requestVariables, endpointParams)
-		response := utils.Unquote(responseStr)
-		response = utils.ReplaceVars(response, requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
-		response = utils.ReplaceVars(response, endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
-
-		return &Response{[]byte(response), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
+		return plainTextResponse(rrd, readFile, exec)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_file {
-		responseFile := extractFilePathFromResponseString(responseStr, state.ConfigFolderPath)
-
-		fileContent, err := readFile(responseFile)
-		if errors.Is(err, ErrResponseFileDoesNotExist) {
-			errorMetadata["file"] = responseFile
-		}
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		responseContent := utils.ReplaceVars(string(fileContent), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
-		responseContent = utils.ReplaceVars(responseContent, endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
-		responseContent = utils.ReplaceVars(responseContent, envVars, utils.ToDolarSignWithWrapVariablePlaceHolder)
-
-		return &Response{
-			[]byte(responseContent),
-			endpointConfigContentType,
-			responseStatusCode,
-			headers}, errorMetadata, nil
+		return fileResponse(rrd, readFile, exec)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_shell {
-		scriptFilePath := extractFilePathFromResponseString(responseStr, state.ConfigFolderPath)
-
-		if len(endpointParams) > 0 {
-			addUrlParamsToRequestVariables(requestVariables, endpointParams)
-		}
-
-		fileVars, hf, err := buildHandlerFiles(requestBody, requestRecord)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		utils.JoinMap(requestVariables, fileVars)
-
-		log.Printf("Executing shell script located in %s", scriptFilePath)
-
-		execResult, err := exec(
-			fmt.Sprintf("sh %s", scriptFilePath),
-			&ExecOptions{
-				Env: requestVariables,
-			},
-		)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		printOutExecOutputIfNecessary(execResult)
-
-		response, err := extractModifiedResponse(hf, readFile, endpointConfigContentType, headers, responseStatusCode)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		return response, errorMetadata, nil
+		return shellResponse(rrd, readFile, exec)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_exec {
-		execCommand := strings.Replace(responseStr, "exec:", "", -1)
-		tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		if len(endpointParams) > 0 {
-			addUrlParamsToRequestVariables(requestVariables, endpointParams)
-		}
-
-		fileVars, hf, err := buildHandlerFiles(requestBody, requestRecord)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		utils.JoinMap(requestVariables, fileVars)
-
-		log.Printf("Executing command: %s", execCommand)
-
-		execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
-			Env: requestVariables,
-		})
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		printOutExecOutputIfNecessary(execResult)
-
-		response, err := extractModifiedResponse(hf, readFile, endpointConfigContentType, headers, responseStatusCode)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		return response, errorMetadata, nil
+		return execResponse(rrd, readFile, exec)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_fileserver {
-		staticFilesPath := extractFilePathFromResponseString(responseStr, state.ConfigFolderPath)
-
-		fileRequested, ok := endpointParams["*"]
-		if !ok {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, errors.New("Failed to capture file name.")
-		}
-
-		filePath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)
-
-		fileContent, err := readFile(filePath)
-		if err != nil {
-			errorMetadata["file"] = fileRequested
-
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		return &Response{fileContent, endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
+		return fileServerResponse(rrd, readFile, exec)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_json {
-		var jsonParsed interface{}
-		err := json.Unmarshal([]byte(responseStr), &jsonParsed)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		jsonEncoded, err := json.Marshal(jsonParsed)
-		if err != nil {
-			return &Response{[]byte(""), endpointConfigContentType, responseStatusCode, headers}, errorMetadata, err
-		}
-
-		jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder))
-
-		return &Response{jsonEncodedModified, endpointConfigContentType, responseStatusCode, headers}, errorMetadata, nil
+		return jsonResponse(rrd, readFile, exec)
 	}
 
 	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, errorMetadata, nil
@@ -549,4 +456,173 @@ func extractModifiedResponse(
 	}
 
 	return response, nil
+}
+
+func plainTextResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	mockVars := buildMockVariablesForPlainTextResponse(data.requestBody)
+
+	utils.JoinMap(data.requestVariables, mockVars)
+
+	addUrlParamsToRequestVariables(data.requestVariables, data.endpointParams)
+	response := utils.Unquote(data.responseStr)
+	response = utils.ReplaceVars(response, data.requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
+	response = utils.ReplaceVars(response, data.endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
+
+	return &Response{[]byte(response), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, nil
+}
+
+func fileResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	responseFile := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+
+	fileContent, err := readFile(responseFile)
+	if errors.Is(err, ErrResponseFileDoesNotExist) {
+		data.errorMetadata["file"] = responseFile
+	}
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	responseContent := utils.ReplaceVars(string(fileContent), data.requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
+	responseContent = utils.ReplaceVars(responseContent, data.endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
+	responseContent = utils.ReplaceVars(responseContent, data.envVars, utils.ToDolarSignWithWrapVariablePlaceHolder)
+
+	return &Response{
+		[]byte(responseContent),
+		data.endpointConfigContentType,
+		data.responseStatusCode,
+		data.headers}, data.errorMetadata, nil
+}
+
+func shellResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	scriptFilePath := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+
+	if len(data.endpointParams) > 0 {
+		addUrlParamsToRequestVariables(data.requestVariables, data.endpointParams)
+	}
+
+	fileVars, hf, err := buildHandlerFiles(data.requestBody, data.requestRecord)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	utils.JoinMap(data.requestVariables, fileVars)
+
+	log.Printf("Executing shell script located in %s", scriptFilePath)
+
+	execResult, err := exec(
+		fmt.Sprintf("sh %s", scriptFilePath),
+		&ExecOptions{
+			Env: data.requestVariables,
+		},
+	)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	printOutExecOutputIfNecessary(execResult)
+
+	response, err := extractModifiedResponse(hf, readFile, data.endpointConfigContentType, data.headers, data.responseStatusCode)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	return response, data.errorMetadata, nil
+}
+
+func execResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	execCommand := strings.Replace(data.responseStr, "exec:", "", -1)
+	tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	if len(data.endpointParams) > 0 {
+		addUrlParamsToRequestVariables(data.requestVariables, data.endpointParams)
+	}
+
+	fileVars, hf, err := buildHandlerFiles(data.requestBody, data.requestRecord)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	utils.JoinMap(data.requestVariables, fileVars)
+
+	log.Printf("Executing command: %s", execCommand)
+
+	execResult, err := exec(fmt.Sprintf("sh %s", tempShellScriptFile), &ExecOptions{
+		Env: data.requestVariables,
+	})
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	printOutExecOutputIfNecessary(execResult)
+
+	response, err := extractModifiedResponse(hf, readFile, data.endpointConfigContentType, data.headers, data.responseStatusCode)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	return response, data.errorMetadata, nil
+}
+
+func fileServerResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	staticFilesPath := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+
+	fileRequested, ok := data.endpointParams["*"]
+	if !ok {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, errors.New("Failed to capture file name.")
+	}
+
+	filePath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)
+
+	fileContent, err := readFile(filePath)
+	if err != nil {
+		data.errorMetadata["file"] = fileRequested
+
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	return &Response{fileContent, data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, nil
+}
+
+func jsonResponse(
+	data *responseResolverData,
+	readFile types.ReadFileFunc,
+	exec ExecFunc,
+) (*Response, map[string]string, error) {
+	var jsonParsed interface{}
+	err := json.Unmarshal([]byte(data.responseStr), &jsonParsed)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	jsonEncoded, err := json.Marshal(jsonParsed)
+	if err != nil {
+		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
+	}
+
+	jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), data.requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder))
+
+	return &Response{jsonEncodedModified, data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, nil
 }
