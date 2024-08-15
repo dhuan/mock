@@ -280,7 +280,7 @@ func resolveEndpointConfigContentType(response string) types.Endpoint_content_ty
 		return types.Endpoint_content_type_fileserver
 	}
 
-	if utils.BeginsWith(response, "{") {
+	if utils.BeginsWith(response, "{") || utils.BeginsWith(response, "[") {
 		return types.Endpoint_content_type_json
 	}
 
