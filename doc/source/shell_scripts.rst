@@ -126,7 +126,7 @@ Code and a few custom HTTP Headers.
 
 .. code:: sh
 
-   echo Hello world!
+   echo Hello world! > $MOCK_RESPONSE_BODY
 
    cat <<EOF > $MOCK_RESPONSE_HEADERS
    Some-Header-Key: Some Header Value
