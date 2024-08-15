@@ -271,6 +271,15 @@
         <article role="main" id="furo-main-content">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="not-released-yet">
+<h2>Not released yet<a class="headerlink" href="#not-released-yet" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Automatically add <code class="docutils literal notranslate"><span class="pre">content-type:</span> <span class="pre">application/json</span></code> header if
+response is an array. Previously this automatic header addition would
+only occur if JSON body was an object at its root - array was not
+supported.</p></li>
+</ul>
+</section>
 <section id="id1">
 <h2>1.4.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>IMPROVEMENTS</p>
@@ -584,6 +593,7 @@ the assert request indicating that the given <code class="docutils literal notra
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#not-released-yet">Not released yet</a></li>
 <li><a class="reference internal" href="#id1">1.4.0</a></li>
 <li><a class="reference internal" href="#section-1">1.3.1</a></li>
 <li><a class="reference internal" href="#section-2">1.3.0</a></li>
