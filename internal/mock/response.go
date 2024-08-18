@@ -280,11 +280,17 @@ func resolveEndpointConfigContentType(response string) types.Endpoint_content_ty
 		return types.Endpoint_content_type_fileserver
 	}
 
-	if utils.BeginsWith(response, "{") || utils.BeginsWith(response, "[") {
+	if (utils.BeginsWith(response, "{") || utils.BeginsWith(response, "[")) && isValidJson(response) {
 		return types.Endpoint_content_type_json
 	}
 
 	return types.Endpoint_content_type_plaintext
+}
+
+func isValidJson(txt string) bool {
+	var jsonParsed interface{}
+
+	return json.Unmarshal([]byte(txt), &jsonParsed) == nil
 }
 
 func ExtractHeadersFromFile(filePath string, readFile types.ReadFileFunc) (map[string]string, error) {

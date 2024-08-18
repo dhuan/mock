@@ -5,6 +5,7 @@
 - Automatically add `content-type: application/json` header if response is an
   array. Previously this automatic header addition would only occur if JSON
   body was an object at its root - array was not supported.
+- Prevent panic in case incorrectly formatted JSON is set as response.
 
 ## 1.4.0
 
