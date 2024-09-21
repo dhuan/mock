@@ -79,3 +79,35 @@ func Test_E2E_BaseApi_CannotBeStartedBecauseBaseApiIsInvalid(t *testing.T) {
 		)
 	}
 }
+
+func Test_E2E_BaseApi_UseForwardWithBaseApiWithoutSpecifyingProtocol(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--status-code 205",
+			"--response 'Hello world! This is the base API.'",
+		}, " "),
+		nil,
+		true,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base localhost:%d", state.Port),
+			"--route foo/bar",
+			"--response-exec '{{MOCK_EXECUTABLE}} forward'",
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(205),
+		StringMatches("Hello world! This is the base API."),
+	)
+}

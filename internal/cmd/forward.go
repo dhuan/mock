@@ -87,6 +87,8 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFile
 	var method string
 	var endpoint string
 	var querystring string
+	var tlsStr string
+	var tls bool
 	var responseFileHeaders string
 	var responseFileBody string
 	var responseFileStatusCode string
@@ -97,6 +99,7 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFile
 		"MOCK_REQUEST_METHOD":       {variable: &method, f: isStringAny(validHttpMethods)},
 		"MOCK_REQUEST_ENDPOINT":     {variable: &endpoint, f: isStringWithText},
 		"MOCK_REQUEST_QUERYSTRING":  {variable: &querystring, f: optionalString},
+		"MOCK_REQUEST_HTTPS":        {variable: &tlsStr, f: isBoolString},
 		"MOCK_RESPONSE_HEADERS":     {variable: &responseFileHeaders, f: pointsToFile},
 		"MOCK_RESPONSE_BODY":        {variable: &responseFileBody, f: pointsToFile},
 		"MOCK_RESPONSE_STATUS_CODE": {variable: &responseFileStatusCode, f: pointsToFile},
@@ -105,10 +108,21 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFile
 		return nil, false, errorMessages, nil, nil
 	}
 
+	tls = tlsStr == "true"
+
 	method = strings.ToUpper(method)
 	url := fmt.Sprintf("%s/%s", baseApiUrl, endpoint)
 	if querystring != "" {
 		url = fmt.Sprintf("%s?%s", url, querystring)
+	}
+
+	protocol := "http://"
+	if tls {
+		protocol = "https://"
+	}
+
+	if !utils.RegexTest("^http", url) {
+		url = fmt.Sprintf("%s%s", protocol, url)
 	}
 
 	request, err := http.NewRequest(method, url, nil)
@@ -168,6 +182,12 @@ func isStringAny(list []string) func(string, bool) (string, bool, string) {
 
 func isStringWithText(value string, exists bool) (string, bool, string) {
 	return value, exists && strings.TrimSpace(value) != "", "is not a string with text"
+}
+
+func isBoolString(value string, exists bool) (string, bool, string) {
+	return strings.ToLower(value),
+		exists && utils.AnyEquals([]string{"true", "false"}, strings.ToLower(value)),
+		"is not a string with text"
 }
 
 func pointsToFile(value string, exists bool) (string, bool, string) {

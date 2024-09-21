@@ -169,6 +169,11 @@ func BuildVars(
 		}
 	}
 
+	tls := "false"
+	if requestRecord.Https {
+		tls = "true"
+	}
+
 	result := map[string]string{
 		"MOCK_HOST": mockHost, "MOCK_REQUEST_HOST": requestRecord.Host,
 		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
@@ -176,6 +181,7 @@ func BuildVars(
 		"MOCK_REQUEST_METHOD":      requestRecord.Method,
 		"MOCK_REQUEST_QUERYSTRING": querystring,
 		"MOCK_REQUEST_NTH":         fmt.Sprintf("%d", nth),
+		"MOCK_REQUEST_HTTPS":       tls,
 		"MOCK_BASE_API":            baseApi,
 	}
 
