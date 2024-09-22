@@ -10,6 +10,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=b6996a85" />
     
     
 
@@ -373,7 +374,7 @@ the HTTP Headers.</p></li>
 <p>In the following example, we’ll see what a Handler looks like, which
 responds with a simple <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code> body content, a <code class="docutils literal notranslate"><span class="pre">201</span></code> Status
 Code and a few custom HTTP Headers.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span>Hello<span class="w"> </span>world!
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span>Hello<span class="w"> </span>world!<span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
 
 cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADERS</span>
 <span class="s">Some-Header-Key: Some Header Value</span>
@@ -415,7 +416,7 @@ cat<span class="w"> </span><span class="s">&lt;&lt;EOF &gt; $MOCK_RESPONSE_HEADE
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Dhuan Oliveira
+                Copyright &#169; 2024, Dhuan Oliveira
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
