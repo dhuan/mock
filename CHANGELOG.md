@@ -1,6 +1,6 @@
 # Changelog
 
-## Not released yet
+## 1.4.1
 
 ADDED
 
