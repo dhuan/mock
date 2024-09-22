@@ -101,3 +101,9 @@ MOCK_REQUEST_NTH
 A number indicating Request’s position in the request history. For example, if
 two requests have been made to the ``foo/bar`` endpoint ever since *mock*
 started, this being the 2nd request, the number in this variable will be 2.
+
+MOCK_REQUEST_HTTPS
+~~~~~~~~~~~~~~~~~~
+
+This is set to `true` in case the receiving request is using HTTPS instead of
+HTTP.
