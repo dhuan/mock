@@ -116,12 +116,12 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFile
 		url = fmt.Sprintf("%s?%s", url, querystring)
 	}
 
-	protocol := "http://"
-	if tls {
-		protocol = "https://"
-	}
+	if !utils.RegexTest("^http://", url) {
+		protocol := "http://"
+		if tls {
+			protocol = "https://"
+		}
 
-	if !utils.RegexTest("^http", url) {
 		url = fmt.Sprintf("%s%s", protocol, url)
 	}
 
