@@ -1,0 +1,12 @@
+aside.sidebar-drawer {
+    width: auto;
+}
+
+aside.toc-drawer {
+    flex-shrink: 0;
+}
+
+div.main div.content {
+    width: auto;
+    max-width: 1900px;
+}
