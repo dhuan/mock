@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+FIXED
+
+- Using `mock forward` with a Base API that uses HTTP/2 would fail due to a bug
+  in the header parsing logic.
+
 ## 1.4.1
 
 ADDED

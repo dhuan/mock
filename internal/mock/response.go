@@ -350,7 +350,10 @@ func parseHeaderLine(text string) (string, string, bool) {
 		return "", "", false
 	}
 
-	return splitResult[0], strings.Join(splitResult[1:], ":"), true
+	key := splitResult[0]
+	value := strings.TrimSpace(strings.Join(splitResult[1:], ":"))
+
+	return key, value, true
 }
 
 func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]string) {
