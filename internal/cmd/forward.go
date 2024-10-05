@@ -56,6 +56,12 @@ var forwardCmd = &cobra.Command{
 			panic(err)
 		}
 
+		for key := range response.Header {
+			if strings.ToLower(key) == "content-length" {
+				response.Header.Del(key)
+			}
+		}
+
 		if err = writeFile(rf.headers, []byte(utils.ToHeadersText(response.Header))); err != nil {
 			panic(err)
 		}
