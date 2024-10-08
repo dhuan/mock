@@ -107,3 +107,37 @@ HTTPS as well.
 Protocol + domain combination: If a protocol is set in the Base API's value,
 then `mock` will always use that protocol when forwarding the request,
 independent of the protocol chosen by requesting client.
+
+Manipulating headers
+--------------------
+
+There may be cases when you don't want certain HTTP Headers from the Base API.
+For that, `mock` provides a command for easily removing headers:
+
+.. code:: sh
+
+   $ mock forward
+   $ mock wipe-headers some-header-key another-header-key
+
+.. note::
+
+    `wipe-headers` is meant to be used `inside shell scripts. <shell_scripts.html>`__
+
+A response handler shell script using `wipe-headers` as exemplified above will
+remove HTTP Headers `some-header-key` and `another-header-key`.
+
+.. note::
+
+    `wipe-headers` is just a faster way of manipulating the
+    `$MOCK_RESPONSE_HEADERS` file. The exact same could've been accomplished
+    with:
+
+    .. code:: sh
+
+        $ mock forward
+        $ grep -v \
+            -e some-header-key \
+            -e another-header-key \
+            $MOCK_RESPONSE_HEADERS | sponge $MOCK_RESPONSE_HEADERS
+
+
