@@ -16,8 +16,8 @@ as you may instead provide an API's specs through command-line arguments.
 ``-p`` or ``--port``
 --------------------
 
-Defines the port through which `mock` will serve your API. Defaults to ``3000``
-if not provided.
+Defines the port through which `mock` will serve your API. If not set, a random
+port number will be assigned instead.
 
 ``-b`` or ``--base``
 --------------------
