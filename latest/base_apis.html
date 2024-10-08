@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=b6996a85" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=1e801841" />
     
     
 
@@ -364,6 +364,34 @@ HTTPS as well.</p>
 then <cite>mock</cite> will always use that protocol when forwarding the request,
 independent of the protocol chosen by requesting client.</p>
 </section>
+<section id="manipulating-headers">
+<h2>Manipulating headers<a class="headerlink" href="#manipulating-headers" title="Link to this heading">¶</a></h2>
+<p>There may be cases when you don’t want certain HTTP Headers from the Base API.
+For that, <cite>mock</cite> provides a command for easily removing headers:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>forward
+$<span class="w"> </span>mock<span class="w"> </span>wipe-headers<span class="w"> </span>some-header-key<span class="w"> </span>another-header-key
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>wipe-headers</cite> is meant to be used <a class="reference external" href="shell_scripts.html">inside shell scripts.</a></p>
+</div>
+<p>A response handler shell script using <cite>wipe-headers</cite> as exemplified above will
+remove HTTP Headers <cite>some-header-key</cite> and <cite>another-header-key</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>wipe-headers</cite> is just a faster way of manipulating the
+<cite>$MOCK_RESPONSE_HEADERS</cite> file. The exact same could’ve been accomplished
+with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>forward
+$<span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-e<span class="w"> </span>some-header-key<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-e<span class="w"> </span>another-header-key<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">$MOCK_RESPONSE_HEADERS</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sponge<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+</pre></div>
+</div>
+</div>
+</section>
 </section>
 
         </article>
@@ -425,6 +453,7 @@ independent of the protocol chosen by requesting client.</p>
 <li><a class="reference internal" href="#intercepting-responses">Intercepting responses</a></li>
 <li><a class="reference internal" href="#intercepting-responses-through-middlewares">Intercepting responses through middlewares</a></li>
 <li><a class="reference internal" href="#base-apis-and-tls">Base APIs and TLS</a></li>
+<li><a class="reference internal" href="#manipulating-headers">Manipulating headers</a></li>
 </ul>
 </li>
 </ul>
