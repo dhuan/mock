@@ -34,6 +34,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.AddCommand(serveCmd)
 	rootCmd.AddCommand(forwardCmd)
+	rootCmd.AddCommand(wipeHeadersCmd)
 	rootCmd.AddCommand(versionCmd)
 
 	serveCmd.PersistentFlags().StringVarP(&flagConfig, "config", "c", "", "configuration file")

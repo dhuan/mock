@@ -2,6 +2,11 @@
 
 ## Unreleased yet
 
+ADDED
+
+- Add the `wipe-headers` command - a helper to be used within response shell
+  scripts for removing undesired header.
+
 FIXED
 
 - Using `mock forward` with a Base API that uses HTTP/2 would fail due to a bug

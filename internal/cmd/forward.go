@@ -100,7 +100,7 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFile
 	var responseFileStatusCode string
 
 	envValid, errorMessages := validateEnv(map[string]*envValidationConfig{
-		"MOCK_BASE_API":             {variable: &baseApiUrl, f: isStringWithText},
+		"MOCK_BASE_API":             {variable: &baseApiUrl, f: optionalString},
 		"MOCK_REQUEST_HEADERS":      {variable: &headersPlainText, f: pointsToFile},
 		"MOCK_REQUEST_METHOD":       {variable: &method, f: isStringAny(validHttpMethods)},
 		"MOCK_REQUEST_ENDPOINT":     {variable: &endpoint, f: isStringWithText},

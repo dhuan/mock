@@ -10,3 +10,15 @@ div.main div.content {
     width: auto;
     max-width: 1900px;
 }
+
+.admonition p {
+    font-size: 16px;
+}
+
+.admonition pre {
+    font-size: 16px;
+}
+
+.highlight pre {
+    font-size: 16px;
+}

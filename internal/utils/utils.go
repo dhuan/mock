@@ -401,7 +401,7 @@ func RegexTest(regex string, subject string) bool {
 	return match
 }
 
-func parseHeaderLine(text string) (string, string, bool) {
+func ParseHeaderLine(text string) (string, string, bool) {
 	splitResult := strings.Split(text, ":")
 
 	if len(splitResult) < 2 {
@@ -423,7 +423,7 @@ func ExtractHeadersFromText(fileContent []byte) map[string]string {
 	headerLines := strings.Split(fileContentText, "\n")
 
 	for i := range headerLines {
-		headerKey, headerValue, ok := parseHeaderLine(headerLines[i])
+		headerKey, headerValue, ok := ParseHeaderLine(headerLines[i])
 		if !ok {
 			continue
 		}
@@ -453,4 +453,25 @@ func GetFreePort() int {
 	listener.Close()
 
 	return listener.Addr().(*net.TCPAddr).Port
+}
+
+func MapFilterFileLines(filePath string, f func(string) (string, bool)) error {
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	result := make([]string, 0)
+	lines := strings.Split(string(fileContent), "\n")
+
+	for i := range lines {
+		modifiedLine, add := f(lines[i])
+		if !add {
+			continue
+		}
+
+		result = append(result, modifiedLine)
+	}
+
+	return os.WriteFile(filePath, []byte(strings.Join(result, "\n")), 0644)
 }
