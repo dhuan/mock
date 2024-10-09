@@ -34,13 +34,14 @@ var wipeHeadersCmd = &cobra.Command{
 			strings.ToLower(args[i])
 		}
 
+		fmt.Printf("!!!!!!!!!!!! args: %+v\n", args)
 		err = utils.MapFilterFileLines(rf.headers, func(line string) (string, bool) {
 			key, _, ok := utils.ParseHeaderLine(line)
 			if !ok {
 				return line, true
 			}
 
-			if utils.IndexOf(args, strings.ToLower(key)) > -1 {
+			if utils.IndexOf(args, strings.ToLower(key)) > -1 || (flagRegex && utils.IndexOfRegex(args, strings.ToLower(key)) > -1) {
 				return "", false
 			}
 

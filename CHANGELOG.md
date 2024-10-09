@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- Support for regular expressions for `wipe-headers`, with `--regex
+  <PATTERN>`.
+
 ## 1.4.2
 
 ADDED

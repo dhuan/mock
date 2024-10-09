@@ -64,6 +64,16 @@ func IndexOf[T comparable](list []T, value T) int {
 	return -1
 }
 
+func IndexOfRegex(list []string, subject string) int {
+	for i := range list {
+		if RegexTest(list[i], subject) {
+			return i
+		}
+	}
+
+	return -1
+}
+
 func MktempDir() (string, error) {
 	result, err := exec.Command("mktemp", "-d").Output()
 	if err != nil {
