@@ -34,7 +34,6 @@ var wipeHeadersCmd = &cobra.Command{
 			strings.ToLower(args[i])
 		}
 
-		fmt.Printf("!!!!!!!!!!!! args: %+v\n", args)
 		err = utils.MapFilterFileLines(rf.headers, func(line string) (string, bool) {
 			key, _, ok := utils.ParseHeaderLine(line)
 			if !ok {
