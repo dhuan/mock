@@ -140,4 +140,8 @@ remove HTTP Headers `some-header-key` and `another-header-key`.
             -e another-header-key \
             $MOCK_RESPONSE_HEADERS | sponge $MOCK_RESPONSE_HEADERS
 
+Regular expressions are also supported:
 
+.. code:: sh
+
+   $ mock wipe-headers --regex some-regex-pattern another-regex-pattern
