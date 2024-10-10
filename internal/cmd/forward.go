@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"log"
@@ -48,6 +50,11 @@ var forwardCmd = &cobra.Command{
 			panic(err)
 		}
 
+		responseBody, err = uncompressIfNeeded(response, responseBody)
+		if err != nil {
+			panic(err)
+		}
+
 		if err = writeFile(rf.body, responseBody); err != nil {
 			panic(err)
 		}
@@ -66,6 +73,24 @@ var forwardCmd = &cobra.Command{
 			panic(err)
 		}
 	},
+}
+
+func uncompressIfNeeded(response *http.Response, responseBody []byte) ([]byte, error) {
+	encoding := response.Header.Get("Content-Encoding")
+	if encoding != "gzip" {
+		return responseBody, nil
+	}
+
+	responseBodyReader := bytes.NewReader(responseBody)
+
+	uncompressReader, err := gzip.NewReader(responseBodyReader)
+	if err != nil {
+		return nil, err
+	}
+
+	response.Header.Del("Content-Encoding")
+
+	return io.ReadAll(uncompressReader)
 }
 
 func writeFile(filePath string, data []byte) error {
