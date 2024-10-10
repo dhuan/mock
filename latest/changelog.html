@@ -278,6 +278,10 @@
 <ul class="simple">
 <li><p>Support for regular expressions for <code class="docutils literal notranslate"><span class="pre">wipe-headers</span></code>, with
 <code class="docutils literal notranslate"><span class="pre">--regex</span>&#160;&#160; <span class="pre">&lt;PATTERN&gt;</span></code>.</p></li>
+<li><p>Decode gzipped responses retrieved from <code class="docutils literal notranslate"><span class="pre">forward</span></code>. Prior to this
+change, <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code> would contain gzip-compressed data if
+HTTP Response was encoded. Now you have access to the uncompressed
+data when manipulating the response body.</p></li>
 </ul>
 </section>
 <section id="id1">
