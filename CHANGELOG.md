@@ -6,6 +6,10 @@ ADDED
 
 - Support for regular expressions for `wipe-headers`, with `--regex
   <PATTERN>`.
+- Decode gzipped responses retrieved from `forward`. Prior to this change,
+  `$MOCK_RESPONSE_BODY` would contain gzip-compressed data if HTTP Response was
+  encoded. Now you have access to the uncompressed data when manipulating the
+  response body.
 
 ## 1.4.2
 

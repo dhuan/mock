@@ -62,12 +62,21 @@ can set things to behave differently if desired.
 current request to the Base API, and then the HTTP Response from Base API will
 be available in the ``$MOCK_RESPONSE_BODY`` environment variable, enabling us
 to tweak the response if desired, before sending to the client. This is
-accomplished by issuing the following shell command, executed from your
-endpoint's shell script:
+accomplished using the `forward` command, executed from your endpoint's shell
+script:
 
 .. code:: sh
 
     $ mock forward
+
+.. note::
+
+   If the HTTP Response obtained from `forward` is encoded with gzip, `mock`
+   decodes that for you, therefore the ``$MOCK_RESPONSE_BODY`` file will
+   contain the decoded data for you to manipulate as you wish. Note also that
+   `mock` removes the `Content-Encoding` HTTP Header upon decoding the data,
+   therefore if you wish to respond to the client with encoded data, you must
+   manually add again the ``Content-Encoding`` header.
 
 Intercepting responses through middlewares
 ------------------------------------------
