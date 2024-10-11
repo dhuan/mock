@@ -19,59 +19,45 @@ import (
 var forwardCmd = &cobra.Command{
 	Use: "forward",
 	Run: func(cmd *cobra.Command, args []string) {
-		request,
-			valid,
-			envValidationErrors,
-			rf,
-			err := buildRequestFromMockEnvVars()
-		if !valid {
-			fmt.Println(strings.Join(envValidationErrors, "\n"))
+		responseShellUtilWrapper("forward", func(request *http.Request, rf *responseFiles) {
+			log.Printf("Forwarding request to Base API: %s %s\n", request.Method, request.RequestURI)
 
-			exitWithError(
-				"Something went wrong. \"forward\" is supposed to be used within Response Shell Scripts. Check the manual for more details.",
-			)
-		}
-		if err != nil {
-			panic(err)
-		}
-
-		log.Printf("Forwarding request to Base API: %s %s\n", request.Method, request.RequestURI)
-
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			panic(err)
-		}
-
-		log.Printf("Got response from Base API: %d\n", response.StatusCode)
-
-		responseBody, err := io.ReadAll(response.Body)
-		if err != nil {
-			panic(err)
-		}
-
-		responseBody, err = uncompressIfNeeded(response, responseBody)
-		if err != nil {
-			panic(err)
-		}
-
-		if err = writeFile(rf.body, responseBody); err != nil {
-			panic(err)
-		}
-
-		if err = writeFile(rf.statusCode, []byte(fmt.Sprintf("%d", response.StatusCode))); err != nil {
-			panic(err)
-		}
-
-		for key := range response.Header {
-			if strings.ToLower(key) == "content-length" {
-				response.Header.Del(key)
+			client := &http.Client{}
+			response, err := client.Do(request)
+			if err != nil {
+				panic(err)
 			}
-		}
 
-		if err = writeFile(rf.headers, []byte(utils.ToHeadersText(response.Header))); err != nil {
-			panic(err)
-		}
+			log.Printf("Got response from Base API: %d\n", response.StatusCode)
+
+			responseBody, err := io.ReadAll(response.Body)
+			if err != nil {
+				panic(err)
+			}
+
+			responseBody, err = uncompressIfNeeded(response, responseBody)
+			if err != nil {
+				panic(err)
+			}
+
+			if err = writeFile(rf.body, responseBody); err != nil {
+				panic(err)
+			}
+
+			if err = writeFile(rf.statusCode, []byte(fmt.Sprintf("%d", response.StatusCode))); err != nil {
+				panic(err)
+			}
+
+			for key := range response.Header {
+				if strings.ToLower(key) == "content-length" {
+					response.Header.Del(key)
+				}
+			}
+
+			if err = writeFile(rf.headers, []byte(utils.ToHeadersText(response.Header))); err != nil {
+				panic(err)
+			}
+		})
 	},
 }
 

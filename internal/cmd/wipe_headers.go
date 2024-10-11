@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -14,42 +14,28 @@ import (
 var wipeHeadersCmd = &cobra.Command{
 	Use: "wipe-headers",
 	Run: func(cmd *cobra.Command, args []string) {
-		_,
-			valid,
-			envValidationErrors,
-			rf,
-			err := buildRequestFromMockEnvVars()
-		if !valid {
-			fmt.Println(strings.Join(envValidationErrors, "\n"))
+		responseShellUtilWrapper("wipe-headers", func(request *http.Request, rf *responseFiles) {
+			for i := range args {
+				strings.ToLower(args[i])
+			}
 
-			exitWithError(
-				"Something went wrong. \"wipe-headers\" is supposed to be used within Response Shell Scripts. Check the manual for more details.",
-			)
-		}
-		if err != nil {
-			panic(err)
-		}
+			err := utils.MapFilterFileLines(rf.headers, func(line string) (string, bool) {
+				key, _, ok := utils.ParseHeaderLine(line)
+				if !ok {
+					return line, true
+				}
 
-		for i := range args {
-			strings.ToLower(args[i])
-		}
+				if utils.IndexOf(args, strings.ToLower(key)) > -1 || (flagRegex && utils.IndexOfRegex(args, strings.ToLower(key)) > -1) {
+					return "", false
+				}
 
-		err = utils.MapFilterFileLines(rf.headers, func(line string) (string, bool) {
-			key, _, ok := utils.ParseHeaderLine(line)
-			if !ok {
 				return line, true
-			}
+			})
+			if err != nil {
+				log.Print(err)
 
-			if utils.IndexOf(args, strings.ToLower(key)) > -1 || (flagRegex && utils.IndexOfRegex(args, strings.ToLower(key)) > -1) {
-				return "", false
+				os.Exit(1)
 			}
-
-			return line, true
 		})
-		if err != nil {
-			log.Print(err)
-
-			os.Exit(1)
-		}
 	},
 }
