@@ -40,6 +40,15 @@ write
 
 Writes data to the HTTP Response.
 
+replace
+-------
+
+.. code:: sh
+
+   $ mock replace foo bar
+
+Searches for `<ARG 1>` and replaces it with `<ARG 2>`, on the HTTP Response Body.
+
 wipe-headers
 ------------
 

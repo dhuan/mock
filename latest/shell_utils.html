@@ -302,6 +302,13 @@ the same http response modification using just <cite>mock</cite> instead of <cit
 </div>
 <p>Writes data to the HTTP Response.</p>
 </section>
+<section id="replace">
+<h2>replace<a class="headerlink" href="#replace" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>replace<span class="w"> </span>foo<span class="w"> </span>bar
+</pre></div>
+</div>
+<p>Searches for <cite>&lt;ARG 1&gt;</cite> and replaces it with <cite>&lt;ARG 2&gt;</cite>, on the HTTP Response Body.</p>
+</section>
 <section id="wipe-headers">
 <h2>wipe-headers<a class="headerlink" href="#wipe-headers" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>wipe-headers<span class="w"> </span>some-header-key<span class="w"> </span>another-header-key
@@ -375,6 +382,7 @@ against the header keys.</p></li>
             <ul>
 <li><a class="reference internal" href="#">Shell Utilities</a><ul>
 <li><a class="reference internal" href="#write">write</a></li>
+<li><a class="reference internal" href="#replace">replace</a></li>
 <li><a class="reference internal" href="#wipe-headers">wipe-headers</a></li>
 </ul>
 </li>
