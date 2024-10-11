@@ -1,0 +1,57 @@
+Shell Utilities
+===============
+
+`mock` provides a set of "utilities" for manipulating response data easily.
+Read further to learn about them.
+
+`In the previous section <shell_scripts.html>`__ we've seen that we can easily
+create shell scripts that act as response handlers for API endpoints. Defining
+the response data is done through writing to certain files such as
+``$MOCK_RESPONSE_BODY``. Although writing to these files is easy enough, for
+more complex requirements we need to write complex shell commands to accomplish
+things - for example replacing strings can be achieved using `sed`:
+
+.. code:: sh
+
+   $ sed 's/foo/bar/g' $MOCK_RESPONSE_BODY | sponge $MOCK_RESPONSE_BODY
+
+Although the above is simple enough, you may not be knowledgeable about all
+shell tricks, not to mention that different UNIX environments may have
+inconsistent or incompatible tools (GNU sed is not exactly totally compatible
+with BSD sed etc).
+
+Using `mock`'s shell utilities can save you of that burden. Let's accomplish
+the same http response modification using just `mock` instead of `sed`:
+
+.. code:: sh
+
+   $ mock replace foo bar
+
+Note how we didn't need to bother typing the file path as before.
+
+In the following sections we'll look at each such utility.
+
+write
+-----
+
+.. code:: sh
+
+   $ printf "Hello world!" | mock write
+
+Writes data to the HTTP Response.
+
+wipe-headers
+------------
+
+.. code:: sh
+
+   $ mock wipe-headers some-header-key another-header-key
+   $ mock wipe-headers --regex some-pattern another-pattern
+
+Removes one or more HTTP Headers. The header names passed as parameters must be
+the exact header name. The string matching is case-insensitive.
+
+Options:
+
+- ``--regex``: The strings passed will be used as regex patterns for matching
+  against the header keys.

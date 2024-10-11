@@ -121,6 +121,7 @@ The above can also be accomplished with
    route_params
    mock_vars
    shell_scripts
+   shell_utils
    static_files
    status_codes
    conditional_responses

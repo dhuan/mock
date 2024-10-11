@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Assertion Chaining" href="assertion_chaining.html" /><link rel="prev" title="Base APIs" href="base_apis.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Serving static files" href="static_files.html" /><link rel="prev" title="Responses from Shell scripts" href="shell_scripts.html" />
 
     <!-- Generated with Sphinx 8.1.0 and Furo 2024.08.06 -->
-        <title>Test Assertions - mock documentation</title>
+        <title>Shell Utilities - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -205,12 +205,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current">
-<li class="toctree-l1 has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shell_utils.html">Shell Utilities</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Shell Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
@@ -219,7 +219,7 @@
 <li class="toctree-l2"><a class="reference internal" href="base_apis.html">Base APIs</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Test Assertions</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Test Assertions</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="assertion_chaining.html">Assertion Chaining</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mock_package.html">Test Assertions with <em>mock</em>’s Go package</a></li>
 </ul>
@@ -251,7 +251,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/test_assertions.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/shell_utils.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -271,86 +271,50 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="test-assertions">
-<h1>Test Assertions<a class="headerlink" href="#test-assertions" title="Link to this heading">¶</a></h1>
-<p>Besides enabling you to set-up APIs, mock provides you with methods to
-make assertions on how your endpoints were called.</p>
-<p>Test Assertions are done by calling the
-<code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">localhost:3000/__mock__/assert</span></code> endpoint.</p>
-<p>In case you’re new to the concept of automated tests and assertions -
-let’s see what a very simple assertion looks like:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello/world&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;condition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;method_match&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;put&quot;</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
+          <section id="shell-utilities">
+<h1>Shell Utilities<a class="headerlink" href="#shell-utilities" title="Link to this heading">¶</a></h1>
+<p><cite>mock</cite> provides a set of “utilities” for manipulating response data easily.
+Read further to learn about them.</p>
+<p><a class="reference external" href="shell_scripts.html">In the previous section</a> we’ve seen that we can easily
+create shell scripts that act as response handlers for API endpoints. Defining
+the response data is done through writing to certain files such as
+<code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code>. Although writing to these files is easy enough, for
+more complex requirements we need to write complex shell commands to accomplish
+things - for example replacing strings can be achieved using <cite>sed</cite>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/foo/bar/g&#39;</span><span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sponge<span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
 </pre></div>
 </div>
-<p>Or if we could say it in plain english: the endpoint <code class="docutils literal notranslate"><span class="pre">hello/world</span></code> was
-requested with the <code class="docutils literal notranslate"><span class="pre">put</span></code> method.</p>
-<p>In case there was never a call to that particular endpoint, you would
-then get a response from mock indicating that no request has been made:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;validation_errors&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;no_call&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
+<p>Although the above is simple enough, you may not be knowledgeable about all
+shell tricks, not to mention that different UNIX environments may have
+inconsistent or incompatible tools (GNU sed is not exactly totally compatible
+with BSD sed etc).</p>
+<p>Using <cite>mock</cite>’s shell utilities can save you of that burden. Let’s accomplish
+the same http response modification using just <cite>mock</cite> instead of <cite>sed</cite>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>replace<span class="w"> </span>foo<span class="w"> </span>bar
 </pre></div>
 </div>
-<p>However in case a request had been made to that endpoint, with the, say,
-<code class="docutils literal notranslate"><span class="pre">POST</span></code> method, you would then get a different validation error,
-because you attempted to assert that it was called with the <code class="docutils literal notranslate"><span class="pre">PUT</span></code>
-method instead:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;validation_errors&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;method_mismatch&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;method_expected&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;put&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;method_requested&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;post&quot;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
+<p>Note how we didn’t need to bother typing the file path as before.</p>
+<p>In the following sections we’ll look at each such utility.</p>
+<section id="write">
+<h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
 </pre></div>
 </div>
-<blockquote>
-<div><p>mock tells you whether the assertion passed or not by including
-“Validation Errors” into the <code class="docutils literal notranslate"><span class="pre">validation_errors</span></code> response field.
-Another indicative is the Response Status - <code class="docutils literal notranslate"><span class="pre">200</span></code> is success,
-<code class="docutils literal notranslate"><span class="pre">400</span></code> means your assertion failed.</p>
-</div></blockquote>
-<p>With that we’ve seen a very simple assertion. There are other things
-that can be asserted in a HTTP Request, such as the header values
-passed, the body payload etc. <a class="reference external" href="conditions_reference.html">For a reference of all available
-condition options, skip to this section.</a></p>
-<section id="which-request-to-assert-against">
-<h2>Which Request to assert against?<a class="headerlink" href="#which-request-to-assert-against" title="Link to this heading">¶</a></h2>
-<p>By default, Assertions are based on the 1st Request. In cases where you
-want to assert against a Request other than the first, you’ll use the
-<code class="docutils literal notranslate"><span class="pre">nth</span></code> Assertion Option.</p>
-<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
-<span class="w"> </span>  &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+  &quot;nth&quot;: 2,</span>
-<span class="w"> </span>  &quot;condition&quot;: {
-<span class="w"> </span>    &quot;type&quot;: &quot;method_match&quot;,
-<span class="w"> </span>    &quot;value&quot;: &quot;post&quot;
-<span class="w"> </span>  }
-<span class="w"> </span>}
+<p>Writes data to the HTTP Response.</p>
+</section>
+<section id="wipe-headers">
+<h2>wipe-headers<a class="headerlink" href="#wipe-headers" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>wipe-headers<span class="w"> </span>some-header-key<span class="w"> </span>another-header-key
+$<span class="w"> </span>mock<span class="w"> </span>wipe-headers<span class="w"> </span>--regex<span class="w"> </span>some-pattern<span class="w"> </span>another-pattern
 </pre></div>
 </div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="assertion_chaining.html">Assertion Chaining</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mock_package.html">Test Assertions with <em>mock</em>’s Go package</a></li>
+<p>Removes one or more HTTP Headers. The header names passed as parameters must be
+the exact header name. The string matching is case-insensitive.</p>
+<p>Options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--regex</span></code>: The strings passed will be used as regex patterns for matching
+against the header keys.</p></li>
 </ul>
-</div>
 </section>
 </section>
 
@@ -359,23 +323,23 @@ want to assert against a Request other than the first, you’ll use the
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="assertion_chaining.html">
+          <a class="next-page" href="static_files.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Assertion Chaining</div>
+                <div class="title">Serving static files</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="base_apis.html">
+          <a class="prev-page" href="shell_scripts.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Base APIs</div>
+                <div class="title">Responses from Shell scripts</div>
                 
               </div>
             </a>
@@ -409,8 +373,9 @@ want to assert against a Request other than the first, you’ll use the
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Test Assertions</a><ul>
-<li><a class="reference internal" href="#which-request-to-assert-against">Which Request to assert against?</a></li>
+<li><a class="reference internal" href="#">Shell Utilities</a><ul>
+<li><a class="reference internal" href="#write">write</a></li>
+<li><a class="reference internal" href="#wipe-headers">wipe-headers</a></li>
 </ul>
 </li>
 </ul>
