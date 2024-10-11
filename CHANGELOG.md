@@ -5,6 +5,7 @@
 ADDED
 
 - Add ``mock write``.
+- Add ``mock replace``.
 - Support for regular expressions for `wipe-headers`, with `--regex
   <PATTERN>`.
 - Decode gzipped responses retrieved from `forward`. Prior to this change,

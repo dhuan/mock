@@ -35,6 +35,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.AddCommand(serveCmd)
 	rootCmd.AddCommand(forwardCmd)
+	rootCmd.AddCommand(replaceCmd)
 	rootCmd.AddCommand(wipeHeadersCmd)
 	rootCmd.AddCommand(writeCmd)
 	rootCmd.AddCommand(versionCmd)
