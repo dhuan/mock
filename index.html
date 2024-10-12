@@ -5,10 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="install.html" />
 
-    <!-- Generated with Sphinx 8.1.0 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.08.06 -->
         <title>mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=1e801841" />
     
@@ -210,6 +211,7 @@
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shell_utils.html">Shell Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
@@ -270,42 +272,74 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="mock-language-agnostic-api-mocking-and-testing-utility">
-<h1>mock - Language-agnostic API mocking and testing utility<a class="headerlink" href="#mock-language-agnostic-api-mocking-and-testing-utility" title="Link to this heading">¶</a></h1>
-<p><em>mock</em> enables you to quickly set up HTTP servers for end-to-end tests.</p>
+          <section id="mock-api-and-testing-utility">
+<h1>mock - API and testing utility<a class="headerlink" href="#mock-api-and-testing-utility" title="Link to this heading">¶</a></h1>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-column sd-col-7 sd-col-xs-7 sd-col-sm-7 sd-col-md-7 sd-col-lg-7 docutils">
+<p><em>mock</em> is an API utility - it lets you:</p>
 <ul class="simple">
-<li><p>Define endpoints and their respective responses through easy syntax;</p></li>
-<li><p>Make assertions on…</p>
-<ul>
-<li><p>Whether a given endpoint was requested;</p></li>
-<li><p>If a JSON payload body was passed correctly to a given endpoint;</p></li>
-<li><p>If a header value was passed correctly;</p></li>
-<li><p>And other useful things…</p></li>
+<li><p>define API routes easily through API configuration files or through
+command-line parameters.</p></li>
+<li><p>use shells scripts as response handlers. Or any other type of program can act
+as response handlers.</p></li>
+<li><p>test your API - make assertions on whether an endpoint was requested.</p></li>
 </ul>
-</li>
+</div>
+<div class="sd-col sd-d-flex-row sd-col-5 sd-col-xs-5 sd-col-sm-5 sd-col-md-5 sd-col-lg-5 docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Quick Links</div>
+<ul class="simple">
+<li><p class="sd-card-text"><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v1.4.3/mock_v1.4.3_linux-386.tar.gz">Download mock for Linux</a></p></li>
+<li><p class="sd-card-text"><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v1.4.3/mock_v1.4.3_darwin-amd64.tar.gz">Download mock for MacOS</a></p></li>
+<li><p class="sd-card-text"><a class="reference external" href="https://github.com/dhuan/mock/releases">Releases</a></p></li>
+<li><p class="sd-card-text"><a class="reference external" href="https://github.com/dhuan/mock">mock’s source code</a></p></li>
+<li><p class="sd-card-text"><a class="reference external" href="https://github.com/dhuan/mock/issues">Report bugs</a></p></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Let’s look at a simple example - an API with 2 routes <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">say_hi/{name}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">what_time_is_it</span></code>:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;say_hi/{name}&#39;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world! My name is ${name}.&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world! My name is ${name}.&#39;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;what_time_is_it&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Now it is %s&quot; $(date +&quot;%H:%M&quot;) &gt; $MOCK_RESPONSE_BODY&#39;</span>
+<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Now it is %s&quot; $(date +&quot;%H:%M&quot;) | mock write&#39;</span>
 </pre></div>
 </div>
-<p>Run the example command the above and try these URLs in your browser or
-any preferred HTTP client: <code class="docutils literal notranslate"><span class="pre">http://localhost:3000/say_hi/mock</span></code> and
-<code class="docutils literal notranslate"><span class="pre">http://localhost:3000/what_time_is_it</span></code></p>
-<section id="quick-links">
-<h2>Quick links<a class="headerlink" href="#quick-links" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v1.4.2/mock_v1.4.2_linux-386.tar.gz">Download mock for Linux</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v1.4.2/mock_v1.4.2_darwin-amd64.tar.gz">Download mock for MacOS</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases">Releases</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock">mock’s source code</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/issues">Report bugs</a></p></li>
-</ul>
-</section>
+<p>Now try requesting your <cite>mock API</cite> at port 3000 (can also be from your
+browser!):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/say_hi/john_doe
+
+Hello,<span class="w"> </span>world!<span class="w"> </span>My<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>john_doe.
+
+$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/what_time_is_it
+
+Now<span class="w"> </span>it<span class="w"> </span>is<span class="w"> </span><span class="m">22</span>:00
+</pre></div>
+</div>
+<p><em>mock</em> lets you also extend other APIs (or any HTTP service, for that matter.)
+Suppose you want to add a new route to an existing API running at
+<code class="docutils literal notranslate"><span class="pre">example.com</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--port<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--base<span class="w"> </span>example.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;some_new_route&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--method<span class="w"> </span>GET<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Hello, world!&quot; | mock write&#39;</span>
+</pre></div>
+</div>
+<p>With the <code class="docutils literal notranslate"><span class="pre">--base</span> <span class="pre">example.com</span></code> option above, your <em>mock API</em> will act as proxy
+to that other website, and extend it with an extra route <code class="docutils literal notranslate"><span class="pre">GET</span>
+<span class="pre">/some_new_route</span></code>. Look up “Base APIs” in the docs for more details.</p>
+<p>There are many other ways of further customising your APIs with <em>mock</em>. Read
+further through this guide to learn.</p>
 <section id="read-further">
 <h2>Read further…<a class="headerlink" href="#read-further" title="Link to this heading">¶</a></h2>
 <p>The core functionalities of <em>mock</em> are documented each in their
@@ -314,8 +348,6 @@ respective sections. Read further to learn:</p>
 <li><p><a class="reference external" href="apis.html">Creating APIs</a></p></li>
 <li><p><a class="reference external" href="test_assertions.html">Test Assertions</a></p></li>
 </ul>
-<hr class="docutils" />
-<p><em>Why “language-agnostic”???</em> - similar tools exist out there but they somehow require you to write in some programming-language when setting up fake APIs for testing. <em>mock</em> on the other hand enables you to set things up easily by just writing configuration files.</p>
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
@@ -375,8 +407,7 @@ file.</a></p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">mock - Language-agnostic API mocking and testing utility</a><ul>
-<li><a class="reference internal" href="#quick-links">Quick links</a></li>
+<li><a class="reference internal" href="#">mock - API and testing utility</a><ul>
 <li><a class="reference internal" href="#read-further">Read further…</a></li>
 <li><a class="reference internal" href="#license">License</a><ul>
 </ul>
@@ -393,8 +424,9 @@ file.</a></p>
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     </body>
 </html>
