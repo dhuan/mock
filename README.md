@@ -1,97 +1,63 @@
 # mock
 
-*[Language-agnostic API mocking and testing utility](https://dhuan.github.io/mock)*
+*[Go to the User Guide](https://dhuan.github.io/mock)*
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/dhuan/mock.svg)](https://pkg.go.dev/github.com/dhuan/mock)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dhuan/mock)](https://goreportcard.com/report/github.com/dhuan/mock)
 
-**mock** enables you to quickly setup a HTTP server for end-to-end tests.
+*mock* is an API utility - it lets you:
 
-- Define endpoints and their respective responses;
-- Make assertions on...
-  - Whether a given endpoint was requested;
-  - If a JSON payload body was passed correctly to a given endpoint;
-  - If a header value was passed correctly;
-  - And other useful things...
-
-The **Getting Started** section ahead gives you an overview of basic usage. To learn all the advanced features, check the [User Guide.](https://dhuan.github.io/mock)
+- define API routes easily through API configuration files or through
+  command-line parameters.
+- use shells scripts as response handlers. Or any other type of program can act
+  as response handlers.
+- test your API - make assertions on whether an endpoint was requested.
 
 ## Getting started
 
-```sh
-$ mock serve -c /path/to/your/config.json -p 4000
-```
-
-Below is a configuration file sample, defining two simple endpoints:
-
-```
-{
-  "endpoints": [
-    {
-      "route": "foo/bar",
-      "method": "POST",
-      "response": {
-        "foo": "bar"
-      }
-    },
-    {
-      "route": "hello/world",
-      "method": "GET",
-      "response": {
-        "some_key": "some_value"
-      }
-    }
-  ]
-}
-```
-
-Let's now make a request to the `foo/bar` endpoint:
+Let's look at a simple example - an API with 2 routes `GET say_hi/{name}` and
+`GET what_time_is_it`:
 
 ```sh
-$ curl localhost:4000/foo/bar \
-  -H 'Content-type: application/json' \
-  -d '{"some_key":"some_value"}'
+$ mock serve --port 3000 \
+  --route 'say_hi/{name}' \
+  --method GET \
+  --response 'Hello, world! My name is ${name}.' \
+  --route "what_time_is_it" \
+  --method GET \
+  --exec 'printf "Now it is %s" $(date +"%H:%M") | mock write'
 ```
 
-And then let's make assertions - Let's verify whether the `foo/bar` endpoint was called with the expected values:
+Now try requesting your `mock API` at port 3000 (can also be from your
+browser!):
 
 ```sh
-$ curl -v http://localhost:4000/__mock__/assert -d @- <<EOF
-{
-  "route": "foo/bar",
-  "assert": {
-    "type": "json_body_match",
-    "key_values": {
-      "some_key": "some_value"
-    },
-    "and": {
-      "type": "method_match",
-      "value": "put"
-    }
-  }
-}
-EOF
+$ curl localhost:3000/say_hi/john_doe
+
+Hello, world! My name is john_doe.
+
+$ curl localhost:3000/what_time_is_it
+
+Now it is 22:00
 ```
 
-In the command above we're trying to assert the following:
-
-> The `foo/bar` endpoint was called, with the JSON Payload `{"some_key":"some_value"}`, **and** with the `put` method.
-
-Obviously, there's a problem with that assertion - the request we made previously was a `post` request, not `put`, therefore we get a response indicating so:
+*mock* lets you also extend other APIs (or any HTTP service, for that matter.)
+Suppose you want to add a new route to an existing API running at
+``example.com``:
 
 ```sh
-{
-  "validation_errors": [
-    {
-      "code": "method_mismatch",
-      "metadata": {
-        "method_expected": "put",
-        "method_requested": "post"
-      }
-    }
-  ]
-}
+$ mock serve --port 3000 \
+  --base example.com \
+  --route 'some_new_route' \
+  --method GET \
+  --exec 'printf "Hello, world!" | mock write' 
 ```
+
+With the ``--base example.com`` option above, your *mock API* will act as proxy
+to that other website, and extend it with an extra route `GET /some_new_route`.
+Look up "Base APIs" in the docs for more details.
+
+*[There are many other ways of further customising your APIs with *mock*. Read further through the guide to learn.](https://dhuan.github.io/mock)*
 
 ## Installing
 
