@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"github.com/dhuan/mock/internal/utils"
 )
 
 var replaceCmd = &cobra.Command{
@@ -17,7 +19,13 @@ var replaceCmd = &cobra.Command{
 				panic(err)
 			}
 
-			result := strings.Replace(string(fileContent), args[0], args[1], 1)
+			result := string(fileContent)
+
+			if flagRegex {
+				result = utils.ReplaceRegex(result, []string{args[0]}, args[1])
+			} else {
+				result = strings.Replace(result, args[0], args[1], 1)
+			}
 
 			err = os.WriteFile(rf.body, []byte(result), 0644)
 			if err != nil {

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- `--regex` option for `mock replace`.
+
 ## 1.4.3
 
 ADDED
