@@ -49,6 +49,10 @@ replace
 
 Searches for `<ARG 1>` and replaces it with `<ARG 2>`, on the HTTP Response Body.
 
+Options:
+
+- ``--regex``: Treats *<ARG 1>* (the search parameter) as a regular expression.
+
 wipe-headers
 ------------
 
