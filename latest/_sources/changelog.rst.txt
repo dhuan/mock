@@ -8,6 +8,10 @@ ADDED
 
 -  ``--regex`` option for ``mock replace``.
 
+IMPROVED
+
+-  Fail gracefully if more than 2 args are passed to ``mock replace``.
+
 1.4.3
 -----
 
