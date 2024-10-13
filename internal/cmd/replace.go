@@ -13,7 +13,9 @@ import (
 var replaceCmd = &cobra.Command{
 	Use: "replace",
 	Run: func(cmd *cobra.Command, args []string) {
-		responseShellUtilWrapper("write", func(request *http.Request, rf *responseFiles) {
+		responseShellUtilWrapper("replace", args, &responseShellUtilOptions{
+			argCountMustMatch: 2,
+		}, func(request *http.Request, rf *responseFiles) {
 			fileContent, err := os.ReadFile(rf.body)
 			if err != nil {
 				panic(err)

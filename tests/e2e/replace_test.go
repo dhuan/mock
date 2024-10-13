@@ -44,3 +44,26 @@ func Test_E2E_Replace_WithRegex(t *testing.T) {
 		StringMatches("Hello, people."),
 	)
 }
+
+func Test_E2E_Replace_Error_OnlyTwoArgsAreAllowed(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				`printf "Hello, world." | {{MOCK_EXECUTABLE}} write`,
+				`{{MOCK_EXECUTABLE}} replace one two three`,
+			}, ";")),
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		nil,
+		StringMatches(`Hello, world.`),
+		ApplicationOutputHasLines([]string{
+			"Output from program execution:",
+			"",
+			`"replace" allows only 2 paramaters.`,
+		}),
+	)
+}

@@ -19,7 +19,7 @@ import (
 var forwardCmd = &cobra.Command{
 	Use: "forward",
 	Run: func(cmd *cobra.Command, args []string) {
-		responseShellUtilWrapper("forward", func(request *http.Request, rf *responseFiles) {
+		responseShellUtilWrapper("forward", args, &responseShellUtilOptions{}, func(request *http.Request, rf *responseFiles) {
 			log.Printf("Forwarding request to Base API: %s %s\n", request.Method, request.RequestURI)
 
 			client := &http.Client{}

@@ -6,10 +6,20 @@ import (
 	"strings"
 )
 
+type responseShellUtilOptions struct {
+	argCountMustMatch int
+}
+
 func responseShellUtilWrapper(
 	commandName string,
+	args []string,
+	options *responseShellUtilOptions,
 	f func(request *http.Request, rf *responseFiles),
 ) {
+	if options.argCountMustMatch > 0 && len(args) != options.argCountMustMatch {
+		exitWithError(fmt.Sprintf(`"%s" allows only 2 paramaters.`, commandName))
+	}
+
 	request,
 		valid,
 		envValidationErrors,

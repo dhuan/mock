@@ -11,7 +11,7 @@ import (
 var writeCmd = &cobra.Command{
 	Use: "write",
 	Run: func(cmd *cobra.Command, args []string) {
-		responseShellUtilWrapper("write", func(request *http.Request, rf *responseFiles) {
+		responseShellUtilWrapper("write", args, &responseShellUtilOptions{}, func(request *http.Request, rf *responseFiles) {
 			stdin, err := io.ReadAll(cmd.InOrStdin())
 			if err != nil {
 				exitWithError("Failed to read stdin!")
