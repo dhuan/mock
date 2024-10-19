@@ -97,4 +97,4 @@ Now let's request that route and see the result:
 
    All environment variables provided by `mock` are uppercased. Therefore if
    your route param is named ``fooBar``, the environment variable will be
-   available to your script as ``MOCK_ROUTE_FOOBAR``
+   available to your script as ``MOCK_ROUTE_PARAM_FOOBAR``
