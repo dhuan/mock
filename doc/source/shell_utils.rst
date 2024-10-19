@@ -68,3 +68,14 @@ Options:
 
 - ``--regex``: The strings passed will be used as regex patterns for matching
   against the header keys.
+
+set-header
+----------
+
+.. code:: sh
+
+   $ mock set-header foo bar
+
+Adds an HTTP Header to the Response. If the provided header name was already
+set previously, then the provided header value will just overwrite the
+previous one.

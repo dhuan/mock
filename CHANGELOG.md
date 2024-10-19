@@ -4,6 +4,7 @@
 
 ADDED
 
+- New command: `mock set-header`.
 - `--regex` option for `mock replace`.
 
 IMPROVED

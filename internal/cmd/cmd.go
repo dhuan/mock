@@ -37,6 +37,7 @@ func Execute() {
 	rootCmd.AddCommand(forwardCmd)
 	rootCmd.AddCommand(replaceCmd)
 	rootCmd.AddCommand(wipeHeadersCmd)
+	rootCmd.AddCommand(setHeaderCmd)
 	rootCmd.AddCommand(writeCmd)
 	rootCmd.AddCommand(versionCmd)
 

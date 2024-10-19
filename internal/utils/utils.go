@@ -485,3 +485,15 @@ func MapFilterFileLines(filePath string, f func(string) (string, bool)) error {
 
 	return os.WriteFile(filePath, []byte(strings.Join(result, "\n")), 0644)
 }
+
+func AddLineToFile(filePath string, newLine string) error {
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	lines := strings.Split(string(fileContent), "\n")
+	lines = append(lines, newLine)
+
+	return os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+}
