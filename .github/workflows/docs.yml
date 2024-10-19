@@ -22,8 +22,8 @@ jobs:
     - name: Build documentation
       run: |
           sudo apt update -y && sudo apt install -y python3 python3-pip python3-sphinx pandoc
-          pip install --break-system-packages furo
-          pip install --break-system-packages sphinx-design
+          pip install -U furo
+          pip install -U sphinx-design
           TMP_DIR=$(mktemp -d)
           mkdir "$TMP_DIR"/latest
 
