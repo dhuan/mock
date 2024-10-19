@@ -7,8 +7,9 @@ aside.toc-drawer {
 }
 
 div.main div.content {
-    width: auto;
+    width: 0;
     max-width: 1900px;
+    flex-grow: 1;
 }
 
 .admonition p {
