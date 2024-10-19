@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -266,7 +266,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -275,7 +275,10 @@
           <section id="route-parameters">
 <h1>Route Parameters<a class="headerlink" href="#route-parameters" title="Link to this heading">¶</a></h1>
 <p>Route Parameters are named route segments that can be captured as values
-when defining Responses.</p>
+when defining Responses. Let’s look at how to capture these parameters and use
+them for our API logic.</p>
+<section id="with-static-response-data">
+<h2>With static response data<a class="headerlink" href="#with-static-response-data" title="Link to this heading">¶</a></h2>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
@@ -318,13 +321,42 @@ parameters, the same syntax applies:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Important: Note in the example above that the response string was
-wrapped around single-quotes, that is necessary because the variable
-‘${book_name}’ is NOT supposed to be processed by the shell program,
-instead <strong>mock</strong> will process that variable while processing the
-request’s reponse, as <code class="docutils literal notranslate"><span class="pre">book_name</span></code> is a Route Parameter and not a
-shell variable.</p>
+<p>In the example above that the response string was wrapped around
+single-quotes, that is necessary because the variable ‘${book_name}’ is NOT
+supposed to be processed by the shell program, instead <strong>mock</strong> will process
+that variable while processing the request’s reponse, as <code class="docutils literal notranslate"><span class="pre">book_name</span></code> is a
+Route Parameter and not a shell variable.</p>
 </div>
+</section>
+<section id="with-shell-scripts">
+<h2>With shell scripts<a class="headerlink" href="#with-shell-scripts" title="Link to this heading">¶</a></h2>
+<p>From shell scripts, there are two different ways through which we can capture
+route parameters.</p>
+<p>We can simply read the environment variable <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_&lt;NAME&gt;</span></code>.</p>
+<p>Let’s spin up a <cite>mock API</cite> with a route that has two route parameters:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;say_hi/{name}/{location}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;printf &quot;Hello! My name is %s. I live on %s.&quot; &quot;${MOCK_ROUTE_PARAM_NAME}&quot; &quot;${MOCK_ROUTE_PARAM_LOCATION}&quot; | mock write&#39;</span>
+</pre></div>
+</div>
+<p>Now let’s request that route and see the result:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/say_hi/john_doe/earth
+
+Hello!<span class="w"> </span>My<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>john_doe.<span class="w"> </span>I<span class="w"> </span>live<span class="w"> </span>on<span class="w"> </span>earth.
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you think the “exec” command above is too lengthy and would like to keep
+your API logic more organised, you can just put that script into a shell file and instead of <code class="docutils literal notranslate"><span class="pre">--exec</span></code>, use <code class="docutils literal notranslate"><span class="pre">--shell-script</span> <span class="pre">/path/to/some/script.sh</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All environment variables provided by <cite>mock</cite> are uppercased. Therefore if
+your route param is named <code class="docutils literal notranslate"><span class="pre">fooBar</span></code>, the environment variable will be
+available to your script as <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_FOOBAR</span></code></p>
+</div>
+</section>
 </section>
 
         </article>
@@ -370,8 +402,28 @@ shell variable.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Route Parameters</a><ul>
+<li><a class="reference internal" href="#with-static-response-data">With static response data</a></li>
+<li><a class="reference internal" href="#with-shell-scripts">With shell scripts</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
