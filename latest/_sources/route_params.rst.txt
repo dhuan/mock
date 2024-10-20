@@ -97,4 +97,16 @@ Now let's request that route and see the result:
 
    All environment variables provided by `mock` are uppercased. Therefore if
    your route param is named ``fooBar``, the environment variable will be
-   available to your script as ``MOCK_ROUTE_PARAM_FOOBAR``
+   available to your script as ``MOCK_ROUTE_PARAM_FOOBAR``. This is not a
+   limitation of `mock`, rather it's just a shell scripting convention that
+   environment variables be uppercased.
+
+Alternatively, Route Parameters can be captured with the ``mock
+get-route-param`` command.
+
+.. code:: sh
+
+   $ printf "Hello! My name is %s. I live on %s." \
+    "$(mock get-route-param name)" \
+    "$(mock get-route-param location)" \
+    | mock write

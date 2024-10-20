@@ -79,3 +79,14 @@ set-header
 Adds an HTTP Header to the Response. If the provided header name was already
 set previously, then the provided header value will just overwrite the
 previous one.
+
+get-route-param
+---------------
+
+.. code:: sh
+
+   $ mock get-route-param some_route_param_name
+
+Gets a `Route Parameter <route_params.html>`__. If the parameter doesn't
+exist, nothing is printed out and `mock` exists with ``1``, otherwise the
+parameter value is printed out and it exits with ``0``.

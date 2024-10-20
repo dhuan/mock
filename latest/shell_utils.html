@@ -337,6 +337,15 @@ against the header keys.</p></li>
 set previously, then the provided header value will just overwrite the
 previous one.</p>
 </section>
+<section id="get-route-param">
+<h2>get-route-param<a class="headerlink" href="#get-route-param" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-route-param<span class="w"> </span>some_route_param_name
+</pre></div>
+</div>
+<p>Gets a <a class="reference external" href="route_params.html">Route Parameter</a>. If the parameter doesn’t
+exist, nothing is printed out and <cite>mock</cite> exists with <code class="docutils literal notranslate"><span class="pre">1</span></code>, otherwise the
+parameter value is printed out and it exits with <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</section>
 </section>
 
         </article>
@@ -399,6 +408,7 @@ previous one.</p>
 <li><a class="reference internal" href="#replace">replace</a></li>
 <li><a class="reference internal" href="#wipe-headers">wipe-headers</a></li>
 <li><a class="reference internal" href="#set-header">set-header</a></li>
+<li><a class="reference internal" href="#get-route-param">get-route-param</a></li>
 </ul>
 </li>
 </ul>
