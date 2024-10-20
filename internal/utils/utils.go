@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -496,4 +498,13 @@ func AddLineToFile(filePath string, newLine string) error {
 	lines = append(lines, newLine)
 
 	return os.WriteFile(filePath, []byte(strings.Join(lines, "\n")), 0644)
+}
+
+func EncodeToJsonBase64(data interface{}) (string, error) {
+	jsonEncoded, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(jsonEncoded), nil
 }

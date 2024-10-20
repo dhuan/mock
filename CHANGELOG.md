@@ -4,7 +4,9 @@
 
 ADDED
 
-- New command: `mock set-header`.
+- New commands:
+  - `mock set-header`.
+  - `mock get-route-param`.
 - `--regex` option for `mock replace`.
 
 IMPROVED

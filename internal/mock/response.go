@@ -364,6 +364,13 @@ func addUrlParamsToRequestVariables(requestVariables, endpointParams map[string]
 
 		requestVariables[keyTransformed] = endpointParams[key]
 	}
+
+	routeParamsEncoded, err := utils.EncodeToJsonBase64(endpointParams)
+	if err != nil {
+		log.Printf("Failed to encode route params to json/base64: %s", err.Error())
+	}
+
+	requestVariables["MOCK_ROUTE_PARAMS"] = routeParamsEncoded
 }
 
 func printOutExecOutputIfNecessary(execResult *ExecResult) {

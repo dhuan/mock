@@ -36,6 +36,7 @@ func Execute() {
 	rootCmd.AddCommand(serveCmd)
 	rootCmd.AddCommand(forwardCmd)
 	rootCmd.AddCommand(replaceCmd)
+	rootCmd.AddCommand(getRouteParamCmd)
 	rootCmd.AddCommand(wipeHeadersCmd)
 	rootCmd.AddCommand(setHeaderCmd)
 	rootCmd.AddCommand(writeCmd)
