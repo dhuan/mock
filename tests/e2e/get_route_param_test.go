@@ -32,7 +32,7 @@ func Test_E2E_GetRouteParam_WithUnexistingKeyExitsWith1(t *testing.T) {
 			"--route say_hi/{name}",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
 				`{{MOCK_EXECUTABLE}} get-route-param this-param-does-not-exist`,
-				`printf "Exit code is %d". "${?}" | mock write`,
+				`printf "Exit code is %d". "${?}" | {{MOCK_EXECUTABLE}} write`,
 			}, ";")),
 		},
 		"GET",
