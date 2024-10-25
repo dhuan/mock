@@ -13,6 +13,10 @@ ADDED
 
 -  ``--regex`` option for ``mock replace``.
 
+FIXED
+
+-  Middlewares could not use ``mock write`` and other helper commands.
+
 IMPROVED
 
 -  Fail gracefully if more than 2 args are passed to ``mock replace``.
