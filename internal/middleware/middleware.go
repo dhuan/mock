@@ -25,12 +25,13 @@ func RunMiddleware(
 	configPath string,
 	middlewareConfigs []MiddlewareConfig,
 	responseBody []byte,
-	responseHeaders map[string]string,
+	responseHeaders *http.Header,
 	responseStatusCode int,
 	request *http.Request,
 	endpointParams map[string]string,
 	vars map[string]string,
 	createTempFile func([]byte) (string, error),
+	requestRecord *RequestRecord,
 ) (*MiddlewareRunResult, error) {
 	result := &MiddlewareRunResult{}
 	result.Body = responseBody
@@ -41,16 +42,21 @@ func RunMiddleware(
 		return result, nil
 	}
 
-	responseFiles, err := buildResponseFiles(responseBody, responseHeaders, responseStatusCode)
+	mockEnvVars, hf, err := mock.BuildHandlerFiles(
+		*requestRecord.Body,
+		requestRecord,
+		responseBody,
+		responseHeaders,
+		responseStatusCode,
+	)
 	if err != nil {
 		return result, err
 	}
 
 	for i := range middlewareConfigs {
-		envVars := map[string]string{
-			"MOCK_RESPONSE_BODY":        responseFiles.body,
-			"MOCK_RESPONSE_HEADERS":     responseFiles.headers,
-			"MOCK_RESPONSE_STATUS_CODE": responseFiles.statusCode,
+		envVars := make(map[string]string)
+		for key := range mockEnvVars {
+			envVars[key] = mockEnvVars[key]
 		}
 
 		for key := range endpointParams {
@@ -85,26 +91,26 @@ func RunMiddleware(
 		}
 	}
 
-	return readResponseFiles(responseFiles, readFile)
+	return readResponseFiles(hf, readFile)
 }
 
 func readResponseFiles(
-	rf *responseFiles,
+	rf *mock.HandlerFiles,
 	readFile ReadFileFunc,
 ) (*MiddlewareRunResult, error) {
 	result := &MiddlewareRunResult{}
 
-	resultResponseBody, err := readFile(rf.body)
+	resultResponseBody, err := readFile(rf.ResponseBody)
 	if err != nil {
 		return result, err
 	}
 
-	resultResponseHeaders, err := readFile(rf.headers)
+	resultResponseHeaders, err := readFile(rf.ResponseHeaders)
 	if err != nil {
 		return result, err
 	}
 
-	resultResponseStatusCode, err := readFile(rf.statusCode)
+	resultResponseStatusCode, err := readFile(rf.ResponseStatusCode)
 	if err != nil {
 		return result, err
 	}
@@ -167,43 +173,4 @@ func routeMatch(r *http.Request, middlewareConfig *MiddlewareConfig) bool {
 	requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
 
 	return utils.RegexTest(middlewareConfig.RouteMatch, requestRoute)
-}
-
-type responseFiles struct {
-	body       string
-	headers    string
-	statusCode string
-}
-
-func buildResponseFiles(
-	responseBody []byte,
-	responseHeaders map[string]string,
-	responseStatusCode int,
-) (*responseFiles, error) {
-	result := &responseFiles{}
-	resultResponseHeaders := []byte(utils.ToHeadersText(toHttpHeaders(responseHeaders)) + "\n")
-	resultResponseBody := make([]byte, len(responseBody))
-	copy(resultResponseBody, responseBody)
-	resultResponseStatusCode := []byte(fmt.Sprintf("%d", responseStatusCode))
-
-	responseBodyFile, err := utils.CreateTempFile(resultResponseBody)
-	if err != nil {
-		return result, err
-	}
-
-	responseHeadersFile, err := utils.CreateTempFile(resultResponseHeaders)
-	if err != nil {
-		return result, err
-	}
-
-	responseStatusCodeFile, err := utils.CreateTempFile(resultResponseStatusCode)
-	if err != nil {
-		return result, err
-	}
-
-	result.body = responseBodyFile
-	result.headers = responseHeadersFile
-	result.statusCode = responseStatusCodeFile
-
-	return result, nil
 }

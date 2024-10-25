@@ -259,7 +259,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 			fmt.Sprintf("--base 'localhost:%d'", state.Port),
 			"--route hello/world",
 			"--response 'Hello world!'",
-			"--middleware 'printf \"Foo: bar\" >> $MOCK_RESPONSE_HEADERS'",
+			"--middleware 'printf \"\nFoo: bar\" >> $MOCK_RESPONSE_HEADERS'",
 			"--middleware 'printf \" Modified!\" >> $MOCK_RESPONSE_BODY'",
 		},
 		"GET",

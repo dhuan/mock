@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -383,12 +384,12 @@ func printOutExecOutputIfNecessary(execResult *ExecResult) {
 	log.Printf(fmt.Sprintf("Output from program execution:\n\n%s\n", output))
 }
 
-type handlerFiles struct {
-	headers            string
-	body               string
-	responseBody       string
-	responseHeaders    string
-	responseStatusCode string
+type HandlerFiles struct {
+	Headers            string
+	Body               string
+	ResponseBody       string
+	ResponseHeaders    string
+	ResponseStatusCode string
 }
 
 func buildMockVariablesForPlainTextResponse(requestBody []byte) map[string]string {
@@ -397,30 +398,41 @@ func buildMockVariablesForPlainTextResponse(requestBody []byte) map[string]strin
 	}
 }
 
-func buildHandlerFiles(requestBody []byte, requestRecord *types.RequestRecord) (map[string]string, *handlerFiles, error) {
+func BuildHandlerFiles(
+	requestBody []byte,
+	requestRecord *types.RequestRecord,
+	responseBody []byte,
+	responseHeaders *http.Header,
+	responseStatusCode int,
+) (map[string]string, *HandlerFiles, error) {
 	bodyFile, err := utils.CreateTempFile(requestBody)
 	if err != nil {
-		return map[string]string{}, &handlerFiles{}, err
+		return map[string]string{}, &HandlerFiles{}, err
 	}
 
-	responseStatusCodeFile, err := utils.CreateTempFile([]byte(""))
+	responseStatusCodeFile, err := utils.CreateTempFile([]byte(strconv.Itoa(responseStatusCode)))
 	if err != nil {
-		return map[string]string{}, &handlerFiles{}, err
+		return map[string]string{}, &HandlerFiles{}, err
 	}
 
-	responseHeadersFile, err := utils.CreateTempFile([]byte(""))
-	if err != nil {
-		return map[string]string{}, &handlerFiles{}, err
+	headersText := ""
+	if len(*responseHeaders) > 0 {
+		headersText = utils.ToHeadersText(*responseHeaders)
 	}
 
-	responseBodyFile, err := utils.CreateTempFile([]byte(""))
+	responseHeadersFile, err := utils.CreateTempFile([]byte(headersText))
 	if err != nil {
-		return map[string]string{}, &handlerFiles{}, err
+		return map[string]string{}, &HandlerFiles{}, err
+	}
+
+	responseBodyFile, err := utils.CreateTempFile(responseBody)
+	if err != nil {
+		return map[string]string{}, &HandlerFiles{}, err
 	}
 
 	headersFile, err := utils.CreateTempFile([]byte(utils.ToHeadersText(requestRecord.Headers)))
 	if err != nil {
-		return map[string]string{}, &handlerFiles{}, err
+		return map[string]string{}, &HandlerFiles{}, err
 	}
 
 	return map[string]string{
@@ -429,7 +441,7 @@ func buildHandlerFiles(requestBody []byte, requestRecord *types.RequestRecord) (
 			"MOCK_RESPONSE_BODY":        responseBodyFile,
 			"MOCK_RESPONSE_HEADERS":     responseHeadersFile,
 			"MOCK_RESPONSE_STATUS_CODE": responseStatusCodeFile,
-		}, &handlerFiles{
+		}, &HandlerFiles{
 			headersFile,
 			bodyFile,
 			responseBodyFile,
@@ -439,13 +451,13 @@ func buildHandlerFiles(requestBody []byte, requestRecord *types.RequestRecord) (
 }
 
 func extractModifiedResponse(
-	hf *handlerFiles,
+	hf *HandlerFiles,
 	readFile types.ReadFileFunc,
 	endpointConfigContentType types.Endpoint_content_type,
 	headers map[string]string,
 	fallbackStatusCode int,
 ) (*Response, error) {
-	extraHeaders, err := ExtractHeadersFromFile(hf.responseHeaders, readFile)
+	extraHeaders, err := ExtractHeadersFromFile(hf.ResponseHeaders, readFile)
 	if err != nil {
 		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
 	}
@@ -455,12 +467,12 @@ func extractModifiedResponse(
 		headers[headerKey] = extraHeaders[headerKey]
 	}
 
-	statusCode, err := extractStatusCodeFromFile(hf.responseStatusCode, readFile)
+	statusCode, err := extractStatusCodeFromFile(hf.ResponseStatusCode, readFile)
 	if err != nil {
 		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
 	}
 
-	bodyContent, err := readFile(hf.responseBody)
+	bodyContent, err := readFile(hf.ResponseBody)
 	if err != nil {
 		return &Response{[]byte(""), types.Endpoint_content_type_unknown, fallbackStatusCode, nil}, err
 	}
@@ -567,7 +579,7 @@ func execWrapper(
 		addUrlParamsToRequestVariables(data.requestVariables, data.endpointParams)
 	}
 
-	fileVars, hf, err := buildHandlerFiles(data.requestBody, data.requestRecord)
+	fileVars, hf, err := BuildHandlerFiles(data.requestBody, data.requestRecord, []byte(""), &http.Header{}, 200)
 	if err != nil {
 		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
 	}

@@ -550,6 +550,8 @@ func handleMiddleware(
 		vars[key] = extraVars[key]
 	}
 
+	httpHeaders := toHttpHeaders(response.Headers)
+
 	responseTransformed := response.Body
 	if hasMiddleware {
 		middlewareRunResult, err := mockMiddleware.RunMiddleware(
@@ -558,12 +560,13 @@ func handleMiddleware(
 			state.ConfigFolderPath,
 			middlewareConfigsForRequest,
 			responseTransformed,
-			response.Headers,
+			&httpHeaders,
 			response.StatusCode,
 			r,
 			endpointParams,
 			vars,
 			utils.CreateTempFile,
+			requestRecord,
 		)
 		if err != nil {
 			panic(err)
@@ -774,4 +777,14 @@ func removeWebProtocolAndPort(url string) string {
 		"^https?://",
 		":[0-9]{1,}$",
 	}, "")
+}
+
+func toHttpHeaders(m map[string]string) http.Header {
+	result := make(http.Header)
+
+	for key := range m {
+		result[key] = []string{m[key]}
+	}
+
+	return result
 }
