@@ -31,6 +31,8 @@ Note how we didn't need to bother typing the file path as before.
 
 In the following sections we'll look at each such utility.
 
+.. _shell_utils_write:
+
 write
 -----
 
@@ -49,6 +51,10 @@ replace
 
 Searches for `<ARG 1>` and replaces it with `<ARG 2>`, on the HTTP Response Body.
 
+Options:
+
+- ``--regex``: Treats *<ARG 1>* (the search parameter) as a regular expression.
+
 wipe-headers
 ------------
 
@@ -64,3 +70,27 @@ Options:
 
 - ``--regex``: The strings passed will be used as regex patterns for matching
   against the header keys.
+
+.. _shell_utils_set_header:
+
+set-header
+----------
+
+.. code:: sh
+
+   $ mock set-header foo bar
+
+Adds an HTTP Header to the Response. If the provided header name was already
+set previously, then the provided header value will just overwrite the
+previous one.
+
+get-route-param
+---------------
+
+.. code:: sh
+
+   $ mock get-route-param some_route_param_name
+
+Gets a `Route Parameter <route_params.html>`__. If the parameter doesn't
+exist, nothing is printed out and `mock` exists with ``1``, otherwise the
+parameter value is printed out and it exits with ``0``.

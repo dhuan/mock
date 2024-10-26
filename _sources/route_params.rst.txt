@@ -2,7 +2,11 @@ Route Parameters
 ================
 
 Route Parameters are named route segments that can be captured as values
-when defining Responses.
+when defining Responses. Let's look at how to capture these parameters and use
+them for our API logic.
+
+With static response data
+-------------------------
 
 .. code:: json
 
@@ -53,9 +57,56 @@ parameters, the same syntax applies:
 
 .. note::
 
-   Important: Note in the example above that the response string was
-   wrapped around single-quotes, that is necessary because the variable
-   ‘${book_name}’ is NOT supposed to be processed by the shell program,
-   instead **mock** will process that variable while processing the
-   request’s reponse, as ``book_name`` is a Route Parameter and not a
-   shell variable.
+   In the example above that the response string was wrapped around
+   single-quotes, that is necessary because the variable ‘${book_name}’ is NOT
+   supposed to be processed by the shell program, instead **mock** will process
+   that variable while processing the request’s reponse, as ``book_name`` is a
+   Route Parameter and not a shell variable.
+
+With shell scripts
+------------------
+
+From shell scripts, there are two different ways through which we can capture
+route parameters.
+
+We can simply read the environment variable ``MOCK_ROUTE_PARAM_<NAME>``.
+
+Let's spin up a `mock API` with a route that has two route parameters:
+
+.. code:: sh
+
+   $ mock serve -p 3000 \
+       --route 'say_hi/{name}/{location}' \
+       --exec 'printf "Hello! My name is %s. I live on %s." "${MOCK_ROUTE_PARAM_NAME}" "${MOCK_ROUTE_PARAM_LOCATION}" | mock write'
+
+
+Now let's request that route and see the result:
+
+.. code:: sh
+
+    $ curl -v localhost:3000/say_hi/john_doe/earth
+
+    Hello! My name is john_doe. I live on earth.
+
+.. note::
+
+   If you think the "exec" command above is too lengthy and would like to keep
+   your API logic more organised, you can just put that script into a shell file and instead of ``--exec``, use ``--shell-script /path/to/some/script.sh``.
+
+.. note::
+
+   All environment variables provided by `mock` are uppercased. Therefore if
+   your route param is named ``fooBar``, the environment variable will be
+   available to your script as ``MOCK_ROUTE_PARAM_FOOBAR``. This is not a
+   limitation of `mock`, rather it's just a shell scripting convention that
+   environment variables be uppercased.
+
+Alternatively, Route Parameters can be captured with the ``mock
+get-route-param`` command.
+
+.. code:: sh
+
+   $ printf "Hello! My name is %s. I live on %s." \
+    "$(mock get-route-param name)" \
+    "$(mock get-route-param location)" \
+    | mock write

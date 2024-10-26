@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=1e801841" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=caabe48b" />
     
     
 
@@ -297,7 +297,7 @@ the same http response modification using just <cite>mock</cite> instead of <cit
 <p>Note how we didn’t need to bother typing the file path as before.</p>
 <p>In the following sections we’ll look at each such utility.</p>
 <section id="write">
-<h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
+<span id="shell-utils-write"></span><h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
 </pre></div>
 </div>
@@ -309,6 +309,10 @@ the same http response modification using just <cite>mock</cite> instead of <cit
 </pre></div>
 </div>
 <p>Searches for <cite>&lt;ARG 1&gt;</cite> and replaces it with <cite>&lt;ARG 2&gt;</cite>, on the HTTP Response Body.</p>
+<p>Options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--regex</span></code>: Treats <em>&lt;ARG 1&gt;</em> (the search parameter) as a regular expression.</p></li>
+</ul>
 </section>
 <section id="wipe-headers">
 <h2>wipe-headers<a class="headerlink" href="#wipe-headers" title="Link to this heading">¶</a></h2>
@@ -323,6 +327,24 @@ the exact header name. The string matching is case-insensitive.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">--regex</span></code>: The strings passed will be used as regex patterns for matching
 against the header keys.</p></li>
 </ul>
+</section>
+<section id="set-header">
+<span id="shell-utils-set-header"></span><h2>set-header<a class="headerlink" href="#set-header" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>set-header<span class="w"> </span>foo<span class="w"> </span>bar
+</pre></div>
+</div>
+<p>Adds an HTTP Header to the Response. If the provided header name was already
+set previously, then the provided header value will just overwrite the
+previous one.</p>
+</section>
+<section id="get-route-param">
+<h2>get-route-param<a class="headerlink" href="#get-route-param" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-route-param<span class="w"> </span>some_route_param_name
+</pre></div>
+</div>
+<p>Gets a <a class="reference external" href="route_params.html">Route Parameter</a>. If the parameter doesn’t
+exist, nothing is printed out and <cite>mock</cite> exists with <code class="docutils literal notranslate"><span class="pre">1</span></code>, otherwise the
+parameter value is printed out and it exits with <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
 </section>
 </section>
 
@@ -385,6 +407,8 @@ against the header keys.</p></li>
 <li><a class="reference internal" href="#write">write</a></li>
 <li><a class="reference internal" href="#replace">replace</a></li>
 <li><a class="reference internal" href="#wipe-headers">wipe-headers</a></li>
+<li><a class="reference internal" href="#set-header">set-header</a></li>
+<li><a class="reference internal" href="#get-route-param">get-route-param</a></li>
 </ul>
 </li>
 </ul>
