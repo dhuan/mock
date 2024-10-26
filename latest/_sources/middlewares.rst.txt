@@ -61,42 +61,69 @@ Examples of Middlewares
 Modify Response Body
 --------------------
 
-The following Middleware Script replaces all occurrences of ``foo`` with ``bar``
-in the response body:
+To kick-off the middleware examples, let's set up a very simple middleware that
+will uppercase all response text.
 
 .. code:: sh
 
-   sed -i 's/foo/bar/g' $MOCK_RESPONSE_BODY
+   $ mock serve -p 3000 \
+       --middleware 'cat $MOCK_RESPONSE_BODY | awk '"'"'{print toupper($0)}'"'"' | mock write' \
+       --route foo/bar \
+       --response 'Hello, world!'
+
+The middleware above simply pipes all response data to ``awk {print
+toupper($0)}``, uppercasing all text.
+
+Let's now request this `mock API` and find out the results:
+
+.. code:: sh
+
+   $ curl localhost:3000/foo/bar
+
+   // Prints out: HELLO, WORLD!
+
+.. note::
+
+   To modify the response in the example above, we've used ``mock write``. If
+   that's new to you :ref:`read more about it here. <shell_utils_write>`
 
 Adding new headers before sending response to client
 ----------------------------------------------------
 
-The following Middleware Script adds two header fields to the response:
+The following middleware adds a header to all endpoints:
 
 .. code:: sh
 
-   echo 'Header-One: Value for header one' >> $MOCK_RESPONSE_HEADERS
-   echo 'Header-Two: Value for header two' >> $MOCK_RESPONSE_HEADERS
+    $ mock serve -p 3000 \
+        --middleware 'mock set-header some-header some-value' \
+        --route foo/bar \
+        --response 'Hello, world!'
 
-.. note::
-
-   Observe that the script is *appeding* new headers to the headers file
-   instead of overwriting it, which is indicated by the ">>" shell operator
-   which appends to file. If you overwrite the file with ">", all headers
-   previously set by the response handler will be overwritten.
-
-Removing headers from the response
-----------------------------------
-
-The following Middleware Script removes all Headers that have the word
-``foobar`` in their names or values.
+Let's request our `mock API` and find out if the header was used:
 
 .. code:: sh
 
-   TMP=$(mktemp)
-   cat $MOCK_RESPONSE_HEADERS | grep -v foobar > $TMP
-   cat $TMP > $MOCK_RESPONSE_HEADERS
+    $ curl -v localhost:3000/foo/bar
 
+    // Prints out:
+
+    > GET /foo/bar HTTP/1.1                                                                                                                                       
+    > Host: localhost:3000                                                                                                                                        
+    >                                                                                                                                                             
+    < HTTP/1.1 200 OK                                                                                                                                             
+    < Some-Header: some-value                                                                                                                                     
+    <                                                                                                                                                             
+    { [13 bytes data]                                                                                                                                             
+    Hello, world!                             
+
+As we can see the ``some-header`` header was included in the response, thanks
+to the middleware. Note the usage of ``-v`` in CURL otherwise we could not have
+seen the response headers.
+
+.. note ::
+
+    In the example above we used ``mock set-header``. :ref:`Read more about it
+    here. <shell_utils_set_header>`
 
 Environment Variables for Middlewares
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

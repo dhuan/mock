@@ -327,35 +327,59 @@ program at all can be used as a middleware.</p>
 </div>
 <section id="modify-response-body">
 <h3>Modify Response Body<a class="headerlink" href="#modify-response-body" title="Link to this heading">¶</a></h3>
-<p>The following Middleware Script replaces all occurrences of <code class="docutils literal notranslate"><span class="pre">foo</span></code> with <code class="docutils literal notranslate"><span class="pre">bar</span></code>
-in the response body:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/foo/bar/g&#39;</span><span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
+<p>To kick-off the middleware examples, let’s set up a very simple middleware that
+will uppercase all response text.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;cat $MOCK_RESPONSE_BODY | awk &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{print toupper($0)}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; | mock write&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world!&#39;</span>
 </pre></div>
 </div>
-</section>
-<section id="adding-new-headers-before-sending-response-to-client">
-<h3>Adding new headers before sending response to client<a class="headerlink" href="#adding-new-headers-before-sending-response-to-client" title="Link to this heading">¶</a></h3>
-<p>The following Middleware Script adds two header fields to the response:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Header-One: Value for header one&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Header-Two: Value for header two&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+<p>The middleware above simply pipes all response data to <code class="docutils literal notranslate"><span class="pre">awk</span> <span class="pre">{print</span>
+<span class="pre">toupper($0)}</span></code>, uppercasing all text.</p>
+<p>Let’s now request this <cite>mock API</cite> and find out the results:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/foo/bar
+
+//<span class="w"> </span>Prints<span class="w"> </span>out:<span class="w"> </span>HELLO,<span class="w"> </span>WORLD!
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Observe that the script is <em>appeding</em> new headers to the headers file
-instead of overwriting it, which is indicated by the “&gt;&gt;” shell operator
-which appends to file. If you overwrite the file with “&gt;”, all headers
-previously set by the response handler will be overwritten.</p>
+<p>To modify the response in the example above, we’ve used <code class="docutils literal notranslate"><span class="pre">mock</span> <span class="pre">write</span></code>. If
+that’s new to you <a class="reference internal" href="shell_utils.html#shell-utils-write"><span class="std std-ref">read more about it here.</span></a></p>
 </div>
 </section>
-<section id="removing-headers-from-the-response">
-<h3>Removing headers from the response<a class="headerlink" href="#removing-headers-from-the-response" title="Link to this heading">¶</a></h3>
-<p>The following Middleware Script removes all Headers that have the word
-<code class="docutils literal notranslate"><span class="pre">foobar</span></code> in their names or values.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">TMP</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
-cat<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span>foobar<span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$TMP</span>
-cat<span class="w"> </span><span class="nv">$TMP</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
+<section id="adding-new-headers-before-sending-response-to-client">
+<h3>Adding new headers before sending response to client<a class="headerlink" href="#adding-new-headers-before-sending-response-to-client" title="Link to this heading">¶</a></h3>
+<p>The following middleware adds a header to all endpoints:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;mock set-header some-header some-value&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world!&#39;</span>
 </pre></div>
+</div>
+<p>Let’s request our <cite>mock API</cite> and find out if the header was used:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/foo/bar
+
+//<span class="w"> </span>Prints<span class="w"> </span>out:
+
+&gt;<span class="w"> </span>GET<span class="w"> </span>/foo/bar<span class="w"> </span>HTTP/1.1
+&gt;<span class="w"> </span>Host:<span class="w"> </span>localhost:3000
+&gt;
+&lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
+&lt;<span class="w"> </span>Some-Header:<span class="w"> </span>some-value
+&lt;
+<span class="o">{</span><span class="w"> </span><span class="o">[</span><span class="m">13</span><span class="w"> </span>bytes<span class="w"> </span>data<span class="o">]</span>
+Hello,<span class="w"> </span>world!
+</pre></div>
+</div>
+<p>As we can see the <code class="docutils literal notranslate"><span class="pre">some-header</span></code> header was included in the response, thanks
+to the middleware. Note the usage of <code class="docutils literal notranslate"><span class="pre">-v</span></code> in CURL otherwise we could not have
+seen the response headers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the example above we used <code class="docutils literal notranslate"><span class="pre">mock</span> <span class="pre">set-header</span></code>. <a class="reference internal" href="shell_utils.html#shell-utils-set-header"><span class="std std-ref">Read more about it
+here.</span></a></p>
 </div>
 </section>
 </section>
@@ -474,7 +498,6 @@ querystring.</p>
 <li><a class="reference internal" href="#examples-of-middlewares">Examples of Middlewares</a><ul>
 <li><a class="reference internal" href="#modify-response-body">Modify Response Body</a></li>
 <li><a class="reference internal" href="#adding-new-headers-before-sending-response-to-client">Adding new headers before sending response to client</a></li>
-<li><a class="reference internal" href="#removing-headers-from-the-response">Removing headers from the response</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#environment-variables-for-middlewares">Environment Variables for Middlewares</a></li>
