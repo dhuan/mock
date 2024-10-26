@@ -31,6 +31,8 @@ Note how we didn't need to bother typing the file path as before.
 
 In the following sections we'll look at each such utility.
 
+.. _shell_utils_write:
+
 write
 -----
 
@@ -68,6 +70,8 @@ Options:
 
 - ``--regex``: The strings passed will be used as regex patterns for matching
   against the header keys.
+
+.. _shell_utils_set_header:
 
 set-header
 ----------
