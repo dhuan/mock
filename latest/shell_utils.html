@@ -296,6 +296,24 @@ the same http response modification using just <cite>mock</cite> instead of <cit
 </div>
 <p>Note how we didn’t need to bother typing the file path as before.</p>
 <p>In the following sections we’ll look at each such utility.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can also use all these utilities in <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">Middlewares</span></a>.
+Let’s accomplish something similar as above, replacing text within the
+response body, but this time with <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a> instead:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;mock replace world universe&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world!&#39;</span>
+</pre></div>
+</div>
+<p>Let’s request our <cite>mock API</cite> now and find out the result:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/foo/bar
+
+//<span class="w"> </span>Prints<span class="w"> </span>out:<span class="w"> </span>Hello,<span class="w"> </span>universe!
+</pre></div>
+</div>
+</div>
 <section id="write">
 <span id="shell-utils-write"></span><h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
