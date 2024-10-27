@@ -31,6 +31,27 @@ Note how we didn't need to bother typing the file path as before.
 
 In the following sections we'll look at each such utility.
 
+.. note::
+
+    You can also use all these utilities in :ref:`Middlewares <middlewares>`.
+    Let's accomplish something similar as above, replacing text within the
+    response body, but this time with :ref:`middlewares <middlewares>` instead:
+
+    .. code:: sh
+
+       $ mock serve -p 3000 \
+           --middleware 'mock replace world universe' \
+           --route foo/bar \
+           --response 'Hello, world!'
+
+    Let's request our `mock API` now and find out the result:
+
+    .. code:: sh
+
+       $ curl localhost:3000/foo/bar
+
+       // Prints out: Hello, universe!
+
 .. _shell_utils_write:
 
 write
