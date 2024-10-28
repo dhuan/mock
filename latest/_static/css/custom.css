@@ -23,3 +23,11 @@ div.main div.content {
 .highlight pre {
     font-size: 16px;
 }
+
+.toc-tree a.reference {
+    font-size: 14px;
+}
+
+.literal span.pre {
+    font-size: 16px;
+}
