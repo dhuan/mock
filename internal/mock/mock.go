@@ -174,15 +174,18 @@ func BuildVars(
 		tls = "true"
 	}
 
+	querystringSerialized, _ := utils.EncodeToJsonBase64(requestRecord.QuerystringParsed)
+
 	result := map[string]string{
 		"MOCK_HOST": mockHost, "MOCK_REQUEST_HOST": requestRecord.Host,
-		"MOCK_REQUEST_URL":         fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
-		"MOCK_REQUEST_ENDPOINT":    endpoint,
-		"MOCK_REQUEST_METHOD":      requestRecord.Method,
-		"MOCK_REQUEST_QUERYSTRING": querystring,
-		"MOCK_REQUEST_NTH":         fmt.Sprintf("%d", nth),
-		"MOCK_REQUEST_HTTPS":       tls,
-		"MOCK_BASE_API":            baseApi,
+		"MOCK_REQUEST_URL":                    fmt.Sprintf("%s%s/%s", protocol, requestRecord.Host, requestRecord.Route),
+		"MOCK_REQUEST_ENDPOINT":               endpoint,
+		"MOCK_REQUEST_METHOD":                 requestRecord.Method,
+		"MOCK_REQUEST_QUERYSTRING":            querystring,
+		"MOCK_REQUEST_QUERYSTRING_SERIALIZED": querystringSerialized,
+		"MOCK_REQUEST_NTH":                    fmt.Sprintf("%d", nth),
+		"MOCK_REQUEST_HTTPS":                  tls,
+		"MOCK_BASE_API":                       baseApi,
 	}
 
 	addQuerystringParams(result, requestRecord)

@@ -115,3 +115,22 @@ get-route-param
 Gets a `Route Parameter <route_params.html>`__. If the parameter doesn't
 exist, nothing is printed out and `mock` exists with ``1``, otherwise the
 parameter value is printed out and it exits with ``0``.
+
+get-query
+---------
+
+.. code:: sh
+
+   $ mock get-query
+   # foo=bar&someKey=someValue
+   $ mock get-query foo
+   # bar
+
+Gets a querystring value from the Request URL.
+
+If no parameter is passed, then the whole querystring string is printed out. If
+a parameter is passed then the querystring with that key is printed out. Exit
+status code is 0 if a valid key is provided, otherwise 1 is returned.
+
+If the current request being handled does not contain any querystring,
+``get-query`` will print nothing, returning with status code 1.

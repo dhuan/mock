@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED
+
+- New command: `mock get-query`
+
 ## 1.4.4
 
 ADDED

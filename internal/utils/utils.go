@@ -508,3 +508,18 @@ func EncodeToJsonBase64(data interface{}) (string, error) {
 
 	return base64.StdEncoding.EncodeToString(jsonEncoded), nil
 }
+
+func DecodeBase64Json(encoded string) (map[string]interface{}, error) {
+	jsonEncoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, err
+	}
+
+	var data map[string]interface{}
+	err = json.Unmarshal(jsonEncoded, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}

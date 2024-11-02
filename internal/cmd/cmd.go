@@ -40,6 +40,7 @@ func Execute() {
 	rootCmd.AddCommand(wipeHeadersCmd)
 	rootCmd.AddCommand(setHeaderCmd)
 	rootCmd.AddCommand(writeCmd)
+	rootCmd.AddCommand(getQueryCmd)
 	rootCmd.AddCommand(versionCmd)
 
 	serveCmd.PersistentFlags().StringVarP(&flagConfig, "config", "c", "", "configuration file")
