@@ -1,3 +1,5 @@
+.. _shell_script_responses:
+
 Responses from Shell scripts
 ============================
 
