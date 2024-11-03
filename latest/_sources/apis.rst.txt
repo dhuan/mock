@@ -117,13 +117,12 @@ The above can also be accomplished with
    :maxdepth: 2
    :caption: Contents:
 
-   headers
+   getting_started
    route_params
    mock_vars
    shell_scripts
    shell_utils
    static_files
-   status_codes
    conditional_responses
    env_vars
    middlewares

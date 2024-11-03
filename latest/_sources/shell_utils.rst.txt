@@ -1,3 +1,5 @@
+.. _shell_utils:
+
 Shell Utilities
 ===============
 
