@@ -31,7 +31,7 @@ func Test_E2E_GetQuery_ExitCode1WhenKeyDoesNotExist(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-query someKey ; printf $? | mock write`,
+				`{{MOCK_EXECUTABLE}} get-query someKey ; printf $? | {{MOCK_EXECUTABLE}} write`,
 			}, ";")),
 		},
 		"GET",
