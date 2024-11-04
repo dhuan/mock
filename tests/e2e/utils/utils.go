@@ -391,7 +391,7 @@ func RunTestWithJsonConfig(
 		Body:    body,
 	}
 
-	configFile := mkTemp([]byte(jsonStr))
+	configFile := MkTemp([]byte(jsonStr))
 
 	RunTestBase(t, true, configFile, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, assertionFunc...)
 }
@@ -747,13 +747,31 @@ func EnvVarExists(varName string) bool {
 	return exists
 }
 
-func mkTemp(content []byte) string {
+func MkTemp(content []byte) string {
 	result, err := exec.Command("mktemp").Output()
 	if err != nil {
 		panic(err)
 	}
 
 	filePath := strings.TrimSuffix(string(result), "\n")
+
+	err = os.WriteFile(filePath, content, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	return filePath
+}
+
+func MkTempNamed(fileName string, content []byte) string {
+	result, err := exec.Command("mktemp", "-d").Output()
+	if err != nil {
+		panic(err)
+	}
+
+	tempDir := strings.TrimSuffix(string(result), "\n")
+
+	filePath := fmt.Sprintf("%s/%s", tempDir, fileName)
 
 	err = os.WriteFile(filePath, content, 0644)
 	if err != nil {

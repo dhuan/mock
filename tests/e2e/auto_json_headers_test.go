@@ -69,3 +69,41 @@ func Test_E2E_InvalidJsonFormat_DoesNotAddJsonHeadersAutomatically(t *testing.T)
 		)
 	}
 }
+
+func Test_E2E_AutomaticallyAddJsonHeaders_IfResponseFileIsJson(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route hello/world",
+			"--method get",
+			fmt.Sprintf(`--response-file '%s'`, MkTempNamed("test.json", []byte(`{"foo":"bar"}`))),
+		},
+		"GET",
+		"hello/world",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(200),
+		HeadersMatch(map[string][]string{
+			"Content-Type": {"application/json"},
+		}),
+	)
+}
+
+func Test_E2E_AutomaticallyAddJsonHeaders_JsonHeaderIsNotAddedIfFileDoesNotHaveJsonExtension(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route hello/world",
+			"--method get",
+			fmt.Sprintf(`--response-file '%s'`, MkTempNamed("test.txt", []byte(`Hello, world!`))),
+		},
+		"GET",
+		"hello/world",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(200),
+		HeadersMatch(map[string][]string{
+			"Content-Type": {"text/plain; charset=utf-8"},
+		}),
+	)
+}

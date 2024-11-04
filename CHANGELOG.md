@@ -5,6 +5,8 @@
 ADDED
 
 - New command: `mock get-query`
+- Header `content-type: application/json` is now automatically added in case a
+  response file is used with JSON extension.
 
 ## 1.4.4
 

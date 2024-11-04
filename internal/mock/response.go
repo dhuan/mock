@@ -248,20 +248,27 @@ func resolveEndpointResponseInternal(
 	return &Response{[]byte(""), types.Endpoint_content_type_unknown, responseStatusCode, headers}, errorMetadata, nil
 }
 
-func extractFilePathFromResponseString(responseStr, configFolderPath string) string {
+func extractFilePathFromResponseString(responseStr, configFolderPath string) (string, string) {
 	splitResult := strings.Split(responseStr, ":")
 
 	if len(splitResult) < 2 {
-		return "unknown"
+		return "unknown", ""
 	}
 
 	filePath := splitResult[1]
 
-	if utils.BeginsWith(filePath, "/") {
-		return filePath
+	splitResult = strings.Split(filePath, ".")
+
+	extension := ""
+	if len(splitResult) > 1 {
+		extension = splitResult[len(splitResult)-1]
 	}
 
-	return fmt.Sprintf("%s/%s", configFolderPath, filePath)
+	if utils.BeginsWith(filePath, "/") {
+		return filePath, extension
+	}
+
+	return fmt.Sprintf("%s/%s", configFolderPath, filePath), extension
 }
 
 func resolveEndpointConfigContentType(response string) types.Endpoint_content_type {
@@ -508,7 +515,7 @@ func fileResponse(
 	readFile types.ReadFileFunc,
 	exec ExecFunc,
 ) (*Response, map[string]string, error) {
-	responseFile := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+	responseFile, extension := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
 
 	fileContent, err := readFile(responseFile)
 	if errors.Is(err, ErrResponseFileDoesNotExist) {
@@ -521,6 +528,10 @@ func fileResponse(
 	responseContent := utils.ReplaceVars(string(fileContent), data.requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder)
 	responseContent = utils.ReplaceVars(responseContent, data.endpointParams, utils.ToDolarSignWithWrapVariablePlaceHolder)
 	responseContent = utils.ReplaceVars(responseContent, data.envVars, utils.ToDolarSignWithWrapVariablePlaceHolder)
+
+	if extension == "json" {
+		data.headers["content-type"] = "application/json"
+	}
 
 	return &Response{
 		[]byte(responseContent),
@@ -556,7 +567,7 @@ func shellResponse(
 	exec ExecFunc,
 ) (*Response, map[string]string, error) {
 	return execWrapper(data, readFile, exec, func() (string, error) {
-		scriptFilePath := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+		scriptFilePath, _ := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
 
 		log.Printf("Executing shell script located in %s", scriptFilePath)
 
@@ -606,7 +617,7 @@ func fileServerResponse(
 	readFile types.ReadFileFunc,
 	exec ExecFunc,
 ) (*Response, map[string]string, error) {
-	staticFilesPath := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
+	staticFilesPath, _ := extractFilePathFromResponseString(data.responseStr, data.state.ConfigFolderPath)
 
 	fileRequested, ok := data.endpointParams["*"]
 	if !ok {
