@@ -4,6 +4,8 @@
 
 ADDED
 
+- Add HTTP headers automatically for file-server routes, based on file
+  extension
 - New command: `mock get-query`
 - Header `content-type: application/json` is now automatically added in case a
   response file is used with JSON extension.

@@ -633,7 +633,26 @@ func fileServerResponse(
 		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, err
 	}
 
+	data.headers["Content-Type"] = resolveContentType(filePath)
+
 	return &Response{fileContent, data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, nil
+}
+
+func resolveContentType(filePath string) string {
+	splitResult := strings.Split(filePath, ".")
+
+	if len(splitResult) < 2 {
+		return "text/plain; charset=utf-8"
+	}
+
+	extension := splitResult[len(splitResult)-1]
+
+	contentType, ok := content_type[extension]
+	if !ok {
+		return "text/plain; charset=utf-8"
+	}
+
+	return contentType
 }
 
 func jsonResponse(

@@ -22,6 +22,7 @@ func Test_E2E_Forward(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 

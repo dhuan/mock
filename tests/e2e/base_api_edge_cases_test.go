@@ -28,6 +28,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_SupportDifferentFormatsOfUrl(t *
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -93,6 +94,7 @@ func Test_E2E_BaseApi_UseForwardWithBaseApiWithoutSpecifyingProtocol(t *testing.
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 

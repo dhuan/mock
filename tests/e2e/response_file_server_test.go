@@ -2,6 +2,7 @@ package tests_e2e
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -86,6 +87,48 @@ func Test_E2E_Response_Fileserver_WithCmdParams_WithAbsolutePath(t *testing.T) {
 			strings.NewReader(""),
 			StatusCodeMatches(200),
 			StringMatches("Hello world!\n"),
+		)
+	}
+}
+
+func Test_E2E_Response_Fileserver_AutomaticHeaders(t *testing.T) {
+	some_text_file_data := "Hello, world!"
+	json_data := `{"hello": "world"}`
+	dummy_data := `dummy_data`
+
+	path := CreateTmpEnvironment(map[string][]byte{
+		"some_text_file.txt": []byte(some_text_file_data),
+		"data.json":          []byte(json_data),
+		"image.jpg":          []byte(dummy_data),
+	})
+
+	for _, tc := range []struct {
+		fileToRequest       string
+		expectedData        []byte
+		expectedContentType string
+	}{
+		{"some_text_file.txt", []byte(some_text_file_data), "text/plain; charset=utf-8"},
+		{"data.json", []byte(json_data), "application/json"},
+		{"image.jpg", []byte(dummy_data), "image/jpeg"},
+	} {
+		RunTest2(
+			t,
+			[]string{
+				"--route public/*",
+				"--file-server .",
+			},
+			"GET",
+			fmt.Sprintf("public/%s", tc.fileToRequest),
+			nil,
+			strings.NewReader(""),
+			&RunMockOptions{
+				Wd: path,
+			},
+			StatusCodeMatches(200),
+			StringMatches(string(tc.expectedData)),
+			HeadersMatch(http.Header{
+				"Content-Type": {tc.expectedContentType},
+			}),
 		)
 	}
 }

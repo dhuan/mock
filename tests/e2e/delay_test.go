@@ -17,6 +17,7 @@ func Test_E2E_Delay_WithoutDelay(t *testing.T) {
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}}",
 		nil,
 		true,
+		nil,
 	)
 	defer killMock()
 
@@ -41,6 +42,7 @@ func Test_E2E_Delay_WithDelay(t *testing.T) {
 		"serve -c {{TEST_DATA_PATH}}/config_basic/config.json -p {{TEST_E2E_PORT}} --delay 3000",
 		nil,
 		true,
+		nil,
 	)
 	defer killMock()
 

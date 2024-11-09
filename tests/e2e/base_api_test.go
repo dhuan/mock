@@ -21,6 +21,7 @@ func Test_E2E_BaseApi_NormalRequest(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -53,6 +54,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -85,6 +87,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithJsonConfig(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -121,6 +124,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_WithQuerystring(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -153,6 +157,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *te
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -187,6 +192,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestBodyIsForwarded(t *testin
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -217,6 +223,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_RequestHeadersAreForwarded(t *te
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -250,6 +257,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -287,6 +295,7 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse_UsingMOCK_BASE_API_RESPONSE(t
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -338,6 +347,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -353,6 +363,7 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_CmdFlagOverwritesConfig(t *testi
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase2()
 
@@ -402,6 +413,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -430,6 +442,7 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
@@ -463,6 +476,7 @@ func Test_E2E_BaseApi_CorsFlagOverwritesCorsHeadersFromBaseApi(t *testing.T) {
 		}, " "),
 		nil,
 		true,
+		nil,
 	)
 	defer killMockBase()
 
