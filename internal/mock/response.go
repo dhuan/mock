@@ -6,8 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dhuan/mock/internal/types"
 	"github.com/dhuan/mock/internal/utils"
@@ -612,6 +616,132 @@ func execWrapper(
 	return response, data.errorMetadata, nil
 }
 
+func fileServerDirectoryResponse(
+	data *responseResolverData,
+	staticFilesPath string,
+	fileRequested string,
+) (*Response, map[string]string, error) {
+	directoryPath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)
+
+	files, err := scanDir(directoryPath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	iconDirectory := svg("icon_directory", 24, 24)
+	iconFile := svg("icon_file", 24, 24)
+
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].dir != !files[j].dir {
+			return files[i].dir
+		}
+
+		return true
+	})
+
+	fileList := ""
+	for i := range files {
+		fileName := files[i].name
+
+		href := fmt.Sprintf("/%s/%s", data.requestRecord.Route, fileName)
+		href = strings.Replace(href, "//", "/", -1)
+
+		modified := files[i].modified
+
+		icon := iconFile
+		if files[i].dir {
+			icon = iconDirectory
+		}
+
+		fileList = fmt.Sprintf(`
+%s
+<tr>
+	<td>%s </td>
+	<td><a href="%s">%s</a></td>
+	<td>%s</td>
+	<td>%s</td>
+</tr>`,
+			fileList, icon, href, fileName, files[i].size, modified)
+	}
+
+	indexName := fmt.Sprintf("/%s", fileRequested)
+	hasPrevDir := fileRequested != ""
+
+	prevDirRow := ""
+	if hasPrevDir {
+		prevDirRow = fmt.Sprintf(`
+<tr>
+	<td>%s </td>
+	<td><a href="%s">Parent directory</a></td>
+	<td></td>
+	<td></td>
+</tr>
+`, svg("icon_back", 24, 24), previousDirHref(data.requestRecord.Route))
+	}
+
+	result := fmt.Sprintf(`<!DOCTYPE html>
+<html>
+<head>
+    <title>mock directory list</title>
+<style>
+a {color: blue;}
+
+table{width: 100%%; border-collapse: collapse;}
+
+table tbody tr td:nth-child(1) {
+	display: flex;
+	justify-content: center;
+}
+
+table tr {
+	border-bottom: 1px dashed #dadada;
+}
+
+table tr:hover td {
+	background: #feffec;
+}
+
+table tr td {
+	padding: 10px 0;
+}
+
+.footer {
+	padding-top: 20px;
+}
+</style>
+</head>
+<body>
+<div style="display: none">
+%s
+%s
+%s
+</div>
+<h1>Index of %s</h1>
+<table>
+	<thead>
+		<tr>
+			<td width="50px"></td>
+			<td>Name</td>
+			<td>Size</td>
+			<td>Modified</td>
+		</tr>
+	</thead>
+	<tbody>
+%s
+%s
+	</tbody>
+</table>
+
+<div class="footer">
+Served with mock __MOCK_VERSION__
+</div>
+</body>
+</html>
+`, svg_back, svg_directory, svg_file, indexName, prevDirRow, fileList)
+
+	return &Response{[]byte(result), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, nil
+}
+
 func fileServerResponse(
 	data *responseResolverData,
 	readFile types.ReadFileFunc,
@@ -625,6 +755,12 @@ func fileServerResponse(
 	}
 
 	filePath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)
+
+	fileRequestedIsDir := isDir(filePath)
+
+	if fileRequested == "" || fileRequestedIsDir {
+		return fileServerDirectoryResponse(data, staticFilesPath, fileRequested)
+	}
 
 	fileContent, err := readFile(filePath)
 	if err != nil {
@@ -674,4 +810,63 @@ func jsonResponse(
 	jsonEncodedModified := []byte(utils.ReplaceVars(string(jsonEncoded), data.requestVariables, utils.ToDolarSignWithWrapVariablePlaceHolder))
 
 	return &Response{jsonEncodedModified, data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, nil
+}
+
+type fileEntry struct {
+	name     string
+	dir      bool
+	modified string
+	size     string
+}
+
+func scanDir(walkFrom string) ([]fileEntry, error) {
+	files := make([]fileEntry, 0)
+
+	i := -1
+	err := filepath.Walk(walkFrom, func(path string, info os.FileInfo, err error) error {
+		i++
+
+		if walkFrom == path {
+			return nil
+		}
+
+		files = append(files, fileEntry{
+			filepath.Base(path),
+			info.IsDir(),
+			info.ModTime().Format(time.RFC822),
+			fmt.Sprintf("%d", info.Size()),
+		})
+
+		if info.IsDir() && i > 0 {
+			return filepath.SkipDir
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
+func isDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return info.IsDir()
+}
+
+func svg(id string, w, h int) string {
+	return fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg"  width="%d"  height="%d"><use href="#%s"></use></svg>`, w, h, id)
+}
+
+func previousDirHref(route string) string {
+	route = utils.ReplaceRegex(route, []string{`^\/`}, "")
+
+	splitResult := strings.Split(route, "/")
+
+	return fmt.Sprintf("/%s", strings.Join(splitResult[0:(len(splitResult)-1)], "/"))
 }

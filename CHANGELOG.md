@@ -4,6 +4,7 @@
 
 ADDED
 
+- Directory navigation for file server.
 - Add HTTP headers automatically for file-server routes, based on file
   extension
 - New command: `mock get-query`
