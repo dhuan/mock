@@ -96,11 +96,11 @@ func Test_E2E_Response_Fileserver_AutomaticHeaders(t *testing.T) {
 	json_data := `{"hello": "world"}`
 	dummy_data := `dummy_data`
 
-	path := CreateTmpEnvironment(map[string][]byte{
-		"some_text_file.txt": []byte(some_text_file_data),
-		"data.json":          []byte(json_data),
-		"image.jpg":          []byte(dummy_data),
-	})
+	path := CreateTmpEnvironment(
+		FileEntry("some_text_file.txt", []byte(some_text_file_data)),
+		FileEntry("data.json", []byte(json_data)),
+		FileEntry("image.jpg", []byte(dummy_data)),
+	)
 
 	for _, tc := range []struct {
 		fileToRequest       string

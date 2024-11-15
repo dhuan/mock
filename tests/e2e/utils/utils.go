@@ -829,7 +829,13 @@ func isAbsolutePath(path string) bool {
 	return beginsWith(path, "/")
 }
 
-func CreateTmpEnvironment(files map[string][]byte) string {
+type FsEntry struct {
+	Dir         bool
+	Name        string
+	FileContent []byte
+}
+
+func CreateTmpEnvironment(entries ...FsEntry) string {
 	result, err := exec.Command("mktemp", "-d").Output()
 	if err != nil {
 		panic(err)
@@ -837,13 +843,23 @@ func CreateTmpEnvironment(files map[string][]byte) string {
 
 	tempDir := strings.TrimSuffix(string(result), "\n")
 
-	for fileName := range files {
-		filePath := fmt.Sprintf("%s/%s", tempDir, fileName)
+	for i := range entries {
+		entry := entries[i]
 
-		if err = os.WriteFile(filePath, files[fileName], 0644); err != nil {
+		filePath := fmt.Sprintf("%s/%s", tempDir, entry.Name)
+
+		if err = os.WriteFile(filePath, entry.FileContent, 0644); err != nil {
 			panic(err)
 		}
 	}
 
 	return tempDir
+}
+
+func FileEntry(name string, content []byte) FsEntry {
+	return FsEntry{
+		Dir:         false,
+		Name:        name,
+		FileContent: content,
+	}
 }
