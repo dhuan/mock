@@ -519,6 +519,74 @@ func StringMatches(expected string) func(t *testing.T, response *Response, serve
 	}
 }
 
+func MatchesFile(filePath string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			panic(err)
+		}
+
+		assert.Equal(t, string(data), string(response.Body))
+	}
+}
+
+func RemoveUntestableDataFromFileserverHtmlOutput(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	result := make([]string, 0)
+	lines := strings.Split(string(response.Body), "\n")
+	skipNext := false
+
+	for i := range lines {
+		if skipNext {
+			skipNext = false
+
+			continue
+		}
+
+		if strings.Index(lines[i], "<!-- TD FILE MODIFIED -->") > -1 {
+			result = append(result, "<td>N/A</td>")
+
+			skipNext = true
+
+			continue
+		}
+
+		result = append(result, lines[i])
+	}
+
+	response.Body = []byte(strings.Join(result, "\n"))
+}
+
+func TidyUpHtmlResponse(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	response.Body = pipeTo(response.Body, &pipeToOptions{acceptedErrorCode: 1}, "tidy", "--show-warnings", "false", "--tidy-mark", "false", "-indent")
+}
+
+type pipeToOptions struct {
+	acceptedErrorCode int
+}
+
+func pipeTo(data []byte, options *pipeToOptions, commandName string, commandArgs ...string) []byte {
+	cmd := exec.Command(commandName, commandArgs...)
+	buffer := &bytes.Buffer{}
+	buffer.Write(data)
+
+	cmd.Stdin = buffer
+
+	output, err := cmd.Output()
+
+	letErrorPass := false
+	if err != nil &&
+		options.acceptedErrorCode > 0 &&
+		err.Error() == fmt.Sprintf("exit status %d", options.acceptedErrorCode) {
+		letErrorPass = true
+	}
+
+	if err != nil && !letErrorPass {
+		panic(err)
+	}
+
+	return output
+}
+
 func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		replaceVars(&expectedLine, state)
@@ -833,6 +901,7 @@ type FsEntry struct {
 	Dir         bool
 	Name        string
 	FileContent []byte
+	Entries     []FsEntry
 }
 
 func CreateTmpEnvironment(entries ...FsEntry) string {
@@ -861,5 +930,13 @@ func FileEntry(name string, content []byte) FsEntry {
 		Dir:         false,
 		Name:        name,
 		FileContent: content,
+	}
+}
+
+func DirEntry(name string, entries []FsEntry) FsEntry {
+	return FsEntry{
+		Dir:     true,
+		Name:    name,
+		Entries: entries,
 	}
 }

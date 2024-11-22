@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>mock directory list</title>
+  <style>
+  a {color: blue;}
+
+  table{width: 100%; border-collapse: collapse;}
+
+  table tbody tr td:nth-child(1) {
+        display: flex;
+        justify-content: center;
+  }
+
+  table tr {
+        border-bottom: 1px dashed #dadada;
+  }
+
+  table tr:hover td {
+        background: #feffec;
+  }
+
+  table tr td {
+        padding: 10px 0;
+  }
+
+  .footer {
+        padding-top: 20px;
+  }
+  </style>
+</head>
+<body>
+  <div style="display: none">
+    <svg id="icon_back" fill="none" width="24" height="24" viewbox=
+    "0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+    <path d="m0 0h48v48h-48z" fill="#fff" fill-opacity=
+    ".01"></path>
+    <path d=
+    "m44 40.8361c-4.8931-5.9729-9.2383-9.3622-13.0356-10.1679s-7.4127-.9274-10.8462-.3652v10.697l-16.1182-17.4547 16.1182-16.5453v10.167c6.3485.0502 11.7456 2.3278 16.1913 6.833 4.4458 4.5052 7.0092 10.1172 7.6905 16.8361z"
+    style=
+    "fill-rule:evenodd;clip-rule:evenodd;fill:#2f88ff;stroke:#000;stroke-width:4;stroke-linejoin:round"></path>
+    </svg> <svg id="icon_directory" enable-background=
+    "new 0 0 48 48" viewbox="0 0 48 48" xmlns=
+    "http://www.w3.org/2000/svg">
+    <path d=
+    "m40 12h-18l-4-4h-10c-2.2 0-4 1.8-4 4v8h40v-4c0-2.2-1.8-4-4-4z"
+    fill="#ffa000"></path>
+    <path d=
+    "m40 12h-32c-2.2 0-4 1.8-4 4v20c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4v-20c0-2.2-1.8-4-4-4z"
+    fill="#ffca28"></path></svg> <svg id="icon_file" xmlns=
+    "http://www.w3.org/2000/svg" width="24" height="24" viewbox=
+    "0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" class=
+    "icon icon-tabler icons-tabler-outline icon-tabler-file">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+    <path d=
+    "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+    </svg>
+  </div>
+  <h1>Index of /</h1>
+  <table>
+    <thead>
+      <tr>
+        <td width="50px"></td>
+        <td>Name</td>
+        <td>Size</td>
+        <td>Modified</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24">
+          <use href="#icon_file"></use></svg>
+        </td>
+        <td>
+          <a href="/public/data.json">data.json</a>
+        </td>
+        <td>18</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24">
+          <use href="#icon_file"></use></svg>
+        </td>
+        <td>
+          <a href="/public/image.jpg">image.jpg</a>
+        </td>
+        <td>10</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24">
+          <use href="#icon_file"></use></svg>
+        </td>
+        <td>
+          <a href="/public/some_folder">some_folder</a>
+        </td>
+        <td>0</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24"
+          height="24">
+          <use href="#icon_file"></use></svg>
+        </td>
+        <td>
+          <a href=
+          "/public/some_text_file.txt">some_text_file.txt</a>
+        </td>
+        <td>13</td>
+        <td>N/A</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="footer">
+    Served with mock __MOCK_VERSION__
+  </div>
+</body>
+</html>

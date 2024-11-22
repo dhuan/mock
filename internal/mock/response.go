@@ -659,6 +659,7 @@ func fileServerDirectoryResponse(
 	<td>%s </td>
 	<td><a href="%s">%s</a></td>
 	<td>%s</td>
+	<!-- TD FILE MODIFIED -->
 	<td>%s</td>
 </tr>`,
 			fileList, icon, href, fileName, files[i].size, modified)

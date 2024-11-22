@@ -132,3 +132,35 @@ func Test_E2E_Response_Fileserver_AutomaticHeaders(t *testing.T) {
 		)
 	}
 }
+
+func Test_E2E_Response_Fileserver_Navigation(t *testing.T) {
+	some_text_file_data := "Hello, world!"
+	json_data := `{"hello": "world"}`
+	dummy_data := `dummy_data`
+
+	path := CreateTmpEnvironment(
+		FileEntry("some_text_file.txt", []byte(some_text_file_data)),
+		FileEntry("data.json", []byte(json_data)),
+		FileEntry("image.jpg", []byte(dummy_data)),
+		DirEntry("some_folder", []FsEntry{}),
+	)
+
+	RunTest2(
+		t,
+		[]string{
+			"--route public/*",
+			"--file-server .",
+		},
+		"GET",
+		"public/",
+		nil,
+		strings.NewReader(""),
+		&RunMockOptions{
+			Wd: path,
+		},
+		StatusCodeMatches(200),
+		RemoveUntestableDataFromFileserverHtmlOutput,
+		TidyUpHtmlResponse,
+		MatchesFile("data/html_match/fileserver_navigation_index.html"),
+	)
+}
