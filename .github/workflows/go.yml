@@ -37,6 +37,7 @@ jobs:
 
     - name: Test E2E
       run: |
+          sudo apt update -y && sudo apt install -y tidy
           make test_e2e
 
     - name: Upload coverage reports to Codecov
