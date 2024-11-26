@@ -12,6 +12,7 @@ import (
 
 type responseShellUtilOptions struct {
 	argCountMustMatch int
+	argCountMax       int
 }
 
 func responseShellUtilWrapper(
@@ -22,6 +23,10 @@ func responseShellUtilWrapper(
 ) {
 	if options.argCountMustMatch > 0 && len(args) != options.argCountMustMatch {
 		exitWithError(fmt.Sprintf(`"%s" allows only 2 paramaters.`, commandName))
+	}
+
+	if options.argCountMax > 0 && len(args) > options.argCountMax {
+		exitWithError(fmt.Sprintf(`"%s" cannot receive more than %d parameters.`, commandName, options.argCountMax))
 	}
 
 	request,

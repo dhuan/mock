@@ -25,6 +25,23 @@ func Test_E2E_GetQuery(t *testing.T) {
 	)
 }
 
+func Test_E2E_GetQuery_GetAll(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				`{{MOCK_EXECUTABLE}} get-query | {{MOCK_EXECUTABLE}} write`,
+			}, ";")),
+		},
+		"GET",
+		"foo/bar?anotherKey=anotherValue&someKey=someValue",
+		nil,
+		nil,
+		StringMatches("anotherKey=anotherValue&someKey=someValue"),
+	)
+}
+
 func Test_E2E_GetQuery_ExitCode1WhenKeyDoesNotExist(t *testing.T) {
 	RunTestWithNoConfigAndWithArgs(
 		t,
