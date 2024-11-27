@@ -392,7 +392,7 @@ func printOutExecOutputIfNecessary(execResult *ExecResult) {
 		return
 	}
 
-	log.Printf(fmt.Sprintf("Output from program execution:\n\n%s\n", output))
+	log.Printf("Output from program execution:\n\n%s\n", output)
 }
 
 type HandlerFiles struct {
