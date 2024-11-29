@@ -147,22 +147,30 @@ func Test_E2E_Response_Fileserver_Navigation(t *testing.T) {
 		}),
 	)
 
-	RunTest2(
-		t,
-		[]string{
-			"--route public/*",
-			"--file-server .",
-		},
-		"GET",
-		"public/",
-		nil,
-		strings.NewReader(""),
-		&RunMockOptions{
-			Wd: path,
-		},
-		StatusCodeMatches(200),
-		RemoveUntestableDataFromFileserverHtmlOutput,
-		TidyUpHtmlResponse,
-		MatchesFile("data/html_match/fileserver_navigation_index.html"),
-	)
+	for _, tc := range []struct {
+		path          string
+		matchHtmlFile string
+	}{
+		{"public/", "data/html_match/fileserver_navigation_index.html"},
+		{"public/some_folder", "data/html_match/fileserver_navigation_directory.html"},
+	} {
+		RunTest2(
+			t,
+			[]string{
+				"--route public/*",
+				"--file-server .",
+			},
+			"GET",
+			tc.path,
+			nil,
+			strings.NewReader(""),
+			&RunMockOptions{
+				Wd: path,
+			},
+			StatusCodeMatches(200),
+			RemoveUntestableDataFromFileserverHtmlOutput,
+			TidyUpHtmlResponse,
+			MatchesFile(tc.matchHtmlFile),
+		)
+	}
 }
