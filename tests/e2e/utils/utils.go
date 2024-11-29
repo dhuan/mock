@@ -2,6 +2,7 @@ package tests_e2e
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -558,6 +559,8 @@ func RemoveUntestableDataFromFileserverHtmlOutput(t *testing.T, response *Respon
 
 func TidyUpHtmlResponse(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 	response.Body = pipeTo(response.Body, &pipeToOptions{acceptedErrorCode: 1}, "tidy", "--show-warnings", "false", "--tidy-mark", "false", "-indent")
+
+	fmt.Printf("HTML Encoded:\n%s\n", base64.StdEncoding.EncodeToString(response.Body))
 }
 
 type pipeToOptions struct {
@@ -912,17 +915,50 @@ func CreateTmpEnvironment(entries ...FsEntry) string {
 
 	tempDir := strings.TrimSuffix(string(result), "\n")
 
-	for i := range entries {
+	i := 0
+	for (len(entries) - 1) >= i {
 		entry := entries[i]
-
 		filePath := fmt.Sprintf("%s/%s", tempDir, entry.Name)
+
+		if entry.Dir {
+			if err = os.Mkdir(filePath, 0744); err != nil {
+				panic(err)
+			}
+
+			for j := range entry.Entries {
+				newEntry := entry.Entries[j]
+				newEntry.Name = fmt.Sprintf("%s/%s", entry.Name, newEntry.Name)
+
+				entries = append(entries, newEntry)
+			}
+
+			i = i + 1
+
+			continue
+		}
 
 		if err = os.WriteFile(filePath, entry.FileContent, 0644); err != nil {
 			panic(err)
 		}
+
+		i = i + 1
 	}
 
+	fmt.Printf(
+		"Created temp structure:\n%s\n",
+		shell("find", tempDir),
+	)
+
 	return tempDir
+}
+
+func shell(command string, params ...string) string {
+	result, err := exec.Command(command, params...).Output()
+	if err != nil {
+		panic(err)
+	}
+
+	return string(result)
 }
 
 func FileEntry(name string, content []byte) FsEntry {

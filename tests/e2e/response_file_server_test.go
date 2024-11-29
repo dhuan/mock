@@ -142,7 +142,9 @@ func Test_E2E_Response_Fileserver_Navigation(t *testing.T) {
 		FileEntry("some_text_file.txt", []byte(some_text_file_data)),
 		FileEntry("data.json", []byte(json_data)),
 		FileEntry("image.jpg", []byte(dummy_data)),
-		DirEntry("some_folder", []FsEntry{}),
+		DirEntry("some_folder", []FsEntry{
+			FileEntry("some_file", []byte(dummy_data)),
+		}),
 	)
 
 	RunTest2(
