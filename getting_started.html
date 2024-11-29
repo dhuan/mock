@@ -3,15 +3,15 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Conditional Response" href="conditional_responses.html" /><link rel="prev" title="Serving static files" href="static_files.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Route Parameters" href="route_params.html" /><link rel="prev" title="Creating APIs" href="apis.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Response Status Code - mock documentation</title>
+        <title>Getting started - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=caabe48b" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=c84fd8c3" />
     
     
 
@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -207,13 +207,12 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_utils.html">Shell Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
@@ -252,7 +251,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/status_codes.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/getting_started.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -266,14 +265,112 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="response-status-code">
-<h1>Response Status Code<a class="headerlink" href="#response-status-code" title="Link to this heading">¶</a></h1>
+          <section id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
+<p>Let’s look into the basics.</p>
+<section id="the-basics-hello-world-with-mock">
+<h2>The basics - “hello world” with mock<a class="headerlink" href="#the-basics-hello-world-with-mock" title="Link to this heading">¶</a></h2>
+<p>The simplest way of defining an endpoint’s response is simply using the
+<code class="docutils literal notranslate"><span class="pre">response</span></code> field within an endpoint object:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="s2">&quot;endpoints&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">     </span><span class="p">{</span>
+<span class="w">       </span><span class="s2">&quot;route&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;foo/bar&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="s2">&quot;response&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Hello, world!&quot;</span>
+<span class="w">     </span><span class="p">}</span>
+<span class="w">   </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The exact same can also be accomplished with just command-line parameters:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;foo/bar&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world!&#39;</span>
+</pre></div>
+</div>
+<p>For simple APIs, static response such as the ones above might be enough. But we’re not limited to that.</p>
+<p><cite>mock</cite> sets no boundaries when it comes to building APIs. You have all the
+capability of the shell environment at your disposal for building APIs.</p>
+</section>
+<section id="mock-as-an-api-framework">
+<h2>mock as an API framework<a class="headerlink" href="#mock-as-an-api-framework" title="Link to this heading">¶</a></h2>
+<p><cite>mock</cite> lets you use shell scripts as “response handlers” for your endpoints.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;/users&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--method<span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--shell-script<span class="w"> </span><span class="s1">&#39;get_users.sh&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span><span class="s2">&quot;/users&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--method<span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--shell-script<span class="w"> </span><span class="s1">&#39;create_user.sh&#39;</span>
+</pre></div>
+</div>
+<p>Above we have an API with a <code class="docutils literal notranslate"><span class="pre">/users</span></code> route, that can be requested with either
+<code class="docutils literal notranslate"><span class="pre">GET</span></code> or <code class="docutils literal notranslate"><span class="pre">POST</span></code> methods. The shell script files <code class="docutils literal notranslate"><span class="pre">get_users.sh</span></code> and
+<code class="docutils literal notranslate"><span class="pre">create_user.sh</span></code> will be executed respectively, acting as response handlers
+for these endpoints.</p>
+<p>Inside your response handlers you can use <cite>mock</cite> to build HTTP Responses.</p>
+<p><code class="docutils literal notranslate"><span class="pre">mock</span> <span class="pre">write</span></code> is one such utility. It sends data to the requesting client.
+Let’s see a simple example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># get_users.sh</span>
+
+<span class="nv">USERS</span><span class="o">=</span><span class="k">$(</span>mysql<span class="w"> </span>...<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;SELECT * FROM users&quot;</span><span class="k">)</span>
+
+<span class="c1"># convert the user sql result to JSON somehow...</span>
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USERS</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
+</pre></div>
+</div>
+<p>You can read more about shell scripts and shell utilities in the following
+links:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="shell_scripts.html#shell-script-responses"><span class="std std-ref">Response from shell scripts</span></a></p></li>
+<li><p><a class="reference internal" href="shell_utils.html#shell-utils"><span class="std std-ref">Shell utilities</span></a></p></li>
+</ul>
+</section>
+<section id="http-headers">
+<h2>HTTP Headers<a class="headerlink" href="#http-headers" title="Link to this heading">¶</a></h2>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">response_headers</span></code> endpoint parameter will add headers to
+a endpoint’s response:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
+<span class="w"> </span>  &quot;endpoints&quot;: [
+<span class="w"> </span>    {
+<span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
+<span class="w"> </span>      &quot;response&quot;: {
+<span class="w"> </span>        &quot;foo&quot;: &quot;bar&quot;
+<span class="w"> </span>      },
+<span class="gi">+      &quot;response_headers&quot;: {</span>
+<span class="gi">+        &quot;Some-Header-Key&quot;: &quot;Some header value&quot;,</span>
+<span class="gi">+        &quot;Another-Header-Key&quot;: &quot;Another header value&quot;</span>
+<span class="gi">+      }</span>
+<span class="w"> </span>    }
+<span class="w"> </span>  ]
+}
+</pre></div>
+</div>
+<p>To add response headers to an endpoint using command-line parameters:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
+<span class="w"> </span>  --route &quot;foo/bar&quot; \
+<span class="w"> </span>  --response &#39;{&quot;foo&quot;:&quot;bar&quot;}&#39; \
+<span class="gi">+  --header &quot;Some-Header-Key: Some header value&quot; \</span>
+<span class="gi">+  --header &quot;Another-Header-Key: Another header value&quot;</span>
+</pre></div>
+</div>
+<p>If you’re using <a class="reference internal" href="shell_scripts.html#shell-script-responses"><span class="std std-ref">shell scripts as response handlers</span></a>, then setting up headers is quite easy.
+Let’s use <a class="reference internal" href="shell_utils.html#shell-utils-set-header"><span class="std std-ref">mock set-header</span></a> to add a <code class="docutils literal notranslate"><span class="pre">Foo:</span> <span class="pre">bar</span></code> HTTP Header to our API response:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
+<span class="w"> </span>  --route &quot;foo/bar&quot; \
+<span class="gi">+  --exec &#39;mock set-header foo bar&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="http-status-code">
+<h2>HTTP Status Code<a class="headerlink" href="#http-status-code" title="Link to this heading">¶</a></h2>
 <p>By default, all responses’ status code will be <code class="docutils literal notranslate"><span class="pre">200</span></code>. You can change
 it using the <code class="docutils literal notranslate"><span class="pre">response_status_code</span></code> option:</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>{
@@ -300,29 +397,30 @@ parameters:</p>
 </pre></div>
 </div>
 </section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="conditional_responses.html">
+          <a class="next-page" href="route_params.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Conditional Response</div>
+                <div class="title">Route Parameters</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="static_files.html">
+          <a class="prev-page" href="apis.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Serving static files</div>
+                <div class="title">Creating APIs</div>
                 
               </div>
             </a>
@@ -344,8 +442,30 @@ parameters:</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Getting started</a><ul>
+<li><a class="reference internal" href="#the-basics-hello-world-with-mock">The basics - “hello world” with mock</a></li>
+<li><a class="reference internal" href="#mock-as-an-api-framework">mock as an API framework</a></li>
+<li><a class="reference internal" href="#http-headers">HTTP Headers</a></li>
+<li><a class="reference internal" href="#http-status-code">HTTP Status Code</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

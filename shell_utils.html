@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=caabe48b" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=c84fd8c3" />
     
     
 
@@ -207,13 +207,12 @@
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Creating APIs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="headers.html">Response with headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shell_scripts.html">Responses from Shell scripts</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Shell Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="static_files.html">Serving static files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="status_codes.html">Response Status Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
@@ -273,7 +272,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <section id="shell-utilities">
-<h1>Shell Utilities<a class="headerlink" href="#shell-utilities" title="Link to this heading">¶</a></h1>
+<span id="shell-utils"></span><h1>Shell Utilities<a class="headerlink" href="#shell-utilities" title="Link to this heading">¶</a></h1>
 <p><cite>mock</cite> provides a set of “utilities” for manipulating response data easily.
 Read further to learn about them.</p>
 <p><a class="reference external" href="shell_scripts.html">In the previous section</a> we’ve seen that we can easily
@@ -296,6 +295,24 @@ the same http response modification using just <cite>mock</cite> instead of <cit
 </div>
 <p>Note how we didn’t need to bother typing the file path as before.</p>
 <p>In the following sections we’ll look at each such utility.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can also use all these utilities in <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">Middlewares</span></a>.
+Let’s accomplish something similar as above, replacing text within the
+response body, but this time with <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a> instead:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;mock replace world universe&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world!&#39;</span>
+</pre></div>
+</div>
+<p>Let’s request our <cite>mock API</cite> now and find out the result:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/foo/bar
+
+//<span class="w"> </span>Prints<span class="w"> </span>out:<span class="w"> </span>Hello,<span class="w"> </span>universe!
+</pre></div>
+</div>
+</div>
 <section id="write">
 <span id="shell-utils-write"></span><h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
@@ -345,6 +362,21 @@ previous one.</p>
 <p>Gets a <a class="reference external" href="route_params.html">Route Parameter</a>. If the parameter doesn’t
 exist, nothing is printed out and <cite>mock</cite> exists with <code class="docutils literal notranslate"><span class="pre">1</span></code>, otherwise the
 parameter value is printed out and it exits with <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</section>
+<section id="get-query">
+<h2>get-query<a class="headerlink" href="#get-query" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-query
+<span class="c1"># foo=bar&amp;someKey=someValue</span>
+$<span class="w"> </span>mock<span class="w"> </span>get-query<span class="w"> </span>foo
+<span class="c1"># bar</span>
+</pre></div>
+</div>
+<p>Gets a querystring value from the Request URL.</p>
+<p>If no parameter is passed, then the whole querystring string is printed out. If
+a parameter is passed then the querystring with that key is printed out. Exit
+status code is 0 if a valid key is provided, otherwise 1 is returned.</p>
+<p>If the current request being handled does not contain any querystring,
+<code class="docutils literal notranslate"><span class="pre">get-query</span></code> will print nothing, returning with status code 1.</p>
 </section>
 </section>
 
@@ -409,6 +441,7 @@ parameter value is printed out and it exits with <code class="docutils literal n
 <li><a class="reference internal" href="#wipe-headers">wipe-headers</a></li>
 <li><a class="reference internal" href="#set-header">set-header</a></li>
 <li><a class="reference internal" href="#get-route-param">get-route-param</a></li>
+<li><a class="reference internal" href="#get-query">get-query</a></li>
 </ul>
 </li>
 </ul>
