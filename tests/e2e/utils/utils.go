@@ -543,7 +543,8 @@ func RemoveUntestableDataFromFileserverHtmlOutput(t *testing.T, response *Respon
 			continue
 		}
 
-		if strings.Index(lines[i], "<!-- TD FILE MODIFIED -->") > -1 {
+		if strings.Index(lines[i], "<!-- TD FILE MODIFIED -->") > -1 ||
+			strings.Index(lines[i], "<!-- TD FILE SIZE -->") > -1 {
 			result = append(result, "<td>N/A</td>")
 
 			skipNext = true

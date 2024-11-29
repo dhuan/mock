@@ -658,6 +658,7 @@ func fileServerDirectoryResponse(
 <tr>
 	<td>%s </td>
 	<td><a href="%s">%s</a></td>
+	<!-- TD FILE SIZE -->
 	<td>%s</td>
 	<!-- TD FILE MODIFIED -->
 	<td>%s</td>
