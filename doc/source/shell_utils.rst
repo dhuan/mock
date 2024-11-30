@@ -136,3 +136,31 @@ status code is 0 if a valid key is provided, otherwise 1 is returned.
 
 If the current request being handled does not contain any querystring,
 ``get-query`` will print nothing, returning with status code 1.
+
+get-header
+----------
+
+.. code:: sh
+
+   $ mock get-headers
+   # Prints out all headers
+   $ mock get-headers authorization
+   # authorization: Bearer xxx
+   $ mock get-headers --regex auth
+   # authorization: Bearer xxx
+   $ mock get-headers -v authorization
+   # Bearer xxx
+
+Gets the HTTP Headers for the current request, based on your search criterias.
+If no search string is passed, all headers are printed out. The search is case
+insensitive. Unless ``--regex`` is used, the search string will only match if
+the it's typed the full header key name.
+
+Options:
+
+- ``--regex``: Use regular expression for searching.
+- ``-v, --value``: Print out only the header value, otherwise the whole header
+  line is printed.
+
+Exit code: If no headers are found given the search criteria, `1` is returned,
+otherwise `0` when headers are found.

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED:
+
+- New command: `mock get-header`
+
 ## 1.4.5
 
 ADDED
