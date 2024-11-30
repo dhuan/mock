@@ -378,6 +378,31 @@ status code is 0 if a valid key is provided, otherwise 1 is returned.</p>
 <p>If the current request being handled does not contain any querystring,
 <code class="docutils literal notranslate"><span class="pre">get-query</span></code> will print nothing, returning with status code 1.</p>
 </section>
+<section id="get-header">
+<h2>get-header<a class="headerlink" href="#get-header" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-headers
+<span class="c1"># Prints out all headers</span>
+$<span class="w"> </span>mock<span class="w"> </span>get-headers<span class="w"> </span>authorization
+<span class="c1"># authorization: Bearer xxx</span>
+$<span class="w"> </span>mock<span class="w"> </span>get-headers<span class="w"> </span>--regex<span class="w"> </span>auth
+<span class="c1"># authorization: Bearer xxx</span>
+$<span class="w"> </span>mock<span class="w"> </span>get-headers<span class="w"> </span>-v<span class="w"> </span>authorization
+<span class="c1"># Bearer xxx</span>
+</pre></div>
+</div>
+<p>Gets the HTTP Headers for the current request, based on your search criterias.
+If no search string is passed, all headers are printed out. The search is case
+insensitive. Unless <code class="docutils literal notranslate"><span class="pre">--regex</span></code> is used, the search string will only match if
+the it’s typed the full header key name.</p>
+<p>Options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--regex</span></code>: Use regular expression for searching.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-v,</span> <span class="pre">--value</span></code>: Print out only the header value, otherwise the whole header
+line is printed.</p></li>
+</ul>
+<p>Exit code: If no headers are found given the search criteria, <cite>1</cite> is returned,
+otherwise <cite>0</cite> when headers are found.</p>
+</section>
 </section>
 
         </article>
@@ -442,6 +467,7 @@ status code is 0 if a valid key is provided, otherwise 1 is returned.</p>
 <li><a class="reference internal" href="#set-header">set-header</a></li>
 <li><a class="reference internal" href="#get-route-param">get-route-param</a></li>
 <li><a class="reference internal" href="#get-query">get-query</a></li>
+<li><a class="reference internal" href="#get-header">get-header</a></li>
 </ul>
 </li>
 </ul>
