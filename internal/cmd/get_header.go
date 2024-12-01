@@ -33,6 +33,14 @@ var getHeaderCmd = &cobra.Command{
 			matches := make([]int, 0)
 
 			for i, headerKey := range headerKeys {
+				if flagRegex {
+					if utils.RegexTest(strings.ToLower(headerSearch), strings.ToLower(headerKey)) {
+						matches = append(matches, i)
+					}
+
+					continue
+				}
+
 				if headerSearch == strings.ToLower(headerKey) {
 					matches = append(matches, i)
 				}

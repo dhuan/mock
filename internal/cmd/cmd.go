@@ -67,6 +67,7 @@ func Execute() {
 	wipeHeadersCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
 	replaceCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
 	getHeaderCmd.PersistentFlags().BoolVarP(&flagValueOnly, "value", "v", false, "get value only")
+	getHeaderCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

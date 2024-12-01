@@ -41,7 +41,7 @@ func Test_E2E_GetHeader_NoMatches_ExitCode1(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header foobar`,
+			`{{MOCK_EXECUTABLE}} get-header key`,
 			`printf $? >> $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
@@ -58,6 +58,21 @@ func Test_E2E_GetHeader_Match(t *testing.T) {
 			`printf $? >> $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
+			"some-header-key: some header value",
+			"0",
+		},
+	)
+}
+
+func Test_E2E_GetHeader_Regex(t *testing.T) {
+	getHeaderTest(
+		t,
+		[]string{
+			`{{MOCK_EXECUTABLE}} get-header --regex key | {{MOCK_EXECUTABLE}} write`,
+			`printf $? >> $MOCK_RESPONSE_BODY`,
+		},
+		[]string{
+			"another-header-key: another header value",
 			"some-header-key: some header value",
 			"0",
 		},
