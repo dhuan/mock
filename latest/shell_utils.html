@@ -380,17 +380,17 @@ status code is 0 if a valid key is provided, otherwise 1 is returned.</p>
 </section>
 <section id="get-header">
 <h2>get-header<a class="headerlink" href="#get-header" title="Link to this heading">¶</a></h2>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-headers
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-header
 <span class="c1"># Prints out all headers</span>
-$<span class="w"> </span>mock<span class="w"> </span>get-headers<span class="w"> </span>authorization
+$<span class="w"> </span>mock<span class="w"> </span>get-header<span class="w"> </span>authorization
 <span class="c1"># authorization: Bearer xxx</span>
-$<span class="w"> </span>mock<span class="w"> </span>get-headers<span class="w"> </span>--regex<span class="w"> </span>auth
+$<span class="w"> </span>mock<span class="w"> </span>get-header<span class="w"> </span>--regex<span class="w"> </span>auth
 <span class="c1"># authorization: Bearer xxx</span>
-$<span class="w"> </span>mock<span class="w"> </span>get-headers<span class="w"> </span>-v<span class="w"> </span>authorization
+$<span class="w"> </span>mock<span class="w"> </span>get-header<span class="w"> </span>-v<span class="w"> </span>authorization
 <span class="c1"># Bearer xxx</span>
 </pre></div>
 </div>
-<p>Gets the HTTP Headers for the current request, based on your search criterias.
+<p>Gets the HTTP Headers from the current request, based on your search criterias.
 If no search string is passed, all headers are printed out. The search is case
 insensitive. Unless <code class="docutils literal notranslate"><span class="pre">--regex</span></code> is used, the search string will only match if
 the it’s typed the full header key name.</p>

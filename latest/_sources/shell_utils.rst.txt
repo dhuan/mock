@@ -142,16 +142,16 @@ get-header
 
 .. code:: sh
 
-   $ mock get-headers
+   $ mock get-header
    # Prints out all headers
-   $ mock get-headers authorization
+   $ mock get-header authorization
    # authorization: Bearer xxx
-   $ mock get-headers --regex auth
+   $ mock get-header --regex auth
    # authorization: Bearer xxx
-   $ mock get-headers -v authorization
+   $ mock get-header -v authorization
    # Bearer xxx
 
-Gets the HTTP Headers for the current request, based on your search criterias.
+Gets the HTTP Headers from the current request, based on your search criterias.
 If no search string is passed, all headers are printed out. The search is case
 insensitive. Unless ``--regex`` is used, the search string will only match if
 the it's typed the full header key name.
