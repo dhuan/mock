@@ -63,7 +63,13 @@ write
 
    $ printf "Hello world!" | mock write
 
-Writes data to the HTTP Response.
+Writes data to the HTTP Response. Unless ``--append`` is used, ``write`` will
+overwrite any response body previously defined.
+
+Options:
+
+- ``-a, --append``: Appends data to the response body instead of overwriting
+  it.
 
 replace
 -------

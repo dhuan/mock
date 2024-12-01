@@ -318,7 +318,13 @@ response body, but this time with <a class="reference internal" href="middleware
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
 </pre></div>
 </div>
-<p>Writes data to the HTTP Response.</p>
+<p>Writes data to the HTTP Response. Unless <code class="docutils literal notranslate"><span class="pre">--append</span></code> is used, <code class="docutils literal notranslate"><span class="pre">write</span></code> will
+overwrite any response body previously defined.</p>
+<p>Options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-a,</span> <span class="pre">--append</span></code>: Appends data to the response body instead of overwriting
+it.</p></li>
+</ul>
 </section>
 <section id="replace">
 <h2>replace<a class="headerlink" href="#replace" title="Link to this heading">¶</a></h2>
