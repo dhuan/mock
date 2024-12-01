@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -17,7 +18,20 @@ var writeCmd = &cobra.Command{
 				exitWithError("Failed to read stdin!")
 			}
 
-			err = os.WriteFile(rf.body, stdin, 0644)
+			contentToWrite := stdin
+
+			if flagAppend {
+				fileContent, err := os.ReadFile(os.Getenv("MOCK_RESPONSE_BODY"))
+				if err != nil {
+					fmt.Printf("Failed to read response body file.\n")
+
+					os.Exit(1)
+				}
+
+				contentToWrite = append(fileContent, stdin...)
+			}
+
+			err = os.WriteFile(rf.body, contentToWrite, 0644)
 			if err != nil {
 				exitWithError(err.Error())
 			}

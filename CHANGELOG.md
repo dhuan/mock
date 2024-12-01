@@ -5,6 +5,7 @@
 ADDED:
 
 - New command: `mock get-header`
+- Add `--append` to `mock write`.
 
 ## 1.4.5
 
