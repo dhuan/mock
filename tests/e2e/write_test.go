@@ -43,3 +43,22 @@ func Test_E2E_Write_Append(t *testing.T) {
 		StringMatches("Hello, world! Append was used. Again."),
 	)
 }
+
+func Test_E2E_Write_WritingMultipleTimesOverwrites(t *testing.T) {
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			"--route foo/bar",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				`printf "Hello, world!" | {{MOCK_EXECUTABLE}} write`,
+				`printf " Append was used." | {{MOCK_EXECUTABLE}} write`,
+				`printf " Again." | {{MOCK_EXECUTABLE}} write`,
+			}, ";")),
+		},
+		"GET",
+		"foo/bar",
+		nil,
+		nil,
+		StringMatches(" Again."),
+	)
+}
