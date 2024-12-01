@@ -58,7 +58,11 @@ var getHeaderCmd = &cobra.Command{
 
 				headerValue = strings.TrimSpace(headerValue)
 
-				fmt.Printf("%s: %s\n", headerKey, headerValue)
+				if flagValueOnly {
+					fmt.Printf("%s\n", headerValue)
+				} else {
+					fmt.Printf("%s: %s\n", headerKey, headerValue)
+				}
 			}
 		})
 	},

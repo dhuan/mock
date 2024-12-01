@@ -64,6 +64,19 @@ func Test_E2E_GetHeader_Match(t *testing.T) {
 	)
 }
 
+func Test_E2E_GetHeader_PrintValueOnly(t *testing.T) {
+	getHeaderTest(
+		t,
+		[]string{
+			`{{MOCK_EXECUTABLE}} get-header -v some-header-key | {{MOCK_EXECUTABLE}} write`,
+		},
+		[]string{
+			"some header value",
+			"",
+		},
+	)
+}
+
 func getHeaderTest(t *testing.T, exec, expectOutput []string) {
 	RunTestWithNoConfigAndWithArgs(
 		t,

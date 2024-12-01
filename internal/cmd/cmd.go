@@ -20,12 +20,13 @@ type MockApiResponse struct {
 }
 
 var (
-	flagConfig  string
-	flagPort    string
-	flagCors    bool
-	flagRegex   bool
-	flagDelay   int64
-	flagBaseApi string
+	flagConfig    string
+	flagPort      string
+	flagCors      bool
+	flagRegex     bool
+	flagValueOnly bool
+	flagDelay     int64
+	flagBaseApi   string
 )
 
 var rootCmd = &cobra.Command{
@@ -65,6 +66,7 @@ func Execute() {
 
 	wipeHeadersCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
 	replaceCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
+	getHeaderCmd.PersistentFlags().BoolVarP(&flagValueOnly, "value", "v", false, "get value only")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
