@@ -17,6 +17,8 @@ func Test_E2E_GetHeader_All(t *testing.T) {
 		},
 		[]string{
 			"accept-encoding: gzip",
+			"another-header-key: another header value",
+			"some-header-key: some header value",
 			"user-agent: Go-http-client/1.1",
 			"0",
 		},
@@ -48,20 +50,36 @@ func Test_E2E_GetHeader_NoMatches_ExitCode1(t *testing.T) {
 	)
 }
 
+func Test_E2E_GetHeader_Match(t *testing.T) {
+	getHeaderTest(
+		t,
+		[]string{
+			`{{MOCK_EXECUTABLE}} get-header some-header-key | {{MOCK_EXECUTABLE}} write`,
+			`printf $? >> $MOCK_RESPONSE_BODY`,
+		},
+		[]string{
+			"some-header-key: some header value",
+			"0",
+		},
+	)
+}
+
 func getHeaderTest(t *testing.T, exec, expectOutput []string) {
 	RunTestWithNoConfigAndWithArgs(
 		t,
 		append(
 			[]string{
 				"--route foo/bar",
-				"--header 'some-header-key: some header value'",
-				"--header 'another-header-key: another header value'",
+				"--response 'Hello, world!'",
 			},
 			fmt.Sprintf("--exec '%s'", strings.Join(exec, ";")),
 		),
 		"GET",
 		"foo/bar",
-		nil,
+		map[string]string{
+			"some-header-key":    "some header value",
+			"another-header-key": "another header value",
+		},
 		nil,
 		StringMatches(strings.Join(expectOutput, "\n")),
 	)

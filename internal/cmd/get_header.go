@@ -45,12 +45,20 @@ var getHeaderCmd = &cobra.Command{
 			}
 
 			for _, headerIndex := range matches {
-				headerValue, ok := headers[headerKeys[headerIndex]]
+				if headerIndex > (len(headerKeys) - 1) {
+					panic(fmt.Errorf("Something went wrong while searching for headers."))
+				}
+
+				headerKey := headerKeys[headerIndex]
+
+				headerValue, ok := headers[headerKey]
 				if !ok {
 					panic(fmt.Errorf("Something went wrong while searching for headers."))
 				}
 
-				fmt.Println(headerValue)
+				headerValue = strings.TrimSpace(headerValue)
+
+				fmt.Printf("%s: %s\n", headerKey, headerValue)
 			}
 		})
 	},
