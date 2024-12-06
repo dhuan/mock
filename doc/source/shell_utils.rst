@@ -113,6 +113,17 @@ Adds an HTTP Header to the Response. If the provided header name was already
 set previously, then the provided header value will just overwrite the
 previous one.
 
+.. _shell_utils_set_status:
+
+set-status
+----------
+
+.. code:: sh
+
+   $ mock set-status 400
+
+Sets the HTTP Status Code for the current response being handled.
+
 get-route-param
 ---------------
 
