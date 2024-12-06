@@ -124,6 +124,8 @@ set-status
 
 Sets the HTTP Status Code for the current response being handled.
 
+.. _shell_utils_get_route_param:
+
 get-route-param
 ---------------
 
