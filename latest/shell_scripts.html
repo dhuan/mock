@@ -286,10 +286,14 @@ Requests.</p>
 </pre></div>
 </div>
 <p>In the example above, any request to <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/foo/bar</span></code> will result in
-<em>mock</em> executing the <code class="docutils literal notranslate"><span class="pre">my_shell_script.sh</span></code>. Scripts can manipulate the HTTP
-Response by writing to a file assigned to the <code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_BODY</span></code> environment
-variable. Following is a script that defines the HTTP Response as <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
+<em>mock</em> executing the <code class="docutils literal notranslate"><span class="pre">my_shell_script.sh</span></code>.</p>
+<p>Scripts can define the HTTP Response through different methods:</p>
+<ul class="simple">
+<li><p>Write to response files which are referenced in environment variables like <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code>.</p></li>
+<li><p>Use command-line utilities provided by <cite>mock</cite>, such as <a class="reference internal" href="shell_utils.html#shell-utils-write"><span class="std std-ref">mock write.</span></a> and <a class="reference internal" href="shell_utils.html#shell-utils-set-header"><span class="std std-ref">mock set-header</span></a>.</p></li>
+</ul>
+<p>A <cite>hello world</cite> script-based response handler looks like the following:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
 </pre></div>
 </div>
 <p>To further customize your script handlers, you may also pass parameters,
@@ -319,7 +323,7 @@ current folder (<code class="docutils literal notranslate"><span class="pre">ls<
 <span class="w"> </span>  &quot;endpoints&quot;: [
 <span class="w"> </span>    {
 <span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;exec:ls -la &gt; $MOCK_RESPONSE_BODY&quot;</span>
+<span class="gi">+      &quot;response&quot;: &quot;exec:ls -la | mock write&quot;</span>
 <span class="w"> </span>    }
 <span class="w"> </span>  ]
 <span class="w"> </span>}
@@ -332,7 +336,7 @@ on the home folder:</p>
 <span class="w"> </span>  &quot;endpoints&quot;: [
 <span class="w"> </span>    {
 <span class="w"> </span>      &quot;route&quot;: &quot;foo/bar&quot;,
-<span class="gi">+      &quot;response&quot;: &quot;exec:ls ~ | wc -l &gt; $MOCK_RESPONSE_BODY&quot;</span>
+<span class="gi">+      &quot;response&quot;: &quot;exec:ls ~ | wc -l | mock write&quot;</span>
 <span class="w"> </span>    }
 <span class="w"> </span>  ]
 <span class="w"> </span>}
@@ -341,7 +345,7 @@ on the home folder:</p>
 <p>The same can be accomplished through command-line parameters:</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>$ mock serve \
 <span class="gi">+  --route &quot;foo/bar&quot; \</span>
-<span class="gi">+  --exec &#39;ls | sort &gt; $MOCK_RESPONSE_BODY&#39;</span>
+<span class="gi">+  --exec &#39;ls | sort | mock write&#39;</span>
 </pre></div>
 </div>
 <section id="environment-variables-for-request-handlers">
@@ -358,12 +362,15 @@ current request being handled.</p>
 exists as such: <code class="docutils literal notranslate"><span class="pre">user/{user_id}</span></code>. We could then retrieve the User ID
 parameter by reading the <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_USER_ID</span></code> environment
 variable.</p>
+<p>Alternatively we can retrieve the same route parameter using
+<a class="reference internal" href="shell_utils.html#shell-utils-get-route-param"><span class="std std-ref">get-route-param</span></a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-route-param<span class="w"> </span>user_id
+</pre></div>
+</div>
 </section>
 <section id="response-files-that-can-be-written-to-by-shell-scripts">
 <h2>Response Files that can be written to by shell scripts<a class="headerlink" href="#response-files-that-can-be-written-to-by-shell-scripts" title="Link to this heading">¶</a></h2>
-<p>So far we’ve seen environment variables that provide us with information
-about the Request that’s being currently handled. The following
-environment variables enable you to further define the HTTP Response:</p>
+<p>The following environment variables enable you to manipulate the HTTP Response:</p>
 <ul class="simple">
 <li><p><strong>MOCK_RESPONSE_BODY</strong>: A file that can be written to in order to set the
 HTTP Response.</p></li>
