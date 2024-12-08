@@ -43,6 +43,7 @@ func Execute() {
 	rootCmd.AddCommand(setHeaderCmd)
 	rootCmd.AddCommand(writeCmd)
 	rootCmd.AddCommand(getQueryCmd)
+	rootCmd.AddCommand(getPayloadCmd)
 	rootCmd.AddCommand(getHeaderCmd)
 	rootCmd.AddCommand(setStatusCmd)
 	rootCmd.AddCommand(versionCmd)

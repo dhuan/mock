@@ -105,6 +105,13 @@ func buildRequestFromMockEnvVars() (*http.Request, bool, []string, *responseFile
 		request.Header.Add(headerKey, headerValue)
 	}
 
+	file, err := os.Open(os.Getenv("MOCK_REQUEST_BODY"))
+	if err != nil {
+		panic(err)
+	}
+
+	request.Body = file
+
 	return request, true, []string{}, &responseFiles{
 		headers:    os.Getenv("MOCK_RESPONSE_HEADERS"),
 		statusCode: os.Getenv("MOCK_RESPONSE_STATUS_CODE"),

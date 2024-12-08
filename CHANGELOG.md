@@ -4,7 +4,7 @@
 
 ADDED:
 
-- New commands: `mock get-header`, `mock set-status`
+- New commands: `mock get-header`, `mock set-status`, `mock get-payload`
 - Add `--append` to `mock write`.
 
 ## 1.4.5
