@@ -183,3 +183,36 @@ Options:
 
 Exit code: If no headers are found given the search criteria, `1` is returned,
 otherwise `0` when headers are found.
+
+get-payload
+-----------
+
+.. code:: sh
+
+   $ mock get-payload
+   # Prints out all request payload
+   $ mock get-payload someFieldName
+   # Prints out the "someFieldName" from the JSON request payload
+
+Gets the request payload. If no parameters are given, the whole request
+payload is printed out.
+
+If a paramater is passed:
+
+- If the request contains a JSON payload and JSON header, `get-payload` will
+  print out the JSON field according to the provided parameter.
+- If the request is a multipart/form-data one, `get-payload` will extract the
+  value accordingly.
+
+About the exit code:
+
+- If no parameters are provided, the exit code will be always be ``0``.
+- If a parameter is provided to extract a payload field, ``0`` is returned if
+  the field exists, otherwise ``1`` is returned.
+
+.. warning::
+
+   When extracting fields from the payload, `mock` respects the content-type
+   header. That means a request may contain a JSON payload, however if the
+   request header is not properly set as JSON, `mock` won't give you the
+   desired value.

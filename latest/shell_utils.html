@@ -416,6 +416,37 @@ line is printed.</p></li>
 <p>Exit code: If no headers are found given the search criteria, <cite>1</cite> is returned,
 otherwise <cite>0</cite> when headers are found.</p>
 </section>
+<section id="get-payload">
+<h2>get-payload<a class="headerlink" href="#get-payload" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-payload
+<span class="c1"># Prints out all request payload</span>
+$<span class="w"> </span>mock<span class="w"> </span>get-payload<span class="w"> </span>someFieldName
+<span class="c1"># Prints out the &quot;someFieldName&quot; from the JSON request payload</span>
+</pre></div>
+</div>
+<p>Gets the request payload. If no parameters are given, the whole request
+payload is printed out.</p>
+<p>If a paramater is passed:</p>
+<ul class="simple">
+<li><p>If the request contains a JSON payload and JSON header, <cite>get-payload</cite> will
+print out the JSON field according to the provided parameter.</p></li>
+<li><p>If the request is a multipart/form-data one, <cite>get-payload</cite> will extract the
+value accordingly.</p></li>
+</ul>
+<p>About the exit code:</p>
+<ul class="simple">
+<li><p>If no parameters are provided, the exit code will be always be <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p>If a parameter is provided to extract a payload field, <code class="docutils literal notranslate"><span class="pre">0</span></code> is returned if
+the field exists, otherwise <code class="docutils literal notranslate"><span class="pre">1</span></code> is returned.</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When extracting fields from the payload, <cite>mock</cite> respects the content-type
+header. That means a request may contain a JSON payload, however if the
+request header is not properly set as JSON, <cite>mock</cite> won’t give you the
+desired value.</p>
+</div>
+</section>
 </section>
 
         </article>
@@ -482,6 +513,7 @@ otherwise <cite>0</cite> when headers are found.</p>
 <li><a class="reference internal" href="#get-route-param">get-route-param</a></li>
 <li><a class="reference internal" href="#get-query">get-query</a></li>
 <li><a class="reference internal" href="#get-header">get-header</a></li>
+<li><a class="reference internal" href="#get-payload">get-payload</a></li>
 </ul>
 </li>
 </ul>
