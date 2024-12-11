@@ -356,6 +356,15 @@ func RunTestWithArgs(
 	RunTestBase(t, true, configurationFilePath, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, nil, assertionFunc...)
 }
 
+func RunTest3(
+	t *testing.T,
+	args []string,
+	request *TestRequest,
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+) {
+	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{*request}, map[string]string{}, nil, assertionFunc...)
+}
+
 func RunTestWithNoConfigAndWithArgs(
 	t *testing.T,
 	args []string,
@@ -373,6 +382,23 @@ func RunTestWithNoConfigAndWithArgs(
 	}
 
 	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, nil, assertionFunc...)
+}
+
+func Get(route string, headers map[string]string) *TestRequest {
+	return &TestRequest{
+		Method:  "GET",
+		Route:   route,
+		Headers: headers,
+	}
+}
+
+func Post(route string, headers map[string]string, body io.Reader) *TestRequest {
+	return &TestRequest{
+		Method:  "POST",
+		Route:   route,
+		Headers: headers,
+		Body:    body,
+	}
 }
 
 func RunTest2(
