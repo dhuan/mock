@@ -1,5 +1,9 @@
 package tests_e2e
 
-var JSON_HEADER map[string]string = map[string]string{
-	"content-type": "application/json",
+import (
+	"net/http"
+)
+
+var JSON_HEADER http.Header = http.Header{
+	"content-type": {"application/json"},
 }

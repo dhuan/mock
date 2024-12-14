@@ -365,6 +365,14 @@ func RunTest3(
 	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{*request}, map[string]string{}, nil, assertionFunc...)
 }
 
+func RunTest4(
+	t *testing.T,
+	args []string,
+	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+) {
+	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{}, map[string]string{}, nil, assertionFunc...)
+}
+
 func RunTestWithNoConfigAndWithArgs(
 	t *testing.T,
 	args []string,
@@ -384,20 +392,43 @@ func RunTestWithNoConfigAndWithArgs(
 	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, nil, assertionFunc...)
 }
 
-func Get(route string, headers map[string]string) *TestRequest {
-	return &TestRequest{
-		Method:  "GET",
-		Route:   route,
-		Headers: headers,
+func requestBase(state *E2eState, method, route string, headers http.Header, payload []byte) *http.Request {
+	url := fmt.Sprintf("http://localhost:%d/%s", state.Port, route)
+
+	request, err := http.NewRequest(
+		method,
+		url,
+		bytes.NewReader(payload),
+	)
+	if err != nil {
+		panic(err)
 	}
+
+	return request
 }
 
-func Post(route string, headers map[string]string, body io.Reader) *TestRequest {
-	return &TestRequest{
-		Method:  "POST",
-		Route:   route,
-		Headers: headers,
-		Body:    body,
+func Post(route string, headers http.Header, payload []byte) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		request := requestBase(state, "POST", route, headers, payload)
+
+		request.Header = headers
+
+		client := &http.Client{}
+		newResponse, err := client.Do(request)
+		if err != nil {
+			panic(err)
+		}
+
+		responseBody, err := io.ReadAll(newResponse.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		*response = Response{
+			Body:       responseBody,
+			Headers:    newResponse.Header,
+			StatusCode: newResponse.StatusCode,
+		}
 	}
 }
 
@@ -1002,4 +1033,21 @@ func DirEntry(name string, entries []FsEntry) FsEntry {
 		Name:    name,
 		Entries: entries,
 	}
+}
+
+func Headers(headerData ...string) http.Header {
+	headers := http.Header{}
+	key := ""
+
+	for i := range headerData {
+		if i%2 == 0 {
+			key = headerData[i]
+
+			continue
+		}
+
+		headers.Set(key, headerData[i])
+	}
+
+	return headers
 }
