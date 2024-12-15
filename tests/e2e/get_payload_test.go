@@ -80,11 +80,31 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
 			"--method POST",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
 				`{{MOCK_EXECUTABLE}} get-payload foo | {{MOCK_EXECUTABLE}} write`,
+				`echo $? | {{MOCK_EXECUTABLE}} write -a`,
 			}, ";")),
 		},
 		PostUrlEncodedForm("foo/bar", map[string]string{
 			"foo": "bar",
 		}),
-		StringMatches("bar\n"),
+		StringMatches("bar\n0\n"),
+	)
+}
+
+func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_FieldDoesNotExist(t *testing.T) {
+	RunTest4(
+		t,
+		[]string{
+			"--route foo/bar",
+			"--method POST",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				`{{MOCK_EXECUTABLE}} get-payload hello | {{MOCK_EXECUTABLE}} write`,
+				`{{MOCK_EXECUTABLE}} get-payload hello`,
+				`echo $? | {{MOCK_EXECUTABLE}} write -a`,
+			}, ";")),
+		},
+		PostUrlEncodedForm("foo/bar", map[string]string{
+			"foo": "bar",
+		}),
+		StringMatches("1\n"),
 	)
 }
