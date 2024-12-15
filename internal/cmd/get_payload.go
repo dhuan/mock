@@ -26,7 +26,7 @@ var getPayloadCmd = &cobra.Command{
 			if len(args) > 0 {
 				fieldName := args[0]
 
-				if isJsonRequest(request) {
+				if searchHeader(request, "content-type", "application/json") {
 					var data map[string]interface{}
 					err = json.Unmarshal(fileContent, &data)
 
@@ -40,7 +40,7 @@ var getPayloadCmd = &cobra.Command{
 					fmt.Printf("%s\n", value)
 				}
 
-				if isFormUrlEncodedHeader(request) {
+				if searchHeader(request, "content-type", "application/x-www-form-urlencoded") {
 					query, err := url.ParseQuery(string(fileContent))
 					if err != nil {
 						os.Exit(1)
@@ -64,23 +64,11 @@ var getPayloadCmd = &cobra.Command{
 	},
 }
 
-func isJsonRequest(request *http.Request) bool {
+func searchHeader(request *http.Request, key, value string) bool {
 	for headerKey := range request.Header {
 		headerValue := strings.Join(request.Header[headerKey], "")
 
-		if strings.ToLower(headerKey) == "content-type" && headerValue == "application/json" {
-			return true
-		}
-	}
-
-	return false
-}
-
-func isFormUrlEncodedHeader(request *http.Request) bool {
-	for headerKey := range request.Header {
-		headerValue := strings.Join(request.Header[headerKey], "")
-
-		if strings.ToLower(headerKey) == "content-type" && headerValue == "application/x-www-form-urlencoded" {
+		if strings.ToLower(headerKey) == key && headerValue == value {
 			return true
 		}
 	}
