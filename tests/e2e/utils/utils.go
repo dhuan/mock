@@ -392,16 +392,20 @@ func RunTestWithNoConfigAndWithArgs(
 	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, nil, assertionFunc...)
 }
 
-func requestBase(state *E2eState, method, route string, headers http.Header, payload []byte) *http.Request {
+func requestBase(state *E2eState, method, route string, headers http.Header, payload io.Reader) *http.Request {
 	url := fmt.Sprintf("http://localhost:%d/%s", state.Port, route)
 
 	request, err := http.NewRequest(
 		method,
 		url,
-		bytes.NewReader(payload),
+		payload,
 	)
 	if err != nil {
 		panic(err)
+	}
+
+	for key := range headers {
+		request.Header.Set(key, strings.Join(headers[key], ","))
 	}
 
 	return request
@@ -409,9 +413,47 @@ func requestBase(state *E2eState, method, route string, headers http.Header, pay
 
 func Post(route string, headers http.Header, payload []byte) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
-		request := requestBase(state, "POST", route, headers, payload)
+		request := requestBase(state, "POST", route, headers, bytes.NewReader(payload))
 
 		request.Header = headers
+
+		client := &http.Client{}
+		newResponse, err := client.Do(request)
+		if err != nil {
+			panic(err)
+		}
+
+		responseBody, err := io.ReadAll(newResponse.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		*response = Response{
+			Body:       responseBody,
+			Headers:    newResponse.Header,
+			StatusCode: newResponse.StatusCode,
+		}
+	}
+}
+
+func PostUrlEncodedForm(route string, data map[string]string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		values := url.Values{}
+		for key := range data {
+			values.Set(key, data[key])
+		}
+
+		payload := strings.NewReader(values.Encode())
+
+		request := requestBase(
+			state,
+			"POST",
+			route,
+			http.Header{
+				"content-type": {"application/x-www-form-urlencoded"},
+			},
+			payload,
+		)
 
 		client := &http.Client{}
 		newResponse, err := client.Do(request)

@@ -71,3 +71,20 @@ func Test_E2E_GetPayload_GetJsonField_WithEmptyPayload_Exit1(t *testing.T) {
 		StringMatches("1"),
 	)
 }
+
+func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
+	RunTest4(
+		t,
+		[]string{
+			"--route foo/bar",
+			"--method POST",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				`{{MOCK_EXECUTABLE}} get-payload foo | {{MOCK_EXECUTABLE}} write`,
+			}, ";")),
+		},
+		PostUrlEncodedForm("foo/bar", map[string]string{
+			"foo": "bar",
+		}),
+		StringMatches("bar\n"),
+	)
+}

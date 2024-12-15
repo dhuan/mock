@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -39,6 +40,22 @@ var getPayloadCmd = &cobra.Command{
 					fmt.Printf("%s\n", value)
 				}
 
+				if isFormUrlEncodedHeader(request) {
+					query, err := url.ParseQuery(string(fileContent))
+					if err != nil {
+						os.Exit(1)
+					}
+
+					value, ok := query[fieldName]
+					if !ok {
+						os.Exit(1)
+					}
+
+					fmt.Printf("%s\n", strings.Join(value, ","))
+
+					return
+				}
+
 				return
 			}
 
@@ -52,6 +69,18 @@ func isJsonRequest(request *http.Request) bool {
 		headerValue := strings.Join(request.Header[headerKey], "")
 
 		if strings.ToLower(headerKey) == "content-type" && headerValue == "application/json" {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isFormUrlEncodedHeader(request *http.Request) bool {
+	for headerKey := range request.Header {
+		headerValue := strings.Join(request.Header[headerKey], "")
+
+		if strings.ToLower(headerKey) == "content-type" && headerValue == "application/x-www-form-urlencoded" {
 			return true
 		}
 	}
