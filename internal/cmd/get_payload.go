@@ -26,35 +26,17 @@ var getPayloadCmd = &cobra.Command{
 			if len(args) > 0 {
 				fieldName := args[0]
 
-				if searchHeader(request, "content-type", "application/json") {
-					var data map[string]interface{}
-					err = json.Unmarshal(fileContent, &data)
-
-					value, ok := data[fieldName]
-					if !ok {
-						os.Exit(1)
-
-						return
-					}
-
-					fmt.Printf("%s\n", value)
-				}
-
-				if searchHeader(request, "content-type", "application/x-www-form-urlencoded") {
-					query, err := url.ParseQuery(string(fileContent))
-					if err != nil {
-						os.Exit(1)
-					}
-
-					value, ok := query[fieldName]
-					if !ok {
-						os.Exit(1)
-					}
-
-					fmt.Printf("%s\n", strings.Join(value, ","))
-
+				getField, ok := resolveGetFieldFunc(request)
+				if !ok {
 					return
 				}
+
+				value, ok := getField(fileContent, fieldName)
+				if !ok {
+					os.Exit(1)
+				}
+
+				fmt.Printf("%s\n", value)
 
 				return
 			}
@@ -64,14 +46,60 @@ var getPayloadCmd = &cobra.Command{
 	},
 }
 
-func searchHeader(request *http.Request, key, value string) bool {
+func getHeader(request *http.Request, key string) (string, bool) {
 	for headerKey := range request.Header {
 		headerValue := strings.Join(request.Header[headerKey], "")
 
-		if strings.ToLower(headerKey) == key && headerValue == value {
-			return true
+		if strings.ToLower(headerKey) == key {
+			return headerValue, true
 		}
 	}
 
-	return false
+	return "", false
+}
+
+func getPayloadField_Json(payload []byte, fieldName string) (string, bool) {
+	var data map[string]interface{}
+	err := json.Unmarshal(payload, &data)
+	if err != nil {
+		return "", false
+	}
+
+	value, ok := data[fieldName]
+	if !ok {
+		return "", false
+	}
+
+	return fmt.Sprintf("%+v", value), true
+}
+
+func getPayloadField_UrlEncoded(payload []byte, fieldName string) (string, bool) {
+	query, err := url.ParseQuery(string(payload))
+	if err != nil {
+		return "", false
+	}
+
+	value, ok := query[fieldName]
+	if !ok {
+		return "", false
+	}
+
+	return fmt.Sprintf("%s", strings.Join(value, ",")), true
+}
+
+func resolveGetFieldFunc(request *http.Request) (func(payload []byte, fieldName string) (string, bool), bool) {
+	contentType, ok := getHeader(request, "content-type")
+	if !ok {
+		return getPayloadField_Json, false
+	}
+
+	if contentType == "application/json" {
+		return getPayloadField_Json, true
+	}
+
+	if contentType == "application/x-www-form-urlencoded" {
+		return getPayloadField_UrlEncoded, true
+	}
+
+	return getPayloadField_Json, false
 }
