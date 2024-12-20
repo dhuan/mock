@@ -95,17 +95,6 @@ func getPayloadField_UrlEncoded(request *http.Request, payload []byte, fieldName
 }
 
 func getPayloadField_Multipart(request *http.Request, payload []byte, fieldName string) (string, bool) {
-	/*
-		bytes.NewReader(payload)
-
-		request, err := http.NewRequest("POST", "/")
-		if err != nil {
-			panic(err)
-		}
-
-		// request.ParseMultipartForm
-	*/
-
 	err := request.ParseMultipartForm(1024 * 1024 * 16)
 	if err != nil {
 		panic(err)
