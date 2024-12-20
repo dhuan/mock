@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -20,6 +21,31 @@ var forwardCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		responseShellUtilWrapper("forward", args, &responseShellUtilOptions{}, func(request *http.Request, rf *responseFiles) {
 			log.Printf("Forwarding request to Base API: %s %s\n", request.Method, request.RequestURI)
+
+			request.RequestURI = ""
+
+			baseApi := os.Getenv("MOCK_BASE_API")
+			tlsStr := os.Getenv("MOCK_REQUEST_HTTPS")
+
+			tls := tlsStr == "true"
+
+			requestUrl := fmt.Sprintf("%s%s", baseApi, request.URL)
+
+			if !utils.RegexTest("^https?://", requestUrl) {
+				protocol := "http://"
+				if tls {
+					protocol = "https://"
+				}
+
+				requestUrl = fmt.Sprintf("%s%s", protocol, requestUrl)
+			}
+
+			URL, err := url.Parse(requestUrl)
+			if err != nil {
+				panic(err)
+			}
+
+			request.URL = URL
 
 			client := &http.Client{}
 			response, err := client.Do(request)

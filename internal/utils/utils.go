@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -522,4 +524,22 @@ func DecodeBase64Json(encoded string) (map[string]interface{}, error) {
 	}
 
 	return data, nil
+}
+
+func CloneRequest(req *http.Request) (*http.Request, error) {
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	rdr1 := io.NopCloser(bytes.NewBuffer(body))
+	rdr2 := io.NopCloser(bytes.NewBuffer(body))
+
+	req.Body = rdr1
+
+	clone := req.Clone(req.Context())
+
+	req.Body = rdr2
+
+	return clone, nil
 }

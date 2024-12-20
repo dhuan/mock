@@ -258,11 +258,6 @@ func newEndpointHandler(
 	config *MockConfig,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		requestBody, err := io.ReadAll(r.Body)
-		if err != nil {
-			panic(err)
-		}
-
 		envVars := getAllEnvVars()
 		endpointParams := getEndpointParams(r)
 
@@ -272,7 +267,7 @@ func newEndpointHandler(
 			panic(err)
 		}
 
-		requestRecord, err := record.BuildRequestRecord(r, requestBody, endpointParams)
+		requestRecord, requestBody, err := record.BuildRequestRecord(r, endpointParams)
 		if err != nil {
 			panic(err)
 		}
@@ -458,14 +453,19 @@ func onNotFound(
 			return
 		}
 
-		response, requestBody, err := sendRequestForBaseApi(baseApi, r)
+		r2, err := utils.CloneRequest(r)
+		if err != nil {
+			panic(err)
+		}
+
+		response, requestBody, err := sendRequestForBaseApi(baseApi, r2)
 		if err != nil {
 			panic(err)
 		}
 
 		endpointParams := getEndpointParams(r)
 
-		requestRecord, err := record.BuildRequestRecord(r, requestBody, endpointParams)
+		requestRecord, requestBody, err := record.BuildRequestRecord(r, endpointParams)
 		if err != nil {
 			panic(err)
 		}

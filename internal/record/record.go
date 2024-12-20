@@ -1,6 +1,10 @@
 package record
 
 import (
+	"bufio"
+	"bytes"
+	"encoding/base64"
+	"io"
 	"net/http"
 	"strings"
 
@@ -8,7 +12,17 @@ import (
 	"github.com/dhuan/mock/internal/utils"
 )
 
-func BuildRequestRecord(r *http.Request, requestBody []byte, routeParams map[string]string) (*types.RequestRecord, error) {
+func BuildRequestRecord(r *http.Request, routeParams map[string]string) (*types.RequestRecord, []byte, error) {
+	r2, err := utils.CloneRequest(r)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	r3, err := utils.CloneRequest(r)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	route := utils.ReplaceRegex(r.RequestURI, []string{`^\/`}, "")
 	headers := buildHeadersForRequestRecord(&r.Header)
 	routeParsed, querystring := parseRoute(route)
@@ -19,11 +33,23 @@ func BuildRequestRecord(r *http.Request, requestBody []byte, routeParams map[str
 		Headers:           *headers,
 	}
 
+	requestBody, err := io.ReadAll(r2.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	requestRecord.Body = &requestBody
 
 	requestRecord.Method = strings.ToLower(r.Method)
 
 	requestRecord.Host = r.Host
+
+	requestSerialized, err := serializeRequest(r3)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	requestRecord.Serialized = requestSerialized
 
 	https := false
 	if r.TLS != nil {
@@ -33,7 +59,27 @@ func BuildRequestRecord(r *http.Request, requestBody []byte, routeParams map[str
 
 	requestRecord.RouteParams = routeParams
 
-	return requestRecord, nil
+	return requestRecord, requestBody, nil
+}
+
+func UnserializeRequest(serialized string) (*http.Request, error) {
+	decoded, err := base64.StdEncoding.DecodeString(serialized)
+	if err != nil {
+		return nil, err
+	}
+
+	r := bufio.NewReader(bytes.NewReader(decoded))
+
+	return http.ReadRequest(r)
+}
+
+func serializeRequest(r *http.Request) (string, error) {
+	b := bytes.Buffer{}
+	if err := r.Write(&b); err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(b.Bytes()), nil
 }
 
 func parseQuerystring(r *http.Request) map[string]string {

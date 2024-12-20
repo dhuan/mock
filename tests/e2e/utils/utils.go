@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"net/url"
@@ -453,6 +454,57 @@ func PostUrlEncodedForm(route string, data map[string]string) func(t *testing.T,
 				"content-type": {"application/x-www-form-urlencoded"},
 			},
 			payload,
+		)
+
+		client := &http.Client{}
+		newResponse, err := client.Do(request)
+		if err != nil {
+			panic(err)
+		}
+
+		responseBody, err := io.ReadAll(newResponse.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		*response = Response{
+			Body:       responseBody,
+			Headers:    newResponse.Header,
+			StatusCode: newResponse.StatusCode,
+		}
+	}
+}
+
+func PostMultipart(route string, data map[string]string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		var b bytes.Buffer
+		w := multipart.NewWriter(&b)
+
+		for key, value := range data {
+			var fw io.Writer
+
+			fw, err := w.CreateFormField(key)
+			if err != nil {
+				panic(err)
+			}
+
+			r := strings.NewReader(value)
+
+			if _, err = io.Copy(fw, r); err != nil {
+				panic(err)
+			}
+		}
+
+		w.Close()
+
+		request := requestBase(
+			state,
+			"POST",
+			route,
+			http.Header{
+				"content-type": {w.FormDataContentType()},
+			},
+			&b,
 		)
 
 		client := &http.Client{}

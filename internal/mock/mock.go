@@ -185,6 +185,7 @@ func BuildVars(
 		"MOCK_REQUEST_QUERYSTRING_SERIALIZED": querystringSerialized,
 		"MOCK_REQUEST_NTH":                    fmt.Sprintf("%d", nth),
 		"MOCK_REQUEST_HTTPS":                  tls,
+		"MOCK_REQUEST_SERIALIZED":             requestRecord.Serialized,
 		"MOCK_BASE_API":                       baseApi,
 	}
 

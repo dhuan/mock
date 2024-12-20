@@ -48,6 +48,7 @@ type RequestRecord struct {
 	Headers           http.Header       `json:"headers"`
 	Body              *[]byte           `json:"body"`
 	RouteParams       map[string]string `json:"route_params"`
+	Serialized        string            `json:"serialized"`
 }
 
 type MockFs interface {
