@@ -192,27 +192,26 @@ get-payload
    $ mock get-payload
    # Prints out all request payload
    $ mock get-payload someFieldName
-   # Prints out the "someFieldName" from the JSON request payload
+   # Prints out the "someFieldName" field from the JSON payload, or multipart
+   # form data, or URL-encoded data depending on the content type.
 
-Gets the request payload. If no parameters are given, the whole request
-payload is printed out.
+Gets either the whole request payload, or a "field" from it.
 
-If a paramater is passed:
+To get the whole payload, just execute ``get-payload`` without any parameter.
 
-- If the request contains a JSON payload and JSON header, `get-payload` will
-  print out the JSON field according to the provided parameter.
-- If the request is a multipart/form-data one, `get-payload` will extract the
-  value accordingly.
+If a parameter is passed, `mock` will identify the kind of payload the request
+is formatted in, through the `Content-Type` header, and then will extract the
+field based on the name passed as parameter.
+
+When extracting fields from the payload, the following payload formats are
+supported:
+
+- JSON payloads (``Content-Type: application/json``)
+- `Multipart Form Data payloads <https://en.wikipedia.org/wiki/MIME#form-data>`_ (``Content-Type: multipart/form-data``)
+- `HTML Form Data <https://en.wikipedia.org/wiki/Percent-encoding#The_application.2Fx-www-form-urlencoded_type>`_ (``Content-Type: application/x-www-form-urlencoded``)
 
 About the exit code:
 
-- If no parameters are provided, the exit code will be always be ``0``.
+- If no parameters are provided, the exit code will always be ``0``.
 - If a parameter is provided to extract a payload field, ``0`` is returned if
   the field exists, otherwise ``1`` is returned.
-
-.. warning::
-
-   When extracting fields from the payload, `mock` respects the content-type
-   header. That means a request may contain a JSON payload, however if the
-   request header is not properly set as JSON, `mock` won't give you the
-   desired value.
