@@ -281,6 +281,16 @@
 <code class="docutils literal notranslate"><span class="pre">mock</span> <span class="pre">get-payload</span></code></p></li>
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">--append</span></code> to <code class="docutils literal notranslate"><span class="pre">mock</span> <span class="pre">write</span></code>.</p></li>
 </ul>
+<p>FIXED:</p>
+<ul class="simple">
+<li><p>BUG: Requests to file-server endpoints’ index page would only be
+rendered if the URL contained a slash at the end. Not having a slash
+suffix would return</p>
+<ol class="arabic simple" start="404">
+<li></li>
+</ol>
+</li>
+</ul>
 </section>
 <section id="id1">
 <h2>1.4.5<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
