@@ -443,6 +443,13 @@ func onNotFound(
 	mockFs types.MockFs,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		endpointConfig, ok := findEndpointConfigByRoute(config.Endpoints, fmt.Sprintf("%s/*", utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")))
+		if ok {
+			newEndpointHandler(state, config.Middlewares, endpointConfig, mockFs, flagDelay, config)(w, r)
+
+			return
+		}
+
 		if corsEnabled {
 			setCorsHeaders(w)
 		}
@@ -787,4 +794,14 @@ func toHttpHeaders(m map[string]string) http.Header {
 	}
 
 	return result
+}
+
+func findEndpointConfigByRoute(endpointConfigs []types.EndpointConfig, route string) (*types.EndpointConfig, bool) {
+	for i := range endpointConfigs {
+		if endpointConfigs[i].Route == route {
+			return &endpointConfigs[i], true
+		}
+	}
+
+	return &types.EndpointConfig{}, false
 }

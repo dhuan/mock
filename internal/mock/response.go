@@ -753,7 +753,7 @@ func fileServerResponse(
 
 	fileRequested, ok := data.endpointParams["*"]
 	if !ok {
-		return &Response{[]byte(""), data.endpointConfigContentType, data.responseStatusCode, data.headers}, data.errorMetadata, errors.New("Failed to capture file name.")
+		fileRequested = ""
 	}
 
 	filePath := fmt.Sprintf("%s/%s", staticFilesPath, fileRequested)

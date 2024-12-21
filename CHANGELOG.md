@@ -7,6 +7,12 @@ ADDED:
 - New commands: `mock get-header`, `mock set-status`, `mock get-payload`
 - Add `--append` to `mock write`.
 
+FIXED:
+
+- BUG: Requests to file-server endpoints' index page would only be rendered if
+  the URL contained a slash at the end. Not having a slash suffix would return
+  404.
+
 ## 1.4.5
 
 ADDED

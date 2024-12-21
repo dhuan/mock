@@ -151,6 +151,7 @@ func Test_E2E_Response_Fileserver_Navigation(t *testing.T) {
 		path          string
 		matchHtmlFile string
 	}{
+		{"public", "data/html_match/fileserver_navigation_index.html"},
 		{"public/", "data/html_match/fileserver_navigation_index.html"},
 		{"public/some_folder", "data/html_match/fileserver_navigation_directory.html"},
 	} {
