@@ -75,8 +75,8 @@ Read further...
 The core functionalities of *mock* are documented each in their
 respective sections. Read further to learn:
 
--  `Creating APIs <apis.html>`__
--  `Test Assertions <test_assertions.html>`__
+-  :ref:`Getting started <getting_started>`
+-  :ref:`Test Assertions <test_assertions>`
 
 License
 -------

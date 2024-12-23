@@ -1,3 +1,5 @@
+.. _test_assertions:
+
 Test Assertions
 ===============
 
