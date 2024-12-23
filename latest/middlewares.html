@@ -315,6 +315,13 @@ configuration files:</p>
 <span class="gi">+  --middleware &quot;sh path/to/another/script.sh&quot;</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the example above, note that the 2nd middleware does not use the
+<code class="docutils literal notranslate"><span class="pre">--route-match</span></code> option, which will result in that middleware being
+executed for all requests. The 1st middleware in the example however uses
+the route matching option.</p>
+</div>
 </section>
 <section id="examples-of-middlewares">
 <h2>Examples of Middlewares<a class="headerlink" href="#examples-of-middlewares" title="Link to this heading">¶</a></h2>
