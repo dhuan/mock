@@ -51,6 +51,13 @@ configuration files:
   +  --route-match 'foo/bar'
   +  --middleware "sh path/to/another/script.sh"
 
+.. note::
+
+   In the example above, note that the 2nd middleware does not use the
+   ``--route-match`` option, which will result in that middleware being
+   executed for all requests. The 1st middleware in the example however uses
+   the route matching option.
+
 Examples of Middlewares
 ~~~~~~~~~~~~~~~~~~~~~~~
 

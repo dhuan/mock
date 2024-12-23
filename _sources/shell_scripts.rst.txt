@@ -18,13 +18,18 @@ Requests.
    }
 
 In the example above, any request to ``POST /foo/bar`` will result in
-*mock* executing the ``my_shell_script.sh``. Scripts can manipulate the HTTP
-Response by writing to a file assigned to the ``MOCK_RESPONSE_BODY`` environment
-variable. Following is a script that defines the HTTP Response as ``Hello world!``:
+*mock* executing the ``my_shell_script.sh``.
+
+Scripts can define the HTTP Response through different methods:
+
+- Write to response files which are referenced in environment variables like ``$MOCK_RESPONSE_BODY``.
+- Use command-line utilities provided by `mock`, such as :ref:`mock write. <shell_utils_write>` and :ref:`mock set-header <shell_utils_set_header>`.
+
+A `hello world` script-based response handler looks like the following:
 
 .. code:: sh
 
-    echo "Hello world!" > $MOCK_RESPONSE_BODY
+    echo "Hello world!" | mock write
 
 To further customize your script handlers, you may also pass parameters,
 just like you can normally pass parameters in a shell command:
@@ -60,7 +65,7 @@ current folder (``ls -la``):
       "endpoints": [
         {
           "route": "foo/bar",
-   +      "response": "exec:ls -la > $MOCK_RESPONSE_BODY"
+   +      "response": "exec:ls -la | mock write"
         }
       ]
     }
@@ -75,7 +80,7 @@ on the home folder:
       "endpoints": [
         {
           "route": "foo/bar",
-   +      "response": "exec:ls ~ | wc -l > $MOCK_RESPONSE_BODY"
+   +      "response": "exec:ls ~ | wc -l | mock write"
         }
       ]
     }
@@ -86,7 +91,7 @@ The same can be accomplished through command-line parameters:
 
     $ mock serve \
    +  --route "foo/bar" \
-   +  --exec 'ls | sort > $MOCK_RESPONSE_BODY'
+   +  --exec 'ls | sort | mock write'
 
 Environment Variables for Request Handlers
 ------------------------------------------
@@ -108,12 +113,17 @@ exists as such: ``user/{user_id}``. We could then retrieve the User ID
 parameter by reading the ``MOCK_ROUTE_PARAM_USER_ID`` environment
 variable.
 
+Alternatively we can retrieve the same route parameter using
+:ref:`get-route-param<shell_utils_get_route_param>`:
+
+.. code:: sh
+
+    $ mock get-route-param user_id
+
 Response Files that can be written to by shell scripts
 ------------------------------------------------------
 
-So far we’ve seen environment variables that provide us with information
-about the Request that’s being currently handled. The following
-environment variables enable you to further define the HTTP Response:
+The following environment variables enable you to manipulate the HTTP Response:
 
 -  **MOCK_RESPONSE_BODY**: A file that can be written to in order to set the
    HTTP Response.
