@@ -357,15 +357,6 @@ func RunTestWithArgs(
 	RunTestBase(t, true, configurationFilePath, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, nil, assertionFunc...)
 }
 
-func RunTest3(
-	t *testing.T,
-	args []string,
-	request *TestRequest,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
-) {
-	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{*request}, map[string]string{}, nil, assertionFunc...)
-}
-
 func RunTest4(
 	t *testing.T,
 	args []string,
@@ -694,8 +685,8 @@ func RemoveUntestableDataFromFileserverHtmlOutput(t *testing.T, response *Respon
 			continue
 		}
 
-		if strings.Index(lines[i], "<!-- TD FILE MODIFIED -->") > -1 ||
-			strings.Index(lines[i], "<!-- TD FILE SIZE -->") > -1 {
+		if strings.Contains(lines[i], "<!-- TD FILE MODIFIED -->") ||
+			strings.Contains(lines[i], "<!-- TD FILE SIZE -->") {
 			result = append(result, "<td>N/A</td>")
 
 			skipNext = true

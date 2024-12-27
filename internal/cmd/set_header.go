@@ -29,7 +29,7 @@ var setHeaderCmd = &cobra.Command{
 					return line, true
 				}
 
-				if strings.ToLower(key) == strings.ToLower(headerKey) {
+				if strings.EqualFold(key, headerKey) {
 					headerExists = true
 
 					return newHeaderLine, true

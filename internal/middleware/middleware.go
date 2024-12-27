@@ -133,16 +133,6 @@ func bytesToInt(data []byte, fallback int) int {
 	return statusCodeParsed
 }
 
-func toHttpHeaders(m map[string]string) http.Header {
-	result := make(http.Header)
-
-	for key := range m {
-		result[key] = []string{m[key]}
-	}
-
-	return result
-}
-
 func GetMiddlewareForRequest(
 	middlewareConfigs []MiddlewareConfig,
 	r *http.Request,

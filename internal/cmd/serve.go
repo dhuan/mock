@@ -465,7 +465,7 @@ func onNotFound(
 			panic(err)
 		}
 
-		response, requestBody, err := sendRequestForBaseApi(baseApi, r2)
+		response, _, err := sendRequestForBaseApi(baseApi, r2)
 		if err != nil {
 			panic(err)
 		}

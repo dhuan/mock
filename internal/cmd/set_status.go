@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,7 +18,7 @@ var setStatusCmd = &cobra.Command{
 
 			_, err := strconv.Atoi(statusCode)
 			if err != nil {
-				exitWithError(fmt.Sprintf("Invalid status code!"))
+				exitWithError("Invalid status code!")
 			}
 
 			err = os.WriteFile(rf.statusCode, []byte(statusCode), 0644)

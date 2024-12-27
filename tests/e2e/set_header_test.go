@@ -42,9 +42,9 @@ func Test_E2E_SetHeader_Overwriting(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				fmt.Sprintf(`{{MOCK_EXECUTABLE}} set-header foo bar`),
-				fmt.Sprintf(`{{MOCK_EXECUTABLE}} set-header hello world`),
-				fmt.Sprintf(`{{MOCK_EXECUTABLE}} set-header foo MODIFIED`),
+				`{{MOCK_EXECUTABLE}} set-header foo bar`,
+				`{{MOCK_EXECUTABLE}} set-header hello world`,
+				`{{MOCK_EXECUTABLE}} set-header foo MODIFIED`,
 			}, ";")),
 		},
 		"GET",

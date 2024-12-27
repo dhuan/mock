@@ -91,7 +91,7 @@ func getPayloadField_UrlEncoded(request *http.Request, payload []byte, fieldName
 		return "", false
 	}
 
-	return fmt.Sprintf("%s", strings.Join(value, ",")), true
+	return strings.Join(value, ","), true
 }
 
 func getPayloadField_Multipart(request *http.Request, payload []byte, fieldName string) (string, bool) {
