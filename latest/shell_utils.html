@@ -429,6 +429,17 @@ supported:</p>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/MIME#form-data">Multipart Form Data payloads</a> (<code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">multipart/form-data</span></code>)</p></li>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Percent-encoding#The_application.2Fx-www-form-urlencoded_type">HTML Form Data</a> (<code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/x-www-form-urlencoded</span></code>)</p></li>
 </ul>
+<p>For JSON payloads, it’s possible to get nested values, with the following
+syntax:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-payload<span class="w"> </span>user.name
+$<span class="w"> </span>mock<span class="w"> </span>get-payload<span class="w"> </span>users<span class="o">[</span><span class="m">0</span><span class="o">]</span>.name
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Retrieving nested values as exemplified above will work only with JSON
+payloads.</p>
+</div>
 <p>About the exit code:</p>
 <ul class="simple">
 <li><p>If no parameters are provided, the exit code will always be <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
