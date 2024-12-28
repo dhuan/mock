@@ -38,6 +38,21 @@ func Test_E2E_GetPayload_GetJsonField_OK(t *testing.T) {
 	)
 }
 
+func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
+	RunTest4(
+		t,
+		[]string{
+			"--route foo/bar",
+			"--method POST",
+			fmt.Sprintf("--exec '%s'", strings.Join([]string{
+				`{{MOCK_EXECUTABLE}} get-payload user.location | {{MOCK_EXECUTABLE}} write`,
+			}, ";")),
+		},
+		Post("foo/bar", JSON_HEADER, []byte(`{"user": {"location": "earth", "age": 20}}`)),
+		StringMatches("earth\n"),
+	)
+}
+
 func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
 	RunTest4(
 		t,

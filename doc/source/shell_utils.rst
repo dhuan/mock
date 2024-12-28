@@ -200,6 +200,19 @@ supported:
 - `Multipart Form Data payloads <https://en.wikipedia.org/wiki/MIME#form-data>`_ (``Content-Type: multipart/form-data``)
 - `HTML Form Data <https://en.wikipedia.org/wiki/Percent-encoding#The_application.2Fx-www-form-urlencoded_type>`_ (``Content-Type: application/x-www-form-urlencoded``)
 
+For JSON payloads, it's possible to get nested values, with the following
+syntax:
+
+.. code:: sh
+
+   $ mock get-payload user.name
+   $ mock get-payload users[0].name
+
+.. important::
+
+   Retrieving nested values as exemplified above will work only with JSON
+   payloads.
+
 About the exit code:
 
 - If no parameters are provided, the exit code will always be ``0``.

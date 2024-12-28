@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 	"strings"
 
+	"github.com/dhuan/mock/internal/map_extract"
 	"github.com/dhuan/mock/internal/utils"
 
 	"github.com/spf13/cobra"
@@ -66,18 +68,33 @@ func getHeader(request *http.Request, key string) (string, bool) {
 }
 
 func getPayloadField_Json(request *http.Request, payload []byte, fieldName string) (string, bool) {
-	var data map[string]interface{}
+	var data interface{}
 	err := json.Unmarshal(payload, &data)
 	if err != nil {
 		return "", false
 	}
 
-	value, ok := data[fieldName]
-	if !ok {
-		return "", false
+	nestedQuery := strings.Contains(fieldName, ".") || strings.Contains(fieldName, "[")
+
+	payloadIsObject := reflect.TypeOf(data).Kind() == reflect.Map
+
+	if !nestedQuery && payloadIsObject {
+		dataParsed, ok := data.(map[string]interface{})
+		if !ok {
+			return "", false
+		}
+
+		value, ok := dataParsed[fieldName]
+		if !ok {
+			return "", false
+		}
+
+		return fmt.Sprintf("%+v", value), true
 	}
 
-	return fmt.Sprintf("%+v", value), true
+	value, ok := map_extract.Extract(data, fieldName)
+
+	return fmt.Sprintf("%+v", value), ok
 }
 
 func getPayloadField_UrlEncoded(request *http.Request, payload []byte, fieldName string) (string, bool) {

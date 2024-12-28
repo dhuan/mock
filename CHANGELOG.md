@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED:
+
+- Add support for retrieving nested values from JSON payloads with `mock
+  get-payload`. For example `mock get-payload users[0].name`.
+
 ## 1.4.6
 
 ADDED:
