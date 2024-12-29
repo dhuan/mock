@@ -38,6 +38,34 @@ func Test_E2E_GetPayload_GetJsonField_OK(t *testing.T) {
 	)
 }
 
+func Test_E2E_GetPayload_GetJsonField_ArrayRoot(t *testing.T) {
+	for _, tc := range []struct {
+		path             string
+		expect           interface{}
+		expectStatusCode int
+	}{
+		{"[0].location", "earth", 0},
+		{"[1].location", "mars", 0},
+		{"[1]", `{"location":"mars"}`, 0},
+		{"[2]", ``, 1},
+	} {
+		RunTest4(
+			t,
+			[]string{
+				"--route foo/bar",
+				"--method POST",
+				fmt.Sprintf("--exec '%s'", strings.Join([]string{
+					fmt.Sprintf(`({{MOCK_EXECUTABLE}} get-payload %s || echo "") | {{MOCK_EXECUTABLE}} write`, tc.path),
+					fmt.Sprintf(`{{MOCK_EXECUTABLE}} get-payload %s`, tc.path),
+					`echo $? | {{MOCK_EXECUTABLE}} write -a`,
+				}, ";")),
+			},
+			Post("foo/bar", JSON_HEADER, []byte(`[{"location":"earth"},{"location":"mars"}]`)),
+			StringMatches(fmt.Sprintf("%+v\n%d\n", tc.expect, tc.expectStatusCode)),
+		)
+	}
+}
+
 func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
 	for _, tc := range []struct {
 		path   string
