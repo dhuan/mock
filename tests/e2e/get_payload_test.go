@@ -39,18 +39,46 @@ func Test_E2E_GetPayload_GetJsonField_OK(t *testing.T) {
 }
 
 func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
-	RunTest4(
-		t,
-		[]string{
-			"--route foo/bar",
-			"--method POST",
-			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-payload user.location | {{MOCK_EXECUTABLE}} write`,
-			}, ";")),
-		},
-		Post("foo/bar", JSON_HEADER, []byte(`{"user": {"location": "earth", "age": 20}}`)),
-		StringMatches("earth\n"),
-	)
+	for _, tc := range []struct {
+		path   string
+		expect interface{}
+	}{
+		{"users[0].location", "earth"},
+		{"users[1].location", "mars"},
+		{"users[1].age", 30},
+		{"users[0]", `{"age":20,"likes":[],"location":"earth"}`},
+		{"users[1].likes", `["food","music"]`},
+		{"users[1].likes[1]", `music`},
+	} {
+		RunTest4(
+			t,
+			[]string{
+				"--route foo/bar",
+				"--method POST",
+				fmt.Sprintf("--exec '%s'", strings.Join([]string{
+					fmt.Sprintf(`{{MOCK_EXECUTABLE}} get-payload %s | {{MOCK_EXECUTABLE}} write`, tc.path),
+				}, ";")),
+			},
+			Post("foo/bar", JSON_HEADER, []byte(`{
+  "users": [
+    {
+      "location": "earth",
+      "age": 20,
+      "likes": []
+    },
+    {
+      "location": "mars",
+      "age": 30,
+      "likes": [
+        "food",
+        "music"
+      ]
+    }
+  ]
+}`)),
+			StringMatches(fmt.Sprintf("%+v\n", tc.expect)),
+		)
+	}
 }
 
 func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
