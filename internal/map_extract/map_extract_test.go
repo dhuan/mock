@@ -68,6 +68,31 @@ func Test_Extract_ArrayRoot(t *testing.T) {
 	}
 }
 
+func Test_Extract_Failure(t *testing.T) {
+	for _, tc := range []struct {
+		path string
+	}{
+		{"users[3].location"},
+		{"users[1].foo"},
+		{"foo"},
+		{"users.foo.bar"},
+		{"[10]"},
+		{"[10].foo"},
+	} {
+		testExtract(t, `{
+			"users": [{
+				"location": "earth",
+				"age": 20,
+				"likes": ["food", "movies"]
+			}, {
+				"location": "mars",
+				"age": 30,
+				"likes": ["music"]
+			}]
+		}`, tc.path, nil, false)
+	}
+}
+
 func testExtract(t *testing.T, jsonData string, fieldName string, expectedValue interface{}, expectedOk bool) {
 	result, ok := map_extract.Extract(parse(jsonData), fieldName)
 

@@ -72,6 +72,10 @@ func Extract(data interface{}, path string) (interface{}, bool) {
 				return nil, false
 			}
 
+			if index > (len(array) - 1) {
+				return nil, false
+			}
+
 			newValue := array[index]
 			if newValue == nil {
 				return nil, false

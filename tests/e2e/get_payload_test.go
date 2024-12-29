@@ -81,6 +81,41 @@ func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
 	}
 }
 
+func Test_E2E_GetPayload_GetJsonField_Nested_InvalidFields(t *testing.T) {
+	for _, tc := range []struct {
+		path string
+	}{
+		{"users[1].location"},
+		{"users[0].foo"},
+		{"users[0].likes[20]"},
+		{"foo"},
+		{"[0]"},
+	} {
+		RunTest4(
+			t,
+			[]string{
+				"--route foo/bar",
+				"--method POST",
+				fmt.Sprintf("--exec '%s'", strings.Join([]string{
+					fmt.Sprintf(`{{MOCK_EXECUTABLE}} get-payload %s | {{MOCK_EXECUTABLE}} write`, tc.path),
+					fmt.Sprintf(`{{MOCK_EXECUTABLE}} get-payload %s`, tc.path),
+					`echo $? | {{MOCK_EXECUTABLE}} write`,
+				}, ";")),
+			},
+			Post("foo/bar", JSON_HEADER, []byte(`{
+  "users": [
+    {
+      "location": "earth",
+      "age": 20,
+      "likes": ["movies"]
+    }
+  ]
+}`)),
+			StringMatches("1\n"),
+		)
+	}
+}
+
 func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
 	RunTest4(
 		t,
