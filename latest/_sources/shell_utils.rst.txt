@@ -52,6 +52,7 @@ write
 .. code:: sh
 
    $ printf "Hello world!" | mock write
+   $ printf '{"foo":"bar"}' | mock write --json
 
 Writes data to the HTTP Response. Unless ``--append`` is used, ``write`` will
 overwrite any response body previously defined.
@@ -60,6 +61,17 @@ Options:
 
 - ``-a, --append``: Appends data to the response body instead of overwriting
   it.
+- ``--json``: Writes data and also adds JSON Header (``Content-Type:
+  application/json``) into the response, so you don't have to do it manually
+  with :ref:`set-header <shell_utils_set_header>`. The piped data is expected
+  to be correctly formatted JSON. This option cannot be used together with
+  ``--append``.
+
+  - If the JSON data is incorrect, exit status code `1` will be returned and
+    no data will be sent, therefore make sure that your JSON data is
+    correctly formatted when using this option.
+  - Additionally, ``--json`` formats your JSON data, removing line-breaks and
+    unnecessary spaces.
 
 replace
 -------

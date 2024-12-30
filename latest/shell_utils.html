@@ -308,6 +308,7 @@ response body, but this time with <a class="reference internal" href="middleware
 <section id="write">
 <span id="shell-utils-write"></span><h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
+$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;{&quot;foo&quot;:&quot;bar&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write<span class="w"> </span>--json
 </pre></div>
 </div>
 <p>Writes data to the HTTP Response. Unless <code class="docutils literal notranslate"><span class="pre">--append</span></code> is used, <code class="docutils literal notranslate"><span class="pre">write</span></code> will
@@ -316,6 +317,19 @@ overwrite any response body previously defined.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">-a,</span> <span class="pre">--append</span></code>: Appends data to the response body instead of overwriting
 it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--json</span></code>: Writes data and also adds JSON Header (<code class="docutils literal notranslate"><span class="pre">Content-Type:</span>
+<span class="pre">application/json</span></code>) into the response, so you don’t have to do it manually
+with <a class="reference internal" href="#shell-utils-set-header"><span class="std std-ref">set-header</span></a>. The piped data is expected
+to be correctly formatted JSON. This option cannot be used together with
+<code class="docutils literal notranslate"><span class="pre">--append</span></code>.</p>
+<ul>
+<li><p>If the JSON data is incorrect, exit status code <cite>1</cite> will be returned and
+no data will be sent, therefore make sure that your JSON data is
+correctly formatted when using this option.</p></li>
+<li><p>Additionally, <code class="docutils literal notranslate"><span class="pre">--json</span></code> formats your JSON data, removing line-breaks and
+unnecessary spaces.</p></li>
+</ul>
+</li>
 </ul>
 </section>
 <section id="replace">
