@@ -25,6 +25,7 @@ var (
 	flagCors      bool
 	flagRegex     bool
 	flagAppend    bool
+	flagJson      bool
 	flagValueOnly bool
 	flagDelay     int64
 	flagBaseApi   string
@@ -68,6 +69,7 @@ func Execute() {
 	serveCmd.PersistentFlags().StringVarP(&flagBaseApi, "base", "b", "", "base API")
 
 	writeCmd.PersistentFlags().BoolVarP(&flagAppend, "append", "a", false, "append instead of overwriting")
+	writeCmd.PersistentFlags().BoolVar(&flagJson, "json", false, "treats received data as JSON and adds necessary JSON header.")
 	wipeHeadersCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
 	replaceCmd.PersistentFlags().BoolVar(&flagRegex, "regex", false, "enable regular expression for seaching")
 	getHeaderCmd.PersistentFlags().BoolVarP(&flagValueOnly, "value", "v", false, "get value only")

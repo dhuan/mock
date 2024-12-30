@@ -6,6 +6,7 @@ ADDED:
 
 - Add support for retrieving nested values from JSON payloads with `mock
   get-payload`. For example `mock get-payload users[0].name`.
+- New ``--json`` option for ``mock write``.
 
 ## 1.4.6
 
