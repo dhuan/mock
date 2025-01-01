@@ -1136,3 +1136,9 @@ func Headers(headerData ...string) http.Header {
 
 	return headers
 }
+
+func CmdExec(commands ...string) string {
+	commandSetExitCodeHeader := `{{MOCK_EXECUTABLE}} set-header Exit-Status-Code "${?}"`
+
+	return fmt.Sprintf("--exec '%s; %s'", strings.Join(commands, ";"), commandSetExitCodeHeader)
+}
