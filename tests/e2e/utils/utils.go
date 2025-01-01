@@ -847,6 +847,14 @@ func HeadersMatch(expectedHeaders http.Header) TestFunc {
 	}
 }
 
+func ExitCodeHeaderMatches(expectedExitCode string) TestFunc {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		HeadersMatch(map[string][]string{
+			"Exit-Status-Code": {expectedExitCode},
+		})(t, response, serverOutput, state)
+	}
+}
+
 func HeaderKeysNotIncluded(headerKeys []string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		for _, headerKey := range headerKeys {

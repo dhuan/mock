@@ -58,9 +58,7 @@ func Test_E2E_GetPayload_GetJsonField_ArrayRoot(t *testing.T) {
 			},
 			Post("foo/bar", JSON_HEADER, []byte(`[{"location":"earth"},{"location":"mars"}]`)),
 			StringMatches(fmt.Sprintf("%+v", tc.expect)),
-			HeadersMatch(map[string][]string{
-				"Exit-Status-Code": {fmt.Sprintf("%d", tc.expectStatusCode)},
-			}),
+			ExitCodeHeaderMatches(fmt.Sprintf("%d", tc.expectStatusCode)),
 		)
 	}
 }
@@ -75,9 +73,7 @@ func Test_E2E_GetPayload_GetJsonField_InvalidJson(t *testing.T) {
 		},
 		Post("foo/bar", JSON_HEADER, []byte(`{This is invalid JSON}`)),
 		StringMatches(""),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"1"},
-		}),
+		ExitCodeHeaderMatches("1"),
 	)
 }
 
@@ -149,9 +145,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_InvalidFields(t *testing.T) {
   ]
 }`)),
 			StringMatches(""),
-			HeadersMatch(map[string][]string{
-				"Exit-Status-Code": {"1"},
-			}),
+			ExitCodeHeaderMatches("1"),
 		)
 	}
 }
@@ -166,9 +160,7 @@ func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
 		},
 		Post("foo/bar", JSON_HEADER, []byte(`{"hello": "world"}`)),
 		StringMatches(""),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"1"},
-		}),
+		ExitCodeHeaderMatches("1"),
 	)
 }
 
@@ -182,9 +174,7 @@ func Test_E2E_GetPayload_GetJsonField_WithEmptyPayload_Exit1(t *testing.T) {
 		},
 		Post("foo/bar", JSON_HEADER, nil),
 		StringMatches(""),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"1"},
-		}),
+		ExitCodeHeaderMatches("1"),
 	)
 }
 
@@ -200,9 +190,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
 			"foo": "bar",
 		}),
 		StringMatches("bar\n"),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"0"},
-		}),
+		ExitCodeHeaderMatches("0"),
 	)
 }
 
@@ -218,9 +206,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_FieldDoesNotExist(t *testing
 			"foo": "bar",
 		}),
 		StringMatches(""),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"1"},
-		}),
+		ExitCodeHeaderMatches("1"),
 	)
 }
 
@@ -236,9 +222,7 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok(t *testing.T) {
 			"foo": "bar",
 		}),
 		StringMatches("bar\n"),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"0"},
-		}),
+		ExitCodeHeaderMatches("0"),
 	)
 }
 
@@ -254,8 +238,6 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_FieldDoesNotExist(t *testing.
 			"foo": "bar",
 		}),
 		StringMatches(""),
-		HeadersMatch(map[string][]string{
-			"Exit-Status-Code": {"1"},
-		}),
+		ExitCodeHeaderMatches("1"),
 	)
 }
