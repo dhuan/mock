@@ -296,7 +296,7 @@ func RunTest(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -312,7 +312,7 @@ func RunTestWithMultipleRequests(
 	t *testing.T,
 	configurationFilePath string,
 	requests []TestRequest,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	RunTestBase(t, true, configurationFilePath, "", requests, nil, nil, assertionFunc...)
 }
@@ -325,7 +325,7 @@ func RunTestWithEnv(
 	headers map[string]string,
 	body io.Reader,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -345,7 +345,7 @@ func RunTestWithArgs(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -357,10 +357,12 @@ func RunTestWithArgs(
 	RunTestBase(t, true, configurationFilePath, strings.Join(args, " "), []TestRequest{request}, map[string]string{}, nil, assertionFunc...)
 }
 
+type TestFunc = func(t *testing.T, response *Response, serverOutput []byte, state *E2eState)
+
 func RunTest4(
 	t *testing.T,
 	args []string,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{}, map[string]string{}, nil, assertionFunc...)
 }
@@ -372,7 +374,7 @@ func RunTestWithNoConfigAndWithArgs(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -403,7 +405,7 @@ func requestBase(state *E2eState, method, route string, headers http.Header, pay
 	return request
 }
 
-func Post(route string, headers http.Header, payload []byte) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func Post(route string, headers http.Header, payload []byte) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		request := requestBase(state, "POST", route, headers, bytes.NewReader(payload))
 
@@ -428,7 +430,7 @@ func Post(route string, headers http.Header, payload []byte) func(t *testing.T, 
 	}
 }
 
-func PostUrlEncodedForm(route string, data map[string]string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func PostUrlEncodedForm(route string, data map[string]string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		values := url.Values{}
 		for key := range data {
@@ -466,7 +468,7 @@ func PostUrlEncodedForm(route string, data map[string]string) func(t *testing.T,
 	}
 }
 
-func PostMultipart(route string, data map[string]string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func PostMultipart(route string, data map[string]string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		var b bytes.Buffer
 		w := multipart.NewWriter(&b)
@@ -525,7 +527,7 @@ func RunTest2(
 	headers map[string]string,
 	body io.Reader,
 	runMockOptions *RunMockOptions,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -544,7 +546,7 @@ func RunTestWithNoConfigAndWithArgsFailing(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -564,7 +566,7 @@ func RunTestWithJsonConfig(
 	route string,
 	headers map[string]string,
 	body io.Reader,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -586,7 +588,7 @@ func RunTestWithArgsAndEnv(
 	headers map[string]string,
 	body io.Reader,
 	env map[string]string,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	request := TestRequest{
 		Method:  method,
@@ -629,7 +631,7 @@ func RunTestBase(
 	requests []TestRequest,
 	env map[string]string,
 	runMockOptions *RunMockOptions,
-	assertionFunc ...func(t *testing.T, response *Response, serverOutput []byte, state *E2eState),
+	assertionFunc ...TestFunc,
 ) {
 	command := resolveCommand(configurationFilePath)
 	if extraArgs != "" {
@@ -654,7 +656,7 @@ func RunTestBase(
 	}
 }
 
-func StringMatches(expected string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func StringMatches(expected string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		replaceVars(&expected, state)
 
@@ -662,7 +664,7 @@ func StringMatches(expected string) func(t *testing.T, response *Response, serve
 	}
 }
 
-func MatchesFile(filePath string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func MatchesFile(filePath string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		data, err := os.ReadFile(filePath)
 		if err != nil {
@@ -733,7 +735,7 @@ func pipeTo(data []byte, options *pipeToOptions, commandName string, commandArgs
 	return output
 }
 
-func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func LineEquals(lineNumber int, expectedLine string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		replaceVars(&expectedLine, state)
 
@@ -741,7 +743,7 @@ func LineEquals(lineNumber int, expectedLine string) func(t *testing.T, response
 	}
 }
 
-func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func ApplicationOutputHasLines(expectedLines []string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		if len(expectedLines) == 0 {
 			return
@@ -785,7 +787,7 @@ func ApplicationOutputHasLines(expectedLines []string) func(t *testing.T, respon
 	}
 }
 
-func ApplicationOutputMatches(expectedLines []string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func ApplicationOutputMatches(expectedLines []string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		if len(expectedLines) == 0 {
 			return
@@ -812,7 +814,7 @@ func ApplicationOutputMatches(expectedLines []string) func(t *testing.T, respons
 	}
 }
 
-func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func LineRegexMatches(lineNumber int, regex string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		assert.Regexp(
 			t,
@@ -822,13 +824,13 @@ func LineRegexMatches(lineNumber int, regex string) func(t *testing.T, response 
 	}
 }
 
-func StatusCodeMatches(expectedStatusCode int) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func StatusCodeMatches(expectedStatusCode int) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		assert.Equal(t, expectedStatusCode, response.StatusCode)
 	}
 }
 
-func HeadersMatch(expectedHeaders http.Header) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func HeadersMatch(expectedHeaders http.Header) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		expectedHeadersKeys := getSortedKeys(expectedHeaders)
 
@@ -845,7 +847,7 @@ func HeadersMatch(expectedHeaders http.Header) func(t *testing.T, response *Resp
 	}
 }
 
-func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func HeaderKeysNotIncluded(headerKeys []string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		for _, headerKey := range headerKeys {
 			_, exists := response.Headers[headerKey]
@@ -859,7 +861,7 @@ func HeaderKeysNotIncluded(headerKeys []string) func(t *testing.T, response *Res
 	}
 }
 
-func JsonMatches(expectedJson map[string]interface{}) func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+func JsonMatches(expectedJson map[string]interface{}) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		jsonEncodedA, err := json.Marshal(expectedJson)
 		if err != nil {
