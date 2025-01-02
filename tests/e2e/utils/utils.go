@@ -361,10 +361,11 @@ type TestFunc = func(t *testing.T, response *Response, serverOutput []byte, stat
 
 func RunTest4(
 	t *testing.T,
+	runMockOptions *RunMockOptions,
 	args []string,
 	assertionFunc ...TestFunc,
 ) {
-	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{}, map[string]string{}, nil, assertionFunc...)
+	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{}, map[string]string{}, runMockOptions, assertionFunc...)
 }
 
 func RunTestWithNoConfigAndWithArgs(
@@ -403,6 +404,31 @@ func requestBase(state *E2eState, method, route string, headers http.Header, pay
 	}
 
 	return request
+}
+
+func Get(route string, headers http.Header) TestFunc {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		request := requestBase(state, "GET", route, headers, nil)
+
+		request.Header = headers
+
+		client := &http.Client{}
+		newResponse, err := client.Do(request)
+		if err != nil {
+			panic(err)
+		}
+
+		responseBody, err := io.ReadAll(newResponse.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		*response = Response{
+			Body:       responseBody,
+			Headers:    newResponse.Header,
+			StatusCode: newResponse.StatusCode,
+		}
+	}
 }
 
 func Post(route string, headers http.Header, payload []byte) TestFunc {
@@ -517,26 +543,6 @@ func PostMultipart(route string, data map[string]string) TestFunc {
 			StatusCode: newResponse.StatusCode,
 		}
 	}
-}
-
-func RunTest2(
-	t *testing.T,
-	args []string,
-	method,
-	route string,
-	headers map[string]string,
-	body io.Reader,
-	runMockOptions *RunMockOptions,
-	assertionFunc ...TestFunc,
-) {
-	request := TestRequest{
-		Method:  method,
-		Route:   route,
-		Headers: headers,
-		Body:    body,
-	}
-
-	RunTestBase(t, true, "", strings.Join(args, " "), []TestRequest{request}, map[string]string{}, runMockOptions, assertionFunc...)
 }
 
 func RunTestWithNoConfigAndWithArgsFailing(

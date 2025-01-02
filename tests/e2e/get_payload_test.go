@@ -10,7 +10,7 @@ import (
 
 func Test_E2E_GetPayload_AllPayload(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -25,7 +25,7 @@ func Test_E2E_GetPayload_AllPayload(t *testing.T) {
 
 func Test_E2E_GetPayload_GetJsonField_OK(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -50,7 +50,7 @@ func Test_E2E_GetPayload_GetJsonField_ArrayRoot(t *testing.T) {
 		{"[2]", "", 1},
 	} {
 		RunTest4(
-			t,
+			t, nil,
 			[]string{
 				"--route foo/bar",
 				"--method POST",
@@ -65,7 +65,7 @@ func Test_E2E_GetPayload_GetJsonField_ArrayRoot(t *testing.T) {
 
 func Test_E2E_GetPayload_GetJsonField_InvalidJson(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -90,7 +90,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
 		{"users[1].likes[1]", `music`},
 	} {
 		RunTest4(
-			t,
+			t, nil,
 			[]string{
 				"--route foo/bar",
 				"--method POST",
@@ -129,7 +129,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_InvalidFields(t *testing.T) {
 		{"[0]"},
 	} {
 		RunTest4(
-			t,
+			t, nil,
 			[]string{
 				"--route foo/bar",
 				"--method POST",
@@ -152,7 +152,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_InvalidFields(t *testing.T) {
 
 func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -166,7 +166,7 @@ func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
 
 func Test_E2E_GetPayload_GetJsonField_WithEmptyPayload_Exit1(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -180,7 +180,7 @@ func Test_E2E_GetPayload_GetJsonField_WithEmptyPayload_Exit1(t *testing.T) {
 
 func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -196,7 +196,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
 
 func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_FieldDoesNotExist(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -212,7 +212,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_FieldDoesNotExist(t *testing
 
 func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",
@@ -228,7 +228,7 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok(t *testing.T) {
 
 func Test_E2E_GetPayload_GetFieldFromMultipartForm_FieldDoesNotExist(t *testing.T) {
 	RunTest4(
-		t,
+		t, nil,
 		[]string{
 			"--route foo/bar",
 			"--method POST",

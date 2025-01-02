@@ -111,19 +111,14 @@ func Test_E2E_Response_Fileserver_AutomaticHeaders(t *testing.T) {
 		{"data.json", []byte(json_data), "application/json"},
 		{"image.jpg", []byte(dummy_data), "image/jpeg"},
 	} {
-		RunTest2(
+		RunTest4(
 			t,
+			&RunMockOptions{Wd: path},
 			[]string{
 				"--route public/*",
 				"--file-server .",
 			},
-			"GET",
-			fmt.Sprintf("public/%s", tc.fileToRequest),
-			nil,
-			strings.NewReader(""),
-			&RunMockOptions{
-				Wd: path,
-			},
+			Get(fmt.Sprintf("public/%s", tc.fileToRequest), nil),
 			StatusCodeMatches(200),
 			StringMatches(string(tc.expectedData)),
 			HeadersMatch(http.Header{
@@ -155,19 +150,14 @@ func Test_E2E_Response_Fileserver_Navigation(t *testing.T) {
 		{"public/", "data/html_match/fileserver_navigation_index.html"},
 		{"public/some_folder", "data/html_match/fileserver_navigation_directory.html"},
 	} {
-		RunTest2(
+		RunTest4(
 			t,
+			&RunMockOptions{Wd: path},
 			[]string{
 				"--route public/*",
 				"--file-server .",
 			},
-			"GET",
-			tc.path,
-			nil,
-			strings.NewReader(""),
-			&RunMockOptions{
-				Wd: path,
-			},
+			Get(tc.path, nil),
 			StatusCodeMatches(200),
 			RemoveUntestableDataFromFileserverHtmlOutput,
 			TidyUpHtmlResponse,
