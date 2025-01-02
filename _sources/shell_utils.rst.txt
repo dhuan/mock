@@ -3,39 +3,29 @@
 Shell Utilities
 ===============
 
-`mock` provides a set of "utilities" for manipulating response data easily.
-Read further to learn about them.
+`mock` provides a set of "utilities" for manipulating request and response data
+easily.
 
-`In the previous section <shell_scripts.html>`__ we've seen that we can easily
-create shell scripts that act as response handlers for API endpoints. Defining
-the response data is done through writing to certain files such as
-``$MOCK_RESPONSE_BODY``. Although writing to these files is easy enough, for
-more complex requirements we need to write complex shell commands to accomplish
-things - for example replacing strings can be achieved using `sed`:
+For a simple example, suppose you wanted to make a simple "search and replace"
+operation before allowing the HTTP Response to be delivered to the requesting
+client. We could just use `sed`:
 
 .. code:: sh
 
-   $ sed 's/foo/bar/g' $MOCK_RESPONSE_BODY | sponge $MOCK_RESPONSE_BODY
+    $ sed -i 's/foo/bar/g' $MOCK_RESPONSE_BODY
 
-Although the above is simple enough, you may not be knowledgeable about all
-shell tricks, not to mention that different UNIX environments may have
-inconsistent or incompatible tools (GNU sed is not exactly totally compatible
-with BSD sed etc).
-
-Using `mock`'s shell utilities can save you of that burden. Let's accomplish
-the same http response modification using just `mock` instead of `sed`:
+Or you could just use `mock`'s ``replace`` utility:
 
 .. code:: sh
 
    $ mock replace foo bar
 
-Note how we didn't need to bother typing the file path as before.
-
-In the following sections we'll look at each such utility.
+This documentation is a reference to all available such utilities for
+manipulating requests and responses.
 
 .. note::
 
-    You can also use all these utilities in :ref:`Middlewares <middlewares>`.
+    Shell utilities are also usable in :ref:`Middlewares <middlewares>`.
     Let's accomplish something similar as above, replacing text within the
     response body, but this time with :ref:`middlewares <middlewares>` instead:
 
@@ -62,6 +52,7 @@ write
 .. code:: sh
 
    $ printf "Hello world!" | mock write
+   $ printf '{"foo":"bar"}' | mock write --json
 
 Writes data to the HTTP Response. Unless ``--append`` is used, ``write`` will
 overwrite any response body previously defined.
@@ -70,6 +61,17 @@ Options:
 
 - ``-a, --append``: Appends data to the response body instead of overwriting
   it.
+- ``--json``: Writes data and also adds JSON Header (``Content-Type:
+  application/json``) into the response, so you don't have to do it manually
+  with :ref:`set-header <shell_utils_set_header>`. The piped data is expected
+  to be correctly formatted JSON. This option cannot be used together with
+  ``--append``.
+
+  - If the JSON data is incorrect, exit status code `1` will be returned and
+    no data will be sent, therefore make sure that your JSON data is
+    correctly formatted when using this option.
+  - Additionally, ``--json`` formats your JSON data, removing line-breaks and
+    unnecessary spaces.
 
 replace
 -------
@@ -209,6 +211,19 @@ supported:
 - JSON payloads (``Content-Type: application/json``)
 - `Multipart Form Data payloads <https://en.wikipedia.org/wiki/MIME#form-data>`_ (``Content-Type: multipart/form-data``)
 - `HTML Form Data <https://en.wikipedia.org/wiki/Percent-encoding#The_application.2Fx-www-form-urlencoded_type>`_ (``Content-Type: application/x-www-form-urlencoded``)
+
+For JSON payloads, it's possible to get nested values, with the following
+syntax:
+
+.. code:: sh
+
+   $ mock get-payload user.name
+   $ mock get-payload users[0].name
+
+.. important::
+
+   Retrieving nested values as exemplified above will work only with JSON
+   payloads.
 
 About the exit code:
 

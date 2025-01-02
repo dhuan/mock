@@ -273,31 +273,23 @@
         <article role="main" id="furo-main-content">
           <section id="shell-utilities">
 <span id="shell-utils"></span><h1>Shell Utilities<a class="headerlink" href="#shell-utilities" title="Link to this heading">¶</a></h1>
-<p><cite>mock</cite> provides a set of “utilities” for manipulating response data easily.
-Read further to learn about them.</p>
-<p><a class="reference external" href="shell_scripts.html">In the previous section</a> we’ve seen that we can easily
-create shell scripts that act as response handlers for API endpoints. Defining
-the response data is done through writing to certain files such as
-<code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code>. Although writing to these files is easy enough, for
-more complex requirements we need to write complex shell commands to accomplish
-things - for example replacing strings can be achieved using <cite>sed</cite>:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/foo/bar/g&#39;</span><span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sponge<span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
+<p><cite>mock</cite> provides a set of “utilities” for manipulating request and response data
+easily.</p>
+<p>For a simple example, suppose you wanted to make a simple “search and replace”
+operation before allowing the HTTP Response to be delivered to the requesting
+client. We could just use <cite>sed</cite>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/foo/bar/g&#39;</span><span class="w"> </span><span class="nv">$MOCK_RESPONSE_BODY</span>
 </pre></div>
 </div>
-<p>Although the above is simple enough, you may not be knowledgeable about all
-shell tricks, not to mention that different UNIX environments may have
-inconsistent or incompatible tools (GNU sed is not exactly totally compatible
-with BSD sed etc).</p>
-<p>Using <cite>mock</cite>’s shell utilities can save you of that burden. Let’s accomplish
-the same http response modification using just <cite>mock</cite> instead of <cite>sed</cite>:</p>
+<p>Or you could just use <cite>mock</cite>’s <code class="docutils literal notranslate"><span class="pre">replace</span></code> utility:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>replace<span class="w"> </span>foo<span class="w"> </span>bar
 </pre></div>
 </div>
-<p>Note how we didn’t need to bother typing the file path as before.</p>
-<p>In the following sections we’ll look at each such utility.</p>
+<p>This documentation is a reference to all available such utilities for
+manipulating requests and responses.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can also use all these utilities in <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">Middlewares</span></a>.
+<p>Shell utilities are also usable in <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">Middlewares</span></a>.
 Let’s accomplish something similar as above, replacing text within the
 response body, but this time with <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a> instead:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
@@ -316,6 +308,7 @@ response body, but this time with <a class="reference internal" href="middleware
 <section id="write">
 <span id="shell-utils-write"></span><h2>write<a class="headerlink" href="#write" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
+$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;{&quot;foo&quot;:&quot;bar&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write<span class="w"> </span>--json
 </pre></div>
 </div>
 <p>Writes data to the HTTP Response. Unless <code class="docutils literal notranslate"><span class="pre">--append</span></code> is used, <code class="docutils literal notranslate"><span class="pre">write</span></code> will
@@ -324,6 +317,19 @@ overwrite any response body previously defined.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">-a,</span> <span class="pre">--append</span></code>: Appends data to the response body instead of overwriting
 it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--json</span></code>: Writes data and also adds JSON Header (<code class="docutils literal notranslate"><span class="pre">Content-Type:</span>
+<span class="pre">application/json</span></code>) into the response, so you don’t have to do it manually
+with <a class="reference internal" href="#shell-utils-set-header"><span class="std std-ref">set-header</span></a>. The piped data is expected
+to be correctly formatted JSON. This option cannot be used together with
+<code class="docutils literal notranslate"><span class="pre">--append</span></code>.</p>
+<ul>
+<li><p>If the JSON data is incorrect, exit status code <cite>1</cite> will be returned and
+no data will be sent, therefore make sure that your JSON data is
+correctly formatted when using this option.</p></li>
+<li><p>Additionally, <code class="docutils literal notranslate"><span class="pre">--json</span></code> formats your JSON data, removing line-breaks and
+unnecessary spaces.</p></li>
+</ul>
+</li>
 </ul>
 </section>
 <section id="replace">
@@ -437,6 +443,17 @@ supported:</p>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/MIME#form-data">Multipart Form Data payloads</a> (<code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">multipart/form-data</span></code>)</p></li>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Percent-encoding#The_application.2Fx-www-form-urlencoded_type">HTML Form Data</a> (<code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">application/x-www-form-urlencoded</span></code>)</p></li>
 </ul>
+<p>For JSON payloads, it’s possible to get nested values, with the following
+syntax:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>get-payload<span class="w"> </span>user.name
+$<span class="w"> </span>mock<span class="w"> </span>get-payload<span class="w"> </span>users<span class="o">[</span><span class="m">0</span><span class="o">]</span>.name
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Retrieving nested values as exemplified above will work only with JSON
+payloads.</p>
+</div>
 <p>About the exit code:</p>
 <ul class="simple">
 <li><p>If no parameters are provided, the exit code will always be <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
