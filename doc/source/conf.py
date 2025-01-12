@@ -29,3 +29,17 @@ html_static_path = ['_static']
 html_css_files = [
   'css/custom.css',
 ]
+
+html_sidebars = {
+   '**': [
+      'sidebar/brand.html',
+      'sidebar/search.html',
+      'sidebar/scroll-start.html',
+      'sidebar/navigation.html',
+      'sidebar/ethical-ads.html',
+      'sidebar/scroll-end.html',
+      'sidebar/variant-selector.html',
+      'ga.html',
+   ],
+}
+
