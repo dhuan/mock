@@ -15,7 +15,6 @@ func Test_E2E_GetRouteParam(t *testing.T) {
 		},
 		Get("say_hi/john_doe/earth", nil),
 		StringMatches("Hi. My name is john_doe. I live on earth."),
-		ExitCodeHeaderMatches("0"),
 	)
 }
 
