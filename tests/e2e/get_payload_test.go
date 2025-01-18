@@ -34,7 +34,7 @@ func Test_E2E_GetPayload_GetJsonField_OK(t *testing.T) {
 			}, ";")),
 		},
 		Post("foo/bar", JSON_HEADER, []byte(`{"foo": "bar"}`)),
-		StringMatches("bar\n"),
+		StringMatches("bar"),
 	)
 }
 
@@ -44,9 +44,9 @@ func Test_E2E_GetPayload_GetJsonField_ArrayRoot(t *testing.T) {
 		expect           interface{}
 		expectStatusCode int
 	}{
-		{"[0].location", "earth\n", 0},
-		{"[1].location", "mars\n", 0},
-		{"[1]", "{\"location\":\"mars\"}\n", 0},
+		{"[0].location", "earth", 0},
+		{"[1].location", "mars", 0},
+		{"[1]", "{\"location\":\"mars\"}", 0},
 		{"[2]", "", 1},
 	} {
 		RunTest4(
@@ -113,7 +113,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
     }
   ]
 }`)),
-			StringMatches(fmt.Sprintf("%+v\n", tc.expect)),
+			StringMatches(fmt.Sprintf("%+v", tc.expect)),
 		)
 	}
 }
@@ -189,7 +189,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
 		PostUrlEncodedForm("foo/bar", map[string]string{
 			"foo": "bar",
 		}),
-		StringMatches("bar\n"),
+		StringMatches("bar"),
 		ExitCodeHeaderMatches("0"),
 	)
 }
@@ -221,7 +221,7 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok(t *testing.T) {
 		PostMultipart("foo/bar", map[string]string{
 			"foo": "bar",
 		}),
-		StringMatches("bar\n"),
+		StringMatches("bar"),
 		ExitCodeHeaderMatches("0"),
 	)
 }

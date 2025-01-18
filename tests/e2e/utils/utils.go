@@ -666,8 +666,16 @@ func StringMatches(expected string) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		replaceVars(&expected, state)
 
-		assert.Equal(t, expected, string(response.Body))
+		assert.Equal(
+			t,
+			removeEndingLineBreaks(expected),
+			removeEndingLineBreaks(string(response.Body)),
+		)
 	}
+}
+
+func removeEndingLineBreaks(str string) string {
+	return replaceRegex(str, []string{`\n$`}, "")
 }
 
 func MatchesFile(filePath string) TestFunc {

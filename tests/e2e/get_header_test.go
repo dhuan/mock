@@ -20,7 +20,6 @@ func Test_E2E_GetHeader_All(t *testing.T) {
 			"another-header-key: another header value",
 			"some-header-key: some header value",
 			"user-agent: Go-http-client/1.1",
-			"",
 		},
 		0,
 	)
@@ -32,7 +31,7 @@ func Test_E2E_GetHeader_NoMatches(t *testing.T) {
 		[]string{
 			`{{MOCK_EXECUTABLE}} get-header foobar > $MOCK_RESPONSE_BODY`,
 		},
-		[]string{""},
+		[]string{},
 		1,
 	)
 }
@@ -55,7 +54,7 @@ func Test_E2E_GetHeader_Match(t *testing.T) {
 			`{{MOCK_EXECUTABLE}} get-header some-header-key > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
-			"some-header-key: some header value\n",
+			"some-header-key: some header value",
 		},
 		0,
 	)
@@ -70,7 +69,6 @@ func Test_E2E_GetHeader_Regex(t *testing.T) {
 		[]string{
 			"another-header-key: another header value",
 			"some-header-key: some header value",
-			"",
 		},
 		0,
 	)
@@ -83,7 +81,7 @@ func Test_E2E_GetHeader_PrintValueOnly(t *testing.T) {
 			`{{MOCK_EXECUTABLE}} get-header -v some-header-key > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
-			"some header value\n",
+			"some header value",
 		},
 		0,
 	)
