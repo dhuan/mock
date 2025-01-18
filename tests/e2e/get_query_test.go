@@ -43,18 +43,14 @@ func Test_E2E_GetQuery_GetAll(t *testing.T) {
 }
 
 func Test_E2E_GetQuery_ExitCode1WhenKeyDoesNotExist(t *testing.T) {
-	RunTestWithNoConfigAndWithArgs(
-		t,
+	RunTest4(
+		t, nil,
 		[]string{
 			"--route foo/bar",
-			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-query someKey ; printf $? | {{MOCK_EXECUTABLE}} write`,
-			}, ";")),
+			CmdExec(`{{MOCK_EXECUTABLE}} get-query someKey > $MOCK_RESPONSE_BODY`),
 		},
-		"GET",
-		"foo/bar?foo=bar",
-		nil,
-		nil,
-		StringMatches("1"),
+		Get("foo/bar?foo=bar", nil),
+		StringMatches(""),
+		ExitCodeHeaderMatches("1"),
 	)
 }
