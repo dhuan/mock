@@ -24,6 +24,10 @@ var getHeaderCmd = &cobra.Command{
 
 			if len(args) == 0 {
 				fmt.Println(string(headersFileContent))
+
+				os.Exit(0)
+
+				return
 			}
 
 			headerSearch := args[0]

@@ -22,7 +22,7 @@ func Test_E2E_GetHeader_All(t *testing.T) {
 			"user-agent: Go-http-client/1.1",
 			"",
 		},
-		2,
+		0,
 	)
 }
 

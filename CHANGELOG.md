@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+FIXED:
+
+- Update `get-header` to return successful exit status code upon retrieving
+  all headers.
+
 ## 1.4.7
 
 ADDED:
