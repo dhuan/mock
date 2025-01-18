@@ -17,7 +17,7 @@ func Test_E2E_Response_FileResponse(t *testing.T) {
 		"foo/bar/1",
 		nil,
 		strings.NewReader(""),
-		StringMatches("Hello world! This is response A.\n"),
+		StringMatches("Hello world! This is response A."),
 	)
 }
 
@@ -33,7 +33,7 @@ func Test_E2E_Response_FileResponse_WithResponseFileFlag(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		StatusCodeMatches(200),
-		StringMatches("Hello world!\n"),
+		StringMatches("Hello world!"),
 	)
 }
 
@@ -45,7 +45,7 @@ func Test_E2E_Response_ResponseInsideFolder(t *testing.T) {
 		"foo/bar/2",
 		nil,
 		strings.NewReader(""),
-		StringMatches("This test asserts that you can set response files inside folders.\n"),
+		StringMatches("This test asserts that you can set response files inside folders."),
 	)
 }
 
@@ -82,7 +82,7 @@ func Test_E2E_Response_WithFile_WithAbsolutePath(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		StatusCodeMatches(200),
-		StringMatches("Hello world!\n"),
+		StringMatches("Hello world!"),
 	)
 }
 
@@ -94,7 +94,7 @@ func Test_E2E_Response_WithDynamicFileName(t *testing.T) {
 		"books/i_robot/content",
 		nil,
 		strings.NewReader(""),
-		StringMatches("This is the book 'I, Robot'.\n"),
+		StringMatches("This is the book 'I, Robot'."),
 	)
 
 	RunTest(
@@ -104,7 +104,7 @@ func Test_E2E_Response_WithDynamicFileName(t *testing.T) {
 		"books/nightfall/content",
 		nil,
 		strings.NewReader(""),
-		StringMatches("This is the book 'Nightfall'.\n"),
+		StringMatches("This is the book 'Nightfall'."),
 	)
 }
 

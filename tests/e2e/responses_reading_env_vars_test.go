@@ -52,7 +52,7 @@ func Test_E2E_Response_ReadingEnvironmentVariable_TextFileResponse(t *testing.T)
 		map[string]string{
 			"FOO": "BAR",
 		},
-		StringMatches("The value of FOO is: BAR.\n"),
+		StringMatches("The value of FOO is: BAR."),
 	)
 }
 

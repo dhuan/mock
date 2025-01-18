@@ -19,7 +19,7 @@ func Test_E2E_Response_Fileserver(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		StatusCodeMatches(200),
-		StringMatches("Hello world!\n"),
+		StringMatches("Hello world!"),
 	)
 }
 
@@ -55,7 +55,7 @@ func Test_E2E_Response_Fileserver_WithCmdParams(t *testing.T) {
 			nil,
 			strings.NewReader(""),
 			StatusCodeMatches(200),
-			StringMatches("Hello world!\n"),
+			StringMatches("Hello world!"),
 		)
 	}
 }
@@ -86,7 +86,7 @@ func Test_E2E_Response_Fileserver_WithCmdParams_WithAbsolutePath(t *testing.T) {
 			nil,
 			strings.NewReader(""),
 			StatusCodeMatches(200),
-			StringMatches("Hello world!\n"),
+			StringMatches("Hello world!"),
 		)
 	}
 }
