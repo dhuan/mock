@@ -308,7 +308,7 @@ func newEndpointHandler(
 		}
 
 		if flagCors {
-			setCorsHeaders(w)
+			setCorsHeadersToResponse(response)
 		}
 
 		err = mockFs.StoreRequestRecord(requestRecord, endpointConfig)
@@ -772,6 +772,12 @@ var corsHeaders map[string]string = map[string]string{
 func setCorsHeaders(w http.ResponseWriter) {
 	for key, value := range corsHeaders {
 		w.Header().Set(key, value)
+	}
+}
+
+func setCorsHeadersToResponse(response *mock.Response) {
+	for key, value := range corsHeaders {
+		response.Headers[key] = value
 	}
 }
 
