@@ -90,7 +90,7 @@ var serveCmd = &cobra.Command{
 		}
 		mockFs := mockfs.MockFs{State: state}
 
-		router.Use(handleOptions(flagCors, state, config, mockFs))
+		router.Use(handleOptions(flagCors, state, config, mockFs, router))
 
 		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs))
 
@@ -678,21 +678,41 @@ func onMethodNotAllowed(corsEnabled bool) http.HandlerFunc {
 	}
 }
 
+func matchRouteAnyMethod(router *chi.Mux, path string) bool {
+	ctx := chi.NewRouteContext()
+
+	for _, method := range strings.Split("POST,GET,PUT,PATCH,DELETE,OPTIONS", ",") {
+		if router.Match(ctx, method, path) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func handleOptions(
 	corsEnabled bool,
 	state *types.State,
 	config *MockConfig,
 	mockFs types.MockFs,
+	router *chi.Mux,
 ) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			match := matchRouteAnyMethod(router, r.URL.Path)
+
+			if strings.ToLower(r.Method) != "options" || !match || !corsEnabled {
+				next.ServeHTTP(w, r)
+
+				return
+			}
+
 			headers := make(map[string]string)
 
-			if corsEnabled && strings.ToLower(r.Method) == "options" {
+			if corsEnabled {
 				for key, value := range corsHeaders {
 					headers[key] = value
 				}
-
 			}
 
 			endpointParams := getEndpointParams(r)
