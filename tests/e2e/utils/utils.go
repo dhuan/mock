@@ -431,6 +431,31 @@ func Get(route string, headers http.Header) TestFunc {
 	}
 }
 
+func Options(route string, headers http.Header) TestFunc {
+	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
+		request := requestBase(state, "OPTIONS", route, headers, nil)
+
+		request.Header = headers
+
+		client := &http.Client{}
+		newResponse, err := client.Do(request)
+		if err != nil {
+			panic(err)
+		}
+
+		responseBody, err := io.ReadAll(newResponse.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		*response = Response{
+			Body:       responseBody,
+			Headers:    newResponse.Header,
+			StatusCode: newResponse.StatusCode,
+		}
+	}
+}
+
 func Post(route string, headers http.Header, payload []byte) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		request := requestBase(state, "POST", route, headers, bytes.NewReader(payload))

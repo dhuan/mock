@@ -680,7 +680,7 @@ func onMethodNotAllowed(corsEnabled bool) http.HandlerFunc {
 func handleOptions(corsEnabled bool) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.ToLower(r.Method) == "options" {
+			if corsEnabled && strings.ToLower(r.Method) == "options" {
 				setCorsHeaders(w)
 				w.WriteHeader(200)
 
