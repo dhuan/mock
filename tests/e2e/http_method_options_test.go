@@ -35,3 +35,23 @@ func Test_E2E_OptionsMethod_WithCorsFlag_CorsHeaders(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_OptionsMethod_WithCorsFlag_WithMiddleware(t *testing.T) {
+	RunTest4(
+		t, nil,
+		[]string{
+			"--cors",
+			"--middleware '/home/work/work/mock/bin/mock set-header foo bar'",
+			"--route foo/bar",
+			"--response 'Hello, world.'",
+		},
+		Options("foo/bar", nil),
+		HeadersMatch(map[string][]string{
+			"Access-Control-Allow-Origin":      {"*"},
+			"Access-Control-Allow-Credentials": {"true"},
+			"Access-Control-Allow-Headers":     {"*"},
+			"Access-Control-Allow-Methods":     {"POST, GET, OPTIONS, PUT, DELETE"},
+			"Foo":                              {"bar"},
+		}),
+	)
+}

@@ -57,7 +57,6 @@ var serveCmd = &cobra.Command{
 
 		router := chi.NewRouter()
 		router.Use(middleware.Logger)
-		router.Use(handleOptions(flagCors))
 		router.MethodNotAllowed(onMethodNotAllowed(flagCors))
 
 		prepareConfig(config)
@@ -90,6 +89,8 @@ var serveCmd = &cobra.Command{
 			ListenPort:                 flagPort,
 		}
 		mockFs := mockfs.MockFs{State: state}
+
+		router.Use(handleOptions(flagCors, state, config, mockFs))
 
 		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs))
 
@@ -677,14 +678,63 @@ func onMethodNotAllowed(corsEnabled bool) http.HandlerFunc {
 	}
 }
 
-func handleOptions(corsEnabled bool) func(next http.Handler) http.Handler {
+func handleOptions(
+	corsEnabled bool,
+	state *types.State,
+	config *MockConfig,
+	mockFs types.MockFs,
+) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if corsEnabled && strings.ToLower(r.Method) == "options" {
-				setCorsHeaders(w)
-				w.WriteHeader(200)
+			headers := make(map[string]string)
 
-				return
+			if corsEnabled && strings.ToLower(r.Method) == "options" {
+				for key, value := range corsHeaders {
+					headers[key] = value
+				}
+
+			}
+
+			endpointParams := getEndpointParams(r)
+
+			requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
+			requestRecords, err := mockFs.GetRecordsMatchingRoute(requestRoute)
+			if err != nil {
+				panic(err)
+			}
+
+			requestRecord, requestBody, err := record.BuildRequestRecord(r, endpointParams)
+			if err != nil {
+				panic(err)
+			}
+
+			response := &mock.Response{
+				Body:                nil,
+				EndpointContentType: types.Endpoint_content_type_unknown,
+				StatusCode:          200,
+				Headers:             headers,
+			}
+
+			response = handleMiddleware(
+				state,
+				r,
+				response,
+				endpointParams,
+				config,
+				requestRecord,
+				requestRecords,
+				requestBody,
+				map[string]string{},
+			)
+
+			for key := range response.Headers {
+				w.Header().Set(key, response.Headers[key])
+			}
+
+			w.WriteHeader(response.StatusCode)
+
+			if response.Body != nil {
+				w.Write(response.Body)
 			}
 
 			next.ServeHTTP(w, r)

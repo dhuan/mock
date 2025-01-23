@@ -3,6 +3,7 @@
 ## Unreleased
 
 ADDED:
+- Middlewares are now also executed for OPTIONS requests.
 - Update OPTIONS HTTP Request logic so that the CORS headers are only included
   in the response when the "--cors" flag is used. If "--cors" is not used,
   then mock won't set OPTIONS routes for you automatically.
