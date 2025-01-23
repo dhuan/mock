@@ -55,3 +55,22 @@ func Test_E2E_OptionsMethod_WithCorsFlag_WithMiddleware(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_OptionsMethod_WithCorsFlag_WithMiddleware_RemoveCorsHeadersThroughMiddleware(t *testing.T) {
+	RunTest4(
+		t, nil,
+		[]string{
+			"--cors",
+			"--middleware 'cat $MOCK_RESPONSE_HEADERS | grep -iv access-control-allow | sponge $MOCK_RESPONSE_HEADERS'",
+			"--route foo/bar",
+			"--response 'Hello, world.'",
+		},
+		Options("foo/bar", nil),
+		HeaderKeysNotIncluded([]string{
+			"Access-Control-Allow-Origin",
+			"Access-Control-Allow-Credentials",
+			"Access-Control-Allow-Headers",
+			"Access-Control-Allow-Methods",
+		}),
+	)
+}
