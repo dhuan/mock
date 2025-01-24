@@ -61,7 +61,7 @@ func Test_E2E_OptionsMethod_WithCorsFlag_WithMiddleware_RemoveCorsHeadersThrough
 		t, nil,
 		[]string{
 			"--cors",
-			"--middleware 'cat $MOCK_RESPONSE_HEADERS | grep -iv access-control-allow | sponge $MOCK_RESPONSE_HEADERS'",
+			"--middleware 'grep -iv access-control-allow $MOCK_RESPONSE_HEADERS | sponge $MOCK_RESPONSE_HEADERS'",
 			"--route foo/bar",
 			"--response 'Hello, world.'",
 		},

@@ -38,7 +38,7 @@ jobs:
     - name: Test E2E
       run: |
           sudo apt update -y
-          sudo apt install -y curl tar
+          sudo apt install -y curl tar moreutils
           curl -L https://github.com/htacg/tidy-html5/releases/download/5.8.0/tidy-5.8.0-Linux-64bit.deb > tidy.deb
           sudo dpkg -i tidy.deb
           make test_e2e
