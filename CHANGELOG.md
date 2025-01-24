@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.8
 
 ADDED:
 - Middlewares are now also executed for OPTIONS requests.
