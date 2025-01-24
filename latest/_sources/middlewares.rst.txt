@@ -76,7 +76,7 @@ will uppercase all response text.
 .. code:: sh
 
    $ mock serve -p 3000 \
-       --middleware 'cat $MOCK_RESPONSE_BODY | awk '"'"'{print toupper($0)}'"'"' | mock write' \
+       --middleware 'awk '"'"'{print toupper($0)}'"'"' $MOCK_RESPONSE_BODY | mock write' \
        --route foo/bar \
        --response 'Hello, world!'
 

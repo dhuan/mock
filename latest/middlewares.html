@@ -349,7 +349,7 @@ program at all can be used as a middleware.</p>
 <p>To kick-off the middleware examples, let’s set up a very simple middleware that
 will uppercase all response text.</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;cat $MOCK_RESPONSE_BODY | awk &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{print toupper($0)}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; | mock write&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;awk &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{print toupper($0)}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; $MOCK_RESPONSE_BODY | mock write&#39;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--response<span class="w"> </span><span class="s1">&#39;Hello, world!&#39;</span>
 </pre></div>
