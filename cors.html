@@ -180,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -235,7 +235,20 @@
 
 </div>
 </div>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VWDWRYCEKE"></script>
+<script>
+(function() {
+  if (window.location.hostname !== "dhuan.github.io")
+    return
 
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VWDWRYCEKE');
+})()
+</script>
       </div>
       
     </div>
@@ -265,7 +278,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -279,6 +292,31 @@ enable browser clients to comunicate without problems:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>--cors<span class="w"> </span>-c<span class="w"> </span>/path/to/your/config.json
 </pre></div>
 </div>
+<section id="customizing-options-requests">
+<h2>Customizing OPTIONS Requests<a class="headerlink" href="#customizing-options-requests" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--cors</span></code> flag adds the necessary headers for you for all requests,
+including OPTIONS requests. There may be cases however when these headers do
+not satisfy your needs, and you need to further customise them. You may use
+<a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">Middlewares</span></a> to customize the headers for OPTIONS requests:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--cors<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--middleware<span class="w"> </span><span class="s1">&#39;test $MOCK_REQUEST_METHOD = &quot;options&quot; &amp;&amp; mock set-header foo bar&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--response<span class="w"> </span><span class="s2">&quot;Hello, world&quot;</span>
+</pre></div>
+</div>
+<p>The middleware above verifies whether the request being handled is an OPTIONS
+request, and then if it is, it adds the <code class="docutils literal notranslate"><span class="pre">Foo:</span> <span class="pre">bar</span></code> HTTP Header to the
+Response.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For an example of when it’d be necessary to manipulate headers for OPTIONS
+requests: there are cases when it’s not desireable that
+<code class="docutils literal notranslate"><span class="pre">Access-Control-Allow-Origin</span></code> be set to <code class="docutils literal notranslate"><span class="pre">*</span></code>, and that it be set to an
+actual origin value.</p>
+</div>
+</section>
 </section>
 
         </article>
@@ -316,8 +354,27 @@ enable browser clients to comunicate without problems:</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Handling CORS</a><ul>
+<li><a class="reference internal" href="#customizing-options-requests">Customizing OPTIONS Requests</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
