@@ -41,7 +41,7 @@ func Test_E2E_OptionsMethod_WithCorsFlag_WithMiddleware(t *testing.T) {
 		t, nil,
 		[]string{
 			"--cors",
-			"--middleware '/home/work/work/mock/bin/mock set-header foo bar'",
+			"--middleware '{{MOCK_EXECUTABLE}} set-header foo bar'",
 			"--route foo/bar",
 			"--response 'Hello, world.'",
 		},
