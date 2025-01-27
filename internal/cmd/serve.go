@@ -451,12 +451,45 @@ func onNotFound(
 			return
 		}
 
+		endpointParams := getEndpointParams(r)
+
 		if corsEnabled {
 			setCorsHeaders(w)
 		}
 
+		envVars := make(map[string]string)
+		envVars["MOCK_REQUEST_NOT_FOUND"] = "true"
+
 		if !hasBaseApi {
-			w.WriteHeader(404)
+			requestRecord, requestBody, err := record.BuildRequestRecord(r, endpointParams)
+			if err != nil {
+				panic(err)
+			}
+
+			requestRoute := utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")
+			requestRecords, err := mockFs.GetRecordsMatchingRoute(requestRoute)
+
+			response := &mock.Response{
+				Body:                []byte(""),
+				EndpointContentType: types.Endpoint_content_type_unknown,
+				StatusCode:          405,
+				Headers:             nil,
+			}
+
+			response = handleMiddleware(
+				state,
+				r,
+				response,
+				endpointParams,
+				config,
+				requestRecord,
+				requestRecords,
+				requestBody,
+				envVars,
+			)
+
+			w.WriteHeader(response.StatusCode)
+			w.Write(response.Body)
 
 			return
 		}
@@ -470,8 +503,6 @@ func onNotFound(
 		if err != nil {
 			panic(err)
 		}
-
-		endpointParams := getEndpointParams(r)
 
 		requestRecord, requestBody, err := record.BuildRequestRecord(r, endpointParams)
 		if err != nil {
