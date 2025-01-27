@@ -147,17 +147,21 @@ customise responses:
 - ``MOCK_RESPONSE_BODY``: A file that can be written to in order to modify the
   HTTP Response before handing it to the client. This file already contains the
   response body defined by your API configuration for the given endpoint.
-
 - ``MOCK_RESPONSE_HEADERS``: A file that can be written to in order to modify
   the HTTP Headers. The headers defined in your configuration's endpoint are
   included in this file at the moment the middleware is executed.
-
 - ``MOCK_RESPONSE_STATUS_CODE``: A file that can be written to in order to
   modify the HTTP Status code.
 
 Route Parameters can also be read. For example if an endpoint exists with its
 route set as ``foo/bar/{some_param}``, middlewares can read them through
 environment variables such as ``MOCK_ROUTE_PARAM_SOME_PARAM``
+
+As Middlewares are executed for both requests with valid routes and requests
+for which a route hasn't been set, you may want to know inside your handler
+script whether it's a valid route or not. For that, read the
+``MOCK_REQUEST_NOT_FOUND`` environment variable. :ref:`You can read more
+about here. <middlewares_not_found>`
 
 For a complete list of all environment variables that can be read from
 middleware handlers, `consult this section.
@@ -196,3 +200,71 @@ words, we're making a custom 404 page for our API:
 
 The middleware above modifies all requests that have the ``foo=bar``
 querystring.
+
+.. _middlewares_not_found:
+
+Handling "not found" requests with Middlewares
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`mock` serves requests based on the endpoints that you configured. When a
+request is made with a route for which an endpoint hasn't been set, `mock`
+responds with ``405 Method not allowed`` HTTP Status.
+
+You may want to change that behavior and provide customised responses when
+requests are made to unexisting routes. That's possible through Middlewares.
+
+By default, Middlewares are set to be executed for all route patterns, unless
+you use the ``route_match`` option and filter the route patterns that you
+desire. In other words, by default Middlewares are executed for all "not_found"
+requests.
+
+You can identify whether the current request being handled is valid or not by
+reading the ``MOCK_REQUEST_NOT_FOUND`` environment variable. It's a boolean
+variable.
+
+Furthermore, requests for invalid routes will result in middleware having the
+``MOCK_RESPONSE_STATUS_CODE`` set to ``405``. If you want a different response
+status code to be set, just change that variable's value.
+
+With that, we can easily create custom "not found" pages. Let's look at an
+example on how to accomplish this:
+
+.. code:: sh
+
+   $ mock serve -p 3000 \
+     --middleware "sh path/to/my/middleware.sh" \
+     --route foo/bar \
+     --response "Hello world!"
+
+.. code:: sh
+
+    // path/to/my/middleware.sh
+
+    if [ "${MOCK_REQUEST_NOT_FOUND}" = "true" ]
+    then
+        mock set-status 404
+
+        printf "This page does not exist!" | mock write
+    fi
+
+Let's analyse the result. Request ``GET foo/bar``:
+
+.. code:: sh
+
+   $ curl localhost:3000/foo/bar
+   # Prints out: Hello, world!
+
+Nothing special there - we got the exact response string as defined the
+endpoint's response - no modification was made to that response through our
+middleware because it only manipulates the response if it's a Not Found request
+- which it detects by reading ``$MOCK_REQUEST_NOT_FOUND``.
+
+Let us now request to a route that does not exist:
+
+.. code:: sh
+
+   $ curl localhost:3000/foo/bar/2
+   # Prints out: This page does not exist!
+
+This time the response was manipulated by the middleware and the custom Not
+Found page was returned successfully by the server.

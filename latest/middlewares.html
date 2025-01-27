@@ -422,6 +422,11 @@ modify the HTTP Status code.</p></li>
 <p>Route Parameters can also be read. For example if an endpoint exists with its
 route set as <code class="docutils literal notranslate"><span class="pre">foo/bar/{some_param}</span></code>, middlewares can read them through
 environment variables such as <code class="docutils literal notranslate"><span class="pre">MOCK_ROUTE_PARAM_SOME_PARAM</span></code></p>
+<p>As Middlewares are executed for both requests with valid routes and requests
+for which a route hasn’t been set, you may want to know inside your handler
+script whether it’s a valid route or not. For that, read the
+<code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_NOT_FOUND</span></code> environment variable. <a class="reference internal" href="#middlewares-not-found"><span class="std std-ref">You can read more
+about here.</span></a></p>
 <p>For a complete list of all environment variables that can be read from
 middleware handlers, <a class="reference external" href="shell_scripts.html#environment-variables-for-request-handlers">consult this section.</a></p>
 </section>
@@ -454,6 +459,58 @@ words, we’re making a custom 404 page for our API:</p>
 </div>
 <p>The middleware above modifies all requests that have the <code class="docutils literal notranslate"><span class="pre">foo=bar</span></code>
 querystring.</p>
+</section>
+<section id="handling-not-found-requests-with-middlewares">
+<span id="middlewares-not-found"></span><h2>Handling “not found” requests with Middlewares<a class="headerlink" href="#handling-not-found-requests-with-middlewares" title="Link to this heading">¶</a></h2>
+<p><cite>mock</cite> serves requests based on the endpoints that you configured. When a
+request is made with a route for which an endpoint hasn’t been set, <cite>mock</cite>
+responds with <code class="docutils literal notranslate"><span class="pre">405</span> <span class="pre">Method</span> <span class="pre">not</span> <span class="pre">allowed</span></code> HTTP Status.</p>
+<p>You may want to change that behavior and provide customised responses when
+requests are made to unexisting routes. That’s possible through Middlewares.</p>
+<p>By default, Middlewares are set to be executed for all route patterns, unless
+you use the <code class="docutils literal notranslate"><span class="pre">route_match</span></code> option and filter the route patterns that you
+desire. In other words, by default Middlewares are executed for all “not_found”
+requests.</p>
+<p>You can identify whether the current request being handled is valid or not by
+reading the <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_NOT_FOUND</span></code> environment variable. It’s a boolean
+variable.</p>
+<p>Furthermore, requests for invalid routes will result in middleware having the
+<code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_STATUS_CODE</span></code> set to <code class="docutils literal notranslate"><span class="pre">405</span></code>. If you want a different response
+status code to be set, just change that variable’s value.</p>
+<p>With that, we can easily create custom “not found” pages. Let’s look at an
+example on how to accomplish this:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--middleware<span class="w"> </span><span class="s2">&quot;sh path/to/my/middleware.sh&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--response<span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>//<span class="w"> </span>path/to/my/middleware.sh
+
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MOCK_REQUEST_NOT_FOUND</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="w"> </span><span class="o">]</span>
+<span class="k">then</span>
+<span class="w">    </span>mock<span class="w"> </span>set-status<span class="w"> </span><span class="m">404</span>
+
+<span class="w">    </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;This page does not exist!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
+<span class="k">fi</span>
+</pre></div>
+</div>
+<p>Let’s analyse the result. Request <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">foo/bar</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/foo/bar
+<span class="c1"># Prints out: Hello, world!</span>
+</pre></div>
+</div>
+<p>Nothing special there - we got the exact response string as defined the
+endpoint’s response - no modification was made to that response through our
+middleware because it only manipulates the response if it’s a Not Found request
+- which it detects by reading <code class="docutils literal notranslate"><span class="pre">$MOCK_REQUEST_NOT_FOUND</span></code>.</p>
+<p>Let us now request to a route that does not exist:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/foo/bar/2
+<span class="c1"># Prints out: This page does not exist!</span>
+</pre></div>
+</div>
+<p>This time the response was manipulated by the middleware and the custom Not
+Found page was returned successfully by the server.</p>
 </section>
 </section>
 
@@ -521,6 +578,7 @@ querystring.</p>
 </li>
 <li><a class="reference internal" href="#environment-variables-for-middlewares">Environment Variables for Middlewares</a></li>
 <li><a class="reference internal" href="#conditions-for-middlewares">Conditions for Middlewares</a></li>
+<li><a class="reference internal" href="#handling-not-found-requests-with-middlewares">Handling “not found” requests with Middlewares</a></li>
 </ul>
 </li>
 </ul>

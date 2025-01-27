@@ -286,12 +286,22 @@
         <article role="main" id="furo-main-content">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="unreleased-yet">
+<h2>Unreleased yet<a class="headerlink" href="#unreleased-yet" title="Link to this heading">¶</a></h2>
+<p>ADDED:</p>
+<ul class="simple">
+<li><p>Allow middlewares to execute on “not found” routes.</p></li>
+</ul>
+</section>
 <section id="id1">
 <h2>1.4.8<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
-<p>ADDED: - Middlewares are now also executed for OPTIONS requests. -
-Update OPTIONS HTTP Request logic so that the CORS headers are only
+<p>ADDED:</p>
+<ul class="simple">
+<li><p>Middlewares are now also executed for OPTIONS requests.</p></li>
+<li><p>Update OPTIONS HTTP Request logic so that the CORS headers are only
 included in the response when the “–cors” flag is used. If “–cors” is
-not used, then mock won’t set OPTIONS routes for you automatically.</p>
+not used, then mock won’t set OPTIONS routes for you automatically.</p></li>
+</ul>
 <p>FIXED:</p>
 <ul class="simple">
 <li><p>Update <code class="docutils literal notranslate"><span class="pre">get-header</span></code> to return successful exit status code upon
@@ -719,6 +729,7 @@ the assert request indicating that the given <code class="docutils literal notra
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#unreleased-yet">Unreleased yet</a></li>
 <li><a class="reference internal" href="#id1">1.4.8</a></li>
 <li><a class="reference internal" href="#section-1">1.4.7</a></li>
 <li><a class="reference internal" href="#section-2">1.4.6</a></li>
