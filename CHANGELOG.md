@@ -5,6 +5,8 @@
 ADDED:
 
 - Allow middlewares to execute on "not found" routes.
+- Make `--route-match` flag work for Middlewares. This flag was documented in
+  the guide but wasn't registered in the command-line parsing logic.
 
 ## 1.4.8
 

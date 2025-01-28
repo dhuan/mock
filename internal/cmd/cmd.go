@@ -66,6 +66,7 @@ func Execute() {
 	serveCmd.PersistentFlags().StringArray("exec", []string{}, "endpoint response exec")
 	serveCmd.PersistentFlags().StringArray("response-exec", []string{}, "endpoint response exec")
 	serveCmd.PersistentFlags().StringArray("middleware", []string{}, "middleware")
+	serveCmd.PersistentFlags().StringArray("route-match", []string{}, "filter middleware by route")
 	serveCmd.PersistentFlags().StringVarP(&flagBaseApi, "base", "b", "", "base API")
 
 	writeCmd.PersistentFlags().BoolVarP(&flagAppend, "append", "a", false, "append instead of overwriting")
