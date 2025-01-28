@@ -10,7 +10,7 @@ func Test_Middlewares_NotFound(t *testing.T) {
 	RunTest4(
 		t, nil,
 		[]string{
-			`--middleware 'test "${MOCK_REQUEST_NOT_FOUND}" = "true" && mock set-status 201 && (echo "OK!" | mock write)'`,
+			`--middleware 'test "${MOCK_REQUEST_NOT_FOUND}" = "true" && {{MOCK_EXECUTABLE}} set-status 201 && (echo "NOT FOUND!" | mock write)'`,
 			"--route foo/bar",
 			`--response "Hello, world."`,
 		},
@@ -18,7 +18,7 @@ func Test_Middlewares_NotFound(t *testing.T) {
 		StringMatches("Hello, world."),
 		StatusCodeMatches(200),
 		Get("no_route", nil),
-		StringMatches("OK!"),
+		StringMatches("NOT FOUND!"),
 		StatusCodeMatches(201),
 	)
 }
