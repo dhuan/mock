@@ -6,11 +6,11 @@ import (
 	. "github.com/dhuan/mock/tests/e2e/utils"
 )
 
-func Test_Middlewares_NotFound(t *testing.T) {
+func Test_Middlewares_NotFound_ModifyResponse(t *testing.T) {
 	RunTest4(
 		t, nil,
 		[]string{
-			`--middleware 'test "${MOCK_REQUEST_NOT_FOUND}" = "true" && {{MOCK_EXECUTABLE}} set-status 201 && (echo "NOT FOUND!" | mock write)'`,
+			`--middleware 'test "${MOCK_REQUEST_NOT_FOUND}" = "true" && {{MOCK_EXECUTABLE}} set-status 201 && (echo "NOT FOUND!" | {{MOCK_EXECUTABLE}} write)'`,
 			"--route foo/bar",
 			`--response "Hello, world."`,
 		},
