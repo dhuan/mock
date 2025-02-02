@@ -173,8 +173,8 @@ func Test_E2E_BaseApi_RequestForwardedToBaseApi_ResponseHeadersAreForwaded(t *te
 		nil,
 		strings.NewReader(""),
 		HeadersMatch(map[string][]string{
-			"Header-One": []string{"value one"},
-			"Header-Two": []string{"value two"},
+			"Header-One": {"value one"},
+			"Header-Two": {"value two"},
 		}),
 	)
 }
@@ -275,8 +275,8 @@ func Test_E2E_BaseApi_Middleware_ModifyingResponse(t *testing.T) {
 		nil,
 		strings.NewReader(""),
 		HeadersMatch(map[string][]string{
-			"Some-Header-From-Base-Api": []string{"some value"},
-			"Foo":                       []string{"bar"},
+			"Some-Header-From-Base-Api": {"some value"},
+			"Foo":                       {"bar"},
 		}),
 		StringMatches("Base Api Response. Modified!"),
 	)
@@ -492,10 +492,10 @@ func Test_E2E_BaseApi_CorsFlagOverwritesCorsHeadersFromBaseApi(t *testing.T) {
 		strings.NewReader(""),
 		StatusCodeMatches(200),
 		HeadersMatch(map[string][]string{
-			"Access-Control-Allow-Origin":      []string{"*"},
-			"Access-Control-Allow-Credentials": []string{"true"},
-			"Access-Control-Allow-Headers":     []string{"*"},
-			"Access-Control-Allow-Methods":     []string{"POST, GET, OPTIONS, PUT, DELETE"},
+			"Access-Control-Allow-Origin":      {"*"},
+			"Access-Control-Allow-Credentials": {"true"},
+			"Access-Control-Allow-Headers":     {"*"},
+			"Access-Control-Allow-Methods":     {"POST, GET, OPTIONS, PUT, DELETE"},
 		}),
 	)
 }
