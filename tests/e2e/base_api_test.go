@@ -499,3 +499,38 @@ func Test_E2E_BaseApi_CorsFlagOverwritesCorsHeadersFromBaseApi(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_BaseApi_ModifyCorsHeadersThroughMiddleware(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Hello world! This is the base API.'",
+		}, " "),
+		nil,
+		true,
+		nil,
+	)
+	defer killMockBase()
+
+	path := CreateTmpEnvironment(
+		FileEntry("middleware.sh", []byte(`cat $MOCK_RESPONSE_HEADERS | awk -F ": " '{if (tolower($0) ~ /access-control-allow/) printf("%s: %s\n", $1, toupper($2)); else print}' | sponge $MOCK_RESPONSE_HEADERS`)),
+	)
+
+	RunTest4(
+		t, nil,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--cors",
+			fmt.Sprintf(`--middleware 'sh %s/middleware.sh'`, path),
+		},
+		Get("foo/bar", nil),
+		StringMatches("Hello world! This is the base API."),
+		HeadersMatch(map[string][]string{
+			"Access-Control-Allow-Credentials": {"TRUE"},
+		}),
+	)
+}

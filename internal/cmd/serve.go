@@ -453,10 +453,6 @@ func onNotFound(
 
 		endpointParams := getEndpointParams(r)
 
-		if corsEnabled {
-			setCorsHeaders(w)
-		}
-
 		envVars := make(map[string]string)
 		envVars["MOCK_REQUEST_NOT_FOUND"] = "true"
 
@@ -474,6 +470,10 @@ func onNotFound(
 				EndpointContentType: types.Endpoint_content_type_unknown,
 				StatusCode:          405,
 				Headers:             nil,
+			}
+
+			if corsEnabled {
+				setCorsHeadersToResponse(response)
 			}
 
 			response = handleMiddleware(
@@ -523,13 +523,7 @@ func onNotFound(
 		mockResponse := buildResponse(response, responseBody)
 
 		if corsEnabled {
-			for key := range mockResponse.Headers {
-				corsHeaderKeys := utils.GetKeys(corsHeaders)
-
-				if utils.IndexOf(corsHeaderKeys, key) > -1 {
-					delete(mockResponse.Headers, key)
-				}
-			}
+			setCorsHeadersToResponse(mockResponse)
 		}
 
 		middlewareHandlerExtraVars := map[string]string{

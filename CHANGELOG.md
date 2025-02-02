@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+ADDED:
+
+- Allow middlewares to modify CORS headers of Base APIs' Responses.
+
 ## 1.4.9
 
 ADDED:
