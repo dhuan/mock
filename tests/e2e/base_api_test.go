@@ -534,3 +534,34 @@ func Test_E2E_BaseApi_ModifyCorsHeadersThroughMiddleware(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_BaseApi_WithMiddleware_ContentLengthIsUpdated(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Hello world! This is the base API.'",
+		}, " "),
+		nil,
+		true,
+		nil,
+	)
+	defer killMockBase()
+
+	RunTest4(
+		t, nil,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--cors",
+			`--middleware 'printf "Hi." > $MOCK_RESPONSE_BODY'`,
+		},
+		Get("foo/bar", nil),
+		StringMatches("Hi."),
+		HeadersMatch(map[string][]string{
+			"Content-Length": {"3"},
+		}),
+	)
+}

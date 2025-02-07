@@ -526,6 +526,12 @@ func onNotFound(
 			setCorsHeadersToResponse(mockResponse)
 		}
 
+		for key := range mockResponse.Headers {
+			if strings.ToLower(key) == "content-length" {
+				delete(mockResponse.Headers, key)
+			}
+		}
+
 		middlewareHandlerExtraVars := map[string]string{
 			"MOCK_BASE_API_RESPONSE": "true",
 		}

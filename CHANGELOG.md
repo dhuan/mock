@@ -2,6 +2,11 @@
 
 ## Unreleased yet
 
+FIXED:
+
+- "Content-Length" header's value would be incorrect in case a Middleware
+  changes a Base API's response body.
+
 ADDED:
 
 - Allow middlewares to modify CORS headers of Base APIs' Responses.
