@@ -488,6 +488,8 @@ func onNotFound(
 				envVars,
 			)
 
+			addHeaders(w, response)
+
 			w.WriteHeader(response.StatusCode)
 			w.Write(response.Body)
 

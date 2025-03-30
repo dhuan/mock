@@ -60,5 +60,11 @@ func Test_E2E_Cors_WithUnexistingRoute(t *testing.T) {
 		},
 		Get("this/route/does/not/exist", nil),
 		StatusCodeMatches(405),
+		HeadersMatch(http.Header{
+			"Access-Control-Allow-Credentials": []string{"true"},
+			"Access-Control-Allow-Headers":     []string{"*"},
+			"Access-Control-Allow-Methods":     []string{"POST, GET, OPTIONS, PUT, DELETE"},
+			"Access-Control-Allow-Origin":      []string{"*"},
+		}),
 	)
 }
