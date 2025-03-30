@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased yet
+
+FIXED:
+
+- Requesting an unexisting endpoint while using `--cors` would panic.
+
 ## 1.4.10
 
 FIXED:

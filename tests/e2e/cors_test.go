@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	. "github.com/dhuan/mock/tests/e2e/utils"
 	e2eutils "github.com/dhuan/mock/tests/e2e/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -47,4 +48,17 @@ func Test_E2E_Cors_HeadersAreNotSet(t *testing.T) {
 	assert.Equal(t, e2eutils.IndexOf(headerKeys, "Access-Control-Allow-Headers"), -1)
 	assert.Equal(t, e2eutils.IndexOf(headerKeys, "Access-Control-Allow-Methods"), -1)
 	assert.Equal(t, e2eutils.IndexOf(headerKeys, "Access-Control-Allow-Origin"), -1)
+}
+
+func Test_E2E_Cors_WithUnexistingRoute(t *testing.T) {
+	RunTest4(
+		t, nil,
+		[]string{
+			"--route test",
+			"--response 'Hello, world.'",
+			"--cors",
+		},
+		Get("this/route/does/not/exist", nil),
+		StatusCodeMatches(405),
+	)
 }

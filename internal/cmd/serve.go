@@ -807,6 +807,10 @@ func setCorsHeaders(w http.ResponseWriter) {
 }
 
 func setCorsHeadersToResponse(response *mock.Response) {
+	if response.Headers == nil {
+		response.Headers = make(map[string]string)
+	}
+
 	for key, value := range corsHeaders {
 		response.Headers[key] = value
 	}
