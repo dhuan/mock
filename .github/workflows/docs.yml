@@ -29,7 +29,7 @@ jobs:
 
           make -s doc_build | make -s github_doc_vars | tar xz -C "$TMP_DIR"/latest
 
-          LATEST_VERSION=$(git tag | tac | grep '^v[0-9]' | head -n 1)
+          LATEST_VERSION=$(git tag | grep '^v[0-9]' | sort -V | tail -n 1)
           git checkout "$LATEST_VERSION"
           make -s doc_build | make -s github_doc_vars | tar xz -C "$TMP_DIR"
 
