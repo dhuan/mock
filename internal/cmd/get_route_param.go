@@ -24,7 +24,7 @@ var getRouteParamCmd = &cobra.Command{
 			var routeParams map[string]interface{}
 			err = json.Unmarshal(jsonEncoded, &routeParams)
 			if err != nil {
-				exitWithError(fmt.Sprintf("Failed to decode json from route params data: %s", err.Error()))
+				os.Exit(1)
 			}
 
 			routeParamValue, ok := routeParams[args[0]]

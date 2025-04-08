@@ -30,3 +30,16 @@ func Test_E2E_GetRouteParam_WithUnexistingKeyExitsWith1(t *testing.T) {
 		ExitCodeHeaderMatches("1"),
 	)
 }
+
+func Test_E2E_GetRouteParam_WithUnexistingKeyExitsWith1_WithRouteWithoutParams(t *testing.T) {
+	RunTest4(
+		t, nil,
+		[]string{
+			"--route say_hi",
+			CmdExec(`{{MOCK_EXECUTABLE}} get-route-param this-param-does-not-exist > $MOCK_RESPONSE_BODY`),
+		},
+		Get("say_hi", nil),
+		StringMatches(""),
+		ExitCodeHeaderMatches("1"),
+	)
+}

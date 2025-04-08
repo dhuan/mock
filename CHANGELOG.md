@@ -2,6 +2,11 @@
 
 ## Unreleased yet
 
+IMPROVED:
+
+- get-route-param: Fail silently with Exit Code 1 instead of printing error
+  message in case attempting to get Route Param for a route that has none.
+
 FIXED:
 
 - Requesting an unexisting endpoint while using `--cors` would panic.
