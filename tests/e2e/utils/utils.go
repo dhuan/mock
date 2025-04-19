@@ -519,24 +519,52 @@ func PostUrlEncodedForm(route string, data map[string]string) TestFunc {
 	}
 }
 
-func PostMultipart(route string, data map[string]string) TestFunc {
+const MultipartValueType_Field = 0
+const MultipartValueType_File = 1
+
+type MultipartValue struct {
+	Data     string
+	Type     int
+	FileName string
+}
+
+func createFormValue(w *multipart.Writer, key string, value *MultipartValue) {
+	var fw io.Writer
+
+	if value.Type == MultipartValueType_Field {
+		fw, err := w.CreateFormField(key)
+		if err != nil {
+			panic(err)
+		}
+
+		r := strings.NewReader(value.Data)
+
+		if _, err = io.Copy(fw, r); err != nil {
+			panic(err)
+		}
+
+		return
+	}
+
+	fw, err := w.CreateFormFile(key, value.FileName)
+	if err != nil {
+		panic(err)
+	}
+
+	r := strings.NewReader(value.Data)
+
+	if _, err = io.Copy(fw, r); err != nil {
+		panic(err)
+	}
+}
+
+func PostMultipart(route string, data map[string]MultipartValue) TestFunc {
 	return func(t *testing.T, response *Response, serverOutput []byte, state *E2eState) {
 		var b bytes.Buffer
 		w := multipart.NewWriter(&b)
 
 		for key, value := range data {
-			var fw io.Writer
-
-			fw, err := w.CreateFormField(key)
-			if err != nil {
-				panic(err)
-			}
-
-			r := strings.NewReader(value)
-
-			if _, err = io.Copy(fw, r); err != nil {
-				panic(err)
-			}
+			createFormValue(w, key, &value)
 		}
 
 		w.Close()

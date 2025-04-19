@@ -218,8 +218,24 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok(t *testing.T) {
 			"--method POST",
 			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
-		PostMultipart("foo/bar", map[string]string{
-			"foo": "bar",
+		PostMultipart("foo/bar", map[string]MultipartValue{
+			"foo": {Data: "bar", Type: MultipartValueType_Field, FileName: ""},
+		}),
+		StringMatches("bar"),
+		ExitCodeHeaderMatches("0"),
+	)
+}
+
+func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok_WithFileField(t *testing.T) {
+	RunTest4(
+		t, nil,
+		[]string{
+			"--route foo/bar",
+			"--method POST",
+			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+		},
+		PostMultipart("foo/bar", map[string]MultipartValue{
+			"foo": {Data: "bar", Type: MultipartValueType_File, FileName: "file_name.txt"},
 		}),
 		StringMatches("bar"),
 		ExitCodeHeaderMatches("0"),
@@ -234,8 +250,8 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_FieldDoesNotExist(t *testing.
 			"--method POST",
 			CmdExec(`{{MOCK_EXECUTABLE}} get-payload doesnotexist > $MOCK_RESPONSE_BODY`),
 		},
-		PostMultipart("foo/bar", map[string]string{
-			"foo": "bar",
+		PostMultipart("foo/bar", map[string]MultipartValue{
+			"foo": {Data: "bar", Type: MultipartValueType_Field, FileName: ""},
 		}),
 		StringMatches(""),
 		ExitCodeHeaderMatches("1"),

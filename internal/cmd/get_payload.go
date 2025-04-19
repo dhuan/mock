@@ -119,7 +119,26 @@ func getPayloadField_Multipart(request *http.Request, payload []byte, fieldName 
 
 	value, ok := request.MultipartForm.Value[fieldName]
 	if !ok {
-		return "", false
+		value, ok := request.MultipartForm.File[fieldName]
+		if !ok {
+			return "", false
+		}
+
+		if len(value) == 0 {
+			return "", false
+		}
+
+		file, err := value[0].Open()
+		if err != nil {
+			return "", false
+		}
+
+		fileContent, err := io.ReadAll(file)
+		if err != nil {
+			return "", false
+		}
+
+		return string(fileContent), true
 	}
 
 	return strings.Join(value, ","), true

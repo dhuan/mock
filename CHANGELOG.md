@@ -2,6 +2,10 @@
 
 ## Unreleased yet
 
+ADDED:
+- get-payload: Add support for reading files from Multipart Form Requests.
+  Previously only "fields" fro Multipart could be read.
+
 IMPROVED:
 
 - get-route-param: Fail silently with Exit Code 1 instead of printing error
