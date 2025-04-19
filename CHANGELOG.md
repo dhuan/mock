@@ -5,7 +5,7 @@
 ADDED:
 
 - get-payload: Add support for reading files from Multipart Form Requests.
-  Previously only "fields" fro Multipart could be read.
+  Previously only "fields" from Multipart could be read.
 
 IMPROVED:
 
