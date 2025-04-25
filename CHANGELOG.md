@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased yet
+
+IMPROVED:
+
+- Avoid creating one temporary file for shell scripts for each request. An
+  internal cache mechanism ensures that the amount of temporary files are
+  reduced.
+
 ## 1.4.11
 
 ADDED:

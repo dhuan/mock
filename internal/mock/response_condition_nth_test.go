@@ -58,6 +58,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_FirstRequest(t *testing.T) {
 			*newRequestRecord("irrelevant_request", "post"),
 		},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, []byte(`default response.`), response.Body)
@@ -84,6 +85,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_SecondRequest(t *testing.T) {
 			*newRequestRecord("foo/bar", "put"),
 		},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, []byte(`this is the second response.`), response.Body)
@@ -109,6 +111,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_ThirdRequest(t *testing.T) {
 			*newRequestRecord("foo/bar", "get"),
 		},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, []byte(`this is the third response.`), response.Body)
@@ -142,6 +145,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_SubsequentRequests(t *testing.T)
 			*newRequestRecord("foo/bar", "get"),
 		},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, []byte(`default response.`), response.Body)
@@ -178,6 +182,7 @@ func Test_ResolveEndpointResponse_Condition_Nth_WithPlus(t *testing.T) {
 			*newRequestRecord("foo/bar", "get"),
 		},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, []byte(`this is the third response.`), response.Body)

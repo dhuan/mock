@@ -61,6 +61,7 @@ func ResolveEndpointResponse(
 	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
 	baseApi string,
+	cache map[string]string,
 ) (*Response, map[string]string, error) {
 	hasResponseIf := len(endpointConfig.ResponseIf) > 0
 	matchingResponseIf := &types.ResponseIf{}
@@ -87,6 +88,7 @@ func ResolveEndpointResponse(
 			envVars,
 			endpointParams,
 			baseApi,
+			cache,
 		)
 	}
 
@@ -105,6 +107,7 @@ func ResolveEndpointResponse(
 		envVars,
 		endpointParams,
 		baseApi,
+		cache,
 	)
 }
 
@@ -180,6 +183,7 @@ func resolveEndpointResponseInternal(
 	envVars map[string]string,
 	endpointParams map[string]string,
 	baseApi string,
+	cache map[string]string,
 ) (*Response, map[string]string, error) {
 	errorMetadata := make(map[string]string)
 	endpointConfigContentType := resolveEndpointConfigContentType(string(response))
@@ -238,7 +242,7 @@ func resolveEndpointResponseInternal(
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_exec {
-		return execResponse(rrd, readFile, exec)
+		return execResponse(rrd, readFile, exec, cache, endpointConfig)
 	}
 
 	if endpointConfigContentType == types.Endpoint_content_type_fileserver {
@@ -548,16 +552,26 @@ func execResponse(
 	data *responseResolverData,
 	readFile types.ReadFileFunc,
 	exec ExecFunc,
+	cache map[string]string,
+	ec *types.EndpointConfig,
 ) (*Response, map[string]string, error) {
 	return execWrapper(data, readFile, exec, func() (string, error) {
-		execCommand := strings.Replace(data.responseStr, "exec:", "", -1)
+		var err error
+		cacheKey := fmt.Sprintf("tmp_exec_file_%s_%s", ec.Method, ec.Route)
 
-		tempShellScriptFile, err := utils.CreateTempFile([]byte(execCommand))
-		if err != nil {
-			return "", err
+		cachedScriptFile, ok := cache[cacheKey]
+		if !ok {
+			execCommand := strings.Replace(data.responseStr, "exec:", "", -1)
+
+			cachedScriptFile, err = utils.CreateTempFile([]byte(execCommand))
+			if err != nil {
+				return "", err
+			}
+
+			cache[cacheKey] = cachedScriptFile
 		}
 
-		command := fmt.Sprintf("sh %s", tempShellScriptFile)
+		command := fmt.Sprintf("sh %s", cachedScriptFile)
 
 		log.Printf("Executing command: %s", command)
 

@@ -31,6 +31,8 @@ import (
 var serveCmd = &cobra.Command{
 	Use: "serve",
 	Run: func(cmd *cobra.Command, args []string) {
+		cache := make(map[string]string)
+
 		endpointsFromCommandLine := args2config.ParseEndpoints(os.Args)
 
 		config, err := resolveConfig(flagConfig)
@@ -92,30 +94,30 @@ var serveCmd = &cobra.Command{
 
 		router.Use(handleOptions(flagCors, state, config, mockFs, router))
 
-		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs))
+		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs, cache))
 
 		for i := range config.Endpoints {
 			endpointConfig := config.Endpoints[i]
 			route := fmt.Sprintf("/%s", endpointConfig.Route)
 
 			if endpointConfig.Method == "get" || endpointConfig.Method == "" {
-				router.Get(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
+				router.Get(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config, cache))
 			}
 
 			if endpointConfig.Method == "post" {
-				router.Post(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
+				router.Post(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config, cache))
 			}
 
 			if endpointConfig.Method == "patch" {
-				router.Patch(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
+				router.Patch(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config, cache))
 			}
 
 			if endpointConfig.Method == "put" {
-				router.Put(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
+				router.Put(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config, cache))
 			}
 
 			if endpointConfig.Method == "delete" {
-				router.Delete(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config))
+				router.Delete(route, newEndpointHandler(state, config.Middlewares, &endpointConfig, mockFs, flagDelay, config, cache))
 			}
 		}
 
@@ -257,6 +259,7 @@ func newEndpointHandler(
 	mockFs types.MockFs,
 	delay int64,
 	config *MockConfig,
+	cache map[string]string,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		envVars := getAllEnvVars()
@@ -284,6 +287,7 @@ func newEndpointHandler(
 			requestRecord,
 			requestRecords,
 			config.Base,
+			cache,
 		)
 		if errors.Is(err, mock.ErrResponseFileDoesNotExist) {
 			log.Printf("Tried to read file that does not exist: %s", errorMetadata["file"])
@@ -442,11 +446,12 @@ func onNotFound(
 	state *types.State,
 	config *MockConfig,
 	mockFs types.MockFs,
+	cache map[string]string,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		endpointConfig, ok := findEndpointConfigByRoute(config.Endpoints, fmt.Sprintf("%s/*", utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")))
 		if ok {
-			newEndpointHandler(state, config.Middlewares, endpointConfig, mockFs, flagDelay, config)(w, r)
+			newEndpointHandler(state, config.Middlewares, endpointConfig, mockFs, flagDelay, config, cache)(w, r)
 
 			return
 		}

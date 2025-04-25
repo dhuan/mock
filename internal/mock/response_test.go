@@ -56,6 +56,7 @@ func Test_ResolveEndpointResponse_GettingResponse_Json(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -92,6 +93,7 @@ func Test_ResolveEndpointResponse_GettingResponse_PlainText(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -130,6 +132,7 @@ func Test_ResolveEndpointResponse_EndpointWithResponseByFile(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -166,6 +169,7 @@ func Test_ResolveEndpointResponse_DefaultResponseStatusCode(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, 200, response.StatusCode)
@@ -193,6 +197,7 @@ func Test_ResolveEndpointResponse_ResponseStatusCode(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, 201, response.StatusCode)
@@ -239,6 +244,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -295,6 +301,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_FallbackResponse(t *t
 		&types.RequestRecord{Querystring: "hello=WORLD"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -355,6 +362,7 @@ func Test_ResolveEndpointResponse_WithQueryStringCondition_WithMultipleValues(t 
 		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(t, 203, response.StatusCode)
@@ -415,6 +423,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_FallingBackToDef
 		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -473,6 +482,7 @@ func Test_ResolveEndpointResponse_WithQueryStringExactCondition_ResolvingToCondi
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -538,6 +548,7 @@ func Test_ResolveEndpointResponse_WithAndChaining(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world&foo=bar"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -589,6 +600,7 @@ func Test_ResolveEndpointResponse_WithOrChaining(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -627,6 +639,7 @@ func Test_ResolveEndpointResponse_Headers_Match(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -664,6 +677,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_Match(t *testing.T) {
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -715,6 +729,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Match
 		&types.RequestRecord{Querystring: "foo=bar"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -766,6 +781,7 @@ func Test_ResolveEndpointResponse_Headers_WithBase_WithConditionalResponse_Condi
 		&types.RequestRecord{Querystring: "hello=world"},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
@@ -820,6 +836,7 @@ func Test_ResolveEndpointResponse_FormMatch_Match(t *testing.T) {
 		&types.RequestRecord{Method: "post", Querystring: "hello=world", Body: &body},
 		[]types.RequestRecord{},
 		"",
+		make(map[string]string),
 	)
 
 	assert.Equal(
