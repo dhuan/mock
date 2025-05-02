@@ -34,20 +34,31 @@ installed:
 
 Clone *mock*\ ’s source code:
 
-::
+.. code:: sh
 
    $ git clone https://github.com/dhuan/mock
 
 Move into the new folder where *mock* was cloned run the make command
 for building the program:
 
-::
+.. code:: sh
 
    $ make build
 
 If executed successfully, the *mock* executable file should’ve been
 created inside the ``bin`` folder from the root repository path.
 
-::
+.. code:: sh
 
    $ ./bin/mock version
+
+Install through Go
+------------------
+
+This installation method requires only having Go installed. No need to clone the repository. Just use Go's `install` utility:
+
+.. code:: sh
+
+    $ go install github.com/dhuan/mock@latest
+
+`mock` should then be available as an executable located in `$GOPATH/bin <https://go.dev/wiki/GOPATH>`_.
