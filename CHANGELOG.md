@@ -8,6 +8,10 @@ IMPROVED:
   internal cache mechanism ensures that the amount of temporary files are
   reduced.
 
+FIXED:
+
+- "delay" would not work when used with Base APIs.
+
 ## 1.4.11
 
 ADDED:

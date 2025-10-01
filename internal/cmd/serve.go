@@ -94,7 +94,7 @@ var serveCmd = &cobra.Command{
 
 		router.Use(handleOptions(flagCors, state, config, mockFs, router))
 
-		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs, cache))
+		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs, cache, flagDelay))
 
 		for i := range config.Endpoints {
 			endpointConfig := config.Endpoints[i]
@@ -320,9 +320,7 @@ func newEndpointHandler(
 			panic(err)
 		}
 
-		if delay > 0 {
-			time.Sleep(time.Duration(delay) * time.Millisecond)
-		}
+		handleDelay(delay)
 
 		response = handleMiddleware(
 			state,
@@ -447,6 +445,7 @@ func onNotFound(
 	config *MockConfig,
 	mockFs types.MockFs,
 	cache map[string]string,
+	delay int64,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		endpointConfig, ok := findEndpointConfigByRoute(config.Endpoints, fmt.Sprintf("%s/*", utils.ReplaceRegex(r.URL.Path, []string{"^/"}, "")))
@@ -500,6 +499,8 @@ func onNotFound(
 
 			return
 		}
+
+		handleDelay(delay)
 
 		r2, err := utils.CloneRequest(r)
 		if err != nil {
@@ -922,4 +923,10 @@ func findEndpointConfigByRoute(endpointConfigs []types.EndpointConfig, route str
 	}
 
 	return &types.EndpointConfig{}, false
+}
+
+func handleDelay(delay int64) {
+	if delay > 0 {
+		time.Sleep(time.Duration(delay) * time.Millisecond)
+	}
 }
