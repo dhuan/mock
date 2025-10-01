@@ -305,19 +305,27 @@ installed:</p>
 <li><p>Git</p></li>
 </ul>
 <p>Clone <em>mock</em>’s source code:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/dhuan/mock
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dhuan/mock
 </pre></div>
 </div>
 <p>Move into the new folder where <em>mock</em> was cloned run the make command
 for building the program:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make build
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>build
 </pre></div>
 </div>
 <p>If executed successfully, the <em>mock</em> executable file should’ve been
 created inside the <code class="docutils literal notranslate"><span class="pre">bin</span></code> folder from the root repository path.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./bin/mock version
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./bin/mock<span class="w"> </span>version
 </pre></div>
 </div>
+</section>
+<section id="install-through-go">
+<h2>Install through Go<a class="headerlink" href="#install-through-go" title="Link to this heading">¶</a></h2>
+<p>This installation method requires only having Go installed. No need to clone the repository. Just use Go’s <cite>install</cite> utility:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>go<span class="w"> </span>install<span class="w"> </span>github.com/dhuan/mock@latest
+</pre></div>
+</div>
+<p><cite>mock</cite> should then be available as an executable located in <a class="reference external" href="https://go.dev/wiki/GOPATH">$GOPATH/bin</a>.</p>
 </section>
 </section>
 
@@ -379,6 +387,7 @@ created inside the <code class="docutils literal notranslate"><span class="pre">
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#download-mock">Download <em>mock</em></a></li>
 <li><a class="reference internal" href="#install-through-source-code">Install through source code</a></li>
+<li><a class="reference internal" href="#install-through-go">Install through Go</a></li>
 </ul>
 </li>
 </ul>
