@@ -1,0 +1,29 @@
+How-tos & Examples
+==================
+
+Delaying specific endpoints
+---------------------------
+
+Making an existing API slow can be easily accomplished combining mock's
+:ref:`Base APIs <base_api>` and the :ref:`delay option.
+<cmd_options_reference__delay>`
+
+.. code:: sh
+
+    mock serve -p 8000 --base example.com --delay 2000
+
+You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using :ref:`middlewares <middlewares>`: 
+
+.. code:: sh
+
+    mock serve -p 8000 --base example.com --middleware '
+    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
+    then
+        sleep 2 # wait two seconds
+    fi
+    '
+
+With that last example, our API at ``localhost:8000`` will act as a proxy to
+``example.com``. All requests will be responded immediately except
+``some/endpoint`` which will have a delay of 2 seconds.

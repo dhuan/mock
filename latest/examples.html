@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Test Assertions" href="test_assertions.html"><link rel="prev" title="Middlewares" href="middlewares.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Handling CORS" href="cors.html"><link rel="prev" title="Conditions Reference" href="conditions_reference.html">
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2025.09.25 -->
-        <title>Base APIs - mock documentation</title>
+        <title>How-tos &amp; Examples - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=acfd86a5" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -198,7 +198,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input aria-label="Toggle navigation of Creating APIs" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input aria-label="Toggle navigation of Creating APIs" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mock_vars.html">Mock Variables</a></li>
@@ -208,7 +208,7 @@
 <li class="toctree-l2"><a class="reference internal" href="conditional_responses.html">Conditional Response</a></li>
 <li class="toctree-l2"><a class="reference internal" href="env_vars.html">Reading Environment Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="middlewares.html">Middlewares</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Base APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_apis.html">Base APIs</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_assertions.html">Test Assertions</a><input aria-label="Toggle navigation of Test Assertions" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -219,7 +219,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">Mock API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_reference.html">Command-line Options Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditions_reference.html">Conditions Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">How-tos &amp; Examples</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How-tos &amp; Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Miscellaneous:</span></p>
 <ul>
@@ -257,7 +257,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/base_apis.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/examples.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -275,138 +275,28 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="base-apis">
-<span id="base-api"></span><h1>Base APIs<a class="headerlink" href="#base-apis" title="Link to this heading">¶</a></h1>
-<p>A <cite>mock</cite> server can be configured to have a Base API. All requests sent to the
-server will be forwarded to the Base API:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--base<span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--route<span class="w"> </span><span class="s1">&#39;hello/world&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--response<span class="w"> </span><span class="s1">&#39;Hello world!&#39;</span>
+          <section id="how-tos-examples">
+<h1>How-tos &amp; Examples<a class="headerlink" href="#how-tos-examples" title="Link to this heading">¶</a></h1>
+<section id="delaying-specific-endpoints">
+<h2>Delaying specific endpoints<a class="headerlink" href="#delaying-specific-endpoints" title="Link to this heading">¶</a></h2>
+<p>Making an existing API slow can be easily accomplished combining mock’s
+<a class="reference internal" href="base_apis.html#base-api"><span class="std std-ref">Base APIs</span></a> and the <a class="reference internal" href="cmd_reference.html#cmd-options-reference-delay"><span class="std std-ref">delay option.</span></a></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--delay<span class="w"> </span><span class="m">2000</span>
 </pre></div>
 </div>
-<p>Alternatively you may use the <code class="docutils literal notranslate"><span class="pre">base</span></code> configuration option for achieving the
-same:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;base&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;middlewares&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">  </span><span class="nt">&quot;endpoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">     </span><span class="p">{</span>
-<span class="w">       </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello/world&quot;</span><span class="p">,</span>
-<span class="w">       </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
-<span class="w">     </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
+<p>You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--middleware<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">if [ &quot;${MOCK_REQUEST_ENDPOINT}&quot; = &quot;some/endpoint&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    sleep 2 # wait two seconds</span>
+<span class="s1">fi</span>
+<span class="s1">&#39;</span>
 </pre></div>
 </div>
-<p>Above we’ve set up an API that uses <code class="docutils literal notranslate"><span class="pre">example.com</span></code> as its Base API,
-furthermore an endpoint was set routed as <code class="docutils literal notranslate"><span class="pre">hello/world</span></code>. If a request is made
-to <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">hello/world</span></code>, the server will act normally responding with the
-response which was set - <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">world!</span></code>. However if a request is made to an
-endpoint that has not been set, then the request will be forwaded to the Base
-API. In other words, a request to <code class="docutils literal notranslate"><span class="pre">foo/bar</span></code> will result in a proxy request to
-<code class="docutils literal notranslate"><span class="pre">example.com/foo/bar</span></code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Base APIs defined through the command-line flag takes precedence over one
-set through configuration file. There can only be one Base API for a running
-<cite>mock</cite> instance.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You can use <cite>mock</cite> solely as a Base API. Don’t define any endpoints and
-start up <cite>mock</cite> with only the Base API option. It will act as a proxy to
-some other service.</p>
-</div>
-<section id="intercepting-responses">
-<h2>Intercepting responses<a class="headerlink" href="#intercepting-responses" title="Link to this heading">¶</a></h2>
-<p>Endpoints defined for a <cite>mock API</cite> overwrite the ones from a Base API. In other
-words, when both your API <em>and</em> Base API offer the same endpoint, then your
-API’s endpoint takes precedence, therefore the Base API’s endpoint does not
-even get requested in that scenario. But that is the default behavior only, we
-can set things to behave differently if desired.</p>
-<p><a class="reference external" href="shell_scripts.html">Through response shell scripts</a> we can forward the
-current request to the Base API, and then the HTTP Response from Base API will
-be available in the <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code> environment variable, enabling us
-to tweak the response if desired, before sending to the client. This is
-accomplished using the <cite>forward</cite> command, executed from your endpoint’s shell
-script:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>forward
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If the HTTP Response obtained from <cite>forward</cite> is encoded with gzip, <cite>mock</cite>
-decodes it for you, therefore the <code class="docutils literal notranslate"><span class="pre">$MOCK_RESPONSE_BODY</span></code> file will contain
-the decoded data for you to manipulate as you wish. Note also that <cite>mock</cite>
-removes the <cite>Content-Encoding</cite> HTTP Header upon decoding the data, therefore
-if you wish to respond to the client with encoded data, you must manually
-add again the <code class="docutils literal notranslate"><span class="pre">Content-Encoding</span></code> header.</p>
-</div>
-</section>
-<section id="intercepting-responses-through-middlewares">
-<h2>Intercepting responses through middlewares<a class="headerlink" href="#intercepting-responses-through-middlewares" title="Link to this heading">¶</a></h2>
-<p><a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">Middlewares</span></a> can be used to manipulate responses given by a
-Base API. In fact Middlewares make no distinction between requests to Base API
-or otherwise.</p>
-<p>On your middleware handler you can find out whether the context is that of a
-Base API request or not by reading the <code class="docutils literal notranslate"><span class="pre">$MOCK_BASE_API_RESPONSE</span></code> environment
-variable.</p>
-<p>The middleware below adds a header <code class="docutils literal notranslate"><span class="pre">Foo:</span> <span class="pre">bar</span></code> to all responses proxied to a
-Base API:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MOCK_BASE_API_RESPONSE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]</span><span class="p">;</span>
-<span class="k">then</span>
-<span class="w">  </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;Foo: bar&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
-<span class="k">fi</span>
-</pre></div>
-</div>
-<p>Alternatively you can just use the <code class="docutils literal notranslate"><span class="pre">route_match</span></code> middleware option in order
-to filter the requests which you want to manipulate, targetting the route
-patterns that are meant for your Base API.</p>
-</section>
-<section id="base-apis-and-tls">
-<h2>Base APIs and TLS<a class="headerlink" href="#base-apis-and-tls" title="Link to this heading">¶</a></h2>
-<p>The Base API option can take a simple domain (<code class="docutils literal notranslate"><span class="pre">example.com</span></code>) as its value, or
-a protocol+domain combo (<code class="docutils literal notranslate"><span class="pre">https://example.com</span></code>). Read further to understand
-how the different methods differ:</p>
-<p>Domain only: The protocol set by the requesting client will be respected. If a
-client requests <cite>mock</cite> using HTTPS, then <cite>mock</cite> will request the Base API using
-HTTPS as well.</p>
-<p>Protocol + domain combination: If a protocol is set in the Base API’s value,
-then <cite>mock</cite> will always use that protocol when forwarding the request,
-independent of the protocol chosen by requesting client.</p>
-</section>
-<section id="manipulating-headers">
-<h2>Manipulating headers<a class="headerlink" href="#manipulating-headers" title="Link to this heading">¶</a></h2>
-<p>There may be cases when you don’t want certain HTTP Headers from the Base API.
-For that, <cite>mock</cite> provides a command for easily removing headers:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>forward
-$<span class="w"> </span>mock<span class="w"> </span>wipe-headers<span class="w"> </span>some-header-key<span class="w"> </span>another-header-key
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><cite>wipe-headers</cite> is meant to be used <a class="reference external" href="shell_scripts.html">inside shell scripts.</a></p>
-</div>
-<p>A response handler shell script using <cite>wipe-headers</cite> as exemplified above will
-remove HTTP Headers <cite>some-header-key</cite> and <cite>another-header-key</cite>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><cite>wipe-headers</cite> is just a faster way of manipulating the
-<cite>$MOCK_RESPONSE_HEADERS</cite> file. The exact same could’ve been accomplished
-with:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>forward
-$<span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-e<span class="w"> </span>some-header-key<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-e<span class="w"> </span>another-header-key<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">$MOCK_RESPONSE_HEADERS</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sponge<span class="w"> </span><span class="nv">$MOCK_RESPONSE_HEADERS</span>
-</pre></div>
-</div>
-</div>
-<p>Regular expressions are also supported:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>wipe-headers<span class="w"> </span>--regex<span class="w"> </span>some-regex-pattern<span class="w"> </span>another-regex-pattern
-</pre></div>
-</div>
+<p>With that last example, our API at <code class="docutils literal notranslate"><span class="pre">localhost:8000</span></code> will act as a proxy to
+<code class="docutils literal notranslate"><span class="pre">example.com</span></code>. All requests will be responded immediately except
+<code class="docutils literal notranslate"><span class="pre">some/endpoint</span></code> which will have a delay of 2 seconds.</p>
 </section>
 </section>
 
@@ -415,23 +305,23 @@ $<span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="test_assertions.html">
+          <a class="next-page" href="cors.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Test Assertions</div>
+                <div class="title">Handling CORS</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="middlewares.html">
+          <a class="prev-page" href="conditions_reference.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Middlewares</div>
+                <div class="title">Conditions Reference</div>
                 
               </div>
             </a>
@@ -465,11 +355,8 @@ $<span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Base APIs</a><ul>
-<li><a class="reference internal" href="#intercepting-responses">Intercepting responses</a></li>
-<li><a class="reference internal" href="#intercepting-responses-through-middlewares">Intercepting responses through middlewares</a></li>
-<li><a class="reference internal" href="#base-apis-and-tls">Base APIs and TLS</a></li>
-<li><a class="reference internal" href="#manipulating-headers">Manipulating headers</a></li>
+<li><a class="reference internal" href="#">How-tos &amp; Examples</a><ul>
+<li><a class="reference internal" href="#delaying-specific-endpoints">Delaying specific endpoints</a></li>
 </ul>
 </li>
 </ul>
