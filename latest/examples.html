@@ -298,6 +298,32 @@ This can be achieved using <a class="reference internal" href="middlewares.html#
 <code class="docutils literal notranslate"><span class="pre">example.com</span></code>. All requests will be responded immediately except
 <code class="docutils literal notranslate"><span class="pre">some/endpoint</span></code> which will have a delay of 2 seconds.</p>
 </section>
+<section id="an-api-powered-by-multiple-languages">
+<h2>An API powered by multiple languages<a class="headerlink" href="#an-api-powered-by-multiple-languages" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>js<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">node &lt;&lt;EOF | mock write</span>
+<span class="s1">console.log(&quot;Hello from Node.js!&quot;)</span>
+<span class="s1">EOF</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>python<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">python3 &lt;&lt;EOF | mock write</span>
+<span class="s1">print(&quot;Hello from Python!&quot;)</span>
+<span class="s1">EOF</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>php<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">php &lt;&lt;EOF | mock write</span>
+<span class="s1">&lt;?php</span>
+<span class="s1">echo &quot;Hello from PHP!\n&quot;;</span>
+<span class="s1">?&gt;</span>
+<span class="s1">EOF</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -357,6 +383,7 @@ This can be achieved using <a class="reference internal" href="middlewares.html#
             <ul>
 <li><a class="reference internal" href="#">How-tos &amp; Examples</a><ul>
 <li><a class="reference internal" href="#delaying-specific-endpoints">Delaying specific endpoints</a></li>
+<li><a class="reference internal" href="#an-api-powered-by-multiple-languages">An API powered by multiple languages</a></li>
 </ul>
 </li>
 </ul>
