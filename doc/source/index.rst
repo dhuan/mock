@@ -101,6 +101,7 @@ file. <https://github.com/dhuan/mock/blob/master/LICENSE>`__
    api_reference
    cmd_reference
    conditions_reference
+   examples
 
 .. toctree::
    :hidden:
