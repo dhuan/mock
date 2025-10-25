@@ -10,14 +10,14 @@ Making an existing API slow can be easily accomplished combining mock's
 
 .. code:: sh
 
-    mock serve -p 8000 --base example.com --delay 2000
+    $ mock serve -p 8000 --base example.com --delay 2000
 
 You may want however to make a specific endpoint slow instead of the whole API.
 This can be achieved using :ref:`middlewares <middlewares>`: 
 
 .. code:: sh
 
-    mock serve -p 8000 --base example.com --middleware '
+    $ mock serve -p 8000 --base example.com --middleware '
     if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
     then
         sleep 2 # wait two seconds
@@ -33,7 +33,7 @@ An API powered by multiple languages
 
 .. code:: sh
 
-    mock serve -p 3000 \
+    $ mock serve -p 3000 \
         --route js \
         --exec '
     node <<EOF | mock write
@@ -66,3 +66,30 @@ Let's test it:
    # Prints out: Hello from Python!
    $ curl localhost:3000/php
    # Prints out: Hello from PHP!
+
+A stateful API
+--------------
+
+.. code:: sh
+
+    $ export TMP=$(mktemp)
+    $ printf "0" > "${TMP}"
+
+    $ mock serve -p 3000 \
+        --route '/hello' \
+        --exec '
+    printf "%s + 1\n" "$(cat ${TMP})" | bc | sponge "${TMP}"
+
+    printf "This server has received %s request(s) so far." "$(cat '"${TMP}"')" | mock write
+    '
+
+Let's test it:
+
+.. code:: sh
+
+   $ curl localhost:3000/hello
+   # Prints out: This server has received 1 request(s) so far.
+   $ curl localhost:3000/hello
+   # Prints out: This server has received 2 request(s) so far.
+   $ curl localhost:3000/hello
+   # Prints out: This server has received 3 request(s) so far.
