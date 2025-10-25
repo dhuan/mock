@@ -33,7 +33,7 @@ An API powered by multiple languages
 
 .. code:: sh
 
-    mock serve -p 8000 \
+    mock serve -p 3000 \
         --route js \
         --exec '
     node <<EOF | mock write
@@ -54,3 +54,15 @@ An API powered by multiple languages
     ?>
     EOF
     '
+
+Let's test it:
+
+
+.. code:: sh
+
+   $ curl localhost:3000/js
+   # Prints out: Hello from Node.js!
+   $ curl localhost:3000/python
+   # Prints out: Hello from Python!
+   $ curl localhost:3000/php
+   # Prints out: Hello from PHP!
