@@ -219,6 +219,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">Mock API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_reference.html">Command-line Options Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditions_reference.html">Conditions Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">How-tos &amp; Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Miscellaneous:</span></p>
 <ul>
@@ -462,27 +463,24 @@ you use the <code class="docutils literal notranslate"><span class="pre">route_m
 desire. In other words, by default Middlewares are executed for all “not_found”
 requests.</p>
 <p>You can identify whether the current request being handled is valid or not by
-reading the <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_NOT_FOUND</span></code> environment variable. It’s a boolean
-variable.</p>
+reading the <code class="docutils literal notranslate"><span class="pre">MOCK_REQUEST_NOT_FOUND</span></code> environment variable, which will be
+<code class="docutils literal notranslate"><span class="pre">true</span></code> if it’s an endpoint not supported by your API.</p>
 <p>Furthermore, requests for invalid routes will result in middleware having the
 <code class="docutils literal notranslate"><span class="pre">MOCK_RESPONSE_STATUS_CODE</span></code> set to <code class="docutils literal notranslate"><span class="pre">405</span></code>. If you want a different response
 status code to be set, just change that variable’s value.</p>
 <p>With that, we can easily create custom “not found” pages. Let’s look at an
 example on how to accomplish this:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--middleware<span class="w"> </span><span class="s2">&quot;sh path/to/my/middleware.sh&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--middleware<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">if [ &quot;${MOCK_REQUEST_NOT_FOUND}&quot; = &quot;true&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    mock set-status 404</span>
+
+<span class="s1">    printf &quot;This page does not exist!&quot; | mock write</span>
+<span class="s1">fi</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--route<span class="w"> </span>foo/bar<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--response<span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
-</pre></div>
-</div>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>//<span class="w"> </span>path/to/my/middleware.sh
-
-<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MOCK_REQUEST_NOT_FOUND</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="w"> </span><span class="o">]</span>
-<span class="k">then</span>
-<span class="w">    </span>mock<span class="w"> </span>set-status<span class="w"> </span><span class="m">404</span>
-
-<span class="w">    </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;This page does not exist!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mock<span class="w"> </span>write
-<span class="k">fi</span>
 </pre></div>
 </div>
 <p>Let’s analyse the result. Request <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">foo/bar</span></code>:</p>

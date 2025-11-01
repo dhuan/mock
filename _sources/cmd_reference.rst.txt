@@ -139,6 +139,8 @@ that your browser does not complain about cross-origin requests.
 
    $ mock serve -c /path/to/config.json --cors
 
+.. _cmd_options_reference__delay:
+
 ``-d`` or ``--delay``
 ---------------------
 
