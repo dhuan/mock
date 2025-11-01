@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Changelog" href="changelog.html"><link rel="prev" title="mock - API and testing utility" href="index.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Handling CORS" href="cors.html"><link rel="prev" title="Conditions Reference" href="conditions_reference.html">
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2025.09.25 -->
-        <title>Installation - mock documentation</title>
+        <title>How-tos &amp; Examples - mock documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=acfd86a5" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -192,12 +192,12 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Installation</a></li>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="apis.html">Creating APIs</a><input aria-label="Toggle navigation of Creating APIs" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="route_params.html">Route Parameters</a></li>
@@ -219,7 +219,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">Mock API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_reference.html">Command-line Options Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditions_reference.html">Conditions Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">How-tos &amp; Examples</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How-tos &amp; Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Miscellaneous:</span></p>
 <ul>
@@ -257,7 +257,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/install.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/examples.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -275,58 +275,87 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
-<section id="download-mock">
-<h2>Download <em>mock</em><a class="headerlink" href="#download-mock" title="Link to this heading">¶</a></h2>
-<p>The easiest installation method is simply downloading <em>mock</em>’s
-executable file. It’s built as a standalone program with no
-dependencies, so just choose one of the supported OSs and start using
-it, or check the releases page where you’ll find other download formats
-available:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v1.4.13/mock_v1.4.13_linux-386.tar.gz">Download mock for Linux</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases/download/v1.4.13/mock_v1.4.13_darwin-amd64.tar.gz">Download mock for MacOS</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dhuan/mock/releases">Releases</a></p></li>
-</ul>
-<p>Or, here’s a few lines of shell for quickly installing it:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>-O<span class="w"> </span>mock.tgz<span class="w"> </span>https://github.com/dhuan/mock/releases/download/v1.4.13/mock_v1.4.13_linux-386.tar.gz
-$<span class="w"> </span>tar<span class="w"> </span>xzvf<span class="w"> </span>mock.tgz
-$<span class="w"> </span>./mock<span class="w"> </span>version
+          <section id="how-tos-examples">
+<h1>How-tos &amp; Examples<a class="headerlink" href="#how-tos-examples" title="Link to this heading">¶</a></h1>
+<section id="delaying-specific-endpoints">
+<h2>Delaying specific endpoints<a class="headerlink" href="#delaying-specific-endpoints" title="Link to this heading">¶</a></h2>
+<p>Making an existing API slow can be easily accomplished combining mock’s
+<a class="reference internal" href="base_apis.html#base-api"><span class="std std-ref">Base APIs</span></a> and the <a class="reference internal" href="cmd_reference.html#cmd-options-reference-delay"><span class="std std-ref">delay option.</span></a></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--delay<span class="w"> </span><span class="m">2000</span>
+</pre></div>
+</div>
+<p>You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--middleware<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">if [ &quot;${MOCK_REQUEST_ENDPOINT}&quot; = &quot;some/endpoint&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    sleep 2 # wait two seconds</span>
+<span class="s1">fi</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>With that last example, our API at <code class="docutils literal notranslate"><span class="pre">localhost:8000</span></code> will act as a proxy to
+<code class="docutils literal notranslate"><span class="pre">example.com</span></code>. All requests will be responded immediately except
+<code class="docutils literal notranslate"><span class="pre">some/endpoint</span></code> which will have a delay of 2 seconds.</p>
+</section>
+<section id="an-api-powered-by-multiple-languages">
+<h2>An API powered by multiple languages<a class="headerlink" href="#an-api-powered-by-multiple-languages" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>js<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">node &lt;&lt;EOF | mock write</span>
+<span class="s1">console.log(&quot;Hello from Node.js!&quot;)</span>
+<span class="s1">EOF</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>python<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">python3 &lt;&lt;EOF | mock write</span>
+<span class="s1">print(&quot;Hello from Python!&quot;)</span>
+<span class="s1">EOF</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span>php<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">php &lt;&lt;EOF | mock write</span>
+<span class="s1">&lt;?php</span>
+<span class="s1">echo &quot;Hello from PHP!\n&quot;;</span>
+<span class="s1">?&gt;</span>
+<span class="s1">EOF</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>Let’s test it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/js
+<span class="c1"># Prints out: Hello from Node.js!</span>
+$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/python
+<span class="c1"># Prints out: Hello from Python!</span>
+$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/php
+<span class="c1"># Prints out: Hello from PHP!</span>
 </pre></div>
 </div>
 </section>
-<section id="install-through-source-code">
-<h2>Install through source code<a class="headerlink" href="#install-through-source-code" title="Link to this heading">¶</a></h2>
-<p>Before proceeding make sure that your system has the following programs
-installed:</p>
-<ul class="simple">
-<li><p>Golang 1.18 or more recent</p></li>
-<li><p>GNU Make</p></li>
-<li><p>Git</p></li>
-</ul>
-<p>Clone <em>mock</em>’s source code:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dhuan/mock
+<section id="a-stateful-api">
+<h2>A stateful API<a class="headerlink" href="#a-stateful-api" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">TMP</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMP</span><span class="si">}</span><span class="s2">&quot;</span>
+
+$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;/hello&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">printf &quot;%s + 1\n&quot; &quot;$(cat ${TMP})&quot; | bc | sponge &quot;${TMP}&quot;</span>
+
+<span class="s1">printf &quot;This server has received %s request(s) so far.&quot; &quot;$(cat &#39;</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TMP</span><span class="si">}</span><span class="s2">&quot;</span><span class="s1">&#39;)&quot; | mock write</span>
+<span class="s1">&#39;</span>
 </pre></div>
 </div>
-<p>Move into the new folder where <em>mock</em> was cloned run the make command
-for building the program:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>build
+<p>Let’s test it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
+<span class="c1"># Prints out: This server has received 1 request(s) so far.</span>
+$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
+<span class="c1"># Prints out: This server has received 2 request(s) so far.</span>
+$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
+<span class="c1"># Prints out: This server has received 3 request(s) so far.</span>
 </pre></div>
 </div>
-<p>If executed successfully, the <em>mock</em> executable file should’ve been
-created inside the <code class="docutils literal notranslate"><span class="pre">bin</span></code> folder from the root repository path.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./bin/mock<span class="w"> </span>version
-</pre></div>
-</div>
-</section>
-<section id="install-through-go">
-<h2>Install through Go<a class="headerlink" href="#install-through-go" title="Link to this heading">¶</a></h2>
-<p>This installation method requires only having Go installed. No need to clone the repository. Just use Go’s <cite>install</cite> utility:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>go<span class="w"> </span>install<span class="w"> </span>github.com/dhuan/mock@latest
-</pre></div>
-</div>
-<p><cite>mock</cite> should then be available as an executable located in <a class="reference external" href="https://go.dev/wiki/GOPATH">$GOPATH/bin</a>.</p>
 </section>
 </section>
 
@@ -335,23 +364,23 @@ created inside the <code class="docutils literal notranslate"><span class="pre">
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="changelog.html">
+          <a class="next-page" href="cors.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Changelog</div>
+                <div class="title">Handling CORS</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="conditions_reference.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Conditions Reference</div>
                 
               </div>
             </a>
@@ -385,10 +414,10 @@ created inside the <code class="docutils literal notranslate"><span class="pre">
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#download-mock">Download <em>mock</em></a></li>
-<li><a class="reference internal" href="#install-through-source-code">Install through source code</a></li>
-<li><a class="reference internal" href="#install-through-go">Install through Go</a></li>
+<li><a class="reference internal" href="#">How-tos &amp; Examples</a><ul>
+<li><a class="reference internal" href="#delaying-specific-endpoints">Delaying specific endpoints</a></li>
+<li><a class="reference internal" href="#an-api-powered-by-multiple-languages">An API powered by multiple languages</a></li>
+<li><a class="reference internal" href="#a-stateful-api">A stateful API</a></li>
 </ul>
 </li>
 </ul>

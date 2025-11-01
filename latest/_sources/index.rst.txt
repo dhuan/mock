@@ -18,8 +18,8 @@ mock - API and testing utility
    .. grid-item-card:: Quick Links
         :columns: 5
 
-        -  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v1.4.12/mock_v1.4.12_linux-386.tar.gz>`__
-        -  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v1.4.12/mock_v1.4.12_darwin-amd64.tar.gz>`__
+        -  `Download mock for Linux <https://github.com/dhuan/mock/releases/download/v1.4.13/mock_v1.4.13_linux-386.tar.gz>`__
+        -  `Download mock for MacOS <https://github.com/dhuan/mock/releases/download/v1.4.13/mock_v1.4.13_darwin-amd64.tar.gz>`__
         -  `Releases <https://github.com/dhuan/mock/releases>`__
         -  `mock\ ’s source code <https://github.com/dhuan/mock>`__
         -  `Report bugs <https://github.com/dhuan/mock/issues>`__

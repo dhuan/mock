@@ -1,3 +1,5 @@
+.. _base_api:
+
 Base APIs
 =========
 

@@ -219,8 +219,8 @@ desire. In other words, by default Middlewares are executed for all "not_found"
 requests.
 
 You can identify whether the current request being handled is valid or not by
-reading the ``MOCK_REQUEST_NOT_FOUND`` environment variable. It's a boolean
-variable.
+reading the ``MOCK_REQUEST_NOT_FOUND`` environment variable, which will be
+``true`` if it's an endpoint not supported by your API.
 
 Furthermore, requests for invalid routes will result in middleware having the
 ``MOCK_RESPONSE_STATUS_CODE`` set to ``405``. If you want a different response
@@ -232,20 +232,16 @@ example on how to accomplish this:
 .. code:: sh
 
    $ mock serve -p 3000 \
-     --middleware "sh path/to/my/middleware.sh" \
+     --middleware '
+   if [ "${MOCK_REQUEST_NOT_FOUND}" = "true" ]
+   then
+       mock set-status 404
+
+       printf "This page does not exist!" | mock write
+   fi
+   ' \
      --route foo/bar \
      --response "Hello world!"
-
-.. code:: sh
-
-    // path/to/my/middleware.sh
-
-    if [ "${MOCK_REQUEST_NOT_FOUND}" = "true" ]
-    then
-        mock set-status 404
-
-        printf "This page does not exist!" | mock write
-    fi
 
 Let's analyse the result. Request ``GET foo/bar``:
 
