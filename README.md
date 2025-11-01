@@ -1,7 +1,5 @@
 # mock
 
-*[Go to the User Guide](https://dhuan.github.io/mock)*
-
 [![Go Reference](https://pkg.go.dev/badge/github.com/dhuan/mock.svg)](https://pkg.go.dev/github.com/dhuan/mock)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dhuan/mock)](https://goreportcard.com/report/github.com/dhuan/mock)
 
@@ -12,6 +10,12 @@
 - use shells scripts as response handlers. Or any other type of program can act
   as response handlers.
 - test your API - make assertions on whether an endpoint was requested.
+
+## Quick links
+
+- [User guide](https://dhuan.github.io/mock)
+- [User guide (main branch, not released yet)](https://dhuan.github.io/mock/latest)
+- [How-tos & Examples](https://dhuan.github.io/mock/latest/examples.html)
 
 ## Getting started
 
