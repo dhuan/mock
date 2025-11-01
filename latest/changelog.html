@@ -277,6 +277,16 @@
         <article role="main" id="furo-main-content">
           <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="unreleased-yet">
+<h2>Unreleased yet<a class="headerlink" href="#unreleased-yet" title="Link to this heading">¶</a></h2>
+<p>FIXED:</p>
+<ul class="simple">
+<li><p>Redirects from the Base API were automatically followed and the
+processed response was returned to the client. Mock responses now
+preserve the redirect by returning the original status (e.g 302) and
+the Location header directly.</p></li>
+</ul>
+</section>
 <section id="id1">
 <h2>1.4.12<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>IMPROVED:</p>
@@ -769,6 +779,7 @@ the assert request indicating that the given <code class="docutils literal notra
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#unreleased-yet">Unreleased yet</a></li>
 <li><a class="reference internal" href="#id1">1.4.12</a></li>
 <li><a class="reference internal" href="#section-1">1.4.11</a></li>
 <li><a class="reference internal" href="#section-2">1.4.10</a></li>
