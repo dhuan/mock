@@ -13,9 +13,9 @@
 
 ## Quick links
 
-- [User guide](https://dhuan.github.io/mock)*
-- [User guide (main branch, not released yet)](https://dhuan.github.io/mock/latest)*
-- [How-tos & Examples](https://dhuan.github.io/mock/latest/examples.html)*
+- [User guide](https://dhuan.github.io/mock)
+- [User guide (main branch, not released yet)](https://dhuan.github.io/mock/latest)
+- [How-tos & Examples](https://dhuan.github.io/mock/latest/examples.html)
 
 ## Getting started
 
