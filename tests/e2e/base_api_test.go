@@ -565,3 +565,31 @@ func Test_E2E_BaseApi_WithMiddleware_ContentLengthIsUpdated(t *testing.T) {
 		}),
 	)
 }
+
+func Test_E2E_BaseApi_WithRedirect(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			`--route 'foo/bar' --header 'Location: http://www.example.com' --status-code 302`,
+		}, " "),
+		nil,
+		true,
+		nil,
+	)
+	defer killMockBase()
+
+	RunTest4(
+		t, nil,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+		},
+		Get("foo/bar", nil),
+		StatusCodeMatches(302),
+		HeadersMatch(map[string][]string{
+			"Location": {"http://www.example.com"},
+		}),
+	)
+}

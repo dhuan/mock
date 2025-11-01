@@ -412,7 +412,11 @@ func Get(route string, headers http.Header) TestFunc {
 
 		request.Header = headers
 
-		client := &http.Client{}
+		client := &http.Client{
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}
 		newResponse, err := client.Do(request)
 		if err != nil {
 			panic(err)

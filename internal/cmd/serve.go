@@ -639,7 +639,11 @@ func sendRequestForBaseApi(baseApi string, r *http.Request) (*http.Response, []b
 		panic(err)
 	}
 
-	client := &http.Client{}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 
 	route := r.URL.Path
 	querystring := ""

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased yet
+
+FIXED:
+
+- Redirects from the Base API were automatically followed and the processed
+  response was returned to the client. Mock responses now preserve the redirect
+  by returning the original status (e.g 302) and the Location header directly.
+
 ## 1.4.12
 
 IMPROVED:
