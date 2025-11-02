@@ -357,6 +357,84 @@ $<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
 </pre></div>
 </div>
 </section>
+<section id="a-crud-api-with-a-simple-data-storage">
+<h2>A CRUD API with a simple data storage<a class="headerlink" href="#a-crud-api-with-a-simple-data-storage" title="Link to this heading">¶</a></h2>
+<p>The following API does two tasks: add users and fetch users.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>To run this example, you’ll need to have <a class="reference external" href="https://github.com/jqlang/jq">jq</a> installed, as the “/users”
+endpoint uses it for parsing.</p>
+</div>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">DATA_DIR</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="w"> </span>-d<span class="k">)</span>
+
+$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--method<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1"># Insert a new user</span>
+
+<span class="s1">USER_NAME=$(mock get-payload name)</span>
+<span class="s1">USER_EMAIL=$(mock get-payload email)</span>
+<span class="s1">USER_COUNT=$(ls $DATA_DIR | wc -l)</span>
+<span class="s1">NEW_USER_ID=&quot;$(printf &quot;%s + 1\n&quot; &quot;${USER_COUNT}&quot; | bc)&quot;</span>
+
+<span class="s1">printf &quot;New user ID generated: %s\n&quot; &quot;${NEW_USER_ID}&quot;</span>
+
+<span class="s1">printf &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{&quot;name&quot;:&quot;%s&quot;,&quot;email&quot;:&quot;%s&quot;}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; &quot;${USER_NAME}&quot; &quot;${USER_EMAIL}&quot; &gt; &quot;${DATA_DIR}/${NEW_USER_ID}.json&quot;</span>
+
+<span class="s1">printf &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{&quot;id&quot;:&quot;%s&quot;}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; &quot;${NEW_USER_ID}&quot; | mock write</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;user/{user_id}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1"># Get an existing user</span>
+
+<span class="s1">USER_ID=&quot;$(mock get-route-param user_id)&quot;</span>
+<span class="s1">USER_FILE=&quot;${DATA_DIR}/${USER_ID}.json&quot;</span>
+
+<span class="s1">if [ ! -f &quot;${USER_FILE}&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    mock set-status 400</span>
+
+<span class="s1">    exit 0</span>
+<span class="s1">fi</span>
+
+<span class="s1">mock write &lt; &quot;${USER_FILE}&quot;</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;users&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1"># Gets ALL users</span>
+
+<span class="s1">cat $DATA_DIR/*.json | jq -s | mock write</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>Let’s now test it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:3000/user<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span>@-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">{&quot;name&quot;:&quot;John Doe&quot;,&quot;email&quot;:&quot;john.doe@example.com&quot;}</span>
+<span class="s">EOF</span>
+<span class="c1"># Prints out: {&quot;id&quot;:&quot;1&quot;}</span>
+
+$<span class="w"> </span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:3000/user<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span>@-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">{&quot;name&quot;:&quot;Jane Doe&quot;,&quot;email&quot;:&quot;jane.doe@example.com&quot;}</span>
+<span class="s">EOF</span>
+<span class="c1"># Prints out: {&quot;id&quot;:&quot;2&quot;}</span>
+
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/user/1
+<span class="c1"># Prints out: {&quot;name&quot;:&quot;John Doe&quot;,&quot;email&quot;:&quot;john.doe@example.com&quot;}</span>
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/user/2
+<span class="c1"># Prints out: {&quot;name&quot;:&quot;Jane Doe&quot;,&quot;email&quot;:&quot;jane.doe@example.com&quot;}</span>
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/users
+<span class="c1"># Prints out: [</span>
+<span class="c1">#  {&quot;name&quot;:&quot;John Doe&quot;,&quot;email&quot;:&quot;john.doe@example.com&quot;},</span>
+<span class="c1">#  {&quot;name&quot;:&quot;Jane Doe&quot;,&quot;email&quot;:&quot;jane.doe@example.com&quot;}</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -418,6 +496,7 @@ $<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
 <li><a class="reference internal" href="#delaying-specific-endpoints">Delaying specific endpoints</a></li>
 <li><a class="reference internal" href="#an-api-powered-by-multiple-languages">An API powered by multiple languages</a></li>
 <li><a class="reference internal" href="#a-stateful-api">A stateful API</a></li>
+<li><a class="reference internal" href="#a-crud-api-with-a-simple-data-storage">A CRUD API with a simple data storage</a></li>
 </ul>
 </li>
 </ul>
