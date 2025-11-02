@@ -93,3 +93,85 @@ Let's test it:
    # Prints out: This server has received 2 request(s) so far.
    $ curl localhost:3000/hello
    # Prints out: This server has received 3 request(s) so far.
+
+A CRUD API with a simple data storage
+-------------------------------------
+
+The following API does two tasks: add users and fetch users.
+
+.. warning::
+
+   To run this example, you'll need to have `jq <https://github.com/jqlang/jq>`_ installed, as the "/users"
+   endpoint uses it for parsing.
+
+.. code:: sh
+
+    $ export DATA_DIR=$(mktemp -d)
+
+    $ mock serve -p 3000 \
+        --route 'user' \
+        --method POST \
+        --exec '
+    # Insert a new user
+
+    USER_NAME=$(mock get-payload name)
+    USER_EMAIL=$(mock get-payload email)
+    USER_COUNT=$(ls $DATA_DIR | wc -l)
+    NEW_USER_ID="$(printf "%s + 1\n" "${USER_COUNT}" | bc)"
+
+    printf "New user ID generated: %s\n" "${NEW_USER_ID}"
+
+    printf '"'"'{"name":"%s","email":"%s"}'"'"' "${USER_NAME}" "${USER_EMAIL}" > "${DATA_DIR}/${NEW_USER_ID}.json"
+
+    printf '"'"'{"id":"%s"}'"'"' "${NEW_USER_ID}" | mock write
+    ' \
+        --route 'user/{user_id}' \
+        --exec '
+    # Get an existing user
+
+    USER_ID="$(mock get-route-param user_id)"
+    USER_FILE="${DATA_DIR}/${USER_ID}.json"
+
+    if [ ! -f "${USER_FILE}" ]
+    then
+        mock set-status 400
+
+        exit 0
+    fi
+
+    mock write < "${USER_FILE}"
+    ' \
+        --route 'users' \
+        --exec '
+    # Gets ALL users
+
+    cat $DATA_DIR/*.json | jq -s | mock write
+    '
+
+Let's now test it:
+
+.. code:: sh
+
+    $ curl -X POST localhost:3000/user \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+    {"name":"John Doe","email":"john.doe@example.com"}
+    EOF
+    # Prints out: {"id":"1"}
+
+    $ curl -X POST localhost:3000/user \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+    {"name":"Jane Doe","email":"jane.doe@example.com"}
+    EOF
+    # Prints out: {"id":"2"}
+
+    $ curl -v localhost:3000/user/1
+    # Prints out: {"name":"John Doe","email":"john.doe@example.com"}
+    $ curl -v localhost:3000/user/2
+    # Prints out: {"name":"Jane Doe","email":"jane.doe@example.com"}
+    $ curl -v localhost:3000/users
+    # Prints out: [
+    #  {"name":"John Doe","email":"john.doe@example.com"},
+    #  {"name":"Jane Doe","email":"jane.doe@example.com"}
+    # ]
