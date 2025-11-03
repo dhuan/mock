@@ -26,6 +26,43 @@ Let's now test it:
     # Registry Domain ID: 2138514_DOMAIN_COM-VRSN
     # ...
 
+What if the visitor accesses our service without passing a `domain`
+querystring? Let's handle that, showing a HTML page where the visitor can
+enter a domain name to be looked up:
+
+.. code:: sh
+
+    $ mock serve -p 3000 \
+        --route 'whois' \
+        --exec '
+    DOMAIN="$(mock get-query domain)"
+
+    if [ -z "${DOMAIN}" ]
+    then
+        mock set-header "Content-Type" "text/html; charset=utf-8"
+
+        mock write <<EOF
+    <!DOCTYPE html>
+    <html lang="en">
+    <body>
+        <form action="/whois" method="get">
+            Domain:
+            <br />
+            <input type="text" name="domain" placeholder="Enter a domain" />
+            <br />
+            <br />
+            <input type="submit" value="Go!" />
+        </form>
+    </body>
+    </html>
+    EOF
+
+        exit 0
+    fi
+
+    whois ${DOMAIN} | mock write
+    '
+
 An API powered by multiple languages
 ------------------------------------
 
