@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+FIXED:
+
+- Executing "get-query" when the request has no querystring would result in
+  printing out `<nil>`. It should print nothing instead.
+
 ## 1.4.13
 
 FIXED:

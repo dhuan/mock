@@ -54,3 +54,15 @@ func Test_E2E_GetQuery_ExitCode1WhenKeyDoesNotExist(t *testing.T) {
 		ExitCodeHeaderMatches("1"),
 	)
 }
+
+func Test_E2E_GetQuery_RequestWithoutQuerystring(t *testing.T) {
+	RunTest4(
+		t, nil,
+		[]string{
+			"--route foo/bar",
+			CmdExec(`{{MOCK_EXECUTABLE}} get-query someKey > $MOCK_RESPONSE_BODY`),
+		},
+		Get("foo/bar", nil),
+		StringMatches(""),
+	)
+}

@@ -23,10 +23,8 @@ var getQueryCmd = &cobra.Command{
 				return
 			}
 
-			querystringParsed, err := utils.DecodeBase64Json(querystringSerialized)
+			querystringParsed, _ := utils.DecodeBase64Json(querystringSerialized)
 			if len(querystringParsed) == 0 {
-				fmt.Println(err)
-
 				os.Exit(1)
 
 				return
