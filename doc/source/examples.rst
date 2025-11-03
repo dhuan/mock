@@ -122,8 +122,7 @@ The following API does two tasks: add users and fetch users.
 
     USER_NAME=$(mock get-payload name)
     USER_EMAIL=$(mock get-payload email)
-    USER_COUNT=$(ls $DATA_DIR | wc -l)
-    NEW_USER_ID="$(printf "%s + 1\n" "${USER_COUNT}" | bc)"
+    NEW_USER_ID="$(ls $DATA_DIR | wc -l | sed "s/$/+1/" | bc)"
 
     printf "New user ID generated: %s\n" "${NEW_USER_ID}"
 
