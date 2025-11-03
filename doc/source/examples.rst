@@ -1,6 +1,12 @@
 How-tos & Examples
 ==================
 
+.. note::
+
+   If you try these examples on your computer by copying/pasting the code
+   snippets from this page, be aware that they'll only work if you have "mock"
+   as a global executable.
+
 Delaying specific endpoints
 ---------------------------
 
