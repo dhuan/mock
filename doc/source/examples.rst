@@ -7,32 +7,24 @@ How-tos & Examples
    snippets from this page, be aware that it'll only work if "mock" is
    installed as a global executable.
 
-Delaying specific endpoints
----------------------------
-
-Making an existing API slow can be easily accomplished combining mock's
-:ref:`Base APIs <base_api>` and the :ref:`delay option.
-<cmd_options_reference__delay>`
+A "Who is" Lookup Service
+-------------------------
 
 .. code:: sh
 
-    $ mock serve -p 8000 --base example.com --delay 2000
+    mock serve -p 3000 \
+        --route 'whois' \
+        --exec 'whois $(mock get-query domain) | mock write'
 
-You may want however to make a specific endpoint slow instead of the whole API.
-This can be achieved using :ref:`middlewares <middlewares>`: 
+Let's now test it:
 
 .. code:: sh
 
-    $ mock serve -p 8000 --base example.com --middleware '
-    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
-    then
-        sleep 2 # wait two seconds
-    fi
-    '
-
-With that last example, our API at ``localhost:8000`` will act as a proxy to
-``example.com``. All requests will be responded immediately except
-``some/endpoint`` which will have a delay of 2 seconds.
+    $ curl localhost:3000/whois?domain=google.com
+    # Prints out:
+    # Domain Name: GOOGLE.COM
+    # Registry Domain ID: 2138514_DOMAIN_COM-VRSN
+    # ...
 
 An API powered by multiple languages
 ------------------------------------
@@ -184,3 +176,31 @@ Let's now test it:
     #  {"name":"John Doe","email":"john.doe@example.com"},
     #  {"name":"Jane Doe","email":"jane.doe@example.com"}
     # ]
+
+Delaying specific endpoints
+---------------------------
+
+Making an existing API slow can be easily accomplished combining mock's
+:ref:`Base APIs <base_api>` and the :ref:`delay option.
+<cmd_options_reference__delay>`
+
+.. code:: sh
+
+    $ mock serve -p 8000 --base example.com --delay 2000
+
+You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using :ref:`middlewares <middlewares>`: 
+
+.. code:: sh
+
+    $ mock serve -p 8000 --base example.com --middleware '
+    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
+    then
+        sleep 2 # wait two seconds
+    fi
+    '
+
+With that last example, our API at ``localhost:8000`` will act as a proxy to
+``example.com``. All requests will be responded immediately except
+``some/endpoint`` which will have a delay of 2 seconds.
+
