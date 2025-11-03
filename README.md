@@ -11,7 +11,7 @@
   as response handlers.
 - test your API - make assertions on whether an endpoint was requested.
 
-[The easiest quickest way to learn and understand `mock` is to see the examples page.](https://dhuan.github.io/mock/latest/examples.html)
+[The fastest way to learn and understand `mock` is to see the examples page.](https://dhuan.github.io/mock/latest/examples.html)
 
 ## Quick links
 
