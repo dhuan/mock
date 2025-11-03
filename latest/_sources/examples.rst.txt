@@ -1,32 +1,30 @@
 How-tos & Examples
 ==================
 
-Delaying specific endpoints
----------------------------
+.. note::
 
-Making an existing API slow can be easily accomplished combining mock's
-:ref:`Base APIs <base_api>` and the :ref:`delay option.
-<cmd_options_reference__delay>`
+   If you try these examples on your computer by copying/pasting the code
+   snippets from this page, be aware that it'll only work if "mock" is
+   installed as a global executable.
 
-.. code:: sh
-
-    $ mock serve -p 8000 --base example.com --delay 2000
-
-You may want however to make a specific endpoint slow instead of the whole API.
-This can be achieved using :ref:`middlewares <middlewares>`: 
+A "Who is" Lookup Service
+-------------------------
 
 .. code:: sh
 
-    $ mock serve -p 8000 --base example.com --middleware '
-    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
-    then
-        sleep 2 # wait two seconds
-    fi
-    '
+    mock serve -p 3000 \
+        --route 'whois' \
+        --exec 'whois $(mock get-query domain) | mock write'
 
-With that last example, our API at ``localhost:8000`` will act as a proxy to
-``example.com``. All requests will be responded immediately except
-``some/endpoint`` which will have a delay of 2 seconds.
+Let's now test it:
+
+.. code:: sh
+
+    $ curl localhost:3000/whois?domain=google.com
+    # Prints out:
+    # Domain Name: GOOGLE.COM
+    # Registry Domain ID: 2138514_DOMAIN_COM-VRSN
+    # ...
 
 An API powered by multiple languages
 ------------------------------------
@@ -116,8 +114,7 @@ The following API does two tasks: add users and fetch users.
 
     USER_NAME=$(mock get-payload name)
     USER_EMAIL=$(mock get-payload email)
-    USER_COUNT=$(ls $DATA_DIR | wc -l)
-    NEW_USER_ID="$(printf "%s + 1\n" "${USER_COUNT}" | bc)"
+    NEW_USER_ID="$(ls $DATA_DIR | wc -l | sed "s/$/+1/" | bc)"
 
     printf "New user ID generated: %s\n" "${NEW_USER_ID}"
 
@@ -170,8 +167,40 @@ Let's now test it:
     # Prints out: {"name":"John Doe","email":"john.doe@example.com"}
     $ curl -v localhost:3000/user/2
     # Prints out: {"name":"Jane Doe","email":"jane.doe@example.com"}
+
+    $ curl -v localhost:3000/user/10
+    # will fail with 400/BadRequest
+
     $ curl -v localhost:3000/users
     # Prints out: [
     #  {"name":"John Doe","email":"john.doe@example.com"},
     #  {"name":"Jane Doe","email":"jane.doe@example.com"}
     # ]
+
+Delaying specific endpoints
+---------------------------
+
+Making an existing API slow can be easily accomplished combining mock's
+:ref:`Base APIs <base_api>` and the :ref:`delay option.
+<cmd_options_reference__delay>`
+
+.. code:: sh
+
+    $ mock serve -p 8000 --base example.com --delay 2000
+
+You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using :ref:`middlewares <middlewares>`: 
+
+.. code:: sh
+
+    $ mock serve -p 8000 --base example.com --middleware '
+    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
+    then
+        sleep 2 # wait two seconds
+    fi
+    '
+
+With that last example, our API at ``localhost:8000`` will act as a proxy to
+``example.com``. All requests will be responded immediately except
+``some/endpoint`` which will have a delay of 2 seconds.
+
