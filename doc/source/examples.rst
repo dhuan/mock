@@ -176,6 +176,10 @@ Let's now test it:
     # Prints out: {"name":"John Doe","email":"john.doe@example.com"}
     $ curl -v localhost:3000/user/2
     # Prints out: {"name":"Jane Doe","email":"jane.doe@example.com"}
+
+    $ curl -v localhost:3000/user/10
+    # will fail with 400/BadRequest
+
     $ curl -v localhost:3000/users
     # Prints out: [
     #  {"name":"John Doe","email":"john.doe@example.com"},
