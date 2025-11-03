@@ -298,6 +298,41 @@ installed as a global executable.</p>
 <span class="c1"># ...</span>
 </pre></div>
 </div>
+<p>What if the visitor accesses our service without passing a <cite>domain</cite>
+querystring? Let’s handle that, showing a HTML page where the visitor can
+enter a domain name to be looked up:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;whois&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">DOMAIN=&quot;$(mock get-query domain)&quot;</span>
+
+<span class="s1">if [ -z &quot;${DOMAIN}&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    mock set-header &quot;Content-Type&quot; &quot;text/html; charset=utf-8&quot;</span>
+
+<span class="s1">    mock write &lt;&lt;EOF</span>
+<span class="s1">&lt;!DOCTYPE html&gt;</span>
+<span class="s1">&lt;html lang=&quot;en&quot;&gt;</span>
+<span class="s1">&lt;body&gt;</span>
+<span class="s1">    &lt;form action=&quot;/whois&quot; method=&quot;get&quot;&gt;</span>
+<span class="s1">        Domain:</span>
+<span class="s1">        &lt;br /&gt;</span>
+<span class="s1">        &lt;input type=&quot;text&quot; name=&quot;domain&quot; placeholder=&quot;Enter a domain&quot; /&gt;</span>
+<span class="s1">        &lt;br /&gt;</span>
+<span class="s1">        &lt;br /&gt;</span>
+<span class="s1">        &lt;input type=&quot;submit&quot; value=&quot;Go!&quot; /&gt;</span>
+<span class="s1">    &lt;/form&gt;</span>
+<span class="s1">&lt;/body&gt;</span>
+<span class="s1">&lt;/html&gt;</span>
+<span class="s1">EOF</span>
+
+<span class="s1">    exit 0</span>
+<span class="s1">fi</span>
+
+<span class="s1">whois ${DOMAIN} | mock write</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
 </section>
 <section id="an-api-powered-by-multiple-languages">
 <h2>An API powered by multiple languages<a class="headerlink" href="#an-api-powered-by-multiple-languages" title="Link to this heading">¶</a></h2>
