@@ -277,26 +277,62 @@
         <article role="main" id="furo-main-content">
           <section id="how-tos-examples">
 <h1>How-tos &amp; Examples<a class="headerlink" href="#how-tos-examples" title="Link to this heading">¶</a></h1>
-<section id="delaying-specific-endpoints">
-<h2>Delaying specific endpoints<a class="headerlink" href="#delaying-specific-endpoints" title="Link to this heading">¶</a></h2>
-<p>Making an existing API slow can be easily accomplished combining mock’s
-<a class="reference internal" href="base_apis.html#base-api"><span class="std std-ref">Base APIs</span></a> and the <a class="reference internal" href="cmd_reference.html#cmd-options-reference-delay"><span class="std std-ref">delay option.</span></a></p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--delay<span class="w"> </span><span class="m">2000</span>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you try these examples on your computer by copying/pasting the code
+snippets from this page, be aware that it’ll only work if “mock” is
+installed as a global executable.</p>
+</div>
+<section id="a-who-is-lookup-service">
+<h2>A “Who is” Lookup Service<a class="headerlink" href="#a-who-is-lookup-service" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;whois&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;whois $(mock get-query domain) | mock write&#39;</span>
 </pre></div>
 </div>
-<p>You may want however to make a specific endpoint slow instead of the whole API.
-This can be achieved using <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a>:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--middleware<span class="w"> </span><span class="s1">&#39;</span>
-<span class="s1">if [ &quot;${MOCK_REQUEST_ENDPOINT}&quot; = &quot;some/endpoint&quot; ]</span>
+<p>Let’s now test it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>localhost:3000/whois?domain<span class="o">=</span>google.com
+<span class="c1"># Prints out:</span>
+<span class="c1"># Domain Name: GOOGLE.COM</span>
+<span class="c1"># Registry Domain ID: 2138514_DOMAIN_COM-VRSN</span>
+<span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>What if the visitor accesses our service without passing a <cite>domain</cite>
+querystring? Let’s handle that, showing a HTML page where the visitor can
+enter a domain name to be looked up:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;whois&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">DOMAIN=&quot;$(mock get-query domain)&quot;</span>
+
+<span class="s1">if [ -z &quot;${DOMAIN}&quot; ]</span>
 <span class="s1">then</span>
-<span class="s1">    sleep 2 # wait two seconds</span>
+<span class="s1">    mock set-header &quot;Content-Type&quot; &quot;text/html; charset=utf-8&quot;</span>
+
+<span class="s1">    mock write &lt;&lt;EOF</span>
+<span class="s1">&lt;!DOCTYPE html&gt;</span>
+<span class="s1">&lt;html lang=&quot;en&quot;&gt;</span>
+<span class="s1">&lt;body&gt;</span>
+<span class="s1">    &lt;form action=&quot;/whois&quot; method=&quot;get&quot;&gt;</span>
+<span class="s1">        Domain:</span>
+<span class="s1">        &lt;br /&gt;</span>
+<span class="s1">        &lt;input type=&quot;text&quot; name=&quot;domain&quot; placeholder=&quot;Enter a domain&quot; /&gt;</span>
+<span class="s1">        &lt;br /&gt;</span>
+<span class="s1">        &lt;br /&gt;</span>
+<span class="s1">        &lt;input type=&quot;submit&quot; value=&quot;Go!&quot; /&gt;</span>
+<span class="s1">    &lt;/form&gt;</span>
+<span class="s1">&lt;/body&gt;</span>
+<span class="s1">&lt;/html&gt;</span>
+<span class="s1">EOF</span>
+
+<span class="s1">    exit 0</span>
 <span class="s1">fi</span>
+
+<span class="s1">whois ${DOMAIN} | mock write</span>
 <span class="s1">&#39;</span>
 </pre></div>
 </div>
-<p>With that last example, our API at <code class="docutils literal notranslate"><span class="pre">localhost:8000</span></code> will act as a proxy to
-<code class="docutils literal notranslate"><span class="pre">example.com</span></code>. All requests will be responded immediately except
-<code class="docutils literal notranslate"><span class="pre">some/endpoint</span></code> which will have a delay of 2 seconds.</p>
 </section>
 <section id="an-api-powered-by-multiple-languages">
 <h2>An API powered by multiple languages<a class="headerlink" href="#an-api-powered-by-multiple-languages" title="Link to this heading">¶</a></h2>
@@ -357,6 +393,108 @@ $<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
 </pre></div>
 </div>
 </section>
+<section id="a-crud-api-with-a-simple-data-storage">
+<h2>A CRUD API with a simple data storage<a class="headerlink" href="#a-crud-api-with-a-simple-data-storage" title="Link to this heading">¶</a></h2>
+<p>The following API does two tasks: add users and fetch users.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>To run this example, you’ll need to have <a class="reference external" href="https://github.com/jqlang/jq">jq</a> installed, as the “/users”
+endpoint uses it for parsing.</p>
+</div>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">DATA_DIR</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="w"> </span>-d<span class="k">)</span>
+
+$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--method<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1"># Insert a new user</span>
+
+<span class="s1">USER_NAME=$(mock get-payload name)</span>
+<span class="s1">USER_EMAIL=$(mock get-payload email)</span>
+<span class="s1">NEW_USER_ID=&quot;$(ls $DATA_DIR | wc -l | sed &quot;s/$/+1/&quot; | bc)&quot;</span>
+
+<span class="s1">printf &quot;New user ID generated: %s\n&quot; &quot;${NEW_USER_ID}&quot;</span>
+
+<span class="s1">printf &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{&quot;name&quot;:&quot;%s&quot;,&quot;email&quot;:&quot;%s&quot;}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; &quot;${USER_NAME}&quot; &quot;${USER_EMAIL}&quot; &gt; &quot;${DATA_DIR}/${NEW_USER_ID}.json&quot;</span>
+
+<span class="s1">printf &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;{&quot;id&quot;:&quot;%s&quot;}&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; &quot;${NEW_USER_ID}&quot; | mock write</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;user/{user_id}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1"># Get an existing user</span>
+
+<span class="s1">USER_ID=&quot;$(mock get-route-param user_id)&quot;</span>
+<span class="s1">USER_FILE=&quot;${DATA_DIR}/${USER_ID}.json&quot;</span>
+
+<span class="s1">if [ ! -f &quot;${USER_FILE}&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    mock set-status 400</span>
+
+<span class="s1">    exit 0</span>
+<span class="s1">fi</span>
+
+<span class="s1">mock write &lt; &quot;${USER_FILE}&quot;</span>
+<span class="s1">&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s1">&#39;users&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1"># Gets ALL users</span>
+
+<span class="s1">cat $DATA_DIR/*.json | jq -s | mock write</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>Let’s now test it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:3000/user<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span>@-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">{&quot;name&quot;:&quot;John Doe&quot;,&quot;email&quot;:&quot;john.doe@example.com&quot;}</span>
+<span class="s">EOF</span>
+<span class="c1"># Prints out: {&quot;id&quot;:&quot;1&quot;}</span>
+
+$<span class="w"> </span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:3000/user<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span>@-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">{&quot;name&quot;:&quot;Jane Doe&quot;,&quot;email&quot;:&quot;jane.doe@example.com&quot;}</span>
+<span class="s">EOF</span>
+<span class="c1"># Prints out: {&quot;id&quot;:&quot;2&quot;}</span>
+
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/user/1
+<span class="c1"># Prints out: {&quot;name&quot;:&quot;John Doe&quot;,&quot;email&quot;:&quot;john.doe@example.com&quot;}</span>
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/user/2
+<span class="c1"># Prints out: {&quot;name&quot;:&quot;Jane Doe&quot;,&quot;email&quot;:&quot;jane.doe@example.com&quot;}</span>
+
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/user/10
+<span class="c1"># will fail with 400/BadRequest</span>
+
+$<span class="w"> </span>curl<span class="w"> </span>-v<span class="w"> </span>localhost:3000/users
+<span class="c1"># Prints out: [</span>
+<span class="c1">#  {&quot;name&quot;:&quot;John Doe&quot;,&quot;email&quot;:&quot;john.doe@example.com&quot;},</span>
+<span class="c1">#  {&quot;name&quot;:&quot;Jane Doe&quot;,&quot;email&quot;:&quot;jane.doe@example.com&quot;}</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+</section>
+<section id="delaying-specific-endpoints">
+<h2>Delaying specific endpoints<a class="headerlink" href="#delaying-specific-endpoints" title="Link to this heading">¶</a></h2>
+<p>Making an existing API slow can be easily accomplished combining mock’s
+<a class="reference internal" href="base_apis.html#base-api"><span class="std std-ref">Base APIs</span></a> and the <a class="reference internal" href="cmd_reference.html#cmd-options-reference-delay"><span class="std std-ref">delay option.</span></a></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--delay<span class="w"> </span><span class="m">2000</span>
+</pre></div>
+</div>
+<p>You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using <a class="reference internal" href="middlewares.html#middlewares"><span class="std std-ref">middlewares</span></a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span><span class="w"> </span>--base<span class="w"> </span>example.com<span class="w"> </span>--middleware<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">if [ &quot;${MOCK_REQUEST_ENDPOINT}&quot; = &quot;some/endpoint&quot; ]</span>
+<span class="s1">then</span>
+<span class="s1">    sleep 2 # wait two seconds</span>
+<span class="s1">fi</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>With that last example, our API at <code class="docutils literal notranslate"><span class="pre">localhost:8000</span></code> will act as a proxy to
+<code class="docutils literal notranslate"><span class="pre">example.com</span></code>. All requests will be responded immediately except
+<code class="docutils literal notranslate"><span class="pre">some/endpoint</span></code> which will have a delay of 2 seconds.</p>
+</section>
 </section>
 
         </article>
@@ -415,9 +553,11 @@ $<span class="w"> </span>curl<span class="w"> </span>localhost:3000/hello
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">How-tos &amp; Examples</a><ul>
-<li><a class="reference internal" href="#delaying-specific-endpoints">Delaying specific endpoints</a></li>
+<li><a class="reference internal" href="#a-who-is-lookup-service">A “Who is” Lookup Service</a></li>
 <li><a class="reference internal" href="#an-api-powered-by-multiple-languages">An API powered by multiple languages</a></li>
 <li><a class="reference internal" href="#a-stateful-api">A stateful API</a></li>
+<li><a class="reference internal" href="#a-crud-api-with-a-simple-data-storage">A CRUD API with a simple data storage</a></li>
+<li><a class="reference internal" href="#delaying-specific-endpoints">Delaying specific endpoints</a></li>
 </ul>
 </li>
 </ul>

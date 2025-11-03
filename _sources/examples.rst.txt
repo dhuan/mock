@@ -1,32 +1,67 @@
 How-tos & Examples
 ==================
 
-Delaying specific endpoints
----------------------------
+.. note::
 
-Making an existing API slow can be easily accomplished combining mock's
-:ref:`Base APIs <base_api>` and the :ref:`delay option.
-<cmd_options_reference__delay>`
+   If you try these examples on your computer by copying/pasting the code
+   snippets from this page, be aware that it'll only work if "mock" is
+   installed as a global executable.
 
-.. code:: sh
-
-    $ mock serve -p 8000 --base example.com --delay 2000
-
-You may want however to make a specific endpoint slow instead of the whole API.
-This can be achieved using :ref:`middlewares <middlewares>`: 
+A "Who is" Lookup Service
+-------------------------
 
 .. code:: sh
 
-    $ mock serve -p 8000 --base example.com --middleware '
-    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
+    mock serve -p 3000 \
+        --route 'whois' \
+        --exec 'whois $(mock get-query domain) | mock write'
+
+Let's now test it:
+
+.. code:: sh
+
+    $ curl localhost:3000/whois?domain=google.com
+    # Prints out:
+    # Domain Name: GOOGLE.COM
+    # Registry Domain ID: 2138514_DOMAIN_COM-VRSN
+    # ...
+
+What if the visitor accesses our service without passing a `domain`
+querystring? Let's handle that, showing a HTML page where the visitor can
+enter a domain name to be looked up:
+
+.. code:: sh
+
+    $ mock serve -p 3000 \
+        --route 'whois' \
+        --exec '
+    DOMAIN="$(mock get-query domain)"
+
+    if [ -z "${DOMAIN}" ]
     then
-        sleep 2 # wait two seconds
-    fi
-    '
+        mock set-header "Content-Type" "text/html; charset=utf-8"
 
-With that last example, our API at ``localhost:8000`` will act as a proxy to
-``example.com``. All requests will be responded immediately except
-``some/endpoint`` which will have a delay of 2 seconds.
+        mock write <<EOF
+    <!DOCTYPE html>
+    <html lang="en">
+    <body>
+        <form action="/whois" method="get">
+            Domain:
+            <br />
+            <input type="text" name="domain" placeholder="Enter a domain" />
+            <br />
+            <br />
+            <input type="submit" value="Go!" />
+        </form>
+    </body>
+    </html>
+    EOF
+
+        exit 0
+    fi
+
+    whois ${DOMAIN} | mock write
+    '
 
 An API powered by multiple languages
 ------------------------------------
@@ -93,3 +128,116 @@ Let's test it:
    # Prints out: This server has received 2 request(s) so far.
    $ curl localhost:3000/hello
    # Prints out: This server has received 3 request(s) so far.
+
+A CRUD API with a simple data storage
+-------------------------------------
+
+The following API does two tasks: add users and fetch users.
+
+.. warning::
+
+   To run this example, you'll need to have `jq <https://github.com/jqlang/jq>`_ installed, as the "/users"
+   endpoint uses it for parsing.
+
+.. code:: sh
+
+    $ export DATA_DIR=$(mktemp -d)
+
+    $ mock serve -p 3000 \
+        --route 'user' \
+        --method POST \
+        --exec '
+    # Insert a new user
+
+    USER_NAME=$(mock get-payload name)
+    USER_EMAIL=$(mock get-payload email)
+    NEW_USER_ID="$(ls $DATA_DIR | wc -l | sed "s/$/+1/" | bc)"
+
+    printf "New user ID generated: %s\n" "${NEW_USER_ID}"
+
+    printf '"'"'{"name":"%s","email":"%s"}'"'"' "${USER_NAME}" "${USER_EMAIL}" > "${DATA_DIR}/${NEW_USER_ID}.json"
+
+    printf '"'"'{"id":"%s"}'"'"' "${NEW_USER_ID}" | mock write
+    ' \
+        --route 'user/{user_id}' \
+        --exec '
+    # Get an existing user
+
+    USER_ID="$(mock get-route-param user_id)"
+    USER_FILE="${DATA_DIR}/${USER_ID}.json"
+
+    if [ ! -f "${USER_FILE}" ]
+    then
+        mock set-status 400
+
+        exit 0
+    fi
+
+    mock write < "${USER_FILE}"
+    ' \
+        --route 'users' \
+        --exec '
+    # Gets ALL users
+
+    cat $DATA_DIR/*.json | jq -s | mock write
+    '
+
+Let's now test it:
+
+.. code:: sh
+
+    $ curl -X POST localhost:3000/user \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+    {"name":"John Doe","email":"john.doe@example.com"}
+    EOF
+    # Prints out: {"id":"1"}
+
+    $ curl -X POST localhost:3000/user \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+    {"name":"Jane Doe","email":"jane.doe@example.com"}
+    EOF
+    # Prints out: {"id":"2"}
+
+    $ curl -v localhost:3000/user/1
+    # Prints out: {"name":"John Doe","email":"john.doe@example.com"}
+    $ curl -v localhost:3000/user/2
+    # Prints out: {"name":"Jane Doe","email":"jane.doe@example.com"}
+
+    $ curl -v localhost:3000/user/10
+    # will fail with 400/BadRequest
+
+    $ curl -v localhost:3000/users
+    # Prints out: [
+    #  {"name":"John Doe","email":"john.doe@example.com"},
+    #  {"name":"Jane Doe","email":"jane.doe@example.com"}
+    # ]
+
+Delaying specific endpoints
+---------------------------
+
+Making an existing API slow can be easily accomplished combining mock's
+:ref:`Base APIs <base_api>` and the :ref:`delay option.
+<cmd_options_reference__delay>`
+
+.. code:: sh
+
+    $ mock serve -p 8000 --base example.com --delay 2000
+
+You may want however to make a specific endpoint slow instead of the whole API.
+This can be achieved using :ref:`middlewares <middlewares>`: 
+
+.. code:: sh
+
+    $ mock serve -p 8000 --base example.com --middleware '
+    if [ "${MOCK_REQUEST_ENDPOINT}" = "some/endpoint" ]
+    then
+        sleep 2 # wait two seconds
+    fi
+    '
+
+With that last example, our API at ``localhost:8000`` will act as a proxy to
+``example.com``. All requests will be responded immediately except
+``some/endpoint`` which will have a delay of 2 seconds.
+

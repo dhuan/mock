@@ -1,13 +1,15 @@
 Changelog
 =========
 
-Unreleased yet
---------------
+1.4.14
+------
 
 FIXED:
 
 -  Executing “get-query” when the request has no querystring would
    result in printing out ``<nil>``. It should print nothing instead.
+
+.. _section-1:
 
 1.4.13
 ------
@@ -19,7 +21,7 @@ FIXED:
    preserve the redirect by returning the original status (e.g 302) and
    the Location header directly.
 
-.. _section-1:
+.. _section-2:
 
 1.4.12
 ------
@@ -34,7 +36,7 @@ FIXED:
 
 -  “delay” would not work when used with Base APIs.
 
-.. _section-2:
+.. _section-3:
 
 1.4.11
 ------
@@ -54,7 +56,7 @@ FIXED:
 
 -  Requesting an unexisting endpoint while using ``--cors`` would panic.
 
-.. _section-3:
+.. _section-4:
 
 1.4.10
 ------
@@ -68,7 +70,7 @@ ADDED:
 
 -  Allow middlewares to modify CORS headers of Base APIs’ Responses.
 
-.. _section-4:
+.. _section-5:
 
 1.4.9
 -----
@@ -83,7 +85,7 @@ FIXED:
    documented in the guide but wasn’t registered in the command-line
    parsing logic.
 
-.. _section-5:
+.. _section-6:
 
 1.4.8
 -----
@@ -100,7 +102,7 @@ FIXED:
 -  Update ``get-header`` to return successful exit status code upon
    retrieving all headers.
 
-.. _section-6:
+.. _section-7:
 
 1.4.7
 -----
@@ -112,7 +114,7 @@ ADDED:
    ``mock get-payload users[0].name``.
 -  New ``--json`` option for ``mock write``.
 
-.. _section-7:
+.. _section-8:
 
 1.4.6
 -----
@@ -131,7 +133,7 @@ FIXED:
 
    404. 
 
-.. _section-8:
+.. _section-9:
 
 1.4.5
 -----
@@ -145,7 +147,7 @@ ADDED
 -  Header ``content-type: application/json`` is now automatically added
    in case a response file is used with JSON extension.
 
-.. _section-9:
+.. _section-10:
 
 1.4.4
 -----
@@ -167,7 +169,7 @@ IMPROVED
 
 -  Fail gracefully if more than 2 args are passed to ``mock replace``.
 
-.. _section-10:
+.. _section-11:
 
 1.4.3
 -----
@@ -183,7 +185,7 @@ ADDED
    HTTP Response was encoded. Now you have access to the uncompressed
    data when manipulating the response body.
 
-.. _section-11:
+.. _section-12:
 
 1.4.2
 -----
@@ -198,7 +200,7 @@ FIXED
 -  Using ``mock forward`` with a Base API that uses HTTP/2 would fail
    due to a bug in the header parsing logic.
 
-.. _section-12:
+.. _section-13:
 
 1.4.1
 -----
@@ -219,7 +221,7 @@ FIXED
 -  ``mock forward`` would panic if Base API was defined without http
    protocol prefix.
 
-.. _section-13:
+.. _section-14:
 
 1.4.0
 -----
@@ -237,7 +239,7 @@ IMPROVEMENTS
    Response if desired. Check the “Base-API” section in the manual for
    more details.
 
-.. _section-14:
+.. _section-15:
 
 1.3.1
 -----
@@ -249,7 +251,7 @@ IMPROVEMENTS:
 -  Add validation for “Base API” value. If you try to set it as an
    invalid hostname or domain, *mock* will fail gracefully.
 
-.. _section-15:
+.. _section-16:
 
 1.3.0
 -----
@@ -266,7 +268,7 @@ FIXED
    was supported as well. This has been fixed - the feature is now
    usable through cmd flag and json config.
 
-.. _section-16:
+.. _section-17:
 
 1.2.0
 -----
@@ -285,7 +287,7 @@ ADDED
 -  Enable individual request headers to be read through environment
    variables such has ``MOCK_REQUEST_HEADER_FOO_BAR``
 
-.. _section-17:
+.. _section-18:
 
 1.1.0
 -----
@@ -298,7 +300,7 @@ ADDED
 -  New condition options added: ``querystring_match_regex``,
    ``querystring_exact_match_regex``.
 
-.. _section-18:
+.. _section-19:
 
 1.0.0
 -----
@@ -318,7 +320,7 @@ ADDED
 -  New environment variable for Request/Middleware Handlers:
    ``MOCK_REQUEST_NTH``;
 
-.. _section-19:
+.. _section-20:
 
 0.8.1
 -----
@@ -327,7 +329,7 @@ ADDED
 
 -  New condition option: ``route_param_match``
 
-.. _section-20:
+.. _section-21:
 
 0.8.0
 -----
@@ -337,7 +339,7 @@ ADDED
 -  ``nth`` condition option: Conditional responses can be set based on
    their position in the request history.
 
-.. _section-21:
+.. _section-22:
 
 0.7.0
 -----
@@ -359,7 +361,7 @@ FIXED
 -  Defining responses referenced through files with absolute path fails.
    (with relative file paths no issues, only absolute);
 
-.. _section-22:
+.. _section-23:
 
 0.6.0
 -----
@@ -373,7 +375,7 @@ ADDED
 -  New variable added to read current request’s host
    ``MOCK_REQUEST_HOST``.
 
-.. _section-23:
+.. _section-24:
 
 0.5.0
 -----
@@ -412,7 +414,7 @@ Features & enhancements
 -  Endpoints can be configured without any HTTP Method - it will default
    to ``GET``;
 
-.. _section-24:
+.. _section-25:
 
 0.4.0
 -----
@@ -429,7 +431,7 @@ Bugs fixed:
 -  Trying to assert with “Json Body” on a Request that didn’t have any
    payload would result in 500 Status Code API Error;
 
-.. _section-25:
+.. _section-26:
 
 0.3.0
 -----
@@ -439,7 +441,7 @@ Bugs fixed:
    ``"response": "sh:./my_shell_script.sh some_param another_param"``;
 -  ``--delay`` option added enabling you to simulate slow APIs;
 
-.. _section-26:
+.. _section-27:
 
 0.2.0
 -----
@@ -453,7 +455,7 @@ Minor stuff:
 -  When trying to reference response files that do not exist, *mock* now
    prevents starting and shows error, failing gracefully.
 
-.. _section-27:
+.. _section-28:
 
 0.1.4
 -----
@@ -472,21 +474,21 @@ Minor stuff:
 -  Fail gracefully if given configuration file does not exist or/and not
    readable.
 
-.. _section-28:
+.. _section-29:
 
 0.1.3
 -----
 
 This release fixes a bug in the ``json_body_match`` condition option.
 
-.. _section-29:
+.. _section-30:
 
 0.1.2
 -----
 
 This release doesn’t have significant changes.
 
-.. _section-30:
+.. _section-31:
 
 0.1.1
 -----
@@ -495,7 +497,7 @@ Features:
 
 -  ``querystring_exact_match`` Assertion Matcher added;
 
-.. _section-31:
+.. _section-32:
 
 0.1.0
 -----
