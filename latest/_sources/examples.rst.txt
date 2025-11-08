@@ -63,6 +63,33 @@ enter a domain name to be looked up:
     whois ${DOMAIN} | mock write
     '
 
+Youtube Downloader Web Service
+------------------------------
+
+.. code:: sh
+
+    $ mock serve -p 3000 \
+        --route "/download/{video_id}" \
+        --exec '
+    VIDEO_ID="$(mock get-route-param video_id)"
+
+    cd $(mktemp -d)
+
+    yt-dlp "https://www.youtube.com/watch?v=${VIDEO_ID}" -f 92
+
+    FILE_NAME="$(ls | head -n 1)"
+
+    mock set-header "Content-Disposition" "attachment; filename=\"${FILE_NAME}\""
+
+    mock write < "${FILE_NAME}"
+    '
+
+Let's test it: in your browser, open up the following address:
+
+.. code-block:: text
+
+    http://localhost:3000/download/jNQXAC9IVRw
+
 An API powered by multiple languages
 ------------------------------------
 
