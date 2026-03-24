@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased yet
+
+FIXED:
+
+- OPTIONS request while using Base APIs resulted in 405 Method Not Allowed
+  Response.
+
 ## 1.4.14
 
 FIXED:
