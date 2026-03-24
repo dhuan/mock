@@ -92,7 +92,7 @@ var serveCmd = &cobra.Command{
 		}
 		mockFs := mockfs.MockFs{State: state}
 
-		router.Use(handleOptions(flagCors, state, config, mockFs, router))
+		router.Use(handleOptions(flagCors, state, config, mockFs, router, hasBaseApi))
 
 		router.NotFound(onNotFound(flagCors, hasBaseApi, baseApi, state, config, mockFs, cache, flagDelay))
 
@@ -739,10 +739,11 @@ func handleOptions(
 	config *MockConfig,
 	mockFs types.MockFs,
 	router *chi.Mux,
+	hasBaseApi bool,
 ) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			match := matchRouteAnyMethod(router, r.URL.Path)
+			match := hasBaseApi || matchRouteAnyMethod(router, r.URL.Path)
 
 			if strings.ToLower(r.Method) != "options" || !match || !corsEnabled {
 				next.ServeHTTP(w, r)

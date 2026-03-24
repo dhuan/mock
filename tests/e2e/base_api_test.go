@@ -460,6 +460,46 @@ func Test_E2E_BaseApi_WithoutAnyEndpoints_WithJsonConfig(t *testing.T) {
 	)
 }
 
+func Test_E2E_BaseApi_CorsHeadersAreAttachedIntoBaseApiResponse(t *testing.T) {
+	state := NewState()
+	killMockBase, _, _, _ := RunMockBg(
+		state,
+		strings.Join([]string{
+			"serve",
+			"-p {{TEST_E2E_PORT}}",
+			"--route 'foo/bar'",
+			"--response 'Hello world! This is the base API.'",
+			"--header 'Access-Control-Allow-Origin: some_origin'",
+			"--header 'Access-Control-Allow-Credentials: false'",
+			"--header 'Access-Control-Allow-Headers: some-header'",
+			"--header 'Access-Control-Allow-Methods: GET'",
+		}, " "),
+		nil,
+		true,
+		nil,
+	)
+	defer killMockBase()
+
+	RunTestWithNoConfigAndWithArgs(
+		t,
+		[]string{
+			fmt.Sprintf("--base 'localhost:%d'", state.Port),
+			"--cors",
+		},
+		"OPTIONS",
+		"foo/bar",
+		nil,
+		strings.NewReader(""),
+		StatusCodeMatches(200),
+		HeadersMatch(map[string][]string{
+			"Access-Control-Allow-Origin":      {"*"},
+			"Access-Control-Allow-Credentials": {"true"},
+			"Access-Control-Allow-Headers":     {"*"},
+			"Access-Control-Allow-Methods":     {"POST, GET, OPTIONS, PUT, DELETE"},
+		}),
+	)
+}
+
 func Test_E2E_BaseApi_CorsFlagOverwritesCorsHeadersFromBaseApi(t *testing.T) {
 	state := NewState()
 	killMockBase, _, _, _ := RunMockBg(
