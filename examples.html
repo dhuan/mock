@@ -334,6 +334,30 @@ enter a domain name to be looked up:</p>
 </pre></div>
 </div>
 </section>
+<section id="youtube-downloader-web-service">
+<h2>Youtube Downloader Web Service<a class="headerlink" href="#youtube-downloader-web-service" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--route<span class="w"> </span><span class="s2">&quot;/download/{video_id}&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--exec<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">VIDEO_ID=&quot;$(mock get-route-param video_id)&quot;</span>
+
+<span class="s1">cd $(mktemp -d)</span>
+
+<span class="s1">yt-dlp &quot;https://www.youtube.com/watch?v=${VIDEO_ID}&quot; -f 92</span>
+
+<span class="s1">FILE_NAME=&quot;$(ls | head -n 1)&quot;</span>
+
+<span class="s1">mock set-header &quot;Content-Disposition&quot; &quot;attachment; filename=\&quot;${FILE_NAME}\&quot;&quot;</span>
+
+<span class="s1">mock write &lt; &quot;${FILE_NAME}&quot;</span>
+<span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>Let’s test it: in your browser, open up the following address:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>http://localhost:3000/download/jNQXAC9IVRw
+</pre></div>
+</div>
+</section>
 <section id="an-api-powered-by-multiple-languages">
 <h2>An API powered by multiple languages<a class="headerlink" href="#an-api-powered-by-multiple-languages" title="Link to this heading">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mock<span class="w"> </span>serve<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
@@ -554,6 +578,7 @@ This can be achieved using <a class="reference internal" href="middlewares.html#
             <ul>
 <li><a class="reference internal" href="#">How-tos &amp; Examples</a><ul>
 <li><a class="reference internal" href="#a-who-is-lookup-service">A “Who is” Lookup Service</a></li>
+<li><a class="reference internal" href="#youtube-downloader-web-service">Youtube Downloader Web Service</a></li>
 <li><a class="reference internal" href="#an-api-powered-by-multiple-languages">An API powered by multiple languages</a></li>
 <li><a class="reference internal" href="#a-stateful-api">A stateful API</a></li>
 <li><a class="reference internal" href="#a-crud-api-with-a-simple-data-storage">A CRUD API with a simple data storage</a></li>
