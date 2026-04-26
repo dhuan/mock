@@ -119,6 +119,42 @@ func Test_ParseEndpoints_WithStatusCode(t *testing.T) {
 	)
 }
 
+func Test_ParseEndpoints_WithRouteMethodShortcuts(t *testing.T) {
+	assert.Equal(
+		t,
+		[]types.EndpointConfig{
+			{
+				Route:              "route-a",
+				Method:             "GET",
+				Response:           []byte("Test"),
+				ResponseStatusCode: 0,
+				Headers:            nil,
+				ResponseIf:         nil,
+				HeadersBase:        nil,
+			},
+			{
+				Route:              "route-b",
+				Method:             "POST",
+				Response:           []byte("Test"),
+				ResponseStatusCode: 0,
+				Headers:            nil,
+				ResponseIf:         nil,
+				HeadersBase:        nil,
+			},
+		},
+		args2config.ParseEndpoints([]string{
+			"--get",
+			"route-a",
+			"--response",
+			"Test",
+			"--post",
+			"route-b",
+			"--response",
+			"Test",
+		}),
+	)
+}
+
 func Test_ParseEndpoints_WithResponseFile(t *testing.T) {
 	assert.Equal(
 		t,

@@ -5,6 +5,7 @@ import "strconv"
 import "fmt"
 import "log"
 import "strings"
+import "slices"
 
 func ParseEndpoints(args []string) []types.EndpointConfig {
 	endpoints := make([]types.EndpointConfig, 0)
@@ -29,6 +30,10 @@ func ParseEndpoints(args []string) []types.EndpointConfig {
 		parseParam([]string{"--exec", "--response-exec"}, arg, args, i, assignResponse(&endpoints[endpointCurrent], "exec:"))
 		parseParam([]string{"--status-code"}, arg, args, i, assignStatusCode(&endpoints[endpointCurrent]))
 		parseParam([]string{"--header"}, arg, args, i, assignHeader(&endpoints[endpointCurrent]))
+
+		for _, method := range all_methods {
+			parseParam([]string{fmt.Sprintf("--%s", method)}, arg, args, i, assignRouteWithMethod(&endpoints[endpointCurrent], strings.ToUpper(method)))
+		}
 	}
 
 	return endpoints
@@ -55,8 +60,29 @@ func ParseMiddlewares(args []string) []types.MiddlewareConfig {
 	return middlewares
 }
 
+var all_methods []string = []string{
+	"get",
+	"post",
+	"delete",
+	"patch",
+	"put",
+	"head",
+	"options",
+	"trace",
+}
+
+func allMethodFlags() []string {
+	result := make([]string, len(all_methods))
+
+	for i, method := range all_methods {
+		result[i] = fmt.Sprintf("--%s", method)
+	}
+
+	return result
+}
+
 func startingNewEndpoint(arg string) bool {
-	return arg == "--route"
+	return arg == "--route" || slices.Contains(allMethodFlags(), arg)
 }
 
 func startingNewMiddleware(arg string) bool {
@@ -79,6 +105,13 @@ func assignMiddlewareRouteMatch(middlewareConfig *types.MiddlewareConfig) func(r
 func assignRoute(endpointConfig *types.EndpointConfig) func(route string) {
 	return func(route string) {
 		endpointConfig.Route = route
+	}
+}
+
+func assignRouteWithMethod(endpointConfig *types.EndpointConfig, method string) func(route string) {
+	return func(route string) {
+		endpointConfig.Route = route
+		endpointConfig.Method = method
 	}
 }
 
