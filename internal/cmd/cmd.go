@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/dhuan/mock/internal/types"
 	mocklib "github.com/dhuan/mock/pkg/mock"
@@ -68,6 +69,23 @@ func Execute() {
 	serveCmd.PersistentFlags().StringArray("middleware", []string{}, "middleware")
 	serveCmd.PersistentFlags().StringArray("route-match", []string{}, "filter middleware by route")
 	serveCmd.PersistentFlags().StringVarP(&flagBaseApi, "base", "b", "", "base API")
+
+	for _, method := range []string{
+		"get",
+		"post",
+		"delete",
+		"patch",
+		"put",
+		"head",
+		"options",
+		"trace",
+	} {
+		serveCmd.PersistentFlags().StringArray(
+			method,
+			[]string{},
+			fmt.Sprintf("create endpoint route with %s method", strings.ToUpper(method)),
+		)
+	}
 
 	writeCmd.PersistentFlags().BoolVarP(&flagAppend, "append", "a", false, "append instead of overwriting")
 	writeCmd.PersistentFlags().BoolVar(&flagJson, "json", false, "treats received data as JSON and adds necessary JSON header.")
