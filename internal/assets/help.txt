@@ -1,0 +1,14 @@
+mock - API builder | __MOCK_VERSION__
+
+$ mock serve -p 9000 \
+  --get foo/bar --response "Hello, world!" \
+  --post foo/bar --response "Hello, world!"
+
+Learn:
+
+$ mock help <CATEGORY>
+
+Available help categories: serve,lib,examples
+
+LICENSE: MIT
+Created by: Dhuan Oliveira

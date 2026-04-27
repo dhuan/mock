@@ -40,6 +40,7 @@ do
     cp internal/cmd/version.go "$TMP_BKP"
     sed -i "s/__VERSION__/$APP_VERSION/g" internal/cmd/version.go
     sed -i "s/__MOCK_VERSION__/$APP_VERSION/g" internal/mock/response.go
+    sed -i "s/__MOCK_VERSION__/$APP_VERSION/g" internal/assets/help.txt
     sed -i "s/__GOOS__/$GOOS/g" internal/cmd/version.go
     sed -i "s/__GOARCH__/$GOARCH/g" internal/cmd/version.go
 

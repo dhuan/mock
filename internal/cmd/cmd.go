@@ -5,8 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/dhuan/mock/internal/assets"
 	"github.com/dhuan/mock/internal/types"
 	mocklib "github.com/dhuan/mock/pkg/mock"
+
 	"github.com/spf13/cobra"
 )
 
@@ -49,6 +51,8 @@ func Execute() {
 	rootCmd.AddCommand(getHeaderCmd)
 	rootCmd.AddCommand(setStatusCmd)
 	rootCmd.AddCommand(versionCmd)
+
+	rootCmd.SetHelpTemplate(assets.HelpText)
 
 	serveCmd.PersistentFlags().StringVarP(&flagConfig, "config", "c", "", "configuration file")
 	serveCmd.PersistentFlags().StringVarP(&flagPort, "port", "p", "UNSET", "port to listen on")
