@@ -511,6 +511,7 @@ func onNotFound(
 		if err != nil {
 			panic(err)
 		}
+		defer response.Body.Close()
 
 		requestRecord, requestBody, err := record.BuildRequestRecord(r, endpointParams)
 		if err != nil {
@@ -521,6 +522,25 @@ func onNotFound(
 		requestRecords, err := mockFs.GetRecordsMatchingRoute(requestRoute)
 		if err != nil {
 			panic(err)
+		}
+
+		middlewareConfigsForRequest := mockMiddleware.GetMiddlewareForRequest(
+			config.Middlewares,
+			r,
+			requestRecord,
+			requestRecords,
+			mock.VerifyCondition,
+		)
+		if len(middlewareConfigsForRequest) == 0 && responseIsEventStream(response) {
+			if corsEnabled {
+				setCorsHeaders(w)
+			}
+
+			if err := forwardStreamingResponse(response, w); err != nil {
+				panic(err)
+			}
+
+			return
 		}
 
 		responseBody, err := io.ReadAll(response.Body)
@@ -705,6 +725,46 @@ func forwardResponse(response *mock.Response, w http.ResponseWriter) {
 	if len(response.Body) > 0 {
 		w.Write(response.Body)
 	}
+}
+
+func forwardStreamingResponse(response *http.Response, w http.ResponseWriter) error {
+	for key, values := range response.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+
+	w.WriteHeader(response.StatusCode)
+
+	flusher, _ := w.(http.Flusher)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := response.Body.Read(buffer)
+		if n > 0 {
+			if _, writeErr := w.Write(buffer[:n]); writeErr != nil {
+				return writeErr
+			}
+
+			if flusher != nil {
+				flusher.Flush()
+			}
+		}
+
+		if err == io.EOF {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+}
+
+func responseIsEventStream(response *http.Response) bool {
+	contentType := strings.ToLower(response.Header.Get("Content-Type"))
+
+	return strings.HasPrefix(contentType, "text/event-stream")
 }
 
 func onMethodNotAllowed(corsEnabled bool) http.HandlerFunc {
