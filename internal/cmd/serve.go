@@ -565,7 +565,9 @@ func onNotFound(
 					return middlewareRunResult.Headers
 				},
 			); err != nil {
-				panic(err)
+				log.Printf("Error while forwarding streaming response:\n%s\n", err.Error())
+
+				return
 			}
 
 			return
