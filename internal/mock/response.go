@@ -195,10 +195,8 @@ func resolveEndpointResponseInternal(
 
 	requestVariables, err := BuildVars(
 		state,
-		responseStatusCode,
 		requestRecord,
 		requestRecords,
-		requestBody,
 		baseApi,
 	)
 	if err != nil {

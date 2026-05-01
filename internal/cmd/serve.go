@@ -524,6 +524,10 @@ func onNotFound(
 			panic(err)
 		}
 
+		middlewareHandlerExtraVars := map[string]string{
+			"MOCK_BASE_API_RESPONSE": "true",
+		}
+
 		middlewareConfigsForRequest := mockMiddleware.GetMiddlewareForRequest(
 			config.Middlewares,
 			r,
@@ -531,12 +535,36 @@ func onNotFound(
 			requestRecords,
 			mock.VerifyCondition,
 		)
-		if len(middlewareConfigsForRequest) == 0 && responseIsEventStream(response) {
-			if corsEnabled {
-				setCorsHeaders(w)
+		if responseIsEventStream(response) {
+			vars, err := mock.BuildVars(state, requestRecord, requestRecords, config.Base)
+			if err != nil {
+				panic(err)
 			}
 
-			if err := forwardStreamingResponse(response, w); err != nil {
+			if err := forwardStreamingResponse(response, w,
+				corsEnabled,
+				func(headers *http.Header) map[string]string {
+					middlewareRunResult, err := mockMiddleware.RunMiddleware(
+						execute,
+						readFile,
+						state.ConfigFolderPath,
+						middlewareConfigsForRequest,
+						[]byte{},
+						headers,
+						response.StatusCode,
+						r,
+						endpointParams,
+						vars,
+						utils.CreateTempFile,
+						requestRecord,
+					)
+					if err != nil {
+						panic(err)
+					}
+
+					return middlewareRunResult.Headers
+				},
+			); err != nil {
 				panic(err)
 			}
 
@@ -558,10 +586,6 @@ func onNotFound(
 			if strings.ToLower(key) == "content-length" {
 				delete(mockResponse.Headers, key)
 			}
-		}
-
-		middlewareHandlerExtraVars := map[string]string{
-			"MOCK_BASE_API_RESPONSE": "true",
 		}
 
 		mockResponse = handleMiddleware(
@@ -608,7 +632,7 @@ func handleMiddleware(
 	middlewareConfigsForRequest := mockMiddleware.GetMiddlewareForRequest(config.Middlewares, r, requestRecord, requestRecords, mock.VerifyCondition)
 	hasMiddleware := len(middlewareConfigsForRequest) > 0
 
-	vars, err := mock.BuildVars(state, response.StatusCode, requestRecord, requestRecords, requestBody, config.Base)
+	vars, err := mock.BuildVars(state, requestRecord, requestRecords, config.Base)
 	if err != nil {
 		panic(err)
 	}
@@ -727,11 +751,31 @@ func forwardResponse(response *mock.Response, w http.ResponseWriter) {
 	}
 }
 
-func forwardStreamingResponse(response *http.Response, w http.ResponseWriter) error {
+func forwardStreamingResponse(
+	response *http.Response,
+	w http.ResponseWriter,
+	corsEnabled bool,
+	runMiddlewares func(*http.Header) map[string]string,
+) error {
+	headers := make(map[string]string)
+	if corsEnabled {
+		for key, value := range corsHeaders {
+			headers[key] = value
+		}
+	}
+
 	for key, values := range response.Header {
 		for _, value := range values {
-			w.Header().Add(key, value)
+			headers[key] = value
 		}
+	}
+
+	for key, value := range runMiddlewares(&response.Header) {
+		headers[key] = value
+	}
+
+	for key, value := range headers {
+		w.Header().Add(key, value)
 	}
 
 	w.WriteHeader(response.StatusCode)

@@ -148,10 +148,8 @@ func getRequestRecordMatchingRoute(mockFs types.MockFs, route string) ([]types.R
 
 func BuildVars(
 	state *types.State,
-	responseStatusCode int,
 	requestRecord *types.RequestRecord,
 	requestRecords []types.RequestRecord,
-	requestBody []byte,
 	baseApi string,
 ) (map[string]string, error) {
 	endpoint := requestRecord.Route
