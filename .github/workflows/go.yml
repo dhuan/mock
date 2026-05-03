@@ -41,6 +41,7 @@ jobs:
           sudo apt install -y curl tar moreutils
           curl -L https://github.com/htacg/tidy-html5/releases/download/5.8.0/tidy-5.8.0-Linux-64bit.deb > tidy.deb
           sudo dpkg -i tidy.deb
+          export PATH=$PATH:$(pwd)/bin
           make test_e2e
 
     - name: Upload coverage reports to Codecov
