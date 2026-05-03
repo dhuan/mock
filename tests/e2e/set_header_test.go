@@ -22,7 +22,7 @@ func Test_E2E_SetHeader(t *testing.T) {
 			[]string{
 				"--route foo/bar",
 				fmt.Sprintf("--exec '%s'", strings.Join([]string{
-					fmt.Sprintf(`{{MOCK_EXECUTABLE}} set-header %s`, tc.headerCommand),
+					fmt.Sprintf(`mock set-header %s`, tc.headerCommand),
 				}, ";")),
 			},
 			"GET",
@@ -42,9 +42,9 @@ func Test_E2E_SetHeader_Overwriting(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} set-header foo bar`,
-				`{{MOCK_EXECUTABLE}} set-header hello world`,
-				`{{MOCK_EXECUTABLE}} set-header foo MODIFIED`,
+				`mock set-header foo bar`,
+				`mock set-header hello world`,
+				`mock set-header foo MODIFIED`,
 			}, ";")),
 		},
 		"GET",

@@ -30,7 +30,7 @@ func Test_E2E_BaseApi_SSE_ModifyHeadersWithMiddleware(t *testing.T) {
 		func(baseApiHost string) string {
 			return fmt.Sprintf(`serve -p {{TEST_E2E_PORT}} --base 'http://%s' \
 --middleware '
-{{MOCK_EXECUTABLE}} set-header foo bar
+mock set-header foo bar
 '
 `, baseApiHost)
 		},

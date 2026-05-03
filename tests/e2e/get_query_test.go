@@ -14,7 +14,7 @@ func Test_E2E_GetQuery(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-query someKey | {{MOCK_EXECUTABLE}} write`,
+				`mock get-query someKey | mock write`,
 			}, ";")),
 		},
 		"GET",
@@ -31,7 +31,7 @@ func Test_E2E_GetQuery_GetAll(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-query | {{MOCK_EXECUTABLE}} write`,
+				`mock get-query | mock write`,
 			}, ";")),
 		},
 		"GET",
@@ -47,7 +47,7 @@ func Test_E2E_GetQuery_ExitCode1WhenKeyDoesNotExist(t *testing.T) {
 		t, nil,
 		[]string{
 			"--route foo/bar",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-query someKey > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-query someKey > $MOCK_RESPONSE_BODY`),
 		},
 		Get("foo/bar?foo=bar", nil),
 		StringMatches(""),
@@ -60,7 +60,7 @@ func Test_E2E_GetQuery_RequestWithoutQuerystring(t *testing.T) {
 		t, nil,
 		[]string{
 			"--route foo/bar",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-query someKey > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-query someKey > $MOCK_RESPONSE_BODY`),
 		},
 		Get("foo/bar", nil),
 		StringMatches(""),

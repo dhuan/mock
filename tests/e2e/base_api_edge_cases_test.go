@@ -103,7 +103,7 @@ func Test_E2E_BaseApi_UseForwardWithBaseApiWithoutSpecifyingProtocol(t *testing.
 		[]string{
 			fmt.Sprintf("--base localhost:%d", state.Port),
 			"--route foo/bar",
-			"--response-exec '{{MOCK_EXECUTABLE}} forward'",
+			"--response-exec 'mock forward'",
 		},
 		"GET",
 		"foo/bar",

@@ -13,7 +13,7 @@ func Test_E2E_GetHeader_All(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header > $MOCK_RESPONSE_BODY`,
+			`mock get-header > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
 			"accept-encoding: gzip",
@@ -29,7 +29,7 @@ func Test_E2E_GetHeader_NoMatches(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header foobar > $MOCK_RESPONSE_BODY`,
+			`mock get-header foobar > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{},
 		1,
@@ -40,7 +40,7 @@ func Test_E2E_GetHeader_NoMatches_ExitCode1(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header key`,
+			`mock get-header key`,
 		},
 		[]string{},
 		1,
@@ -51,7 +51,7 @@ func Test_E2E_GetHeader_Match(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header some-header-key > $MOCK_RESPONSE_BODY`,
+			`mock get-header some-header-key > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
 			"some-header-key: some header value",
@@ -64,7 +64,7 @@ func Test_E2E_GetHeader_Regex(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header --regex key > $MOCK_RESPONSE_BODY`,
+			`mock get-header --regex key > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
 			"another-header-key: another header value",
@@ -78,7 +78,7 @@ func Test_E2E_GetHeader_PrintValueOnly(t *testing.T) {
 	getHeaderTest(
 		t,
 		[]string{
-			`{{MOCK_EXECUTABLE}} get-header -v some-header-key > $MOCK_RESPONSE_BODY`,
+			`mock get-header -v some-header-key > $MOCK_RESPONSE_BODY`,
 		},
 		[]string{
 			"some header value",

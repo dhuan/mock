@@ -14,9 +14,9 @@ func Test_E2E_Replace(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "Hello, world." | {{MOCK_EXECUTABLE}} write`,
-				`{{MOCK_EXECUTABLE}} replace world WORLD`,
-				`{{MOCK_EXECUTABLE}} replace . !`,
+				`printf "Hello, world." | mock write`,
+				`mock replace world WORLD`,
+				`mock replace . !`,
 			}, ";")),
 		},
 		"GET",
@@ -33,8 +33,8 @@ func Test_E2E_Replace_WithRegex(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "Hello, world." | {{MOCK_EXECUTABLE}} write`,
-				`{{MOCK_EXECUTABLE}} replace --regex "w[a-z]{1,}" people`,
+				`printf "Hello, world." | mock write`,
+				`mock replace --regex "w[a-z]{1,}" people`,
 			}, ";")),
 		},
 		"GET",
@@ -51,8 +51,8 @@ func Test_E2E_Replace_Error_OnlyTwoArgsAreAllowed(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "Hello, world." | {{MOCK_EXECUTABLE}} write`,
-				`{{MOCK_EXECUTABLE}} replace one two three`,
+				`printf "Hello, world." | mock write`,
+				`mock replace one two three`,
 			}, ";")),
 		},
 		"GET",

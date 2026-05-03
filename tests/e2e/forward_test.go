@@ -32,7 +32,7 @@ func Test_E2E_Forward(t *testing.T) {
 			fmt.Sprintf("--base 'http://localhost:%d'", state.Port),
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} forward`,
+				`mock forward`,
 				`printf " Modified!" >> $MOCK_RESPONSE_BODY`,
 				`STATUS_CODE=$(cat $MOCK_RESPONSE_STATUS_CODE)`,
 				`echo $((STATUS_CODE+1)) > $MOCK_RESPONSE_STATUS_CODE`,

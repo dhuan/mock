@@ -14,7 +14,7 @@ func Test_E2E_Write(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "Hello, world! Write was used." | {{MOCK_EXECUTABLE}} write`,
+				`printf "Hello, world! Write was used." | mock write`,
 			}, ";")),
 		},
 		"GET",
@@ -31,9 +31,9 @@ func Test_E2E_Write_Append(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "Hello, world!" | {{MOCK_EXECUTABLE}} write`,
-				`printf " Append was used." | {{MOCK_EXECUTABLE}} write -a`,
-				`printf " Again." | {{MOCK_EXECUTABLE}} write --append`,
+				`printf "Hello, world!" | mock write`,
+				`printf " Append was used." | mock write -a`,
+				`printf " Again." | mock write --append`,
 			}, ";")),
 		},
 		"GET",
@@ -50,8 +50,8 @@ func Test_E2E_Write_WritingMultipleTimesOverwrites(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "Hello, world!" | {{MOCK_EXECUTABLE}} write`,
-				`printf "Write again." | {{MOCK_EXECUTABLE}} write`,
+				`printf "Hello, world!" | mock write`,
+				`printf "Write again." | mock write`,
 			}, ";")),
 		},
 		"GET",
@@ -70,8 +70,8 @@ func Test_E2E_Write_WithJsonOption_Ok(t *testing.T) {
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
 				// Space excess is intentional in order to assert
 				// that --json formats the JSON for us.
-				`printf "{\"foo\":          \"bar\"}" | {{MOCK_EXECUTABLE}} write --json`,
-				`{{MOCK_EXECUTABLE}} set-header Exit-Status-Code "${?}"`,
+				`printf "{\"foo\":          \"bar\"}" | mock write --json`,
+				`mock set-header Exit-Status-Code "${?}"`,
 			}, ";")),
 		},
 		"GET",
@@ -92,8 +92,8 @@ func Test_E2E_Write_WithJsonOption_InvalidJson(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "{\"foo\":INVALID}" | {{MOCK_EXECUTABLE}} write --json`,
-				`{{MOCK_EXECUTABLE}} set-header Exit-Status-Code "${?}"`,
+				`printf "{\"foo\":INVALID}" | mock write --json`,
+				`mock set-header Exit-Status-Code "${?}"`,
 			}, ";")),
 		},
 		"GET",
@@ -114,8 +114,8 @@ func Test_E2E_Write_WithJsonOption_CannotUseWithAppend(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`printf "{\"foo\":123}" | {{MOCK_EXECUTABLE}} write --json --append`,
-				`{{MOCK_EXECUTABLE}} set-header Exit-Status-Code "${?}"`,
+				`printf "{\"foo\":123}" | mock write --json --append`,
+				`mock set-header Exit-Status-Code "${?}"`,
 			}, ";")),
 		},
 		"GET",

@@ -14,7 +14,7 @@ func Test_E2E_SetStatus(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} set-status 210`,
+				`mock set-status 210`,
 			}, ";")),
 		},
 		"GET",
@@ -31,7 +31,7 @@ func Test_E2E_SetStatus_Error_InvalidStatusCodeParameter(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} set-status invalid`,
+				`mock set-status invalid`,
 			}, ";")),
 		},
 		"GET",
