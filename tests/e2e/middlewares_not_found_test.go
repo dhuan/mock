@@ -10,8 +10,8 @@ import (
 
 var middleware_script string = strings.Join([]string{
 	`test "${MOCK_REQUEST_NOT_FOUND}" = "true"`,
-	`&& {{MOCK_EXECUTABLE}} set-status 201`,
-	`&& (echo "NOT FOUND!" | {{MOCK_EXECUTABLE}} write)`,
+	`&& mock set-status 201`,
+	`&& (echo "NOT FOUND!" | mock write)`,
 }, " ")
 
 func Test_Middlewares_NotFound_ModifyResponse(t *testing.T) {

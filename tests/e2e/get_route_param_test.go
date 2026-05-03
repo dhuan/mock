@@ -11,7 +11,7 @@ func Test_E2E_GetRouteParam(t *testing.T) {
 		t, nil,
 		[]string{
 			"--route say_hi/{name}/{location}",
-			CmdExec(`printf "Hi. My name is $({{MOCK_EXECUTABLE}} get-route-param name). I live on $({{MOCK_EXECUTABLE}} get-route-param location)." > $MOCK_RESPONSE_BODY`),
+			CmdExec(`printf "Hi. My name is $(mock get-route-param name). I live on $(mock get-route-param location)." > $MOCK_RESPONSE_BODY`),
 		},
 		Get("say_hi/john_doe/earth", nil),
 		StringMatches("Hi. My name is john_doe. I live on earth."),
@@ -23,7 +23,7 @@ func Test_E2E_GetRouteParam_WithUnexistingKeyExitsWith1(t *testing.T) {
 		t, nil,
 		[]string{
 			"--route say_hi/{name}",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-route-param this-param-does-not-exist > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-route-param this-param-does-not-exist > $MOCK_RESPONSE_BODY`),
 		},
 		Get("say_hi/john_doe", nil),
 		StringMatches(""),
@@ -36,7 +36,7 @@ func Test_E2E_GetRouteParam_WithUnexistingKeyExitsWith1_WithRouteWithoutParams(t
 		t, nil,
 		[]string{
 			"--route say_hi",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-route-param this-param-does-not-exist > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-route-param this-param-does-not-exist > $MOCK_RESPONSE_BODY`),
 		},
 		Get("say_hi", nil),
 		StringMatches(""),

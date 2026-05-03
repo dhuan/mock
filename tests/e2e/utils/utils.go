@@ -206,10 +206,9 @@ func replaceVars(command *string, state *E2eState) {
 	}
 
 	vars := map[string]string{
-		"TEST_DATA_PATH":  fmt.Sprintf("%s/tests/e2e/data", pwd()),
-		"TEST_E2E_PORT":   fmt.Sprint(state.Port),
-		"WD":              wd,
-		"MOCK_EXECUTABLE": fmt.Sprintf("%s/bin/mock", pwd()),
+		"TEST_DATA_PATH": fmt.Sprintf("%s/tests/e2e/data", pwd()),
+		"TEST_E2E_PORT":  fmt.Sprint(state.Port),
+		"WD":             wd,
 	}
 
 	for key, value := range vars {
@@ -1223,7 +1222,7 @@ func Headers(headerData ...string) http.Header {
 }
 
 func CmdExec(commands ...string) string {
-	commandSetExitCodeHeader := `{{MOCK_EXECUTABLE}} set-header Exit-Status-Code "${?}"`
+	commandSetExitCodeHeader := `mock set-header Exit-Status-Code "${?}"`
 
 	return fmt.Sprintf("--exec '%s; %s'", strings.Join(commands, ";"), commandSetExitCodeHeader)
 }

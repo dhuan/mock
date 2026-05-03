@@ -15,7 +15,7 @@ func Test_E2E_GetPayload_AllPayload(t *testing.T) {
 			"--route foo/bar",
 			"--method POST",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-payload > $MOCK_RESPONSE_BODY`,
+				`mock get-payload > $MOCK_RESPONSE_BODY`,
 			}, ";")),
 		},
 		Post("foo/bar", nil, []byte("Hello, world. This is the payload.")),
@@ -30,7 +30,7 @@ func Test_E2E_GetPayload_GetJsonField_OK(t *testing.T) {
 			"--route foo/bar",
 			"--method POST",
 			fmt.Sprintf("--exec '%s'", strings.Join([]string{
-				`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`,
+				`mock get-payload foo > $MOCK_RESPONSE_BODY`,
 			}, ";")),
 		},
 		Post("foo/bar", JSON_HEADER, []byte(`{"foo": "bar"}`)),
@@ -54,7 +54,7 @@ func Test_E2E_GetPayload_GetJsonField_ArrayRoot(t *testing.T) {
 			[]string{
 				"--route foo/bar",
 				"--method POST",
-				CmdExec(fmt.Sprintf(`({{MOCK_EXECUTABLE}} get-payload %s) > $MOCK_RESPONSE_BODY`, tc.path)),
+				CmdExec(fmt.Sprintf(`(mock get-payload %s) > $MOCK_RESPONSE_BODY`, tc.path)),
 			},
 			Post("foo/bar", JSON_HEADER, []byte(`[{"location":"earth"},{"location":"mars"}]`)),
 			StringMatches(fmt.Sprintf("%+v", tc.expect)),
@@ -69,7 +69,7 @@ func Test_E2E_GetPayload_GetJsonField_InvalidJson(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
 		Post("foo/bar", JSON_HEADER, []byte(`{This is invalid JSON}`)),
 		StringMatches(""),
@@ -94,7 +94,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_OK(t *testing.T) {
 			[]string{
 				"--route foo/bar",
 				"--method POST",
-				CmdExec(fmt.Sprintf(`{{MOCK_EXECUTABLE}} get-payload %s > $MOCK_RESPONSE_BODY`, tc.path)),
+				CmdExec(fmt.Sprintf(`mock get-payload %s > $MOCK_RESPONSE_BODY`, tc.path)),
 			},
 			Post("foo/bar", JSON_HEADER, []byte(`{
   "users": [
@@ -133,7 +133,7 @@ func Test_E2E_GetPayload_GetJsonField_Nested_InvalidFields(t *testing.T) {
 			[]string{
 				"--route foo/bar",
 				"--method POST",
-				CmdExec(fmt.Sprintf(`{{MOCK_EXECUTABLE}} get-payload %s > $MOCK_RESPONSE_BODY`, tc.path)),
+				CmdExec(fmt.Sprintf(`mock get-payload %s > $MOCK_RESPONSE_BODY`, tc.path)),
 			},
 			Post("foo/bar", JSON_HEADER, []byte(`{
   "users": [
@@ -156,7 +156,7 @@ func Test_E2E_GetPayload_GetJsonField_FieldDoesNotExist(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
 		Post("foo/bar", JSON_HEADER, []byte(`{"hello": "world"}`)),
 		StringMatches(""),
@@ -170,7 +170,7 @@ func Test_E2E_GetPayload_GetJsonField_WithEmptyPayload_Exit1(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
 		Post("foo/bar", JSON_HEADER, nil),
 		StringMatches(""),
@@ -184,7 +184,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_Ok(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
 		PostUrlEncodedForm("foo/bar", map[string]string{
 			"foo": "bar",
@@ -200,7 +200,7 @@ func Test_E2E_GetPayload_GetFieldFromUrlEncodedForm_FieldDoesNotExist(t *testing
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload hello > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload hello > $MOCK_RESPONSE_BODY`),
 		},
 		PostUrlEncodedForm("foo/bar", map[string]string{
 			"foo": "bar",
@@ -216,7 +216,7 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok(t *testing.T) {
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
 		PostMultipart("foo/bar", map[string]MultipartValue{
 			"foo": {Data: "bar", Type: MultipartValueType_Field, FileName: ""},
@@ -232,7 +232,7 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_Ok_WithFileField(t *testing.T
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload foo > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload foo > $MOCK_RESPONSE_BODY`),
 		},
 		PostMultipart("foo/bar", map[string]MultipartValue{
 			"foo": {Data: "bar", Type: MultipartValueType_File, FileName: "file_name.txt"},
@@ -248,7 +248,7 @@ func Test_E2E_GetPayload_GetFieldFromMultipartForm_FieldDoesNotExist(t *testing.
 		[]string{
 			"--route foo/bar",
 			"--method POST",
-			CmdExec(`{{MOCK_EXECUTABLE}} get-payload doesnotexist > $MOCK_RESPONSE_BODY`),
+			CmdExec(`mock get-payload doesnotexist > $MOCK_RESPONSE_BODY`),
 		},
 		PostMultipart("foo/bar", map[string]MultipartValue{
 			"foo": {Data: "bar", Type: MultipartValueType_Field, FileName: ""},
