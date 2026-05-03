@@ -12,7 +12,7 @@ test_unit_with_coverage:
 	go test -v -race -coverprofile=coverage.out -covermode=atomic ./internal/... ./pkg/...
 
 test_e2e:
-	go test -v $(shell find tests | grep 'e2e.*_test.go')
+	sh ./scripts/test_e2e.sh
 
 doc_dev:
 	sh ./scripts/doc_dev.sh
