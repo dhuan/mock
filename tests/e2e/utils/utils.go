@@ -85,9 +85,13 @@ func RunMockBg(
 	}
 
 	replaceVars(&command, state)
-	commandParameters := command_parse.ToCommandParameters(command)
 
-	cmd := exec.Command(state.BinaryPath, commandParameters...)
+	commandParameters := []string{
+		"-c",
+		fmt.Sprintf(`%s %s`, state.BinaryPath, command),
+	}
+
+	cmd := exec.Command("sh", commandParameters...)
 	buf := &bytes.Buffer{}
 	cmd.Stdout = buf
 	cmd.Stderr = buf

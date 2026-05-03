@@ -11,9 +11,44 @@ import (
 	"time"
 
 	. "github.com/dhuan/mock/tests/e2e/utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_E2E_BaseApi_SSE_IsStreamedWithoutWaitingForUpstreamClose(t *testing.T) {
+	sseTest(
+		t,
+		func(baseApiHost string) string {
+			return fmt.Sprintf("serve -p {{TEST_E2E_PORT}} --base 'http://%s'", baseApiHost)
+		},
+		nil,
+	)
+}
+
+func Test_E2E_BaseApi_SSE_ModifyHeadersWithMiddleware(t *testing.T) {
+	sseTest(
+		t,
+		func(baseApiHost string) string {
+			return fmt.Sprintf(`serve -p {{TEST_E2E_PORT}} --base 'http://%s' \
+--middleware '
+{{MOCK_EXECUTABLE}} set-header foo bar
+'
+`, baseApiHost)
+		},
+		func(t *testing.T, response *http.Response) {
+			assert.Equal(
+				t,
+				response.Header.Get("Foo"),
+				"bar",
+			)
+		},
+	)
+}
+
+func sseTest(
+	t *testing.T,
+	execCommand func(string) string,
+	f func(*testing.T, *http.Response),
+) {
 	upstreamHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.Header().Set("Cache-Control", "no-cache")
@@ -46,7 +81,7 @@ func Test_E2E_BaseApi_SSE_IsStreamedWithoutWaitingForUpstreamClose(t *testing.T)
 	state := NewState()
 	killMock, serverOutput, _, _ := RunMockBg(
 		state,
-		fmt.Sprintf("serve -p {{TEST_E2E_PORT}} --base 'http://%s'", listener.Addr().String()),
+		execCommand(listener.Addr().String()),
 		nil,
 		true,
 		nil,
@@ -84,5 +119,9 @@ func Test_E2E_BaseApi_SSE_IsStreamedWithoutWaitingForUpstreamClose(t *testing.T)
 
 	if firstLine != "data: first event\n" {
 		t.Fatalf("unexpected first SSE line: %q", firstLine)
+	}
+
+	if f != nil {
+		f(t, response)
 	}
 }
