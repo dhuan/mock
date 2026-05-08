@@ -22,29 +22,27 @@
 ## Getting started
 
 Let's look at a simple example - an API with 2 routes `GET say_hi/{name}` and
-`GET what_time_is_it`:
+`GET time-now`:
 
 ```sh
 $ mock serve --port 3000 \
-  --route 'say_hi/{name}' \
-  --method GET \
-  --response 'Hello, world! My name is ${name}.' \
-  --route "what_time_is_it" \
-  --method GET \
-  --exec 'printf "Now it is %s" $(date +"%H:%M") | mock write'
+  --get "/time-now" \
+  --exec 'printf "Now it is %s" $(date +"%H:%M") | mock write' \
+  --post "/shut-down/{application}" \
+  --exec 'killall $(mock get-route-param application)'
 ```
 
-Now try requesting your `mock API` at port 3000 (can also be from your
-browser!):
+Let's test it out:
 
 ```sh
-$ curl localhost:3000/say_hi/john_doe
+$ curl localhost:3000/time-now
 
-Hello, world! My name is john_doe.
-
-$ curl localhost:3000/what_time_is_it
-
+# Prints out:
 Now it is 22:00
+
+$ curl -X POST localhost:3000/shut-down/mock
+
+# Shuts down the server!
 ```
 
 *mock* lets you also extend other APIs (or any HTTP service, for that matter.)
@@ -54,13 +52,12 @@ Suppose you want to add a new route to an existing API running at
 ```sh
 $ mock serve --port 3000 \
   --base example.com \
-  --route 'some_new_route' \
-  --method GET \
+  --get 'some_new_route' \
   --exec 'printf "Hello, world!" | mock write' 
 ```
 
-With the ``--base example.com`` option above, your *mock API* will act as proxy
-to that other website, and extend it with an extra route `GET /some_new_route`.
+With the ``--base example.com`` option above, your API will act as proxy to
+that other website, and extend it with an extra route `GET /some_new_route`.
 Look up "Base APIs" in the docs for more details.
 
 *[There are many other ways of further customising your APIs with *mock*. Read further through the guide to learn.](https://dhuan.github.io/mock)*
