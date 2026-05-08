@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased yet
+## 1.4.16
 
 FIXED:
 - SSE (Server-sent events) endpoints do not work from Base APIs
