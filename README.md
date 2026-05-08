@@ -21,9 +21,6 @@
 
 ## Getting started
 
-Let's look at a simple example - an API with 2 routes `GET say_hi/{name}` and
-`GET time-now`:
-
 ```sh
 $ mock serve --port 3000 \
   --get "/time-now" \
