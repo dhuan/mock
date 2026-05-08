@@ -33,12 +33,10 @@ Let's test it out:
 
 ```sh
 $ curl localhost:3000/time-now
-
 # Prints out:
 Now it is 22:00
 
 $ curl -X POST localhost:3000/shut-down/mock
-
 # Shuts down the server!
 ```
 
