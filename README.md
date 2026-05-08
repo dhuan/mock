@@ -52,12 +52,12 @@ Suppose you want to add a new route to an existing API running at
 ```sh
 $ mock serve --port 3000 \
   --base example.com \
-  --get 'some_new_route' \
+  --get 'some-new-route' \
   --exec 'printf "Hello, world!" | mock write' 
 ```
 
 With the ``--base example.com`` option above, your API will act as proxy to
-that other website, and extend it with an extra route `GET /some_new_route`.
+that other website, and extend it with an extra route `GET /some-new-route`.
 Look up "Base APIs" in the docs for more details.
 
 *[There are many other ways of further customising your APIs with *mock*. Read further through the guide to learn.](https://dhuan.github.io/mock)*
