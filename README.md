@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=dhuan&project=mock&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # mock
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/dhuan/mock.svg)](https://pkg.go.dev/github.com/dhuan/mock)
